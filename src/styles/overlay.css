@@ -1,0 +1,357 @@
+/* ============================================================
+   eyeread — the floating glass prompter window.
+   Ported from design_system/ui_kits/overlay/index.html
+   ============================================================ */
+
+.overlay-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 32px 32px; /* top: enough for box-shadow to render without clipping */
+  position: relative;
+  overflow: visible;
+}
+
+/* ===== The glass panel — the heart of the brand ===== */
+.overlay-panel {
+  position: relative;
+  width: 560px; /* overridden inline — resizable, remembered per script */
+  max-width: calc(100vw - 48px);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--accent-subtle-border);
+  box-shadow: 0 0 0 1px rgba(110, 86, 247, 0.35), 0 8px 32px rgba(0,0,0,0.45);
+  background: rgba(10, 10, 18, var(--ov-alpha, 0.62));
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  transition: opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out),
+    background var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) var(--ease-out),
+    box-shadow var(--dur-slow) var(--ease-out);
+}
+
+/* ===== Shield tint — full panel colour wash ===== */
+/* A pseudo-element overlay so the tint sits above the glass background
+   but below the content. Transitions smoothly between states. */
+.overlay-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: background var(--dur-slow) var(--ease-out);
+  z-index: 0;
+}
+/* HIDDEN (shielded) — violet tint */
+.overlay-panel.shielded::before {
+  background: rgba(110, 86, 247, 0.10);
+}
+/* VISIBLE (exposed to screen-share) — red warning tint */
+.overlay-panel.exposed::before {
+  background: rgba(239, 68, 68, 0.13);
+}
+/* Make sure panel children sit above the tint layer */
+.overlay-panel > * { position: relative; z-index: 1; }
+
+/* Also tint the border and shadow */
+.overlay-panel.shielded {
+  border-color: rgba(110, 86, 247, 0.45);
+  box-shadow: 0 0 0 1px rgba(110, 86, 247, 0.45), 0 8px 32px rgba(0,0,0,0.45), 0 0 28px rgba(110, 86, 247, 0.18);
+}
+.overlay-panel.exposed {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.45), 0 8px 32px rgba(0,0,0,0.45), 0 0 28px rgba(239, 68, 68, 0.18);
+}
+
+/* Pass-through mode (⌥E): same glass — only the chrome recedes, and the
+   drag grip stays prominent since it remains grabbable. */
+.overlay-panel.ghost {
+  border-color: rgba(110, 86, 247, 0.16);
+  box-shadow: none;
+}
+.overlay-panel.ghost .ov-head,
+.overlay-panel.ghost .ov-foot,
+.overlay-panel.ghost .ov-resize {
+  opacity: 0.45;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.overlay-panel.ghost .ov-foot {
+  border-top-color: transparent;
+}
+.overlay-panel.ghost .grip {
+  opacity: 1;
+  background: var(--accent-subtle-bg);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px var(--accent-subtle-border);
+}
+
+.ov-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 0;
+  overflow: hidden;
+}
+.ov-head .ov-time { flex-shrink: 0; }
+.ov-head .ov-voice { flex-shrink: 0; }
+.grip {
+  display: grid;
+  grid-template-columns: repeat(2, 3px);
+  gap: 3px;
+  cursor: grab;
+  opacity: 0.5;
+  padding: 4px;
+}
+.grip i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  pointer-events: none;
+}
+.ov-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.ov-time svg { width: 13px; height: 13px; }
+.ov-voice {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.ov-voice svg { width: 12px; height: 12px; }
+.ov-voice.on { color: var(--accent-text); }
+.ov-invisible {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  background: var(--accent-subtle-bg);
+  border: 1px solid var(--accent-subtle-border);
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.ov-invisible svg { width: 13px; height: 13px; }
+
+.ov-body { padding: 8px 22px 4px; position: relative; }
+.ov-window {
+  height: 168px; /* overridden inline — resizable */
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
+}
+.ov-window .er-script { padding: 56px 0; }
+.ov-empty {
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+/* control bar */
+.ov-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 14px;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 8px;
+}
+.ic {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  padding: 0;
+}
+.ic:hover { background: var(--surface-hover); color: var(--text-primary); }
+.ic svg { width: 19px; height: 19px; }
+.ic.accent { background: var(--accent); color: #fff; box-shadow: var(--glow-accent-sm); }
+.ic.accent:hover { background: var(--accent-hover); }
+.ic.on {
+  background: var(--accent-subtle-bg);
+  color: var(--accent-text);
+  border-color: var(--accent-subtle-border);
+}
+.sep { width: 1px; height: 22px; background: var(--border-default); margin: 0 3px; }
+.sizebtn { font-family: var(--font-display); font-weight: 700; }
+.ic.ic-sm { width: 26px; height: 26px; border-radius: var(--radius-sm); flex: none; }
+.ic.ic-sm svg { width: 14px; height: 14px; }
+
+/* screen-share shield button — shows HIDDEN / VISIBLE label */
+.ic.ov-shield {
+  width: auto;
+  padding: 0 7px;
+  gap: 4px;
+  height: 26px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.ic.ov-shield svg { width: 13px; height: 13px; flex-shrink: 0; }
+.ic.ov-shield .ov-shield-label { display: inline; }
+/* HIDDEN = shielded → accent purple pill */
+.ic.ov-shield.on {
+  color: var(--accent-text);
+  background: var(--accent-subtle-bg);
+  border-color: var(--accent-subtle-border);
+}
+/* VISIBLE = exposed to screen-share → red warning pill */
+.ic.ov-shield:not(.on) {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* click-through toggle button */
+.ic.ov-passthru {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  width: auto;
+  padding: 0 8px;
+  height: 26px;
+}
+.ic.ov-passthru:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+.ic.ov-passthru.on {
+  color: var(--accent-text);
+  background: var(--accent-subtle-bg);
+  border-color: var(--accent-subtle-border);
+}
+
+/* corner resize handle */
+.ov-resize {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  color: var(--text-tertiary);
+  opacity: 0.45;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  transition: opacity var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  touch-action: none;
+}
+.ov-resize:hover,
+.ov-resize.dragging {
+  opacity: 1;
+  color: var(--accent-text);
+}
+.ov-resize svg { width: 12px; height: 12px; pointer-events: none; }
+
+/* ===== Settings drawer — slides out from the bottom of the panel ===== */
+.ov-drawer {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 220ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity    180ms ease;
+  opacity: 0;
+  /* Always fully opaque — settings must be readable at any panel opacity */
+  background: rgba(10, 10, 18, 0.92);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  border-top: 1px solid var(--border-subtle);
+}
+.ov-drawer.open {
+  max-height: 420px; /* tall enough for all controls */
+  opacity: 1;
+}
+/* Rename: was .ov-settings */
+.ov-drawer-content {
+  padding: 16px 20px 20px;
+}
+.ovs-row { margin-bottom: 16px; }
+.ovs-row:last-child { margin-bottom: 0; }
+.ovs-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.ovs-val { font-family: var(--font-mono); font-size: 11px; color: var(--accent-text); }
+.ovs-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ===== Browser demo backdrop (web preview only) ===== */
+.demo-stage { position: fixed; inset: 0; }
+.demo-shared {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(76, 108, 200, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(110, 86, 247, 0.12), transparent 60%),
+    linear-gradient(135deg, #0e1424 0%, #0a0d18 60%, #0c0a16 100%);
+  padding: 64px 84px;
+  box-sizing: border-box;
+  color: #cdd5e6;
+}
+.demo-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: #6f7ba0;
+}
+.demo-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 52px;
+  letter-spacing: -0.02em;
+  color: #eef2fb;
+  margin: 16px 0 0;
+  max-width: 760px;
+  line-height: 1.04;
+}
+.demo-sub { font-size: 19px; color: #93a0c0; margin-top: 18px; max-width: 600px; line-height: 1.5; }
+.overlay-root.demo { justify-content: flex-start; padding-top: 64px; }
+.overlay-root.demo .overlay-panel,
+.overlay-root.demo .ov-drawer { position: relative; z-index: 20; }

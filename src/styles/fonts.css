@@ -1,0 +1,16 @@
+/* ============================================================
+   eyeread — font custom properties (self-hosted).
+   Replaces design_system/tokens/fonts.css: same variables, but
+   the faces load from bundled @fontsource woff2 files (imported
+   in src/main.jsx) instead of the Google Fonts CDN. Works
+   offline; no third-party request at runtime.
+   ============================================================ */
+
+:root {
+  --font-display: 'Space Grotesk', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* The script-reading face — same readable sans, just the role it plays */
+  --font-prompt: 'Hanken Grotesk', system-ui, sans-serif;
+}

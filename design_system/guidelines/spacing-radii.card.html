@@ -1,0 +1,33 @@
+<!-- @dsCard group="Spacing" viewport="700x170" name="Radii & elevation" subtitle="Corner radii and shadow elevation on near-black" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--bg-base); display: flex; gap: 34px; }
+  .grp { display: flex; gap: 14px; }
+  .col { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .box { width: 60px; height: 56px; background: var(--surface-2); border: 1px solid var(--border-default); }
+  .el { width: 60px; height: 56px; background: var(--surface-2); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+  .lab { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); }
+  .div { width: 1px; background: var(--border-subtle); }
+</style>
+</head>
+<body>
+  <div class="grp">
+    <div class="col"><div class="box" style="border-radius:var(--radius-sm)"></div><div class="lab">sm 8</div></div>
+    <div class="col"><div class="box" style="border-radius:var(--radius-md)"></div><div class="lab">md 12</div></div>
+    <div class="col"><div class="box" style="border-radius:var(--radius-lg)"></div><div class="lab">lg 16</div></div>
+    <div class="col"><div class="box" style="border-radius:var(--radius-2xl)"></div><div class="lab">2xl 28</div></div>
+    <div class="col"><div class="box" style="border-radius:var(--radius-pill)"></div><div class="lab">pill</div></div>
+  </div>
+  <div class="div"></div>
+  <div class="grp">
+    <div class="col"><div class="el" style="box-shadow:var(--shadow-md)"></div><div class="lab">md</div></div>
+    <div class="col"><div class="el" style="box-shadow:var(--shadow-lg)"></div><div class="lab">lg</div></div>
+    <div class="col"><div class="el" style="box-shadow:var(--shadow-xl)"></div><div class="lab">xl</div></div>
+    <div class="col"><div class="el" style="box-shadow:var(--glow-accent); border-color:var(--accent-subtle-border)"></div><div class="lab">glow</div></div>
+  </div>
+</body>
+</html>

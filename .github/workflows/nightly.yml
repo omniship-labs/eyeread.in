@@ -1,0 +1,178 @@
+# Nightly build — triggered on every push to the `dev` branch and once
+# daily at 03:00 UTC. Always force-updates the same "nightly" release tag
+# so the updater endpoint URL never changes.
+#
+# Same secrets as the stable workflow are required.
+
+name: Nightly
+
+on:
+  push:
+    branches: [dev]
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            runner: macos-latest
+          - target: x86_64-apple-darwin
+            runner: macos-13
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: npm ci
+
+      - name: Generate icons
+        run: npx tauri icon src-tauri/icons/icon.png
+
+      - name: Stamp nightly version
+        run: |
+          STAMP=$(date -u +"%Y%m%d")
+          BASE=$(node -p "require('./package.json').version")
+          NIGHTLY_VERSION="${BASE}-nightly.${STAMP}"
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('package.json'));
+            p.version = '$NIGHTLY_VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+          "
+          sed -i '' "s/^version = \".*\"/version = \"$NIGHTLY_VERSION\"/" src-tauri/Cargo.toml
+          echo "NIGHTLY_VERSION=$NIGHTLY_VERSION" >> $GITHUB_ENV
+
+      - name: Import Apple signing certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain
+          CERT_PATH=$RUNNER_TEMP/cert.p12
+          echo "$APPLE_CERTIFICATE" | base64 --decode > "$CERT_PATH"
+          security create-keychain -p "" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "" "$KEYCHAIN_PATH"
+
+      - name: Build, sign & notarize (nightly config)
+        env:
+          RELEASE_CHANNEL: nightly
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          npm run tauri build -- \
+            --target ${{ matrix.target }} \
+            --bundles dmg,updater \
+            --config src-tauri/tauri.nightly.conf.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-${{ matrix.target }}
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+            src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz
+            src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz.sig
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Resolve nightly version
+        run: |
+          STAMP=$(date -u +"%Y%m%d")
+          BASE=$(node -p "require('./package.json').version")
+          echo "NIGHTLY_VERSION=${BASE}-nightly.${STAMP}" >> $GITHUB_ENV
+
+      - name: Build latest.json
+        run: |
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          REPO="https://github.com/${{ github.repository }}/releases/download/nightly"
+
+          ARM_SIG=$(cat artifacts/nightly-aarch64-apple-darwin/*.app.tar.gz.sig)
+          X86_SIG=$(cat artifacts/nightly-x86_64-apple-darwin/*.app.tar.gz.sig)
+
+          cat > latest.json <<EOF
+          {
+            "version": "${{ env.NIGHTLY_VERSION }}",
+            "notes": "Nightly build — may be unstable.",
+            "pub_date": "$DATE",
+            "platforms": {
+              "darwin-aarch64": {
+                "url": "$REPO/eyeread.in_nightly_aarch64.app.tar.gz",
+                "signature": "$ARM_SIG"
+              },
+              "darwin-x86_64": {
+                "url": "$REPO/eyeread.in_nightly_x86_64.app.tar.gz",
+                "signature": "$X86_SIG"
+              }
+            }
+          }
+          EOF
+
+      - name: Normalize artifact filenames
+        run: |
+          for arch in aarch64 x86_64; do
+            src=$(ls artifacts/nightly-${arch}-apple-darwin/*.app.tar.gz)
+            cp "$src" "eyeread.in_nightly_${arch}.app.tar.gz"
+            cp "${src}.sig" "eyeread.in_nightly_${arch}.app.tar.gz.sig"
+            cp $(ls artifacts/nightly-${arch}-apple-darwin/*.dmg) "eyeread.in_nightly_${arch}.dmg"
+          done
+
+      - name: Publish / update nightly release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: eyeread.in Nightly (${{ env.NIGHTLY_VERSION }})
+          prerelease: true
+          draft: false
+          body: |
+            Automated nightly build from the `dev` branch.
+            Built: ${{ env.NIGHTLY_VERSION }}
+
+            > ⚠️ This build may be unstable. For production use, download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
+          files: |
+            eyeread.in_nightly_aarch64.app.tar.gz
+            eyeread.in_nightly_aarch64.app.tar.gz.sig
+            eyeread.in_nightly_aarch64.dmg
+            eyeread.in_nightly_x86_64.app.tar.gz
+            eyeread.in_nightly_x86_64.app.tar.gz.sig
+            eyeread.in_nightly_x86_64.dmg
+            latest.json

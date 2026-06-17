@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Name × mark exploration — round 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #08080c; color: #f2f2f7; font-family: 'Hanken Grotesk', sans-serif; padding: 56px 48px 96px; -webkit-font-smoothing: antialiased; }
+  .head { max-width: 1200px; margin: 0 auto 54px; }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: #7a7a8f; margin-bottom: 14px; }
+  .title { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+
+  /* ===== MARKS ===== */
+  .section-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #55556a; margin-bottom: 24px; }
+  .marks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto 68px; }
+  .mark-tile { background: #13131c; border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; padding: 36px 28px 28px; display: flex; flex-direction: column; align-items: center; gap: 20px; transition: border-color .2s; }
+  .mark-tile:hover { border-color: rgba(110,86,247,0.5); }
+  .mark-svg { width: 96px; height: 96px; }
+  .mark-lockup { display: flex; align-items: center; gap: 12px; }
+  .mark-lockup svg.m { width: 40px; height: 40px; }
+  .mark-word { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.02em; }
+  .mark-word .a { color: #6e56f7; }
+  .mark-note { font-size: 12.5px; color: #7a7a8f; text-align: center; line-height: 1.5; }
+  .mark-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #55556a; }
+
+  /* ===== NAME TILES ===== */
+  .names-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1200px; margin: 0 auto; }
+  .ntile { background: #13131c; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 22px 20px 18px; transition: border-color .2s, transform .2s; }
+  .ntile:hover { border-color: rgba(110,86,247,0.45); transform: translateY(-2px); }
+  .ntile.hot { border-color: rgba(110,86,247,0.3); background: #16152a; }
+  .nlockup { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .nlockup img { width: 32px; height: 32px; }
+  .nword { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.02em; line-height: 1; }
+  .nword .a { color: #6e56f7; }
+  .nrat { font-size: 12.5px; color: #a8a8ba; line-height: 1.5; min-height: 36px; }
+  .nmeta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ndom { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8a76ff; background: rgba(110,86,247,0.12); border: 1px solid rgba(110,86,247,0.28); padding: 4px 9px; border-radius: 999px; }
+  .ndom.b { color: #a594ff; background: rgba(110,86,247,0.07); border-color: rgba(110,86,247,0.18); }
+  .new-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,77,106,0.14); color: #ff7a90; padding: 3px 7px; border-radius: 999px; }
+  .spacer { height: 36px; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="eyebrow">Naming · round 3 · mark explorations</div>
+  <div class="title">Mark directions + more names</div>
+</div>
+
+<!-- ===== MARKS ===== -->
+<div class="section-title">01 — The mark: three directions</div>
+<div class="marks">
+
+  <!-- A: The panel (current, refined) -->
+  <div class="mark-tile">
+    <div class="mark-label">A · The script panel</div>
+    <svg class="mark-svg" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="ga"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="bg-a" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#161622"/>
+          <stop offset="1" stop-color="#0e0e1a"/>
+        </linearGradient>
+      </defs>
+      <rect x="3" y="3" width="90" height="90" rx="22" fill="url(#bg-a)" stroke="#2e2e3e" stroke-width="2"/>
+      <!-- upcoming lines -->
+      <rect x="26" y="28" width="36" height="5.5" rx="2.75" fill="#2e2e3e"/>
+      <!-- active line + caret -->
+      <path d="M18 48 L24 43.5 V52.5 Z" fill="#6e56f7" filter="url(#ga)"/>
+      <rect x="28" y="45" width="40" height="6" rx="3" fill="#6e56f7" filter="url(#ga)"/>
+      <!-- upcoming -->
+      <rect x="26" y="63" width="28" height="5.5" rx="2.75" fill="#2e2e3e"/>
+    </svg>
+    <div class="mark-lockup">
+      <svg class="m" viewBox="0 0 40 40" fill="none"><defs><filter id="ga2"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="1.5" y="1.5" width="37" height="37" rx="10" fill="#0e0e1a" stroke="#2e2e3e" stroke-width="1.5"/><rect x="12" y="11" width="17" height="3.5" rx="1.75" fill="#2e2e3e"/><path d="M8 20 L11 17.2 V22.8 Z" fill="#6e56f7" filter="url(#ga2)"/><rect x="13" y="18" width="19" height="4" rx="2" fill="#6e56f7" filter="url(#ga2)"/><rect x="12" y="27" width="13" height="3.5" rx="1.75" fill="#2e2e3e"/></svg>
+      <div class="mark-word">on<span class="a">cue</span></div>
+    </div>
+    <div class="mark-note">Contained, professional. Reads well at any size. The glowing line = the cue you're on.</div>
+  </div>
+
+  <!-- B: Lens -->
+  <div class="mark-tile">
+    <div class="mark-label">B · The camera lens</div>
+    <svg class="mark-svg" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="gb"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- outer ring (camera lens / lens aperture) -->
+      <circle cx="48" cy="48" r="41" stroke="#2e2e3e" stroke-width="2" fill="#0e0e1a"/>
+      <circle cx="48" cy="48" r="35" stroke="#1e1e2a" stroke-width="1"/>
+      <!-- upcoming line -->
+      <rect x="28" y="36" width="28" height="4" rx="2" fill="#2a2a38"/>
+      <!-- active cue line + caret -->
+      <path d="M22 48 L27 44 V52 Z" fill="#6e56f7" filter="url(#gb)"/>
+      <rect x="30" y="45.5" width="38" height="5" rx="2.5" fill="#6e56f7" filter="url(#gb)"/>
+      <!-- upcoming -->
+      <rect x="28" y="57" width="22" height="4" rx="2" fill="#2a2a38"/>
+      <!-- lens glare -->
+      <circle cx="62" cy="34" r="4" fill="rgba(110,86,247,0.18)" filter="url(#gb)"/>
+    </svg>
+    <div class="mark-lockup">
+      <svg class="m" viewBox="0 0 40 40" fill="none"><defs><filter id="gb2"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="17.5" stroke="#2e2e3e" stroke-width="1.5" fill="#0e0e1a"/><rect x="11" y="14.5" width="13" height="3" rx="1.5" fill="#2a2a38"/><path d="M9 20 L12 17.2 V22.8 Z" fill="#6e56f7" filter="url(#gb2)"/><rect x="13" y="18.5" width="17" height="3.5" rx="1.75" fill="#6e56f7" filter="url(#gb2)"/><rect x="11" y="23.5" width="10" height="3" rx="1.5" fill="#2a2a38"/></svg>
+      <div class="mark-word">speak<span class="a">easy</span></div>
+    </div>
+    <div class="mark-note">The camera aperture + the cue line inside. Says "eye on the lens." More photographic.</div>
+  </div>
+
+  <!-- C: Floating / naked caret -->
+  <div class="mark-tile">
+    <div class="mark-label">C · The naked caret</div>
+    <svg class="mark-svg" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="gc"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="gc2"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- lines only, no container, floating in space -->
+      <!-- dim upcoming -->
+      <rect x="24" y="30" width="50" height="4.5" rx="2.25" fill="#2a2a38"/>
+      <!-- caret -->
+      <path d="M14 48 L22 42 V54 Z" fill="#6e56f7" filter="url(#gc)"/>
+      <!-- active bright line, longer -->
+      <rect x="27" y="45.5" width="56" height="5" rx="2.5" fill="#7060f8" filter="url(#gc)"/>
+      <!-- glowing halo on active -->
+      <rect x="27" y="45.5" width="56" height="5" rx="2.5" fill="#6e56f7" filter="url(#gc2)"/>
+      <!-- dim next line -->
+      <rect x="24" y="62" width="38" height="4.5" rx="2.25" fill="#2a2a38"/>
+    </svg>
+    <div class="mark-lockup">
+      <svg class="m" viewBox="0 0 40 40" fill="none"><defs><filter id="gc3"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="8" y="11" width="22" height="3.5" rx="1.75" fill="#2a2a38"/><path d="M4 20 L9 16.5 V23.5 Z" fill="#6e56f7" filter="url(#gc3)"/><rect x="11" y="18" width="25" height="4" rx="2" fill="#6e56f7" filter="url(#gc3)"/><rect x="8" y="27" width="16" height="3.5" rx="1.75" fill="#2a2a38"/></svg>
+      <div class="mark-word">off<span class="a">book</span></div>
+    </div>
+    <div class="mark-note">No container — just the floating line in space. Works perfectly on dark UI. Minimal and confident.</div>
+  </div>
+</div>
+
+<!-- ===== NAMES ===== -->
+<div class="section-title" style="max-width:1200px;margin:0 auto 24px">02 — Names: round 3 (hover a card)</div>
+<div class="names-grid">
+
+  <div class="ntile hot">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">on<span class="a">cue</span></div><span class="new-badge">fav</span></div>
+    <div class="nrat">Speakers live and die "on cue." The most confident two syllables in the room.</div>
+    <div class="nmeta"><span class="ndom">oncue.live</span><span class="ndom b">oncue.show</span></div>
+  </div>
+
+  <div class="ntile hot">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">speak<span class="a">easy</span></div><span class="new-badge">new</span></div>
+    <div class="nrat">Double meaning: "speak easy" (relax, you've got notes) + a speakeasy (secret, hidden). Invisible overlay = the hidden bar.</div>
+    <div class="nmeta"><span class="ndom">speakeasy.live</span><span class="ndom b">speak.easy</span></div>
+  </div>
+
+  <div class="ntile hot">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">off<span class="a">book</span></div><span class="new-badge">new</span></div>
+    <div class="nrat">Theater term for memorized lines — but you look offbook while still reading. The irony is the whole product.</div>
+    <div class="nmeta"><span class="ndom">offbook.show</span><span class="ndom b">off.book</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">cue<span class="a">line</span></div></div>
+    <div class="nrat">Cue + the scrolling line in one word. Literal and descriptive.</div>
+    <div class="nmeta"><span class="ndom">cueline.show</span><span class="ndom b">cueline.app</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">cue<span class="a">ly</span></div></div>
+    <div class="nrat">Coined from "cue," soft and modern. The .ly TLD is a natural split.</div>
+    <div class="nmeta"><span class="ndom">cue.ly</span><span class="ndom b">cuely.com</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">air<span class="a">script</span></div><span class="new-badge">new</span></div>
+    <div class="nrat">On-air + your script. Broadcasting vocabulary — feels serious and live.</div>
+    <div class="nmeta"><span class="ndom">airscript.live</span><span class="ndom b">airscript.fm</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">glass<span class="a">cue</span></div><span class="new-badge">new</span></div>
+    <div class="nrat">The product described in two words: the glass overlay + the cue. Honest and elegant.</div>
+    <div class="nmeta"><span class="ndom">glasscue.app</span><span class="ndom b">glasscue.io</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">through<span class="a">line</span></div></div>
+    <div class="nrat">The narrative thread speakers must never lose. Beloved by coaches and orators.</div>
+    <div class="nmeta"><span class="ndom">throughline.show</span><span class="ndom b">getthrough.line</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">re<span class="a">cite</span></div></div>
+    <div class="nrat">To deliver lines aloud. One word, clear verb. recite.ai reads like a brand.</div>
+    <div class="nmeta"><span class="ndom">recite.ai</span><span class="ndom b">recite.live</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">prompt<span class="a">a</span></div></div>
+    <div class="nrat">Coined from "prompt," soft ending. Says teleprompter without the baggage.</div>
+    <div class="nmeta"><span class="ndom">prompta.ai</span><span class="ndom b">prompta.live</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">take<span class="a">cue</span></div><span class="new-badge">new</span></div>
+    <div class="nrat">"Take your cue" — the director's command. Theatrical, confident, short.</div>
+    <div class="nmeta"><span class="ndom">takecue.show</span><span class="ndom b">takecue.app</span></div>
+  </div>
+
+  <div class="ntile">
+    <div class="nlockup"><img src="../assets/logo-mark.svg"/><div class="nword">tele<span class="a">o</span></div></div>
+    <div class="nrat">Abstract from "tele-." No description, no baggage — premium and coined.</div>
+    <div class="nmeta"><span class="ndom">teleo.ai</span><span class="ndom b">teleo.app</span></div>
+  </div>
+
+</div>
+</body>
+</html>

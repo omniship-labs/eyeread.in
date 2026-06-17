@@ -1,0 +1,47 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="The glass overlay material" subtitle="Translucent prompter — you see through it, screen-share can't" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 0; }
+  .stage {
+    height: 200px; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1d2b45 0%, #0f1830 55%, #161226 100%);
+    position: relative; overflow: hidden;
+  }
+  /* fake "content underneath" to prove translucency */
+  .behind { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); opacity: 0.5; }
+  .behind div:nth-child(odd) { background: rgba(255,255,255,0.04); }
+  .glass {
+    position: relative; width: 380px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-glass); -webkit-backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--accent-subtle-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glow-accent);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+  }
+  .head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: var(--glow-accent-sm); }
+  .live { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--accent-text); }
+  .timer { margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); }
+  .script { font-family: var(--font-prompt); font-size: 18px; line-height: var(--leading-reading); font-weight: 500; color: var(--text-primary); }
+  .spoken { color: var(--prompt-upcoming); }
+  .active { color: #fff; text-shadow: var(--glow-text); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="behind"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <div class="glass">
+      <div class="head">
+        <span style="font-family:var(--font-mono);font-size:10px;display:flex;align-items:center;gap:6px;color:var(--text-secondary)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>02:14</span>
+        <span class="timer">142 wpm</span>
+      </div>
+      <div class="script"><span class="spoken">…and that's why </span><span class="active">the overlay stays invisible</span> on every screen share.</div>
+    </div>
+  </div>
+</body>
+</html>

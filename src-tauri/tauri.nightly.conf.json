@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "eyeread.in Nightly",
+  "identifier": "in.eyeread.app.nightly",
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "eyeread.in Nightly"
+      }
+    ]
+  },
+  "bundle": {
+    "shortDescription": "Invisible teleprompter (nightly build)"
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "",
+      "endpoints": [
+        "https://github.com/omniship-labs/eyeread.in/releases/download/nightly/latest.json"
+      ]
+    }
+  }
+}

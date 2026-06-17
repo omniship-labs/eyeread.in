@@ -1,0 +1,272 @@
+<!-- @dsCard group="Marketing" viewport="1280x720" name="eyeread.in — landing page" subtitle="Free, open-source teleprompter — hero, features, OSS CTA" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>eyeread.in — free, open source teleprompter</title>
+<link rel="stylesheet" href="../../styles.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  html,body{min-height:100%}
+  body{margin:0;color:var(--text-primary);overflow-x:hidden}
+
+  /* Nav */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;padding:0 52px;height:62px;background:rgba(8,8,12,0.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle)}
+  .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .nav-brand img{width:30px;height:30px}
+  .nav-brand-word{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--text-primary)}
+  .nav-brand-word span{color:var(--accent)}
+  .nav-links{display:flex;gap:30px;margin-left:48px}
+  .nav-link{font-family:var(--font-sans);font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;transition:color var(--dur-fast) var(--ease-out)}
+  .nav-link:hover{color:var(--text-primary)}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .nav-gh{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;background:var(--surface-2);border:1px solid var(--border-default);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text-primary);text-decoration:none;transition:all var(--dur-fast) var(--ease-out)}
+  .nav-gh:hover{background:var(--surface-3)}
+  .nav-gh svg{width:16px;height:16px}
+
+  /* Hero */
+  .hero{min-height:100vh;display:flex;align-items:center;padding:120px 52px 80px;position:relative;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;pointer-events:none}
+  .hero-bg-glow-1{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(110,86,247,0.22) 0%,transparent 70%);filter:blur(40px)}
+  .hero-bg-glow-2{position:absolute;top:30%;right:-10%;width:500px;height:400px;background:radial-gradient(ellipse,rgba(76,108,200,0.12) 0%,transparent 70%);filter:blur(60px)}
+  .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1180px;margin:0 auto;width:100%;position:relative}
+  .hero-left{}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);background:var(--accent-subtle-bg);border:1px solid var(--accent-subtle-border);padding:6px 12px;border-radius:var(--radius-pill);margin-bottom:28px}
+  .hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent-sm)}
+  h1{font-family:var(--font-display);font-size:clamp(40px,4.5vw,68px);font-weight:700;letter-spacing:-.03em;line-height:1.02;color:#fff;margin:0 0 8px}
+  h1 .hl{color:var(--accent)}
+  .hero-sub{font-size:clamp(16px,1.4vw,20px);color:var(--text-secondary);line-height:1.55;max-width:480px;margin:20px 0 38px}
+  .hero-sub b{color:var(--text-primary);font-weight:600}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .btn-primary{display:inline-flex;align-items:center;gap:9px;height:48px;padding:0 24px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-lg);font-family:var(--font-sans);font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:var(--glow-accent);transition:all var(--dur-base) var(--ease-out)}
+  .btn-primary:hover{background:var(--accent-hover);box-shadow:0 0 32px rgba(110,86,247,0.6)}
+  .btn-primary svg{width:18px;height:18px}
+  .btn-ghost{display:inline-flex;align-items:center;gap:9px;height:48px;padding:0 20px;background:var(--surface-2);border:1px solid var(--border-default);border-radius:var(--radius-lg);font-family:var(--font-sans);font-size:15px;font-weight:600;color:var(--text-primary);text-decoration:none;transition:all var(--dur-base) var(--ease-out)}
+  .btn-ghost:hover{background:var(--surface-3)}
+  .btn-ghost svg{width:18px;height:18px}
+  .hero-note{margin-top:18px;font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);display:flex;align-items:center;gap:8px}
+  .hero-note svg{width:14px;height:14px;color:var(--success)}
+
+  /* Hero visual — the overlay in action */
+  .hero-right{position:relative}
+  .screen{border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0e1828 0%,#0a1020 60%,#0d0b1c 100%);border:1px solid rgba(255,255,255,0.1);box-shadow:var(--shadow-xl),0 0 0 1px rgba(110,86,247,0.12);aspect-ratio:16/10;position:relative}
+  .screen-inner{padding:28px 32px;height:100%;box-sizing:border-box}
+  .slide-ey{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5a6a8a;margin-bottom:12px}
+  .slide-h{font-family:var(--font-display);font-weight:700;font-size:clamp(20px,2.4vw,32px);color:#dde6f6;letter-spacing:-.02em;line-height:1.08;max-width:340px}
+  .slide-sub{font-size:clamp(11px,1.1vw,14px);color:#7a8aa0;margin-top:10px;max-width:280px;line-height:1.5}
+  /* mini chart */
+  .chart-mini{position:absolute;right:28px;bottom:20%;display:flex;align-items:flex-end;gap:8px;height:80px;opacity:0.9}
+  .bm{width:18px;border-radius:4px 4px 0 0;background:rgba(90,110,180,0.35)}
+  .bm.hot{background:linear-gradient(180deg,#8a76ff,rgba(110,86,247,0.3));box-shadow:0 0 16px rgba(110,86,247,0.3)}
+  /* floating prompter overlay */
+  .ov-float{position:absolute;top:14%;left:50%;transform:translateX(-50%);width:82%;background:rgba(10,10,22,0.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--accent-subtle-border);border-radius:14px;box-shadow:var(--glow-accent);padding:12px 16px 10px}
+  .ovf-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .ovf-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent-sm)}
+  .ovf-live{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-text)}
+  .ovf-invisible{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--accent-text);opacity:.7;display:flex;align-items:center;gap:5px}
+  .ovf-text{font-family:var(--font-prompt);font-size:clamp(13px,1.4vw,17px);line-height:1.4;font-weight:500}
+  .ovf-s{color:var(--prompt-upcoming);opacity:.45}
+  .ovf-a{color:#fff;font-weight:700;text-shadow:var(--glow-text)}
+  .ovf-u{color:var(--text-secondary);opacity:.7}
+  .webcam-pill{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:rgba(8,8,14,0.8);backdrop-filter:blur(12px);border:1px solid var(--border-default);border-radius:999px;padding:6px 12px;display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);white-space:nowrap}
+  .wcam{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+
+  /* Features */
+  .features{padding:100px 52px;max-width:1180px;margin:0 auto}
+  .sec-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px}
+  .sec-title{font-family:var(--font-display);font-size:clamp(26px,2.8vw,40px);font-weight:700;letter-spacing:-.025em;color:#fff;margin-bottom:56px;max-width:500px}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .feat{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:28px}
+  .feat-icon{width:42px;height:42px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:18px;flex-shrink:0}
+  .feat-icon.ind{background:var(--accent-subtle-bg);color:var(--accent-text)}
+  .feat-icon.red{background:var(--record-subtle);color:var(--record-text)}
+  .feat-icon.grn{background:rgba(52,211,153,.12);color:var(--success)}
+  .feat-icon svg{width:22px;height:22px}
+  .feat h3{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:-.01em;color:var(--text-primary);margin:0 0 8px}
+  .feat p{font-size:13.5px;color:var(--text-secondary);line-height:1.55;margin:0}
+
+  /* Open source */
+  .oss{padding:80px 52px;max-width:1180px;margin:0 auto}
+  .oss-card{background:linear-gradient(135deg,rgba(110,86,247,.1),rgba(110,86,247,.04));border:1px solid var(--accent-subtle-border);border-radius:var(--radius-2xl);padding:56px 60px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}
+  .oss-eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-text);margin-bottom:14px}
+  .oss-title{font-family:var(--font-display);font-size:clamp(22px,2.5vw,34px);font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:14px}
+  .oss-body{font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:560px}
+  .oss-body b{color:var(--text-primary)}
+  .oss-btns{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+
+  /* Footer */
+  footer{border-top:1px solid var(--border-subtle);padding:30px 52px;display:flex;align-items:center;gap:24px;color:var(--text-tertiary)}
+  .ft-brand{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text-secondary);letter-spacing:-.01em}
+  .ft-brand img{width:22px;height:22px}
+  .ft-brand span{color:var(--accent)}
+  footer p{font-size:12.5px;font-family:var(--font-mono)}
+  footer a{color:var(--text-tertiary);text-decoration:none}
+  footer a:hover{color:var(--accent-text)}
+  .ft-right{margin-left:auto;display:flex;gap:20px;font-size:12.5px;font-family:var(--font-mono)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">
+    <img src="../../assets/logo-mark.svg" alt="eyeread.in"/>
+    <div class="nav-brand-word">eyeread<span>.in</span></div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#">How it works</a>
+    <a class="nav-link" href="#">Features</a>
+    <a class="nav-link" href="#">Open source</a>
+  </div>
+  <div class="nav-right">
+    <a class="nav-gh" href="#">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-bg-glow-1"></div>
+    <div class="hero-bg-glow-2"></div>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span>Free · Open source · MIT</div>
+      <h1>Look at the lens.<br/>Not your notes.</h1>
+      <p class="hero-sub">eyeread floats your script over <b>whatever you're sharing</b> — invisible on every recording, every stream, every screen share. Voice tracking follows along so the highlight is always where you are.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download free
+        </a>
+        <a class="btn-ghost" href="#">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="hero-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        No account, no subscription, no catch.
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="screen">
+        <div class="screen-inner">
+          <div class="slide-ey">All-hands · Q3 2026</div>
+          <div class="slide-h">We shipped invisible.<br/>Now we scale it.</div>
+          <div class="slide-sub">Three numbers that defined the quarter.</div>
+          <div class="chart-mini">
+            <div class="bm" style="height:42%"></div>
+            <div class="bm" style="height:60%"></div>
+            <div class="bm" style="height:78%"></div>
+            <div class="bm hot" style="height:100%"></div>
+          </div>
+        </div>
+        <!-- floating overlay -->
+        <div class="ov-float">
+          <div class="webcam-pill"><span class="wcam"></span> Camera · eyeread invisible</div>
+          <div class="ovf-head">
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);display:flex;align-items:center;gap:5px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              01:42
+            </span>
+            <span class="ovf-invisible">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              Invisible
+            </span>
+          </div>
+          <div class="ovf-text">
+            <span class="ovf-s">Before we look at the numbers — </span><span class="ovf-a">what this team shipped</span><span class="ovf-u"> in ninety days is remarkable.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <div class="sec-label">What it does</div>
+  <div class="sec-title">The prompter your audience can't see</div>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-icon ind">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/></svg>
+      </div>
+      <h3>Invisible to every recorder</h3>
+      <p>eyeread renders outside the OS capture layer. Zoom, Loom, QuickTime, OBS — none of them see it. Your audience never knows it's there.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon ind">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      </div>
+      <h3>Voice tracking</h3>
+      <p>It listens. The highlight follows the word you're saying, not a timer. Pause for emphasis — it waits. Speed up — it keeps up.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon ind">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </div>
+      <h3>Near the camera</h3>
+      <p>Anchors at the top of your screen, just below the webcam. Your eyes stay on the lens — not drifting down to notes. You look present.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon grn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <h3>Works on any device</h3>
+      <p>macOS, Windows, any browser — eyeread adapts. Overlay your slides, your call, your recording setup. Any content, any tool.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon grn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>Timer built in</h3>
+      <p>Count up from first word, or count down to a target. Stay on time without looking at your watch. One less thing to manage.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon red">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </div>
+      <h3>Free, forever</h3>
+      <p>No trial, no paywall, no "pro" tier. MIT licensed. The full app is yours. If it helps you, donate. If not, it's still yours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Open source -->
+<section class="oss">
+  <div class="oss-card">
+    <div>
+      <div class="oss-eyebrow">Open source · MIT license</div>
+      <div class="oss-title">Built in the open. Kept free on purpose.</div>
+      <p class="oss-body">eyeread.in is <b>fully open source</b>. Read the code, audit it, fork it, contribute to it. No tracking, no telemetry, no subscription hidden in plain sight. The people who find it genuinely useful keep it alive by donating — voluntarily, without pressure.</p>
+    </div>
+    <div class="oss-btns">
+      <a class="btn-primary" href="#" style="white-space:nowrap">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        View on GitHub
+      </a>
+      <a class="btn-ghost" href="#" style="white-space:nowrap;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        Donate
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-brand"><img src="../../assets/logo-mark.svg" alt=""/>eyeread<span>.in</span></div>
+  <p>Free and open source · MIT License · <a href="#">eyeread.in</a></p>
+  <div class="ft-right">
+    <a href="#">GitHub</a>
+    <a href="#">Privacy</a>
+    <a href="#">Donate</a>
+  </div>
+</footer>
+
+</body>
+</html>

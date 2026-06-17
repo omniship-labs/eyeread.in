@@ -1,0 +1,7 @@
+node_modules
+.playwright-mcp
+dist
+src-tauri/target
+src-tauri/gen
+.DS_Store
+*.local

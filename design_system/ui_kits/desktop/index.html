@@ -1,0 +1,336 @@
+<!-- @dsCard group="Desktop" viewport="1280x800" name="eyeread desktop app" subtitle="Script library, editor, and overlay settings" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>eyeread.in — Desktop App</title>
+<link rel="stylesheet" href="../../styles.css"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../../assets/lucide-icon.js"></script>
+<style>
+  html,body{height:100%;overflow:hidden}
+  body{margin:0;background:var(--bg-base);display:flex;flex-direction:column}
+  #root{flex:1;display:flex;overflow:hidden}
+
+  /* ── Traffic-light chrome ── */
+  .titlebar{height:44px;background:var(--bg-sunken);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 18px;gap:8px;-webkit-app-region:drag;flex-shrink:0}
+  .tl{width:12px;height:12px;border-radius:50%;cursor:pointer}
+  .tl.r{background:#ff5f57}.tl.y{background:#febc2e}.tl.g{background:#28c840}
+  .titlebar-name{margin:0 auto;font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text-tertiary);letter-spacing:-.01em}
+
+  /* ── Sidebar ── */
+  .sidebar{width:220px;background:var(--bg-sunken);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px}
+  .sb-brand img{width:32px;height:32px}
+  .sb-brand-word{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text-primary)}
+  .sb-brand-word span{color:var(--accent)}
+  .sb-nav{display:flex;flex-direction:column;gap:2px;padding:0 8px}
+  .sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-sans);font-size:14px;font-weight:500;color:var(--text-secondary);transition:all var(--dur-fast) var(--ease-out)}
+  .sb-item:hover{background:var(--surface-hover);color:var(--text-primary)}
+  .sb-item.active{background:var(--accent-subtle-bg);color:var(--accent-text)}
+  .sb-item svg{width:17px;height:17px;flex-shrink:0}
+  .sb-section{font-family:var(--font-mono);font-size:10px;letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--text-tertiary);padding:14px 18px 6px}
+  .sb-spacer{flex:1}
+  .sb-bottom{padding:12px 8px;border-top:1px solid var(--border-subtle)}
+  .sb-donate{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--radius-md);cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-secondary);transition:all var(--dur-fast) var(--ease-out)}
+  .sb-donate:hover{background:rgba(255,184,77,.12);color:var(--warning)}
+  .sb-donate svg{width:16px;height:16px}
+
+  /* ── Main ── */
+  .main{flex:1;display:flex;overflow:hidden}
+
+  /* ── Library ── */
+  .lib{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .lib-top{padding:22px 28px 0;flex-shrink:0}
+  .lib-title{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--text-primary);margin-bottom:16px}
+  .lib-search-row{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .lib-search{flex:1;height:36px;background:var(--surface-1);border:1px solid var(--border-default);border-radius:var(--radius-md);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--text-tertiary)}
+  .lib-search input{background:transparent;border:none;outline:none;color:var(--text-primary);font-family:var(--font-sans);font-size:14px;flex:1}
+  .lib-search svg{width:16px;height:16px;flex-shrink:0}
+  .lib-btn{height:36px;padding:0 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:var(--glow-accent-sm);transition:all var(--dur-fast) var(--ease-out)}
+  .lib-btn:hover{background:var(--accent-hover)}
+  .lib-btn svg{width:16px;height:16px}
+  .lib-tabs{display:flex;gap:0;border-bottom:1px solid var(--border-subtle)}
+  .lib-tab{padding:9px 16px;font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all var(--dur-fast) var(--ease-out)}
+  .lib-tab:hover{color:var(--text-secondary)}
+  .lib-tab.active{color:var(--text-primary);border-bottom-color:var(--accent)}
+  .lib-list{flex:1;overflow-y:auto;padding:16px 28px}
+  .script-card{display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:var(--radius-lg);border:1px solid var(--border-subtle);background:var(--surface-1);cursor:pointer;transition:all var(--dur-base) var(--ease-out);margin-bottom:10px}
+  .script-card:hover{border-color:var(--border-default);background:var(--surface-2);transform:translateX(2px)}
+  .script-card.selected{border-color:var(--accent-subtle-border);background:var(--accent-subtle-bg)}
+  .sc-icon{width:42px;height:42px;border-radius:var(--radius-md);background:var(--surface-3);display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);flex-shrink:0}
+  .sc-icon svg{width:20px;height:20px}
+  .sc-icon.live{background:var(--accent-subtle-bg);color:var(--accent-text)}
+  .sc-body{flex:1;min-width:0}
+  .sc-title{font-family:var(--font-sans);font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:3px}
+  .sc-preview{font-size:12.5px;color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sc-meta{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .sc-stat{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:5px}
+  .sc-stat svg{width:12px;height:12px}
+  .sc-badge{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+  .sc-badge.draft{background:var(--surface-3);color:var(--text-tertiary)}
+  .sc-badge.ready{background:var(--accent-subtle-bg);color:var(--accent-text)}
+
+  /* ── Editor ── */
+  .editor{flex:1;display:flex;overflow:hidden}
+  .ed-main{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:24px 32px}
+  .ed-topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-shrink:0}
+  .ed-back{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-tertiary);cursor:pointer;padding:6px 10px;border-radius:var(--radius-sm);transition:all var(--dur-fast) var(--ease-out)}
+  .ed-back:hover{background:var(--surface-hover);color:var(--text-primary)}
+  .ed-back svg{width:15px;height:15px}
+  .ed-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text-primary);border:none;background:transparent;outline:none;flex:1;letter-spacing:-.01em}
+  .ed-stats{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);display:flex;gap:12px}
+  .ed-body{flex:1;display:flex;gap:20px;overflow:hidden}
+  .ed-textarea{flex:1;background:var(--surface-1);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:24px 28px;font-family:var(--font-prompt);font-size:18px;line-height:1.7;color:var(--text-primary);outline:none;resize:none;overflow-y:auto;transition:border-color var(--dur-fast) var(--ease-out)}
+  .ed-textarea:focus{border-color:var(--accent);background:var(--surface-2)}
+  .ed-textarea::placeholder{color:var(--text-tertiary)}
+
+  /* Editor right panel */
+  .ed-panel{width:256px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-bottom:16px;flex-shrink:0}
+  .ep-card{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px}
+  .ep-label{font-family:var(--font-mono);font-size:10px;letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--text-tertiary);margin-bottom:12px}
+  .ep-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-family:var(--font-sans);font-size:13px;color:var(--text-secondary)}
+  .ep-val{font-family:var(--font-mono);font-size:12px;color:var(--accent-text)}
+  .ep-slider{-webkit-appearance:none;width:100%;height:5px;border-radius:999px;cursor:pointer;outline:none;margin-bottom:4px}
+  .ep-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--accent);box-shadow:var(--glow-accent-sm)}
+  .ep-seg{display:flex;gap:2px;background:var(--bg-base);border:1px solid var(--border-default);border-radius:var(--radius-sm);padding:2px}
+  .ep-seg button{flex:1;height:26px;border:none;background:transparent;color:var(--text-secondary);font-family:var(--font-sans);font-size:11px;font-weight:600;border-radius:4px;cursor:pointer}
+  .ep-seg button.on{background:var(--accent-subtle-bg);color:var(--accent-text)}
+  .sw-wrap{position:relative;width:36px;height:20px;border-radius:999px;background:var(--surface-3);border:1px solid var(--border-default);cursor:pointer;transition:all var(--dur-base) var(--ease-out);flex-shrink:0}
+  .sw-wrap .th{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:var(--shadow-sm);transition:transform var(--dur-base) var(--ease-spring)}
+  .sw-wrap.on{background:var(--accent);border-color:transparent;box-shadow:var(--glow-accent-sm)}
+  .sw-wrap.on .th{transform:translateX(16px)}
+  .ov-mini{background:rgba(10,10,18,.66);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--accent-subtle-border);border-radius:var(--radius-md);padding:12px 14px;box-shadow:var(--glow-accent-sm)}
+  .ov-mini-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .ov-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent-sm)}
+  .ov-live{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-text)}
+  .ov-text{font-family:var(--font-prompt);font-size:13px;line-height:1.45;color:var(--text-secondary)}
+  .ov-text .act{color:#fff;font-weight:600;text-shadow:0 0 12px rgba(110,86,247,.7)}
+  .start-btn{width:100%;height:40px;background:var(--accent);border:none;border-radius:var(--radius-md);font-family:var(--font-sans);font-size:14px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--glow-accent-sm);transition:all var(--dur-fast) var(--ease-out)}
+  .start-btn:hover{background:var(--accent-hover)}
+  .start-btn svg{width:16px;height:16px}
+
+  /* ── Settings ── */
+  .settings-main{flex:1;overflow-y:auto;padding:28px 40px}
+  .settings-title{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:28px;letter-spacing:-.02em}
+  .set-group{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:20px;overflow:hidden}
+  .set-group-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--text-tertiary);padding:14px 18px 10px;border-bottom:1px solid var(--border-subtle)}
+  .set-row{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border-subtle);gap:12px}
+  .set-row:last-child{border-bottom:none}
+  .set-info{flex:1}
+  .set-info b{display:block;font-family:var(--font-sans);font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:2px}
+  .set-info span{font-size:12.5px;color:var(--text-tertiary)}
+  .hotkey{font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);background:var(--surface-3);border:1px solid var(--border-default);padding:3px 8px;border-radius:var(--radius-sm)}
+  .donate-card{background:linear-gradient(135deg,rgba(255,184,77,.08),rgba(255,184,77,.04));border:1px solid rgba(255,184,77,.24);border-radius:var(--radius-lg);padding:22px 24px;display:flex;align-items:center;gap:18px}
+  .donate-card svg{width:32px;height:32px;color:var(--warning);flex-shrink:0}
+  .donate-card-body h4{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .donate-card-body p{font-size:13px;color:var(--text-secondary);line-height:1.5}
+  .donate-btn{height:36px;padding:0 18px;background:rgba(255,184,77,.18);border:1px solid rgba(255,184,77,.4);color:var(--warning);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;transition:all var(--dur-fast) var(--ease-out)}
+  .donate-btn:hover{background:rgba(255,184,77,.28)}
+</style>
+</head>
+<body>
+<!-- macOS title bar -->
+<div class="titlebar">
+  <div class="tl r"></div><div class="tl y"></div><div class="tl g"></div>
+  <span class="titlebar-name">eyeread</span>
+</div>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const Icon = window.TpdIcon;
+
+const SCRIPTS = [
+  { id:1, title:'Q3 All-Hands', text:`Good morning, everyone. Before we get into the numbers, I want to say — what this team shipped in the last ninety days is genuinely remarkable.\n\nWe launched invisible. Not as a metaphor. The product literally disappears from every screen recording, every shared frame, every Zoom call in the room. That was the hard problem. We solved it.\n\nNow we scale it. Three numbers define this quarter: fourteen thousand active installs, forty-two thousand scripts read, and a net promoter score of seventy-one — higher than any tool in this category.\n\nSo let's talk about what comes next.`, words:109, mins:1, tag:'ready', pinned:true },
+  { id:2, title:'Product Demo — Investors', text:`Imagine you're presenting to a room of two hundred people. Your slides are up, your camera is on — and your script is floating right there, invisible to everyone but you.\n\nThat's eyeread. A transparent overlay that lives on top of whatever you're sharing. It reads your voice and moves with you. When you speed up, it speeds up. When you pause, it waits.\n\nNo one can see it. Not on Zoom, not on Loom, not on any recording software. We render it outside the captured layers of the operating system.\n\nIt's free. Open source. And it's yours.`, words:96, mins:1, tag:'ready', pinned:false },
+  { id:3, title:'Podcast Intro — Season 2', text:`Welcome back to the show. I'm your host, and this is season two of Invisible Work — conversations with the builders, speakers, and thinkers who make hard things look easy.\n\nThis season we're going deeper: into the craft of live communication, the tools that make you better on camera, and the companies being built quietly, without the noise.\n\nIf that sounds like your kind of show — subscribe, share it with one person who would love it, and let's get into it.`, words:80, mins:1, tag:'draft', pinned:false },
+  { id:4, title:'Conference Keynote — Opening', text:`There's a version of this talk where I stand up here and tell you everything I know.\n\nBut the best talks I've ever seen weren't about knowledge. They were about permission.\n\nPermission to try something before you're ready. Permission to ship before it's perfect. Permission to look at the camera and say — I don't have all the answers, but I have this.\n\nSo that's what we're doing today. Together.`, words:72, mins:1, tag:'draft', pinned:false },
+];
+
+function wpm(text, speed=135){ const w=text.split(/\s+/).length; return Math.ceil(w/speed); }
+function wordCount(text){ return text.split(/\s+/).filter(Boolean).length; }
+
+function App(){
+  const [screen, setScreen] = React.useState('library');
+  const [selId, setSelId] = React.useState(1);
+  const [scripts, setScripts] = React.useState(SCRIPTS);
+  const [libTab, setLibTab] = React.useState('all');
+  const [size, setSize] = React.useState(30);
+  const [speed, setSpeed] = React.useState(135);
+  const [opacity, setOpacity] = React.useState(66);
+  const [mirror, setMirror] = React.useState(false);
+  const [timerMode, setTimerMode] = React.useState('up');
+  const [position, setPosition] = React.useState('top');
+  const [settingsTab, setSettingsTab] = React.useState('overlay');
+
+  const sel = scripts.find(s=>s.id===selId)||scripts[0];
+
+  function openEditor(id){ setSelId(id); setScreen('editor'); }
+  function updateText(val){ setScripts(ss=>ss.map(s=>s.id===selId?{...s,text:val,words:wordCount(val)}:s)); }
+
+  return (
+    <div className="main">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div className="sb-brand">
+          <img src="../../assets/logo-mark.svg" alt="eyeread.in"/>
+          <div className="sb-brand-word">eyeread<span>.in</span></div>
+        </div>
+        <div className="sb-nav">
+          <div className={"sb-item"+(screen==='library'?' active':'')} onClick={()=>setScreen('library')}><Icon name="library" size={17}/>Scripts</div>
+          <div className={"sb-item"+(screen==='editor'?' active':'')} onClick={()=>setScreen('editor')}><Icon name="file-text" size={17}/>Editor</div>
+        </div>
+        <div className="sb-section">Workspace</div>
+        <div className="sb-nav">
+          <div className={"sb-item"+(screen==='settings'?' active':'')} onClick={()=>setScreen('settings')}><Icon name="settings" size={17}/>Settings</div>
+          <div className="sb-item" onClick={()=>{}}><Icon name="keyboard" size={17}/>Hotkeys</div>
+        </div>
+        <div className="sb-spacer"/>
+        <div className="sb-bottom">
+          <div className="sb-donate" onClick={()=>setScreen('settings')}><Icon name="heart" size={16}/>Support eyeread</div>
+        </div>
+      </div>
+
+      {/* Library */}
+      {screen==='library' && (
+        <div className="lib">
+          <div className="lib-top">
+            <div className="lib-title">Scripts</div>
+            <div className="lib-search-row">
+              <div className="lib-search"><Icon name="search" size={16}/><input placeholder="Search scripts…"/></div>
+              <button className="lib-btn" onClick={()=>openEditor(1)}><Icon name="plus" size={16}/>New script</button>
+            </div>
+            <div className="lib-tabs">
+              {['all','recent','pinned'].map(t=>(
+                <div key={t} className={"lib-tab"+(libTab===t?' active':'')} onClick={()=>setLibTab(t)}>{t.charAt(0).toUpperCase()+t.slice(1)}</div>
+              ))}
+            </div>
+          </div>
+          <div className="lib-list">
+            {scripts.filter(s=>libTab==='pinned'?s.pinned:true).map(s=>(
+              <div key={s.id} className={"script-card"+(selId===s.id?' selected':'')} onClick={()=>openEditor(s.id)}>
+                <div className={"sc-icon"+(s.tag==='ready'?' live':'')}><Icon name="file-text" size={20}/></div>
+                <div className="sc-body">
+                  <div className="sc-title">{s.title}{s.pinned&&<span style={{marginLeft:6,fontSize:11,color:'var(--accent-text)'}}>★</span>}</div>
+                  <div className="sc-preview">{s.text.slice(0,80)}…</div>
+                </div>
+                <div className="sc-meta">
+                  <div className="sc-stat"><Icon name="type" size={12}/>{wordCount(s.text)}w</div>
+                  <div className="sc-stat"><Icon name="clock" size={12}/>{wpm(s.text,speed)}m</div>
+                  <div className={"sc-badge "+s.tag}>{s.tag}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Editor */}
+      {screen==='editor' && (
+        <div className="editor">
+          <div className="ed-main">
+            <div className="ed-topbar">
+              <div className="ed-back" onClick={()=>setScreen('library')}><Icon name="arrow-left" size={15}/>Library</div>
+              <input className="ed-title" value={sel.title} onChange={e=>setScripts(ss=>ss.map(s=>s.id===selId?{...s,title:e.target.value}:s))}/>
+              <div className="ed-stats">
+                <span>{wordCount(sel.text)}w</span>
+                <span>~{wpm(sel.text,speed)} min at {speed} wpm</span>
+              </div>
+            </div>
+            <div className="ed-body">
+              <textarea className="ed-textarea" value={sel.text} onChange={e=>updateText(e.target.value)} placeholder="Paste or type your script here…"/>
+              {/* Right panel */}
+              <div className="ed-panel">
+                {/* Overlay preview */}
+                <div className="ep-card">
+                  <div className="ep-label">Live preview</div>
+                  <div className="ov-mini" style={{background:`rgba(10,10,18,${opacity/100})`}}>
+                    <div className="ov-mini-head"><span className="ov-dot"/><span className="ov-live">Live</span><span style={{marginLeft:'auto',fontFamily:'var(--font-mono)',fontSize:10,color:'var(--text-tertiary)'}}>0:00</span></div>
+                    <div className="ov-text" style={{fontSize:size*0.46+'px',transform:mirror?'scaleX(-1)':'none'}}>
+                      <span>Look at </span><span className="act">the lens —</span><span> not your notes.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Size + speed */}
+                <div className="ep-card">
+                  <div className="ep-label">Reading</div>
+                  <div className="ep-row">Text size<span className="ep-val">{size}px</span></div>
+                  <input type="range" className="ep-slider" min="22" max="52" value={size} onChange={e=>setSize(+e.target.value)} style={{background:`linear-gradient(90deg,var(--accent) ${(size-22)/30*100}%,var(--surface-3) ${(size-22)/30*100}%)`,marginBottom:12}}/>
+                  <div className="ep-row">Scroll speed<span className="ep-val">{speed} wpm</span></div>
+                  <input type="range" className="ep-slider" min="80" max="220" value={speed} onChange={e=>setSpeed(+e.target.value)} style={{background:`linear-gradient(90deg,var(--accent) ${(speed-80)/140*100}%,var(--surface-3) ${(speed-80)/140*100}%)`}}/>
+                </div>
+
+                {/* Overlay controls */}
+                <div className="ep-card">
+                  <div className="ep-label">Overlay</div>
+                  <div className="ep-row">Opacity<span className="ep-val">{opacity}%</span></div>
+                  <input type="range" className="ep-slider" min="30" max="100" value={opacity} onChange={e=>setOpacity(+e.target.value)} style={{background:`linear-gradient(90deg,var(--accent) ${(opacity-30)/70*100}%,var(--surface-3) ${(opacity-30)/70*100}%)`,marginBottom:12}}/>
+                  <div className="ep-row">Mirror<div className={"sw-wrap"+(mirror?' on':'')} onClick={()=>setMirror(m=>!m)}><span className="th"/></div></div>
+                  <div className="ep-row" style={{marginBottom:8}}>Position</div>
+                  <div className="ep-seg">
+                    {['top','center','bottom'].map(p=><button key={p} className={position===p?'on':''} onClick={()=>setPosition(p)}>{p.charAt(0).toUpperCase()+p.slice(1)}</button>)}
+                  </div>
+                  <div className="ep-row" style={{marginTop:12,marginBottom:8}}>Timer</div>
+                  <div className="ep-seg">
+                    {[{v:'off',l:'Off'},{v:'up',l:'Up'},{v:'down',l:'Down'}].map(o=><button key={o.v} className={timerMode===o.v?'on':''} onClick={()=>setTimerMode(o.v)}>{o.l}</button>)}
+                  </div>
+                </div>
+
+                <button className="start-btn"><Icon name="play" size={16}/>Start reading</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings */}
+      {screen==='settings' && (
+        <div className="settings-main">
+          <div className="settings-title">Settings</div>
+
+          <div className="donate-card">
+            <Icon name="heart" size={32}/>
+            <div className="donate-card-body">
+              <h4>eyeread is free and open source</h4>
+              <p>No subscription, no paywall. If eyeread helps you speak better, consider supporting its development.</p>
+              <button className="donate-btn">Donate ↗</button>
+            </div>
+          </div>
+
+          <div className="set-group">
+            <div className="set-group-label">Overlay behavior</div>
+            <div className="set-row"><div className="set-info"><b>Default position</b><span>Where the overlay anchors on screen</span></div><div className="ep-seg" style={{width:200}}>{['Top','Center','Bottom'].map(p=><button key={p} className={position===p.toLowerCase()?'on':''} onClick={()=>setPosition(p.toLowerCase())}>{p}</button>)}</div></div>
+            <div className="set-row"><div className="set-info"><b>Default opacity</b><span>Overlay transparency when first launched</span></div><span className="ep-val">{opacity}%</span></div>
+            <div className="set-row"><div className="set-info"><b>Hide from screen-share</b><span>Overlay is invisible to all capture software</span></div><div className={"sw-wrap on"}><span className="th"/></div></div>
+            <div className="set-row"><div className="set-info"><b>Mirror text</b><span>Flip horizontally for beam-splitter rigs</span></div><div className={"sw-wrap"+(mirror?' on':'')} onClick={()=>setMirror(m=>!m)}><span className="th"/></div></div>
+          </div>
+
+          <div className="set-group">
+            <div className="set-group-label">Hotkeys</div>
+            <div className="set-row"><div className="set-info"><b>Show / hide overlay</b><span>Toggle the prompter</span></div><span className="hotkey">⌘ + Shift + E</span></div>
+            <div className="set-row"><div className="set-info"><b>Play / pause scroll</b><span></span></div><span className="hotkey">Space</span></div>
+            <div className="set-row"><div className="set-info"><b>Increase text size</b><span></span></div><span className="hotkey">⌘ + +</span></div>
+            <div className="set-row"><div className="set-info"><b>Decrease text size</b><span></span></div><span className="hotkey">⌘ + −</span></div>
+            <div className="set-row"><div className="set-info"><b>Scroll speed up</b><span></span></div><span className="hotkey">↑</span></div>
+            <div className="set-row"><div className="set-info"><b>Scroll speed down</b><span></span></div><span className="hotkey">↓</span></div>
+          </div>
+
+          <div className="set-group">
+            <div className="set-group-label">About</div>
+            <div className="set-row"><div className="set-info"><b>Version</b><span>eyeread for macOS</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--text-tertiary)'}}>0.1.0-beta</span></div>
+            <div className="set-row"><div className="set-info"><b>License</b><span>MIT — free and open source</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--text-tertiary)'}}>MIT</span></div>
+            <div className="set-row"><div className="set-info"><b>Source code</b><span>github.com/eyeread/eyeread</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--accent-text)'}}>GitHub ↗</span></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

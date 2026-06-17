@@ -1,0 +1,37 @@
+<svg width="230" height="48" viewBox="0 0 230 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="eyeread.in">
+  <defs>
+    <linearGradient id="wm-glass" x1="24" y1="0" x2="24" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="rgba(255,255,255,0.14)"></stop>
+      <stop offset="1" stop-color="rgba(255,255,255,0.04)"></stop>
+    </linearGradient>
+    <linearGradient id="wm-shine" x1="24" y1="0" x2="24" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="rgba(255,255,255,0.18)"></stop>
+      <stop offset="1" stop-color="rgba(255,255,255,0)"></stop>
+    </linearGradient>
+    <filter id="wm-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.8" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <filter id="wm-soft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="b"></feGaussianBlur>
+      <feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge>
+    </filter>
+    <clipPath id="wm-clip">
+      <path d="M2 24 C5 12 12 8 24 8 C36 8 43 12 46 24 C43 36 36 40 24 40 C12 40 5 36 2 24Z"></path>
+    </clipPath>
+  </defs>
+  
+  <rect x="0" y="0" width="48" height="48" rx="13" fill="url(#wm-glass)" stroke="rgba(255,255,255,0.18)" stroke-width="1"></rect>
+  <rect x="0" y="0" width="48" height="24" rx="13" fill="url(#wm-shine)"></rect>
+  <path d="M2 24 C5 12 12 8 24 8 C36 8 43 12 46 24 C43 36 36 40 24 40 C12 40 5 36 2 24Z" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.1"></path>
+  <circle cx="24" cy="24" r="8.5" fill="rgba(110,86,247,0.06)" stroke="rgba(110,86,247,0.45)" stroke-width="1.1"></circle>
+  <g clip-path="url(#wm-clip)">
+    <rect x="8" y="19.5" width="32" height="2" rx="1" fill="rgba(255,255,255,0.1)"></rect>
+    <rect x="6" y="22.5" width="36" height="3" rx="1.5" fill="#6e56f7" filter="url(#wm-glow)"></rect>
+    <rect x="12" y="22.8" width="24" height="2.4" rx="1.2" fill="rgba(110,86,247,0.4)" filter="url(#wm-soft)"></rect>
+    <rect x="8" y="27.5" width="32" height="2" rx="1" fill="rgba(255,255,255,0.08)"></rect>
+  </g>
+  <circle cx="32" cy="17" r="2" fill="rgba(255,255,255,0.22)" filter="url(#wm-soft)"></circle>
+  
+  <text x="60" y="32" font-family="&#39;Space Grotesk&#39;, sans-serif" font-size="25" font-weight="700" letter-spacing="-0.4" fill="#f2f2f7">eyeread<tspan fill="#6e56f7">.in</tspan></text>
+</svg>

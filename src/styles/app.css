@@ -1,0 +1,228 @@
+/* ============================================================
+   eyeread — app globals + shared component styles.
+   Tokens come from ../design_system/styles.css (single source).
+   ============================================================ */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The overlay window draws on a fully transparent surface */
+body.overlay-window {
+  background: transparent;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ---- Switch (.sw-wrap pattern) ----------------------------- */
+.er-switch {
+  position: relative;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  flex: none;
+  padding: 0;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.er-switch--md {
+  width: 42px;
+  height: 24px;
+}
+.er-switch--md .th {
+  width: 18px;
+  height: 18px;
+}
+.er-switch--md.on .th {
+  transform: translateX(18px);
+}
+.er-switch--sm {
+  width: 36px;
+  height: 20px;
+}
+.er-switch--sm .th {
+  width: 14px;
+  height: 14px;
+}
+.er-switch--sm.on .th {
+  transform: translateX(16px);
+}
+.er-switch .th {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-spring);
+  display: block;
+}
+.er-switch.on {
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: var(--glow-accent-sm);
+}
+
+/* ---- Slider (.ep-slider pattern) ---------------------------- */
+.er-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+.er-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent);
+  box-shadow: var(--glow-accent-sm);
+}
+
+/* ---- Segmented (.ep-seg / .seg pattern) ---------------------- */
+.er-seg {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 3px;
+}
+.er-seg button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+  padding: 0 8px;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.er-seg button svg {
+  width: 14px;
+  height: 14px;
+}
+.er-seg button[aria-pressed='true'] {
+  background: var(--accent-subtle-bg);
+  color: var(--accent-text);
+  box-shadow: inset 0 0 0 1px var(--accent-subtle-border);
+}
+.er-seg--sm {
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+.er-seg--sm button {
+  height: 26px;
+  font-size: 11px;
+  border-radius: 4px;
+}
+.er-seg--md button {
+  height: 30px;
+  font-size: 12px;
+}
+
+/* ---- ScriptViewer (prompter reading states) ------------------ */
+.er-script {
+  font-family: var(--font-prompt);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.er-script--center {
+  text-align: center;
+}
+.er-script--mirror {
+  transform: scaleX(-1);
+}
+.er-script--sm {
+  font-size: var(--prompt-sm);
+}
+.er-script--md {
+  font-size: var(--prompt-md);
+}
+.er-script--lg {
+  font-size: var(--prompt-lg);
+}
+.er-script--xl {
+  font-size: var(--prompt-xl);
+}
+.er-script__w {
+  transition: color 0.3s var(--ease-out), opacity 0.3s var(--ease-out);
+}
+.er-script__w--spoken {
+  color: var(--prompt-upcoming);
+  opacity: 0.18;
+}
+.er-script__w--upcoming {
+  color: var(--prompt-spoken);
+  opacity: 0.28;
+}
+.er-script__w--active {
+  color: var(--prompt-active);
+  opacity: 1;
+  font-weight: 700;
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.9),
+    0 0 28px rgba(140, 110, 255, 0.85),
+    0 0 56px rgba(110, 86, 247, 0.55);
+}
+/* Bell curve highlight — peak at active+1, symmetric taper.
+   Floor is above the base upcoming so the bell is always visible. */
+.er-script__w--near-1 {
+  color: var(--prompt-active);
+  opacity: 0.85;
+  font-weight: 500;
+}
+.er-script__w--near-2 {
+  color: var(--prompt-active);
+  opacity: 0.68;
+}
+.er-script__w--near-3 {
+  color: var(--prompt-active);
+  opacity: 0.52;
+}
+.er-script__w--near-4 {
+  color: var(--prompt-active);
+  opacity: 0.38;
+}
+
+/* Click a word to read from there */
+.er-script--clickable .er-script__w {
+  cursor: pointer;
+  border-radius: 4px;
+}
+.er-script--clickable .er-script__w:hover {
+  color: var(--accent-text);
+  opacity: 1;
+  background: var(--accent-subtle-bg);
+}

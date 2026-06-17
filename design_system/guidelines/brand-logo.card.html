@@ -1,0 +1,67 @@
+<!-- @dsCard group="Brand" viewport="700x260" name="Logo · mark & wordmark" subtitle="Glass-friendly eye mark with the indigo cue line" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+  body { margin: 0; padding: 0; background: var(--bg-base); }
+  .row { display: flex; height: 130px; }
+  .cell { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; }
+  .cell.dark { background: var(--bg-base); }
+  .cell.glass {
+    background: linear-gradient(135deg, #1a2a4a, #0e1a30);
+    position: relative; overflow: hidden;
+  }
+  .cell.glass::after { content:''; position:absolute; inset:0; backdrop-filter:blur(0); }
+  .cell.light { background: #e8edf6; }
+  .lockup { display: flex; align-items: center; gap: 10px; }
+  .lockup img { width: 36px; height: 36px; }
+  .lw { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.02em; }
+  .lw.dark-txt { color: #f2f2f7; }
+  .lw.dark-txt span { color: #6e56f7; }
+  .lw.light-txt { color: #1a1a2e; }
+  .lw.light-txt span { color: #6e56f7; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .tag.on-dark { color: rgba(255,255,255,0.35); }
+  .tag.on-light { color: rgba(30,30,60,0.4); }
+  .divider-row { display: flex; height: 130px; border-top: 1px solid var(--border-subtle); }
+  .marks-row { display: flex; align-items: center; justify-content: center; gap: 28px; padding: 0 28px; width: 100%; }
+  .mark-sz { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .mark-sz span { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <!-- Row 1: three backgrounds -->
+  <div class="row">
+    <div class="cell dark">
+      <div class="lockup"><img src="../assets/logo-mark.svg" alt=""/><div class="lw dark-txt">eyeread<span>.in</span></div></div>
+      <div class="tag on-dark">On near-black</div>
+    </div>
+    <div class="cell glass">
+      <div class="lockup"><img src="../assets/logo-mark.svg" alt=""/><div class="lw dark-txt">eyeread<span>.in</span></div></div>
+      <div class="tag on-dark">On frosted glass</div>
+    </div>
+    <div class="cell light">
+      <div class="lockup"><img src="../assets/logo-mark.svg" alt=""/><div class="lw light-txt">eyeread<span>.in</span></div></div>
+      <div class="tag on-light">On light surface</div>
+    </div>
+  </div>
+  <!-- Row 2: mark scale -->
+  <div class="divider-row">
+    <div class="marks-row">
+      <div class="mark-sz"><img src="../assets/logo-mark.svg" width="64" height="64" alt=""/><span>64px</span></div>
+      <div class="mark-sz"><img src="../assets/logo-mark.svg" width="48" height="48" alt=""/><span>48px</span></div>
+      <div class="mark-sz"><img src="../assets/logo-mark.svg" width="32" height="32" alt=""/><span>32px</span></div>
+      <div class="mark-sz"><img src="../assets/logo-mark.svg" width="20" height="20" alt=""/><span>20px</span></div>
+      <div class="mark-sz"><img src="../assets/logo-mark.svg" width="16" height="16" alt=""/><span>16px</span></div>
+      <div style="width:1px; height:60px; background:var(--border-subtle); margin:0 8px;"></div>
+      <div class="mark-sz" style="gap:10px">
+        <img src="../assets/logo-wordmark.svg" height="38" style="max-width:220px" alt="eyeread.in"/>
+        <span>eye = I &middot; &ldquo;I read in&rdquo;</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

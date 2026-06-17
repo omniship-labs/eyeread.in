@@ -1,0 +1,294 @@
+<!-- @dsCard group="Overlay" viewport="1280x720" name="Teleprompter overlay — in use" subtitle="The floating glass prompter over shared content, near the camera" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>eyeread.in — Overlay</title>
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../../assets/lucide-icon.js"></script>
+<style>
+  html, body { height: 100%; }
+  body { margin: 0; overflow: hidden; background: #050507; }
+
+  /* ===== The screen being shared (presentation) ===== */
+  .stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .shared {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(76,108,200,0.18), transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, rgba(110,86,247,0.12), transparent 60%),
+      linear-gradient(135deg, #0e1424 0%, #0a0d18 60%, #0c0a16 100%);
+    padding: 64px 84px; box-sizing: border-box; color: #cdd5e6;
+  }
+  .slide-eyebrow { font-family: var(--font-mono); font-size: 13px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: #6f7ba0; }
+  .slide-title { font-family: var(--font-display); font-weight: 700; font-size: 52px; letter-spacing: -0.02em; color: #eef2fb; margin: 16px 0 0; max-width: 760px; line-height: 1.04; }
+  .slide-sub { font-size: 19px; color: #93a0c0; margin-top: 18px; max-width: 600px; line-height: 1.5; }
+  .chart { position: absolute; right: 84px; bottom: 72px; display: flex; align-items: flex-end; gap: 16px; height: 220px; opacity: 0.9; }
+  .bar { width: 46px; border-radius: 8px 8px 0 0; background: linear-gradient(180deg, rgba(120,140,210,0.5), rgba(120,140,210,0.12)); }
+  .bar.hot { background: linear-gradient(180deg, #8a76ff, rgba(138,118,255,0.2)); box-shadow: 0 0 30px rgba(110,86,247,0.4); }
+  .share-frame { position: absolute; inset: 0; border: 2px solid rgba(110,86,247,0.0); pointer-events: none; }
+
+  /* "Screen-share is active" chrome strip */
+  .sharebar {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 10px; padding: 7px 16px;
+    background: rgba(8,8,14,0.7); backdrop-filter: var(--blur-glass);
+    border: 1px solid var(--border-default); border-top: none;
+    border-radius: 0 0 14px 14px; font-family: var(--font-sans); font-size: 13px; color: var(--text-secondary);
+    z-index: 5;
+  }
+  .sharebar .gd { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+  /* ===== Webcam tile — anchors "the camera" ===== */
+  .camera-wrap { position: absolute; top: 58px; left: 50%; transform: translateX(-50%); z-index: 18; display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .camera {
+    width: 168px; height: 104px; border-radius: 16px; position: relative; overflow: hidden;
+    background: radial-gradient(120px 120px at 50% 30%, #2a3147, #14182a 70%);
+    border: 1px solid var(--border-strong); box-shadow: var(--shadow-lg);
+  }
+  .camera .head { position: absolute; left: 50%; top: 22px; transform: translateX(-50%); width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(180deg,#4a5474,#333c58); }
+  .camera .shoulders { position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%); width: 120px; height: 70px; border-radius: 60px 60px 0 0; background: linear-gradient(180deg,#3a4257,#28304a); }
+  .camera .ring { position: absolute; inset: 0; border-radius: 16px; box-shadow: inset 0 0 0 2px rgba(110,86,247,0.0); }
+  .camera-label { margin-top: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-tertiary); display: flex; align-items: center; gap: 6px; }
+  .lens-hint { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--accent-text); white-space: nowrap; opacity: 0.9; }
+  .lens-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: var(--glow-accent-sm); }
+
+  /* ===== The floating prompter overlay ===== */
+  .overlay {
+    position: absolute; top: 182px; left: 50%; transform: translateX(-50%); z-index: 20;
+    width: 560px; max-width: calc(100vw - 48px);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--accent-subtle-border);
+    box-shadow: var(--glow-accent), var(--shadow-xl);
+    background: rgba(10,10,18,var(--ov-alpha, 0.62));
+    backdrop-filter: var(--blur-glass); -webkit-backdrop-filter: var(--blur-glass);
+    transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
+  }
+  .overlay.hidden { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.98); pointer-events: none; }
+  .ov-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px 0; }
+  .grip { display: grid; grid-template-columns: repeat(2, 3px); gap: 3px; cursor: grab; opacity: 0.5; }
+  .grip i { width: 3px; height: 3px; border-radius: 50%; background: var(--text-secondary); }
+  .ov-invisible { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-text); background: var(--accent-subtle-bg); border: 1px solid var(--accent-subtle-border); padding: 4px 9px; border-radius: var(--radius-pill); }
+  .ov-invisible svg { width: 13px; height: 13px; }
+
+  .ov-body { padding: 8px 22px 4px; position: relative; }
+  .ov-window { height: 168px; overflow: hidden; position: relative;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%); }
+  .reader { font-family: var(--font-prompt); font-weight: 500; line-height: 1.45; letter-spacing: -0.01em; padding: 56px 0; }
+  .reader.mirror { transform: scaleX(-1); }
+  .w { transition: color .3s var(--ease-out), opacity .3s var(--ease-out); }
+  .w.spoken { color: var(--prompt-upcoming); opacity: 0.4; }
+  .w.upcoming { color: var(--prompt-spoken); opacity: 0.72; }
+  .w.active { color: #fff; opacity: 1; font-weight: 600; text-shadow: var(--glow-text); }
+
+  /* control bar */
+  .ov-foot { display: flex; align-items: center; gap: 8px; padding: 12px 16px 14px; border-top: 1px solid var(--border-subtle); margin-top: 8px; }
+  .ic { width: 36px; height: 36px; border-radius: var(--radius-md); border: 1px solid transparent; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
+  .ic:hover { background: var(--surface-hover); color: var(--text-primary); }
+  .ic svg { width: 19px; height: 19px; }
+  .ic.accent { background: var(--accent); color: #fff; box-shadow: var(--glow-accent-sm); }
+  .ic.accent:hover { background: var(--accent-hover); }
+  .ic.on { background: var(--accent-subtle-bg); color: var(--accent-text); border-color: var(--accent-subtle-border); }
+  .sep { width: 1px; height: 22px; background: var(--border-default); margin: 0 3px; }
+  .sizebtn { font-family: var(--font-display); font-weight: 700; }
+  .timecode { margin-left: auto; font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
+
+  /* live indicator */
+  .live { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); }
+  .live .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: var(--glow-accent-sm); animation: pulse 1.7s var(--ease-in-out) infinite; }
+  .live .lab { font-size: 11px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--accent-text); font-weight: 500; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.82)} }
+  @media (prefers-reduced-motion: reduce){ .live .dot{ animation:none } }
+
+  /* settings popover */
+  .settings {
+    position: absolute; top: 188px; right: max(24px, calc(50% - 520px)); z-index: 21; width: 268px;
+    background: var(--surface-1); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl); padding: 16px; transform-origin: top right;
+  }
+  .settings h4 { font-family: var(--font-display); font-size: 14px; margin: 0 0 14px; color: var(--text-primary); }
+  .set-row { margin-bottom: 16px; }
+  .set-label { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-sans); font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+  .set-val { font-family: var(--font-mono); font-size: 11px; color: var(--accent-text); }
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 999px; background: var(--surface-3); cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); box-shadow: var(--glow-accent-sm); margin-top: 0; }
+  .seg { display: flex; gap: 2px; padding: 3px; background: var(--bg-base); border: 1px solid var(--border-default); border-radius: var(--radius-md); }
+  .seg button { flex: 1; height: 30px; border: none; background: transparent; color: var(--text-secondary); font-family: var(--font-sans); font-weight: 600; font-size: 12px; border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .seg button svg { width: 14px; height: 14px; }
+  .seg button[aria-pressed=true] { background: var(--accent-subtle-bg); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent-subtle-border); }
+
+  /* audience-view toggle (bottom-right) */
+  .aud { position: absolute; bottom: 26px; right: 26px; z-index: 22; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+  .aud-card { display: flex; align-items: center; gap: 12px; background: rgba(8,8,14,0.72); backdrop-filter: var(--blur-glass); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 11px 14px; box-shadow: var(--shadow-lg); }
+  .aud-txt { font-family: var(--font-sans); }
+  .aud-txt b { display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .aud-txt span { font-size: 11px; color: var(--text-tertiary); }
+  .sw { position: relative; width: 42px; height: 24px; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--border-default); cursor: pointer; flex: none; transition: all var(--dur-base) var(--ease-out); }
+  .sw .th { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--dur-base) var(--ease-spring); }
+  .sw.on { background: var(--accent); border-color: transparent; box-shadow: var(--glow-accent-sm); }
+  .sw.on .th { transform: translateX(18px); }
+  .aud-flag { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-text); background: var(--accent-subtle-bg); border: 1px solid var(--accent-subtle-border); padding: 6px 11px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 7px; opacity: 0; transform: translateY(4px); transition: all var(--dur-base) var(--ease-out); }
+  .aud-flag.show { opacity: 1; transform: none; }
+  .aud-flag svg { width: 13px; height: 13px; }
+
+  /* top-left brand */
+  .brand { position: absolute; top: 20px; left: 22px; z-index: 22; display: flex; align-items: center; gap: 9px; opacity: 0.85; }
+  .brand img { width: 30px; height: 30px; }
+  .brand b { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.02em; color: var(--text-primary); }
+  .brand b i { color: var(--accent); font-style: normal; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="react">
+    const Icon = window.TpdIcon;
+    const SCRIPT = "Look right at the lens — not at your notes. eyeread.in floats your script over whatever you're sharing, stays completely invisible on the recording, and follows every word you say — free, open source, invisible.";
+    const WORDS = SCRIPT.split(/\s+/);
+
+    function fmt(t){ const sign=t<0?'-':''; t=Math.abs(Math.floor(t)); const m=Math.floor(t/60), s=t%60; return sign+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+
+    function App(){
+      const [active, setActive] = React.useState(14);
+      const [playing, setPlaying] = React.useState(true);
+      const [elapsed, setElapsed] = React.useState(86);
+      const [size, setSize] = React.useState(30);
+      const [speed, setSpeed] = React.useState(135);   // wpm
+      const [opacity, setOpacity] = React.useState(62);
+      const [mirror, setMirror] = React.useState(false);
+      const [timerMode, setTimerMode] = React.useState('up');   // off | up | down
+      const [countFrom] = React.useState(300);
+      const [showSettings, setShowSettings] = React.useState(false);
+      const [audience, setAudience] = React.useState(false);
+      const windowRef = React.useRef(null);
+      const activeRef = React.useRef(null);
+
+      // advance the highlight at the chosen words-per-minute
+      React.useEffect(()=>{
+        if(!playing) return;
+        const id = setInterval(()=>{
+          setActive(a => (a+1) % WORDS.length);
+          setElapsed(e => e+1);
+        }, Math.round(60000/speed) );
+        return ()=>clearInterval(id);
+      },[playing, speed]);
+
+      // keep the active word vertically centered in the reading window
+      React.useEffect(()=>{
+        const win = windowRef.current, w = activeRef.current;
+        if(!win || !w) return;
+        const target = w.offsetTop - win.clientHeight/2 + w.offsetHeight/2;
+        win.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+      },[active, size]);
+
+      const timecode = timerMode==='up' ? fmt(elapsed)
+                     : timerMode==='down' ? fmt(countFrom - elapsed)
+                     : null;
+
+      let wc = -1;
+      return (
+        <div className="stage">
+          {/* shared content underneath */}
+          <div className="shared">
+            <div className="slide-eyebrow">Q3 · Company All-Hands</div>
+            <h1 className="slide-title">We shipped invisible. Now we scale it.</h1>
+            <p className="slide-sub">Three numbers that defined the quarter — and where the next one takes us.</p>
+            <div className="chart">
+              <div className="bar" style={{height:'46%'}}></div>
+              <div className="bar" style={{height:'63%'}}></div>
+              <div className="bar" style={{height:'78%'}}></div>
+              <div className="bar hot" style={{height:'100%'}}></div>
+            </div>
+          </div>
+
+          <div className="sharebar"><span className="gd"></span> Screen-share active · 1,204 watching</div>
+
+          <div className="brand">
+            <img src="../../assets/logo-mark.svg" alt="" />
+            <b>eyeread<i>.in</i></b>
+          </div>
+
+          {/* webcam — the camera the speaker looks at */}
+          <div className="camera-wrap">
+            <div className="camera">
+              <div className="shoulders"></div>
+              <div className="head"></div>
+              <div className="ring"></div>
+            </div>
+            <div className="camera-label"><Icon name="video" size={11}/> Your camera</div>
+          </div>
+
+          {/* the floating prompter */}
+          <div className={"overlay" + (audience ? " hidden":"")} style={{['--ov-alpha']: opacity/100}}>
+            <div className="ov-head">
+              <span className="grip"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              {timecode && <span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--text-secondary)',display:'flex',alignItems:'center',gap:6}}><Icon name={timerMode==='down'?'hourglass':'timer'} size={13}/>{timecode}</span>}
+              <span className="ov-invisible"><Icon name="eye-off" size={13}/> Invisible to screen-share</span>
+            </div>
+            <div className="ov-body">
+              <div className="ov-window" ref={windowRef}>
+                <div className={"reader" + (mirror?" mirror":"")} style={{fontSize:size+'px'}}>
+                  {WORDS.map((w,i)=>{ wc++; const s = wc<active?'spoken':wc===active?'active':'upcoming';
+                    return <span key={i} ref={wc===active?activeRef:null} className={"w "+s}>{w}{' '}</span>; })}
+                </div>
+              </div>
+            </div>
+            <div className="ov-foot">
+              <button className="ic" title="Restart" onClick={()=>{setActive(0);setElapsed(0);}}><Icon name="rotate-ccw"/></button>
+              <button className="ic accent" title={playing?'Pause':'Play'} onClick={()=>setPlaying(p=>!p)}><Icon name={playing?'pause':'play'}/></button>
+              <button className="ic" title="Skip ahead" onClick={()=>setActive(a=>Math.min(WORDS.length-1,a+5))}><Icon name="chevrons-right"/></button>
+              <span className="sep"></span>
+              <button className="ic sizebtn" title="Smaller" onClick={()=>setSize(s=>Math.max(22,s-3))} style={{fontSize:13}}>A</button>
+              <button className="ic sizebtn" title="Larger" onClick={()=>setSize(s=>Math.min(46,s+3))} style={{fontSize:18}}>A</button>
+              <button className={"ic"+(mirror?" on":"")} title="Mirror" onClick={()=>setMirror(m=>!m)}><Icon name="flip-horizontal-2"/></button>
+              <button className={"ic"+(showSettings?" on":"")} title="Settings" onClick={()=>setShowSettings(s=>!s)}><Icon name="settings"/></button>
+            </div>
+          </div>
+
+          {/* settings popover */}
+          {showSettings && !audience && (
+            <div className="settings">
+              <h4>Prompter settings</h4>
+              <div className="set-row">
+                <div className="set-label">Scroll speed <span className="set-val">{speed} wpm</span></div>
+                <input type="range" min="80" max="220" value={speed} onChange={e=>setSpeed(+e.target.value)} />
+              </div>
+              <div className="set-row">
+                <div className="set-label">Text size <span className="set-val">{size}px</span></div>
+                <input type="range" min="22" max="46" value={size} onChange={e=>setSize(+e.target.value)} />
+              </div>
+              <div className="set-row">
+                <div className="set-label">Overlay opacity <span className="set-val">{opacity}%</span></div>
+                <input type="range" min="30" max="100" value={opacity} onChange={e=>setOpacity(+e.target.value)} />
+              </div>
+              <div className="set-row" style={{marginBottom:0}}>
+                <div className="set-label">Timer</div>
+                <div className="seg">
+                  <button aria-pressed={timerMode==='off'} onClick={()=>setTimerMode('off')}>Off</button>
+                  <button aria-pressed={timerMode==='up'} onClick={()=>setTimerMode('up')}><Icon name="timer" size={14}/>Count up</button>
+                  <button aria-pressed={timerMode==='down'} onClick={()=>setTimerMode('down')}><Icon name="hourglass" size={14}/>Down</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* audience-view proof */}
+          <div className="aud">
+            <div className={"aud-flag"+(audience?" show":"")}><Icon name="check" size={13}/> Overlay hidden — invisible on the recording</div>
+            <div className="aud-card">
+              <div className="aud-txt"><b>Audience view</b><span>See what viewers see</span></div>
+              <div className={"sw"+(audience?" on":"")} onClick={()=>setAudience(a=>!a)}><span className="th"></span></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

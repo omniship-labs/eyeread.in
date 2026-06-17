@@ -1,0 +1,38 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+// Self-hosted fonts (exact family names the design tokens expect)
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/600.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/hanken-grotesk/400.css';
+import '@fontsource/hanken-grotesk/500.css';
+import '@fontsource/hanken-grotesk/600.css';
+import '@fontsource/hanken-grotesk/700.css';
+import '@fontsource/hanken-grotesk/800.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/600.css';
+import '@fontsource/jetbrains-mono/700.css';
+
+// Design-system tokens (single source of truth), minus its CDN fonts.css —
+// src/styles/fonts.css declares the same variables for the local faces.
+import './styles/fonts.css';
+import '../design_system/tokens/colors.css';
+import '../design_system/tokens/typography.css';
+import '../design_system/tokens/spacing.css';
+import '../design_system/tokens/effects.css';
+import '../design_system/tokens/base.css';
+
+import './styles/app.css';
+import './styles/main-window.css';
+import './styles/overlay.css';
+import './styles/settings-window.css';
+import { App } from './App';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);

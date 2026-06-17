@@ -1,0 +1,22 @@
+/* ============================================================
+   teleprompt.d · Fonts
+   Display : Space Grotesk  — geometric, technical, HUD headings
+   Sans    : Hanken Grotesk — readable UI + long-form body
+   Mono    : JetBrains Mono — labels, timecodes, WPM, REC tags
+   ------------------------------------------------------------
+   All three are genuine Google Fonts (no substitution).
+   Loaded via the Google Fonts CDN below. For self-hosted /
+   offline production, swap this @import for local @font-face
+   rules pointing at /assets/fonts.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-display: 'Space Grotesk', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* The script-reading face — same readable sans, just the role it plays */
+  --font-prompt: 'Hanken Grotesk', system-ui, sans-serif;
+}

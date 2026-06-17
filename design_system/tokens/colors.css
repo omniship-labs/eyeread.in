@@ -1,0 +1,101 @@
+/* ============================================================
+   teleprompt.d · Color
+   Direction A · "Signal" — near-black + electric indigo.
+   Base ramps first, semantic aliases second. Always reference
+   the semantic aliases in components.
+   ============================================================ */
+
+:root {
+  /* ---- Ink ramp (near-black surfaces) -------------------- */
+  --ink-1000: #060609;   /* sunken / app void           */
+  --ink-900:  #0a0a0f;   /* base canvas                 */
+  --ink-850:  #0f0f17;
+  --ink-800:  #13131c;   /* surface 1 (panels)          */
+  --ink-700:  #1a1a26;   /* surface 2 (cards)           */
+  --ink-600:  #232331;   /* surface 3 (raised / hover)  */
+  --ink-500:  #2e2e3e;   /* hairlines on dark           */
+  --ink-400:  #3a3a4d;
+
+  /* ---- Light ramp (text on dark) ------------------------ */
+  --paper-100: #ffffff;
+  --paper-200: #f2f2f7;  /* primary text                */
+  --paper-300: #c9c9d6;
+  --paper-400: #a8a8ba;  /* secondary text              */
+  --paper-500: #7a7a8f;  /* tertiary text               */
+  --paper-600: #54546420;
+
+  /* ---- Accent · electric indigo ------------------------- */
+  --indigo-300: #b6a8ff;
+  --indigo-400: #8a76ff;
+  --indigo-500: #6e56f7;  /* primary accent             */
+  --indigo-600: #5a42e0;
+  --indigo-700: #4632b8;
+  --indigo-800: #2f2080;
+
+  /* ---- Signal · record red (recording / on-air) --------- */
+  --signal-400: #ff7a90;
+  --signal-500: #ff4d6a;
+  --signal-600: #e03455;
+
+  /* ---- Status ------------------------------------------- */
+  --green-500:  #34d399;   /* connected / synced / good  */
+  --amber-500:  #ffb84d;   /* warning / paused           */
+
+  /* ============================================================
+     SEMANTIC ALIASES — reference these in components
+     ============================================================ */
+
+  /* Surfaces */
+  --bg-base:        var(--ink-900);
+  --bg-sunken:      var(--ink-1000);
+  --surface-1:      var(--ink-800);
+  --surface-2:      var(--ink-700);
+  --surface-3:      var(--ink-600);
+  --surface-hover:  rgba(255,255,255,0.04);
+  --surface-active: rgba(255,255,255,0.07);
+
+  /* Glass (the overlay's signature material) */
+  --glass-bg:       rgba(12,12,20,0.66);
+  --glass-bg-heavy: rgba(8,8,14,0.78);
+  --glass-border:   rgba(255,255,255,0.10);
+
+  /* Text */
+  --text-primary:   var(--paper-200);
+  --text-secondary: var(--paper-400);
+  --text-tertiary:  var(--paper-500);
+  --text-disabled:  #4a4a58;
+  --text-on-accent: #ffffff;
+  --text-inverse:   var(--ink-900);
+
+  /* Borders */
+  --border-subtle:  rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.10);
+  --border-strong:  rgba(255,255,255,0.16);
+
+  /* Accent semantics */
+  --accent:            var(--indigo-500);
+  --accent-hover:      var(--indigo-400);
+  --accent-press:      var(--indigo-600);
+  --accent-text:       var(--indigo-300);
+  --accent-subtle-bg:     rgba(110,86,247,0.14);
+  --accent-subtle-bg-hover: rgba(110,86,247,0.22);
+  --accent-subtle-border: rgba(110,86,247,0.32);
+  --accent-glow:       rgba(110,86,247,0.55);
+
+  /* Record / live */
+  --record:         var(--signal-500);
+  --record-text:    var(--signal-400);
+  --record-subtle:  rgba(255,77,106,0.14);
+
+  /* Teleprompter reading states */
+  --prompt-spoken:   var(--paper-200);              /* already said      */
+  --prompt-active:   #ffffff;                       /* current word      */
+  --prompt-upcoming: var(--paper-500);              /* not yet reached   */
+  --prompt-highlight: var(--accent-glow);           /* glow on active    */
+
+  /* Status semantics */
+  --success: var(--green-500);
+  --warning: var(--amber-500);
+  --danger:  var(--signal-500);
+  --focus-ring: rgba(110,86,247,0.55);
+}

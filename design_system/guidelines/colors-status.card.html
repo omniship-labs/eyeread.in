@@ -1,0 +1,39 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Signal, status & text" subtitle="Record red, status hues, and the text ramp on dark" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 22px; background: var(--bg-base); display: flex; gap: 26px; }
+  .group { flex: 1; }
+  .glabel { font-family: var(--font-mono); font-size: 10px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 10px; }
+  .row { display: flex; gap: 10px; }
+  .dot { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .chip { width: 100%; height: 38px; border-radius: var(--radius-sm); }
+  .cap { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-tertiary); }
+  .swrap { flex: 1; }
+  .text-stack { display: flex; flex-direction: column; gap: 7px; }
+  .ts { font-family: var(--font-sans); font-weight: 600; font-size: 15px; }
+</style>
+</head>
+<body>
+  <div class="group">
+    <div class="glabel">Signal & status</div>
+    <div class="row">
+      <div class="dot swrap"><div class="chip" style="background:var(--record); box-shadow:var(--glow-record)"></div><div class="cap">record</div></div>
+      <div class="dot swrap"><div class="chip" style="background:var(--success)"></div><div class="cap">success</div></div>
+      <div class="dot swrap"><div class="chip" style="background:var(--warning)"></div><div class="cap">warning</div></div>
+      <div class="dot swrap"><div class="chip" style="background:var(--accent)"></div><div class="cap">live</div></div>
+    </div>
+  </div>
+  <div class="group">
+    <div class="glabel">Text on dark</div>
+    <div class="text-stack">
+      <div class="ts" style="color:var(--text-primary)">Primary &nbsp;<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);font-weight:400">#f2f2f7</span></div>
+      <div class="ts" style="color:var(--text-secondary)">Secondary &nbsp;<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);font-weight:400">#a8a8ba</span></div>
+      <div class="ts" style="color:var(--text-tertiary)">Tertiary &nbsp;<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);font-weight:400">#7a7a8f</span></div>
+    </div>
+  </div>
+</body>
+</html>

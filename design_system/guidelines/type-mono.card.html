@@ -1,0 +1,25 @@
+<!-- @dsCard group="Type" viewport="700x170" name="Mono · JetBrains Mono" subtitle="Timecodes, WPM, REC tags, eyebrows" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; padding: 24px; background: var(--bg-base); font-family: var(--font-mono); }
+  .row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .tag { font-size: 11px; letter-spacing: var(--tracking-label); text-transform: uppercase; padding: 5px 10px; border-radius: var(--radius-pill); }
+  .time { font-size: 30px; font-weight: 500; color: var(--text-primary); letter-spacing: 0.02em; }
+  .eyebrow { font-size: 12px; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-tertiary); margin-top: 18px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="time">02:14<span style="color:var(--text-tertiary)">.8</span></div>
+    <div class="tag" style="background:var(--record-subtle); color:var(--record-text)">● Rec</div>
+    <div class="tag" style="background:var(--accent-subtle-bg); color:var(--accent-text)">Live</div>
+    <div class="tag" style="background:var(--surface-2); color:var(--text-secondary)">142 wpm</div>
+    <div class="tag" style="background:var(--surface-2); color:var(--success)">● Synced</div>
+  </div>
+  <div class="eyebrow">eyeread · invisible to screen share</div>
+</body>
+</html>
