@@ -2,7 +2,7 @@
 
 eyeread.in is available under a dual-license model:
 
-- **Open source:** GNU Affero General Public License v3.0 (AGPL-3.0) — see `LICENSE.md`
+- **Open source:** GNU Affero General Public License v3.0 (AGPL-3.0) — see `LICENSE`
 - **Commercial:** This license, available for purchase
 
 ## Who needs a commercial license?

@@ -13,7 +13,7 @@ If you do not agree, do not use the App.
 
 eyeread.in is a teleprompter tool that displays a floating text overlay on your
 screen. It is provided free of charge. The source code is available under the
-Business Source License 1.1 (BUSL-1.1); see [LICENSE.md](LICENSE.md).
+GNU Affero General Public License v3.0 (AGPL-3.0); see [LICENSE](LICENSE).
 
 ---
 

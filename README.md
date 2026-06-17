@@ -117,5 +117,5 @@ Both channels install side-by-side. The nightly build auto-stamps its version
 (`0.1.0-nightly.20260612`) so the in-app updater treats each nightly as newer than the last.
 See `.github/workflows/` for the full CI setup and required secrets.
 
-BUSL-1.1 © 2026 OmniShip — see [LICENSE.md](LICENSE.md).
-Each release converts to AGPL-3.0-or-later two years after publication.
+AGPL-3.0 © 2026 Mrithyunjay Jagannath Halinge — see [LICENSE](LICENSE).
+Commercial licenses available: mrithyunjay7@gmail.com
