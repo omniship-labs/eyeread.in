@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, FileText, Type, Clock, Pin, Trash2, Play } from 'lucide-react';
+import { Search, Plus, FileText, Type, Clock, Pin, Trash2 } from 'lucide-react';
 import { wordCount, readingMins } from '../lib/utils';
 
 const TABS = ['all', 'recent', 'pinned'];

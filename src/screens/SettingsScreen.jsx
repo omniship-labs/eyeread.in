@@ -5,7 +5,6 @@ import { Segmented } from '../components/Segmented';
 import { openExternal, setOverlayContentProtected, checkForUpdate, installUpdate, isTauri } from '../lib/tauri';
 
 const REPO_URL = 'https://github.com/omniship-labs/eyeread.in';
-const DONATE_URL = 'https://opencollective.com/omniship';
 const TERMS_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS.md';
 const PRIVACY_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/PRIVACY.md';
 

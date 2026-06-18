@@ -65,7 +65,7 @@ export function VoiceDebugger({ log, pointer, active, words }) {
           {' · '}
           active <b style={{ color: '#4ade80' }}>{active}</b>
           {' · '}
-          <span style={{ color: '#94a3b8' }}>"{scriptWord(active)}"</span>
+          <span style={{ color: '#94a3b8' }}>&quot;{scriptWord(active)}&quot;</span>
         </span>
       </div>
 

@@ -7,8 +7,8 @@ import { voiceAvailable } from '../hooks/useVoiceTracking';
 
 import { requestMicPermission } from '../lib/mic';
 
-export function Editor({ script, settings, onChange, onSettings, onBack, onStart }) {
-  const { size, speed, opacity, blur, mirror, timerMode, countFrom, position, voice } = settings;
+export function Editor({ script, settings, onChange, onSettings, onStart }) {
+  const { size, speed, timerMode, countFrom, voice } = settings;
   const countFromMins = Math.round((countFrom ?? 300) / 60);
 
   return (
