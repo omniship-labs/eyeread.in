@@ -7,8 +7,7 @@ An **OmniShip** project · [omniship.dev](https://omniship.dev)
 A teleprompter that floats your script as a translucent glass overlay on top of whatever
 you're sharing — and **stays invisible to screen-share and screen capture**.
 Voice tracking follows you as you speak and highlights the exact word you're on.
-Free, forever. Source-available under BUSL-1.1; each release becomes open source
-(AGPL-3.0) two years after publication.
+Free, forever. Open source under AGPL-3.0. Commercial licenses available.
 
 **macOS only.** This is a deliberate product decision, not a technical shortcut —
 see [Why macOS only?](#why-macos-only) below.

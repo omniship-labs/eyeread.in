@@ -1,6 +1,6 @@
 # Terms of Use
 
-**eyeread.in** — published by OmniShip  
+**eyeread.in** — published by Mrithyunjay Jagannath Halinge  
 _Last updated: June 2026_
 
 Please read these Terms of Use ("Terms") carefully before downloading or using
@@ -35,7 +35,7 @@ limitation:
   broadcasting any session in which the App is visible or in use.
 - The content of any scripts, text, or other material you display through the App.
 
-OmniShip provides a display tool only. It does not initiate, control, or
+Mrithyunjay Jagannath Halinge provides a display tool only. It does not initiate, control, or
 participate in any recording or broadcast. What you do with third-party recording
 software is entirely your responsibility.
 
@@ -47,7 +47,7 @@ THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
 
-OmniShip does not warrant that the App will be uninterrupted, error-free, or free
+Mrithyunjay Jagannath Halinge does not warrant that the App will be uninterrupted, error-free, or free
 of harmful components, or that any defects will be corrected.
 
 ---
@@ -69,7 +69,7 @@ APP SHALL NOT EXCEED USD $10.
 
 ## 5. Indemnification
 
-You agree to indemnify, defend, and hold harmless OmniShip and its contributors
+You agree to indemnify, defend, and hold harmless Mrithyunjay Jagannath Halinge and its contributors
 from and against any claims, liabilities, damages, losses, and expenses
 (including reasonable legal fees) arising out of or in any way connected with
 your use of the App, your violation of these Terms, or your violation of any
@@ -91,7 +91,7 @@ You agree not to use the App to:
 
 ## 7. Updates and changes
 
-OmniShip may release updates to the App at any time. We may also update these
+Mrithyunjay Jagannath Halinge may release updates to the App at any time. We may also update these
 Terms. Continued use of the App after a Terms update constitutes acceptance of
 the revised Terms. We will update the "Last updated" date above when changes
 are made.
@@ -101,7 +101,7 @@ are made.
 ## 8. Termination
 
 These Terms apply for as long as you use the App. You may stop at any time by
-uninstalling it. OmniShip reserves the right to discontinue the App at any time
+uninstalling it. Mrithyunjay Jagannath Halinge reserves the right to discontinue the App at any time
 without notice.
 
 ---
@@ -127,7 +127,7 @@ provisions will continue in full force and effect.
 
 ## 11. Entire agreement
 
-These Terms constitute the entire agreement between you and OmniShip regarding
+These Terms constitute the entire agreement between you and Mrithyunjay Jagannath Halinge regarding
 the App and supersede any prior agreements.
 
 ---
