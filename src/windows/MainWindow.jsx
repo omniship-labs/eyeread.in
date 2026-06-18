@@ -17,9 +17,9 @@ class ErrorBoundary extends Component {
   }
 }
 import { useListResize } from '../hooks/useListResize';
-import { Library } from '../screens/Library';
-import { Editor } from '../screens/Editor';
-import { SettingsScreen } from '../screens/SettingsScreen';
+import { Library } from '../features/Library';
+import { Editor } from '../features/Editor';
+import { SettingsScreen } from '../features/SettingsScreen';
 import {
   defaultSettings,
   fetchScripts,

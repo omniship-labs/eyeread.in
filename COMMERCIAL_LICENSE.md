@@ -31,7 +31,7 @@ on use case, company size, and distribution model.
 
 ## How to obtain a commercial license
 
-Contact: **mrithyunjay7@gmail.com**
+Contact: **license@omniship.dev**
 
 Please include a brief description of your intended use case and company.
 

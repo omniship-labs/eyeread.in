@@ -14,8 +14,8 @@ import {
   X,
 } from 'lucide-react';
 import { ScriptViewer } from '../components/ScriptViewer';
-import { SettingsDrawer } from '../components/overlay/SettingsDrawer';
-import { VoiceDebugger, useVoiceDebugger } from '../components/overlay/VoiceDebugger';
+import { SettingsDrawer } from './overlay/SettingsDrawer';
+import { VoiceDebugger, useVoiceDebugger } from './overlay/VoiceDebugger';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
 import { useClickThrough } from '../hooks/useClickThrough';
 import { usePanelResize, clampSize } from '../hooks/usePanelResize';

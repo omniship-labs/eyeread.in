@@ -135,4 +135,4 @@ Your GitHub username and the date of signing will be recorded in
 please open an issue so we can arrange a separate corporate CLA before your
 first pull request.
 
-For questions or commercial licensing enquiries: **mrithyunjay7@gmail.com**
+For questions or commercial licensing enquiries: **license@omniship.dev**

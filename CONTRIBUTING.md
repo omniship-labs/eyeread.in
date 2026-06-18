@@ -37,7 +37,7 @@ npm run tauri dev
 
 - Windows or Linux ports — see [Why macOS only?](README.md#why-macos-only) in the README
 - New UI screens or major feature additions without prior discussion
-- Changes to the design tokens in `design_system/` — those come from the design source of truth
+- Changes to the design tokens in `design/` — those come from the design source of truth
 
 Open an issue to discuss anything large before writing code.
 

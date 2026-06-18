@@ -1,6 +1,6 @@
 /* ============================================================
    eyeread — font custom properties (self-hosted).
-   Replaces design_system/tokens/fonts.css: same variables, but
+   Replaces design/tokens/fonts.css: same variables, but
    the faces load from bundled @fontsource woff2 files (imported
    in src/main.jsx) instead of the Google Fonts CDN. Works
    offline; no third-party request at runtime.

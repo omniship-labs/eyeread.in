@@ -1,6 +1,6 @@
 import { Timer as TimerIcon, Hourglass } from 'lucide-react';
-import { Switch } from '../Switch';
-import { Segmented } from '../Segmented';
+import { Switch } from '../../components/Switch';
+import { Segmented } from '../../components/Segmented';
 import { requestMicPermission } from '../../lib/mic';
 import { voiceAvailable } from '../../hooks/useVoiceTracking';
 
