@@ -2,6 +2,8 @@
 
 <!-- A concise description of the change and why it's needed. -->
 
+Fixes #
+
 ## Type of change
 
 - [ ] Bug fix
@@ -11,10 +13,7 @@
 
 ## Checklist
 
-- [ ] `npm test` passes
 - [ ] `npm run lint` passes
-- [ ] `npm run format` has been run
-- [ ] I have read [CONTRIBUTING.md](../CONTRIBUTING.md)
 - [ ] I have signed the [CLA](../CLA.md) (the bot will check on first PR)
 
 ## Screenshots / recording

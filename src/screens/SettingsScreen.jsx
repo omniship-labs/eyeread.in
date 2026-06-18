@@ -170,7 +170,7 @@ export function SettingsScreen({ settings, onSettings }) {
         <div className="set-row">
           <div className="set-info">
             <b>Version</b>
-            <span>eyeread.in for macOS · by OmniShip</span>
+            <span>eyeread.in for macOS · by Mrithyunjay Jagannath Halinge</span>
           </div>
           <span className="set-mono">
             {/* __RELEASE_CHANNEL__ is injected by Vite at build time */}
@@ -217,9 +217,9 @@ export function SettingsScreen({ settings, onSettings }) {
         <div className="set-row">
           <div className="set-info">
             <b>License</b>
-            <span>Source-available — converts to AGPL-3.0 two years after each release</span>
+            <span>Open source — AGPL-3.0. Commercial licenses available.</span>
           </div>
-          <span className="set-mono">BUSL-1.1</span>
+          <span className="set-mono">AGPL-3.0</span>
         </div>
         <div className="set-row">
           <div className="set-info">
@@ -242,7 +242,7 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row" style={{ justifyContent: 'center' }}>
           <span style={{ fontSize: 12, color: 'var(--text-tertiary)', textAlign: 'center' }}>
-            Built with ❤️ by OmniShip
+            Built with ❤️ by Mrithyunjay Jagannath Halinge
           </span>
         </div>
       </div>

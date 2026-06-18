@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Commercial License
+    url: mailto:mrithyunjay7@gmail.com?subject=eyeread.in%20Commercial%20License
+    about: Need to use eyeread.in in a proprietary product or SaaS without AGPL obligations? Email us for a commercial license.
+  - name: Discussions
+    url: https://github.com/omniship-labs/eyeread.in/discussions
+    about: Questions, ideas, or general conversation — use Discussions instead of opening an issue.
