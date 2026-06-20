@@ -1,7 +1,7 @@
 # Contributor License Agreement
 
 Thank you for your interest in contributing to eyeread.in, maintained by
-Mrithyunjay Jagannath Halinge ("Licensor", "we", "us").
+Mrithyunjay Halinge ("MJ", "Licensor", "we", "us"), operating as OmniShip Labs.
 
 By submitting a pull request or otherwise contributing code, documentation, or
 other materials to this repository, you ("Contributor") agree to the following

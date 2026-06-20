@@ -1,6 +1,6 @@
 # Terms of Use
 
-**eyeread.in** — published by Mrithyunjay Jagannath Halinge  
+**eyeread.in** — published by Mrithyunjay Halinge ("MJ"), operating as OmniShip Labs
 _Last updated: June 2026_
 
 Please read these Terms of Use ("Terms") carefully before downloading or using
@@ -35,9 +35,9 @@ limitation:
   broadcasting any session in which the App is visible or in use.
 - The content of any scripts, text, or other material you display through the App.
 
-Mrithyunjay Jagannath Halinge provides a display tool only. It does not initiate, control, or
-participate in any recording or broadcast. What you do with third-party recording
-software is entirely your responsibility.
+MJ provides a display tool only. It does not initiate, control, or participate
+in any recording or broadcast. What you do with third-party recording software
+is entirely your responsibility.
 
 ---
 
@@ -47,21 +47,21 @@ THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
 
-Mrithyunjay Jagannath Halinge does not warrant that the App will be uninterrupted, error-free, or free
-of harmful components, or that any defects will be corrected.
+MJ does not warrant that the App will be uninterrupted, error-free, or free of
+harmful components, or that any defects will be corrected.
 
 ---
 
 ## 4. Limitation of liability
 
-TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL OMNISHIP
-OR ITS CONTRIBUTORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
-CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR DAMAGES FOR LOSS OF PROFITS,
-REVENUE, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATING
-TO YOUR USE OF OR INABILITY TO USE THE APP, EVEN IF OMNISHIP HAS BEEN ADVISED
-OF THE POSSIBILITY OF SUCH DAMAGES.
+TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL MJ OR ITS
+CONTRIBUTORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL,
+EXEMPLARY, OR PUNITIVE DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA,
+GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATING TO YOUR USE OF
+OR INABILITY TO USE THE APP, EVEN IF MJ HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
 
-TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, OMNISHIP'S TOTAL CUMULATIVE
+TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, MJ'S TOTAL CUMULATIVE
 LIABILITY TO YOU FOR ALL CLAIMS ARISING OUT OF OR RELATING TO THESE TERMS OR THE
 APP SHALL NOT EXCEED USD $10.
 
@@ -69,11 +69,11 @@ APP SHALL NOT EXCEED USD $10.
 
 ## 5. Indemnification
 
-You agree to indemnify, defend, and hold harmless Mrithyunjay Jagannath Halinge and its contributors
-from and against any claims, liabilities, damages, losses, and expenses
-(including reasonable legal fees) arising out of or in any way connected with
-your use of the App, your violation of these Terms, or your violation of any
-applicable law or the rights of any third party.
+You agree to indemnify, defend, and hold harmless MJ and its contributors from
+and against any claims, liabilities, damages, losses, and expenses (including
+reasonable legal fees) arising out of or in any way connected with your use of
+the App, your violation of these Terms, or your violation of any applicable law
+or the rights of any third party.
 
 ---
 
@@ -91,17 +91,16 @@ You agree not to use the App to:
 
 ## 7. Updates and changes
 
-Mrithyunjay Jagannath Halinge may release updates to the App at any time. We may also update these
-Terms. Continued use of the App after a Terms update constitutes acceptance of
-the revised Terms. We will update the "Last updated" date above when changes
-are made.
+MJ may release updates to the App at any time. We may also update these Terms.
+Continued use of the App after a Terms update constitutes acceptance of the
+revised Terms. We will update the "Last updated" date above when changes are made.
 
 ---
 
 ## 8. Termination
 
 These Terms apply for as long as you use the App. You may stop at any time by
-uninstalling it. Mrithyunjay Jagannath Halinge reserves the right to discontinue the App at any time
+uninstalling it. MJ reserves the right to discontinue the App at any time
 without notice.
 
 ---
@@ -127,8 +126,8 @@ provisions will continue in full force and effect.
 
 ## 11. Entire agreement
 
-These Terms constitute the entire agreement between you and Mrithyunjay Jagannath Halinge regarding
-the App and supersede any prior agreements.
+These Terms constitute the entire agreement between you and MJ regarding the App
+and supersede any prior agreements.
 
 ---
 
