@@ -113,11 +113,23 @@
 
 .aw-supporters-list {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
 }
 
 .aw-supporter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
   color: var(--text-secondary);
+}
+.aw-supporter:hover { color: var(--text-primary); }
+
+.aw-supporter-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
 }

@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { openExternal, hideAboutWindow, isTauri } from '../lib/tauri';
+import sponsors from '../data/sponsors.json';
 import './about/about-window.css';
+
+const OC_URL = 'https://opencollective.com/eyereadin';
 
 const REPO_URL    = 'https://github.com/omniship-labs/eyeread.in';
 const MJ_URL      = 'https://m.halinge.in';
@@ -68,9 +71,28 @@ export function AboutWindow() {
 
       <div className="aw-section">
         <div className="aw-section-label">Supporters</div>
-        <div className="aw-supporters-empty">
-          Be the first to support eyeread.in
-        </div>
+        {sponsors.length > 0 ? (
+          <div className="aw-supporters-list">
+            {sponsors.map((s) => (
+              <span
+                key={s.profile || s.name}
+                className="aw-supporter"
+                onClick={s.profile ? () => openExternal(s.profile) : undefined}
+                style={s.profile ? { cursor: 'pointer' } : undefined}
+              >
+                {s.image && (
+                  <img className="aw-supporter-avatar" src={s.image} alt="" draggable={false} />
+                )}
+                {s.name}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div className="aw-supporters-empty">
+            Be the first to{' '}
+            <span className="aw-link" onClick={() => openExternal(OC_URL)}>support eyeread.in ↗</span>
+          </div>
+        )}
       </div>
     </div>
   );

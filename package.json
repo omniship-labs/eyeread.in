@@ -7,6 +7,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "sponsors": "node scripts/fetch-sponsors.mjs",
+    "prebuild": "node scripts/fetch-sponsors.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
