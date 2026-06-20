@@ -3,7 +3,7 @@ name = "eyeread-in"
 version = "0.1.0"
 description = "eyeread.in — invisible teleprompter"
 authors = ["OmniShip"]
-license = "BUSL-1.1"
+license = "AGPL-3.0"
 edition = "2021"
 
 [lib]

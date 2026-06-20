@@ -22,6 +22,11 @@ const URL = `https://opencollective.com/${SLUG}/members/all.json`;
 const OUT = resolve(ROOT, 'src/data/sponsors.json');
 const AVATAR_DIR = resolve(ROOT, 'public/sponsors'); // served at /sponsors/<id>.png
 
+// Contributors at/above this lifetime total "graduate" to the featured Sponsors
+// spot; everyone else is a Backer. members/all.json has no tier name, so we
+// derive the tier from amount — override with OC_SPONSOR_THRESHOLD.
+const SPONSOR_THRESHOLD = Number(process.env.OC_SPONSOR_THRESHOLD || 100);
+
 /** Download an avatar locally so the shipped app makes zero network calls. */
 async function downloadAvatar(url, id) {
   try {
@@ -55,11 +60,13 @@ async function main() {
   const sponsors = [];
   for (const m of backers) {
     const image = m.image ? await downloadAvatar(m.image, m.MemberId) : null;
+    const total = m.totalAmountDonated ?? 0;
     sponsors.push({
       name: m.name || 'Anonymous',
       image,
       profile: m.profile || null,
-      total: m.totalAmountDonated ?? 0,
+      total,
+      tier: total >= SPONSOR_THRESHOLD ? 'sponsor' : 'backer',
     });
   }
 

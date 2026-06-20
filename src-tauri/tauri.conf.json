@@ -46,7 +46,7 @@
         "title": "About eyeread.in",
         "url": "index.html?window=about",
         "width": 360,
-        "height": 480,
+        "height": 600,
         "resizable": false,
         "maximizable": false,
         "minimizable": false,

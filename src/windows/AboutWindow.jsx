@@ -69,30 +69,58 @@ export function AboutWindow() {
 
       <div className="aw-divider" />
 
-      <div className="aw-section">
+      <div className="aw-section aw-section-supporters">
         <div className="aw-section-label">Supporters</div>
         {sponsors.length > 0 ? (
-          <div className="aw-supporters-list">
-            {sponsors.map((s) => (
-              <span
-                key={s.profile || s.name}
-                className="aw-supporter"
-                onClick={s.profile ? () => openExternal(s.profile) : undefined}
-                style={s.profile ? { cursor: 'pointer' } : undefined}
-              >
-                {s.image && (
-                  <img className="aw-supporter-avatar" src={s.image} alt="" draggable={false} />
-                )}
-                {s.name}
-              </span>
-            ))}
-          </div>
+          <>
+            <div className="aw-supporters-scroll">
+              <SupporterGroup
+                title="Sponsors"
+                tier="sponsor"
+                people={sponsors.filter((s) => s.tier === 'sponsor')}
+                onOpen={openExternal}
+              />
+              <SupporterGroup
+                title="Backers"
+                tier="backer"
+                people={sponsors.filter((s) => s.tier !== 'sponsor')}
+                onOpen={openExternal}
+              />
+            </div>
+            <span className="aw-link aw-supporters-all" onClick={() => openExternal(OC_URL)}>
+              View all on Open Collective ↗
+            </span>
+          </>
         ) : (
           <div className="aw-supporters-empty">
             Be the first to{' '}
             <span className="aw-link" onClick={() => openExternal(OC_URL)}>support eyeread.in ↗</span>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function SupporterGroup({ title, tier, people, onOpen }) {
+  if (people.length === 0) return null;
+  return (
+    <div className={`aw-tier aw-tier-${tier}`}>
+      <div className="aw-tier-label">{title}</div>
+      <div className="aw-supporters-list">
+        {people.map((s) => (
+          <span
+            key={s.profile || s.name}
+            className="aw-supporter"
+            onClick={s.profile ? () => onOpen(s.profile) : undefined}
+            style={s.profile ? { cursor: 'pointer' } : undefined}
+          >
+            {s.image && (
+              <img className="aw-supporter-avatar" src={s.image} alt="" draggable={false} />
+            )}
+            {s.name}
+          </span>
+        ))}
       </div>
     </div>
   );
