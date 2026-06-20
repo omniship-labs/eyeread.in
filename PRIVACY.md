@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**eyeread.in** — published by OmniShip  
+**eyeread.in** — published by Mrithyunjay Halinge ("MJ"), operating as OmniShip Labs  
 _Last updated: June 2026_
 
 Your privacy is straightforward with eyeread.in: **the App stores everything
