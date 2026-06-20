@@ -4,8 +4,27 @@ import { Switch } from '../components/Switch';
 import { Segmented } from '../components/Segmented';
 import { wordCount, readingMins } from '../lib/utils';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
-
 import { requestMicPermission } from '../lib/mic';
+
+const LANGUAGES = [
+  { value: 'en',    label: 'English' },
+  { value: 'en-GB', label: 'English (UK)' },
+  { value: 'es',    label: 'Español' },
+  { value: 'fr',    label: 'Français' },
+  { value: 'de',    label: 'Deutsch' },
+  { value: 'it',    label: 'Italiano' },
+  { value: 'pt',    label: 'Português' },
+  { value: 'nl',    label: 'Nederlands' },
+  { value: 'pl',    label: 'Polski' },
+  { value: 'ru',    label: 'Русский' },
+  { value: 'ar',    label: 'العربية' },
+  { value: 'he',    label: 'עברית' },
+  { value: 'ja',    label: '日本語' },
+  { value: 'ko',    label: '한국어' },
+  { value: 'zh-CN', label: '中文（简体）' },
+  { value: 'zh-TW', label: '中文（繁體）' },
+  { value: 'hi',    label: 'हिन्दी' },
+];
 
 export function Editor({ script, settings, onChange, onSettings, onStart }) {
   const { size, speed, timerMode, countFrom, voice } = settings;
@@ -86,6 +105,19 @@ export function Editor({ script, settings, onChange, onSettings, onStart }) {
                   Voice not available in this environment — scroll will pause when enabled.
                 </div>
               )}
+            </div>
+
+            <div className="ep-card">
+              <div className="ep-label">Language</div>
+              <select
+                className="ep-select"
+                value={script.language ?? 'en'}
+                onChange={(e) => onChange({ language: e.target.value })}
+              >
+                {LANGUAGES.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
             </div>
 
             <div className="ep-card">

@@ -23,6 +23,8 @@ export const defaultSettings = {
   hideFromShare: true,
   voice: true, // voice tracking on/off
   overlaySize: { w: 560, h: 168 }, // user default; per-script overlaySize wins
+  reduceMotion: false, // disable scroll easing animations in overlay
+  highContrast: false, // boost text contrast in overlay
 };
 
 const seedScripts = () => {

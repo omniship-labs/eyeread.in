@@ -20,7 +20,7 @@ export function useVoiceTracking({
   pointer,    // owned by caller
   setPointer,
   setActive,
-  debug,      // optional { logHeard, logMatch, logSkip, logStop }
+  language,
 }) {
   const normWords = useMemo(() => words.map(normalizeWord), [words]);
 
@@ -29,12 +29,10 @@ export function useVoiceTracking({
   const normWordsRef = useRef(normWords);
   const playingRef   = useRef(playing);
   const wpmRef       = useRef(wpm);
-  const debugRef     = useRef(debug);
   useEffect(() => { pointerRef.current   = pointer;   }, [pointer]);
   useEffect(() => { normWordsRef.current = normWords; }, [normWords]);
   useEffect(() => { playingRef.current   = playing;   }, [playing]);
   useEffect(() => { wpmRef.current       = wpm;       }, [wpm]);
-  useEffect(() => { debugRef.current     = debug;     }, [debug]);
 
   // ---- graceful slide -------------------------------------------------------
   // activeRef tracks where the highlight currently is inside this hook so the
@@ -88,31 +86,22 @@ export function useVoiceTracking({
   // when normWords or other deps change — the ref is always current.
   const onWordsRef = useRef(null);
   onWordsRef.current = useCallback((heardWords) => {
-    const nw  = normWordsRef.current;
-    const dbg = debugRef.current;
+    const nw = normWordsRef.current;
     const normalized = heardWords.map(normalizeWord).filter(Boolean);
-    dbg?.logHeard(normalized);
 
-    // Search starts no more than 2 ahead of the visible highlight to prevent
-    // jumping to a repeated phrase before the slide catches up
     const searchFrom = Math.min(pointerRef.current, activeRef.current + 2);
     let p = searchFrom;
 
     for (const hw of normalized) {
       if (!hw) continue;
       const windowEnd = Math.min(nw.length, p + 3);
-      let matched = false;
       for (let j = p; j < windowEnd; j++) {
         if (!nw[j]) continue;
         if (wordMatches(nw[j], hw)) {
-          if (j > p) dbg?.logSkip(hw, p, j + 1);
-          else       dbg?.logMatch(hw, nw[j], j);
           p = j + 1;
-          matched = true;
           break;
         }
       }
-      if (!matched) dbg?.logStop(hw, p);
     }
 
     if (p > pointerRef.current) {
@@ -120,13 +109,13 @@ export function useVoiceTracking({
       setPointer(p);
       slideTo(Math.min(p - 1, nw.length - 1));
     }
-  }, [setPointer, slideTo]); // normWords via ref, no stale closure
+  }, [setPointer, slideTo]);
 
   // Stable wrapper so useSpeechRecognition never re-subscribes
   const onWords = useCallback((hw) => onWordsRef.current(hw), []);
 
   const srEnabled = !!(playing && voiceEnabled && voiceAvailable);
-  const { listening, error } = useSpeechRecognition({ enabled: srEnabled, onWords });
+  const { listening, error } = useSpeechRecognition({ enabled: srEnabled, onWords, language });
 
   // ---- auto-scroll (voice off) ----------------------------------------------
   useEffect(() => {

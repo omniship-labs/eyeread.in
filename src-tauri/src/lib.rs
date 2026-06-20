@@ -1,10 +1,20 @@
 use tauri::{
-    menu::{Menu, MenuItem},
+    menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Manager,
+    AppHandle, Manager, WindowEvent,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
+
+/// Open the About window — called from JS menu listener or Settings screen.
+#[tauri::command]
+fn show_about_window(app: AppHandle) {
+    if let Some(win) = app.get_webview_window("about") {
+        let _ = win.show();
+        let _ = win.center();
+        let _ = win.set_focus();
+    }
+}
 
 /// Check for an update and return a human-readable status string to the frontend.
 #[tauri::command]
@@ -29,6 +39,24 @@ async fn install_update(app: AppHandle) -> Result<(), String> {
         app.restart();
     }
     Ok(())
+}
+
+fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+    let about       = MenuItem::with_id(app, "about", "About eyeread.in", true, None::<&str>)?;
+    let hide        = PredefinedMenuItem::hide(app, None)?;
+    let hide_others = PredefinedMenuItem::hide_others(app, None)?;
+    let show_all    = PredefinedMenuItem::show_all(app, None)?;
+    let sep         = PredefinedMenuItem::separator(app)?;
+    let quit        = PredefinedMenuItem::quit(app, None)?;
+
+    let app_submenu = Submenu::with_items(
+        app,
+        "eyeread.in",
+        true,
+        &[&about, &sep, &hide, &hide_others, &show_all, &sep, &quit],
+    )?;
+
+    Menu::with_items(app, &[&app_submenu])
 }
 
 fn build_tray(app: &AppHandle) -> tauri::Result<()> {
@@ -94,15 +122,40 @@ pub fn run() {
     }];
 
     tauri::Builder::default()
+        .menu(build_app_menu)
+        .on_menu_event(|app, event| {
+            if event.id.as_ref() == "about" {
+                if let Some(win) = app.get_webview_window("about") {
+                    let _ = win.show();
+                    let _ = win.center();
+                    let _ = win.set_focus();
+                }
+            }
+        })
+        // Closing the About/Settings windows should hide them, not destroy them,
+        // so they can be reopened. (macOS red button destroys by default.)
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                let label = window.label();
+                if label == "about" || label == "settings" {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
-        // Restore main window position/size on launch; exclude overlay window
+        // Restore main window position/size on launch. Skip the transient
+        // windows (overlay/settings/about) so their saved "visible" state
+        // doesn't force them open on startup.
         .plugin(
             tauri_plugin_window_state::Builder::new()
                 .skip_initial_state("overlay")
+                .skip_initial_state("settings")
+                .skip_initial_state("about")
                 .build(),
         )
         .plugin(
@@ -110,7 +163,7 @@ pub fn run() {
                 .add_migrations("sqlite:eyeread.db", migrations)
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![check_for_update, install_update])
+        .invoke_handler(tauri::generate_handler![check_for_update, install_update, show_about_window])
         .setup(|app| {
             build_tray(&app.handle().clone())?;
             Ok(())
