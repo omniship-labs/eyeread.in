@@ -11,7 +11,7 @@ const SR =
 
 export const srAvailable = !!SR;
 
-export function useSpeechRecognition({ enabled, onWords }) {
+export function useSpeechRecognition({ enabled, onWords, language }) {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState(null);
   const recRef = useRef(null);
@@ -27,9 +27,7 @@ export function useSpeechRecognition({ enabled, onWords }) {
     rec.continuous = true;
     rec.interimResults = true;
     rec.maxAlternatives = 3;
-    rec.lang = (navigator.language || 'en-US').startsWith('en')
-      ? navigator.language
-      : 'en-US';
+    rec.lang = language || navigator.language || 'en-US';
 
     rec.onresult = (e) => {
       const res = e.results[e.results.length - 1];
@@ -70,7 +68,7 @@ export function useSpeechRecognition({ enabled, onWords }) {
       try { rec.stop(); } catch { /* noop */ }
       setListening(false);
     };
-  }, [enabled]);
+  }, [enabled, language]);
 
   return { listening, error };
 }

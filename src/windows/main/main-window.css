@@ -401,6 +401,24 @@
   color: var(--text-secondary);
 }
 .ep-val { font-family: var(--font-mono); font-size: 12px; color: var(--accent-text); }
+.ep-select {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 5px 26px 5px 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+.ep-select:focus { border-color: var(--accent); }
 .ep-time-input {
   width: 44px;
   background: var(--surface-3);
@@ -527,6 +545,25 @@
 .set-mono { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); }
 .set-link { font-family: var(--font-mono); font-size: 12px; color: var(--accent-text); cursor: pointer; }
 .set-link:hover { color: var(--paper-100); }
+.set-select {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 160px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+.set-select:focus { border-color: var(--accent); }
 .hotkey {
   font-family: var(--font-mono);
   font-size: 11px;

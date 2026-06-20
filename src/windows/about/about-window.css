@@ -1,0 +1,123 @@
+.aw-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  padding: 0 28px 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+  user-select: none;
+  border: 1px solid var(--border-default);
+  -webkit-app-region: drag;
+}
+
+/* disable drag on everything interactive inside */
+.aw-root * {
+  -webkit-app-region: no-drag;
+}
+
+/* clear drag strip — sits above hero, gives macOS traffic lights room */
+.aw-titlebar {
+  width: 100%;
+  height: 40px;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.aw-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.aw-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  margin-bottom: 6px;
+  pointer-events: none;
+}
+
+.aw-name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.aw-version {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.aw-org {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.aw-credit {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
+
+.aw-link {
+  color: var(--accent-text);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.aw-link:hover { color: var(--paper-100); }
+
+.aw-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 2px 0 14px;
+}
+
+.aw-section {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.aw-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 7px;
+}
+
+.aw-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.aw-supporters-empty {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.aw-supporters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.aw-supporter {
+  font-size: 13px;
+  color: var(--text-secondary);
+}

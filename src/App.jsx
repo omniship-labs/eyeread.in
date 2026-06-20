@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { MainWindow } from './windows/MainWindow';
 import { OverlayWindow } from './windows/OverlayWindow';
 import { SettingsWindow } from './windows/SettingsWindow';
+import { AboutWindow } from './windows/AboutWindow';
 
 const windowKind =
   new URLSearchParams(window.location.search).get('window') || 'main';
@@ -14,5 +15,6 @@ export function App() {
 
   if (windowKind === 'overlay')  return <OverlayWindow />;
   if (windowKind === 'settings') return <SettingsWindow />;
+  if (windowKind === 'about')    return <AboutWindow />;
   return <MainWindow />;
 }

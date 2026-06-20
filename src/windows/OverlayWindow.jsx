@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { ScriptViewer } from '../components/ScriptViewer';
 import { SettingsDrawer } from './overlay/SettingsDrawer';
-import { VoiceDebugger, useVoiceDebugger } from './overlay/VoiceDebugger';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
 import { useClickThrough } from '../hooks/useClickThrough';
 import { usePanelResize, clampSize } from '../hooks/usePanelResize';
@@ -30,11 +29,6 @@ import {
   setOverlayContentProtected,
 } from '../lib/tauri';
 import { fmtTime } from '../lib/utils';
-
-// Show voice debug panel when ?debug is in the URL (dev only)
-const DEBUG_VOICE =
-  typeof window !== 'undefined' &&
-  new URLSearchParams(window.location.search).has('debug');
 
 export function OverlayWindow() {
   const [script, setScript]         = useState(null);
@@ -163,9 +157,6 @@ export function OverlayWindow() {
     return () => { un1?.(); un2?.(); };
   }, [setPanelSize]);
 
-  // ---- voice debug -----------------------------------------------------------
-  const voiceDbg = useVoiceDebugger();
-
   // ---- voice tracking / auto-scroll ------------------------------------------
   const jumpToRef = useRef((idx) => { setActive(idx); setPointer(idx); }); // fallback before hook mounts
   const { usingVoice, listening, jumpTo } = useVoiceTracking({
@@ -176,7 +167,7 @@ export function OverlayWindow() {
     pointer,
     setPointer,
     setActive,
-    debug: DEBUG_VOICE ? voiceDbg : undefined,
+    language: script?.language,
   });
   // Keep ref current so overlay:load listener (registered once) always calls latest jumpTo
   useEffect(() => { jumpToRef.current = jumpTo; }, [jumpTo]);
@@ -333,7 +324,12 @@ export function OverlayWindow() {
 
         <div className="ov-body">
           {words.length > 0 ? (
-            <div className="ov-window" ref={windowRef} style={{ height: panelSize.h }}>
+            <div
+              className="ov-window"
+              ref={windowRef}
+              style={{ height: panelSize.h }}
+              dir={['ar', 'he', 'fa', 'ur'].includes(script?.language) ? 'rtl' : 'ltr'}
+            >
               <ScriptViewer
                 text={script.text}
                 active={active}
@@ -409,14 +405,6 @@ export function OverlayWindow() {
 
       </div>
 
-      {DEBUG_VOICE && (
-        <VoiceDebugger
-          log={voiceDbg.log}
-          pointer={pointer}
-          active={active}
-          words={words}
-        />
-      )}
     </div>
   );
 }
