@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { openExternal, hideAboutWindow, isTauri } from '../lib/tauri';
+import { openExternal } from '../lib/tauri';
 import sponsors from '../data/sponsors.json';
 import './about/about-window.css';
 
@@ -20,18 +19,6 @@ function getVersion() {
 }
 
 export function AboutWindow() {
-  useEffect(() => {
-    if (!isTauri) return;
-    let unlisten;
-    (async () => {
-      const { getCurrentWindow } = await import('@tauri-apps/api/window');
-      unlisten = await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
-        if (!focused) hideAboutWindow();
-      });
-    })();
-    return () => unlisten?.();
-  }, []);
-
   return (
     <div className="aw-root">
       {/* drag region — clear strip at top, avoids traffic lights */}

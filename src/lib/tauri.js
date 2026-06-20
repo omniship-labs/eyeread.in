@@ -145,13 +145,6 @@ export async function showAboutWindow() {
   await invoke('show_about_window');
 }
 
-export async function hideAboutWindow() {
-  if (!isTauri) return;
-  const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
-  const win = await WebviewWindow.getByLabel('about');
-  await win?.hide();
-}
-
 export async function hideOverlay() {
   if (isTauri) {
     const win = await overlayWindow();
