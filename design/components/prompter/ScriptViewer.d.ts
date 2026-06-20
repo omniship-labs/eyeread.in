@@ -3,7 +3,6 @@ import * as React from 'react';
 /**
  * The teleprompter reading panel — dims spoken words, glows the active word, keeps upcoming readable.
  * Drive `active` from the voice-detection word index.
- * @startingPoint section="Prompter" subtitle="Highlighted-line script reader with voice tracking" viewport="700x300"
  */
 export interface ScriptViewerProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The script text. Split on whitespace into words. */

@@ -1,0 +1,33 @@
+<svg width="728" height="90" viewBox="0 0 728 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="lbgf" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+    <filter id="lbgs" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+    <clipPath id="lbsq"><rect x="4" y="4" width="80" height="80" rx="20"></rect></clipPath>
+    <linearGradient id="lbsh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.42)"></stop><stop offset="45%" stop-color="rgba(255,255,255,0.10)"></stop><stop offset="100%" stop-color="rgba(255,255,255,0)"></stop></linearGradient>
+  </defs>
+
+  
+  <rect width="200" height="90" fill="#6e56f7"></rect>
+  <rect x="200" width="528" height="90" fill="#0e0e1a"></rect>
+  <rect x="198" y="0" width="4" height="90" fill="#ffffff"></rect>
+
+  
+  <svg x="69" y="14" width="62" height="62" viewBox="0 0 88 88" overflow="visible">
+    <rect x="2" y="2" width="84" height="84" rx="22" fill="rgba(255,255,255,0.18)"></rect>
+    <g clip-path="url(#lbsq)">
+      <rect x="4" y="4" width="80" height="40" fill="#f2f2f7"></rect>
+      <rect x="4" y="44" width="80" height="40" fill="#0e0e1a"></rect>
+      <rect x="4" y="41.5" width="80" height="5" fill="#6e56f7" filter="url(#lbgf)"></rect>
+      <rect x="11" y="42" width="66" height="4" fill="rgba(110,86,247,0.5)" filter="url(#lbgs)"></rect>
+      <rect x="4" y="4" width="80" height="80" fill="url(#lbsh)"></rect>
+    </g>
+  </svg>
+
+  
+  <text x="218" y="38" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="22" letter-spacing="-0.5" fill="#f2f2f7">eyeread<tspan fill="#6e56f7">.in</tspan></text>
+  <text x="218" y="60" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="500" font-size="13" fill="#7a7a92">Invisible teleprompter · screen-safe · voice tracking</text>
+
+  
+  <rect x="594" y="18" width="120" height="54" rx="10" fill="#6e56f7"></rect>
+  <text x="654" y="49" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="14" fill="#ffffff">Download →</text>
+</svg>

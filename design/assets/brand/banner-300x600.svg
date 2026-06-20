@@ -1,0 +1,40 @@
+<svg width="300" height="600" viewBox="0 0 300 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="b600bg" x1="150" y1="0" x2="150" y2="600" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#0d0b1e"></stop><stop offset="100%" stop-color="#09090e"></stop></linearGradient>
+    <radialGradient id="b600gl" cx="50%" cy="22%" r="50%"><stop offset="0%" stop-color="#6e56f7" stop-opacity="0.16"></stop><stop offset="100%" stop-color="#6e56f7" stop-opacity="0"></stop></radialGradient>
+  </defs>
+  <rect width="300" height="600" fill="url(#b600bg)"></rect>
+  <rect width="300" height="600" fill="url(#b600gl)"></rect>
+  <rect x="0.5" y="0.5" width="299" height="599" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"></rect>
+  <svg x="100" y="54" width="100" height="100" viewBox="0 0 88 88" overflow="visible">
+    <defs>
+      <filter id="b600gf" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+      <filter id="b600gs" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+      <clipPath id="b600sq"><rect x="4" y="4" width="80" height="80" rx="20"></rect></clipPath>
+      <linearGradient id="b600sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.42)"></stop><stop offset="45%" stop-color="rgba(255,255,255,0.10)"></stop><stop offset="100%" stop-color="rgba(255,255,255,0)"></stop></linearGradient>
+    </defs>
+    <rect x="2" y="2" width="84" height="84" rx="22" fill="rgba(255,255,255,0.18)"></rect>
+    <g clip-path="url(#b600sq)">
+      <rect x="4" y="4" width="80" height="40" fill="#f2f2f7"></rect>
+      <rect x="4" y="44" width="80" height="40" fill="#0e0e1a"></rect>
+      <rect x="4" y="41.5" width="80" height="5" fill="#6e56f7" filter="url(#b600gf)"></rect>
+      <rect x="11" y="42" width="66" height="4" fill="rgba(110,86,247,0.5)" filter="url(#b600gs)"></rect>
+      <rect x="4" y="4" width="80" height="80" fill="url(#b600sh)"></rect>
+    </g>
+  </svg>
+  <text x="150" y="192" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="30" letter-spacing="-0.7" fill="#f2f2f7">eyeread<tspan fill="#6e56f7">.in</tspan></text>
+  <text x="150" y="224" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="600" font-size="17" fill="#c8c8dc">Look at the lens.</text>
+  <text x="150" y="246" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="500" font-size="14" fill="#7a7a92">Not your notes.</text>
+  <line x1="40" y1="268" x2="260" y2="268" stroke="rgba(255,255,255,0.06)" stroke-width="1"></line>
+  <rect x="22" y="282" width="256" height="50" rx="10" fill="rgba(110,86,247,0.07)" stroke="rgba(110,86,247,0.18)" stroke-width="1"></rect>
+  <text x="44" y="303" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="600" font-size="13" fill="#c8c8dc">Invisible to every recorder</text>
+  <text x="44" y="321" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-size="11.5" fill="#6a6a82">Zoom, Loom, OBS, QuickTime</text>
+  <rect x="22" y="342" width="256" height="50" rx="10" fill="rgba(110,86,247,0.07)" stroke="rgba(110,86,247,0.18)" stroke-width="1"></rect>
+  <text x="44" y="363" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="600" font-size="13" fill="#c8c8dc">Voice tracking</text>
+  <text x="44" y="381" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-size="11.5" fill="#6a6a82">Follows what you say</text>
+  <rect x="22" y="402" width="256" height="50" rx="10" fill="rgba(110,86,247,0.07)" stroke="rgba(110,86,247,0.18)" stroke-width="1"></rect>
+  <text x="44" y="423" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="600" font-size="13" fill="#c8c8dc">Near the camera</text>
+  <text x="44" y="441" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-size="11.5" fill="#6a6a82">Eyes stay on the lens</text>
+  <rect x="22" y="508" width="256" height="46" rx="10" fill="#6e56f7"></rect>
+  <text x="150" y="536" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="16" fill="#ffffff">Download free →</text>
+</svg>

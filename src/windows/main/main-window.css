@@ -25,11 +25,9 @@
   position: relative;
 }
 .titlebar-name {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   user-select: none;
 }
 .titlebar .tl {
@@ -48,12 +46,27 @@
   overflow: hidden;
 }
 
-/* The drag region is only the title text — expands to fill available space */
+/* The drag region expands to fill available space */
 .titlebar-name {
   flex: 1;
-  text-align: center;
+  justify-content: center;
   -webkit-app-region: drag;
   app-region: drag;
+}
+.titlebar-logo {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.titlebar-wordmark {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.titlebar-wordmark-in {
+  color: var(--accent);
 }
 
 /* ── Settings gear in titlebar ── */

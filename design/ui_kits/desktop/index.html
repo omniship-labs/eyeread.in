@@ -1,4 +1,4 @@
-<!-- @dsCard group="Desktop" viewport="1280x800" name="eyeread desktop app" subtitle="Script library, editor, and overlay settings" -->
+<!-- @dsCard group="Desktop" viewport="1280x800" name="eyeread.in desktop app" subtitle="Script library, editor, and overlay settings" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,7 +137,7 @@
 <!-- macOS title bar -->
 <div class="titlebar">
   <div class="tl r"></div><div class="tl y"></div><div class="tl g"></div>
-  <span class="titlebar-name">eyeread</span>
+  <span class="titlebar-name">eyeread.in</span>
 </div>
 <div id="root"></div>
 <script type="text/babel" data-presets="react">
@@ -176,7 +176,7 @@ function App(){
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sb-brand">
-          <img src="../../assets/logo-mark.svg" alt="eyeread.in"/>
+          <img src="../../assets/logos/eyeread-mark-bounded-dark.svg" alt="eyeread.in" />
           <div className="sb-brand-word">eyeread<span>.in</span></div>
         </div>
         <div className="sb-nav">
@@ -190,7 +190,7 @@ function App(){
         </div>
         <div className="sb-spacer"/>
         <div className="sb-bottom">
-          <div className="sb-donate" onClick={()=>setScreen('settings')}><Icon name="heart" size={16}/>Support eyeread</div>
+          <div className="sb-donate" onClick={()=>setScreen('settings')}><Icon name="heart" size={16}/>Support eyeread.in</div>
         </div>
       </div>
 
@@ -295,8 +295,8 @@ function App(){
           <div className="donate-card">
             <Icon name="heart" size={32}/>
             <div className="donate-card-body">
-              <h4>eyeread is free and open source</h4>
-              <p>No subscription, no paywall. If eyeread helps you speak better, consider supporting its development.</p>
+              <h4>eyeread.in is open source (AGPL-3.0)</h4>
+              <p>No subscription, no paywall. If eyeread.in helps you speak better, consider supporting its development.</p>
               <button className="donate-btn">Donate ↗</button>
             </div>
           </div>
@@ -321,9 +321,9 @@ function App(){
 
           <div className="set-group">
             <div className="set-group-label">About</div>
-            <div className="set-row"><div className="set-info"><b>Version</b><span>eyeread for macOS</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--text-tertiary)'}}>0.1.0-beta</span></div>
-            <div className="set-row"><div className="set-info"><b>License</b><span>MIT — free and open source</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--text-tertiary)'}}>MIT</span></div>
-            <div className="set-row"><div className="set-info"><b>Source code</b><span>github.com/eyeread/eyeread</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--accent-text)'}}>GitHub ↗</span></div>
+            <div className="set-row"><div className="set-info"><b>Version</b><span>eyeread.in for macOS</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--text-tertiary)'}}>0.1.0-beta</span></div>
+            <div className="set-row"><div className="set-info"><b>License</b><span>Free and open source</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--accent-text)'}}>AGPL-3.0</span></div>
+            <div className="set-row"><div className="set-info"><b>Source code</b><span>github.com/omniship-labs/eyeread</span></div><span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'var(--accent-text)'}}>GitHub ↗</span></div>
           </div>
         </div>
       )}

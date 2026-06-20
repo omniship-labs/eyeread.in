@@ -1,272 +1,403 @@
-<!-- @dsCard group="Marketing" viewport="1280x720" name="eyeread.in — landing page" subtitle="Free, open-source teleprompter — hero, features, OSS CTA" -->
+<!-- @dsCard group="Marketing" viewport="1280x800" name="eyeread.in — landing page" subtitle="Invisible teleprompter · dark, cinematic, minimal" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>eyeread.in — free, open source teleprompter</title>
+<title>eyeread.in — Look at the lens.</title>
 <link rel="stylesheet" href="../../styles.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
-  html,body{min-height:100%}
-  body{margin:0;color:var(--text-primary);overflow-x:hidden}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-  /* Nav */
-  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;padding:0 52px;height:62px;background:rgba(8,8,12,0.72);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle)}
-  .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-  .nav-brand img{width:30px;height:30px}
-  .nav-brand-word{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--text-primary)}
-  .nav-brand-word span{color:var(--accent)}
-  .nav-links{display:flex;gap:30px;margin-left:48px}
-  .nav-link{font-family:var(--font-sans);font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;transition:color var(--dur-fast) var(--ease-out)}
-  .nav-link:hover{color:var(--text-primary)}
-  .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-  .nav-gh{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;background:var(--surface-2);border:1px solid var(--border-default);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text-primary);text-decoration:none;transition:all var(--dur-fast) var(--ease-out)}
-  .nav-gh:hover{background:var(--surface-3)}
-  .nav-gh svg{width:16px;height:16px}
+/* ── NAV ─────────────────────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;padding:0 48px;background:rgba(10,10,15,0.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-inner{display:flex;align-items:center;width:100%;max-width:1200px;margin:0 auto}
+.nav-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.nav-brand img{width:28px;height:28px}
+.nav-word{font-family:var(--font-display);font-weight:700;font-size:17px;letter-spacing:-.02em;color:var(--text-primary)}
+.nav-word span{color:var(--accent)}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-gh{display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:var(--radius-md);border:1px solid var(--border-default);background:var(--surface-2);font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text-secondary);text-decoration:none;transition:color .15s,border-color .15s}
+.nav-gh:hover{color:var(--text-primary);border-color:var(--border-strong)}
+.nav-cta{height:32px;padding:0 16px;border-radius:var(--radius-md);background:var(--accent);border:none;font-family:var(--font-sans);font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:background .15s}
+.nav-cta:hover{background:var(--accent-hover)}
 
-  /* Hero */
-  .hero{min-height:100vh;display:flex;align-items:center;padding:120px 52px 80px;position:relative;overflow:hidden}
-  .hero-bg{position:absolute;inset:0;pointer-events:none}
-  .hero-bg-glow-1{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(110,86,247,0.22) 0%,transparent 70%);filter:blur(40px)}
-  .hero-bg-glow-2{position:absolute;top:30%;right:-10%;width:500px;height:400px;background:radial-gradient(ellipse,rgba(76,108,200,0.12) 0%,transparent 70%);filter:blur(60px)}
-  .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1180px;margin:0 auto;width:100%;position:relative}
-  .hero-left{}
-  .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);background:var(--accent-subtle-bg);border:1px solid var(--accent-subtle-border);padding:6px 12px;border-radius:var(--radius-pill);margin-bottom:28px}
-  .hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent-sm)}
-  h1{font-family:var(--font-display);font-size:clamp(40px,4.5vw,68px);font-weight:700;letter-spacing:-.03em;line-height:1.02;color:#fff;margin:0 0 8px}
-  h1 .hl{color:var(--accent)}
-  .hero-sub{font-size:clamp(16px,1.4vw,20px);color:var(--text-secondary);line-height:1.55;max-width:480px;margin:20px 0 38px}
-  .hero-sub b{color:var(--text-primary);font-weight:600}
-  .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .btn-primary{display:inline-flex;align-items:center;gap:9px;height:48px;padding:0 24px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-lg);font-family:var(--font-sans);font-size:15px;font-weight:700;text-decoration:none;cursor:pointer;box-shadow:var(--glow-accent);transition:all var(--dur-base) var(--ease-out)}
-  .btn-primary:hover{background:var(--accent-hover);box-shadow:0 0 32px rgba(110,86,247,0.6)}
-  .btn-primary svg{width:18px;height:18px}
-  .btn-ghost{display:inline-flex;align-items:center;gap:9px;height:48px;padding:0 20px;background:var(--surface-2);border:1px solid var(--border-default);border-radius:var(--radius-lg);font-family:var(--font-sans);font-size:15px;font-weight:600;color:var(--text-primary);text-decoration:none;transition:all var(--dur-base) var(--ease-out)}
-  .btn-ghost:hover{background:var(--surface-3)}
-  .btn-ghost svg{width:18px;height:18px}
-  .hero-note{margin-top:18px;font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);display:flex;align-items:center;gap:8px}
-  .hero-note svg{width:14px;height:14px;color:var(--success)}
+/* ── HERO ────────────────────────────────────────────────────── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 48px 80px;position:relative;overflow:hidden;text-align:center}
+.hero-glow-top{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(110,86,247,0.24) 0%,transparent 68%);filter:blur(60px);pointer-events:none}
+.hero-glow-btm{position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(76,60,200,0.12) 0%,transparent 70%);filter:blur(80px);pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text);background:rgba(110,86,247,0.1);border:1px solid rgba(110,86,247,0.22);padding:5px 12px;border-radius:var(--radius-pill);margin-bottom:32px}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+h1{font-family:var(--font-display);font-size:clamp(44px,5.5vw,80px);font-weight:700;letter-spacing:-.04em;line-height:1.0;color:#fff;max-width:860px}
+h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{margin-top:20px;font-size:clamp(15px,1.5vw,20px);color:var(--text-secondary);line-height:1.6;max-width:520px}
+.cta-row{margin-top:40px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.btn-p{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 26px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-lg);font-family:var(--font-sans);font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 0 32px rgba(110,86,247,0.35);transition:background .15s,box-shadow .15s}
+.btn-p:hover{background:var(--accent-hover);box-shadow:0 0 48px rgba(110,86,247,0.5)}
+.btn-g{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 22px;background:transparent;color:var(--text-primary);border:1px solid var(--border-default);border-radius:var(--radius-lg);font-family:var(--font-sans);font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:border-color .15s,background .15s}
+.btn-g:hover{background:var(--surface-2);border-color:var(--border-strong)}
+.hero-note{margin-top:16px;font-family:var(--font-mono);font-size:11.5px;color:var(--text-tertiary);display:flex;align-items:center;gap:7px;justify-content:center}
 
-  /* Hero visual — the overlay in action */
-  .hero-right{position:relative}
-  .screen{border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0e1828 0%,#0a1020 60%,#0d0b1c 100%);border:1px solid rgba(255,255,255,0.1);box-shadow:var(--shadow-xl),0 0 0 1px rgba(110,86,247,0.12);aspect-ratio:16/10;position:relative}
-  .screen-inner{padding:28px 32px;height:100%;box-sizing:border-box}
-  .slide-ey{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5a6a8a;margin-bottom:12px}
-  .slide-h{font-family:var(--font-display);font-weight:700;font-size:clamp(20px,2.4vw,32px);color:#dde6f6;letter-spacing:-.02em;line-height:1.08;max-width:340px}
-  .slide-sub{font-size:clamp(11px,1.1vw,14px);color:#7a8aa0;margin-top:10px;max-width:280px;line-height:1.5}
-  /* mini chart */
-  .chart-mini{position:absolute;right:28px;bottom:20%;display:flex;align-items:flex-end;gap:8px;height:80px;opacity:0.9}
-  .bm{width:18px;border-radius:4px 4px 0 0;background:rgba(90,110,180,0.35)}
-  .bm.hot{background:linear-gradient(180deg,#8a76ff,rgba(110,86,247,0.3));box-shadow:0 0 16px rgba(110,86,247,0.3)}
-  /* floating prompter overlay */
-  .ov-float{position:absolute;top:14%;left:50%;transform:translateX(-50%);width:82%;background:rgba(10,10,22,0.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--accent-subtle-border);border-radius:14px;box-shadow:var(--glow-accent);padding:12px 16px 10px}
-  .ovf-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-  .ovf-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent-sm)}
-  .ovf-live{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-text)}
-  .ovf-invisible{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--accent-text);opacity:.7;display:flex;align-items:center;gap:5px}
-  .ovf-text{font-family:var(--font-prompt);font-size:clamp(13px,1.4vw,17px);line-height:1.4;font-weight:500}
-  .ovf-s{color:var(--prompt-upcoming);opacity:.45}
-  .ovf-a{color:#fff;font-weight:700;text-shadow:var(--glow-text)}
-  .ovf-u{color:var(--text-secondary);opacity:.7}
-  .webcam-pill{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:rgba(8,8,14,0.8);backdrop-filter:blur(12px);border:1px solid var(--border-default);border-radius:999px;padding:6px 12px;display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);white-space:nowrap}
-  .wcam{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+/* ── DEMO VISUAL ─────────────────────────────────────────────── */
+.demo-wrap{margin-top:72px;position:relative;max-width:900px;width:100%}
+.demo-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:7px;background:rgba(10,10,18,0.85);backdrop-filter:blur(12px);border:1px solid var(--border-default);border-radius:var(--radius-pill);padding:6px 14px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-tertiary);white-space:nowrap}
+.cam-dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success)}
 
-  /* Features */
-  .features{padding:100px 52px;max-width:1180px;margin:0 auto}
-  .sec-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px}
-  .sec-title{font-family:var(--font-display);font-size:clamp(26px,2.8vw,40px);font-weight:700;letter-spacing:-.025em;color:#fff;margin-bottom:56px;max-width:500px}
-  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .feat{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:28px}
-  .feat-icon{width:42px;height:42px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:18px;flex-shrink:0}
-  .feat-icon.ind{background:var(--accent-subtle-bg);color:var(--accent-text)}
-  .feat-icon.red{background:var(--record-subtle);color:var(--record-text)}
-  .feat-icon.grn{background:rgba(52,211,153,.12);color:var(--success)}
-  .feat-icon svg{width:22px;height:22px}
-  .feat h3{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:-.01em;color:var(--text-primary);margin:0 0 8px}
-  .feat p{font-size:13.5px;color:var(--text-secondary);line-height:1.55;margin:0}
+/* screen frame */
+.screen-frame{border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,0.09);background:linear-gradient(140deg,#0c1424 0%,#080c16 60%,#0c0b1c 100%);box-shadow:0 40px 120px rgba(0,0,0,0.6),0 0 0 1px rgba(110,86,247,0.1),0 0 80px rgba(110,86,247,0.08);aspect-ratio:16/9;position:relative;display:flex;align-items:center;justify-content:center}
 
-  /* Open source */
-  .oss{padding:80px 52px;max-width:1180px;margin:0 auto}
-  .oss-card{background:linear-gradient(135deg,rgba(110,86,247,.1),rgba(110,86,247,.04));border:1px solid var(--accent-subtle-border);border-radius:var(--radius-2xl);padding:56px 60px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}
-  .oss-eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-text);margin-bottom:14px}
-  .oss-title{font-family:var(--font-display);font-size:clamp(22px,2.5vw,34px);font-weight:700;letter-spacing:-.02em;color:#fff;margin-bottom:14px}
-  .oss-body{font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:560px}
-  .oss-body b{color:var(--text-primary)}
-  .oss-btns{display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+/* background slide content */
+.slide-content{padding:40px 52px;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center}
+.slide-ey{font-family:var(--font-mono);font-size:clamp(9px,0.8vw,12px);letter-spacing:.14em;text-transform:uppercase;color:#4a5f7a;margin-bottom:14px}
+.slide-h{font-family:var(--font-display);font-weight:700;font-size:clamp(20px,2.5vw,38px);color:#c8d8ec;letter-spacing:-.02em;line-height:1.1;max-width:380px}
+.slide-bars{display:flex;align-items:flex-end;gap:10px;height:70px;position:absolute;right:52px;bottom:22%}
+.bar{border-radius:4px 4px 0 0;width:20px}
 
-  /* Footer */
-  footer{border-top:1px solid var(--border-subtle);padding:30px 52px;display:flex;align-items:center;gap:24px;color:var(--text-tertiary)}
-  .ft-brand{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text-secondary);letter-spacing:-.01em}
-  .ft-brand img{width:22px;height:22px}
-  .ft-brand span{color:var(--accent)}
-  footer p{font-size:12.5px;font-family:var(--font-mono)}
-  footer a{color:var(--text-tertiary);text-decoration:none}
-  footer a:hover{color:var(--accent-text)}
-  .ft-right{margin-left:auto;display:flex;gap:20px;font-size:12.5px;font-family:var(--font-mono)}
+/* the overlay floating on top */
+.overlay-float{position:absolute;top:10%;left:50%;transform:translateX(-50%);width:80%;background:rgba(10,10,22,0.64);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(110,86,247,0.3);border-radius:14px;box-shadow:0 0 0 1px rgba(110,86,247,0.08),0 20px 60px rgba(110,86,247,0.18);padding:12px 18px 14px}
+.ov-header{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.ov-pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.ov-timer{font-family:var(--font-mono);font-size:11px;color:var(--accent-text);letter-spacing:.06em}
+.ov-tag{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--accent-text);opacity:.65;display:flex;align-items:center;gap:5px}
+.ov-line{font-family:'Hanken Grotesk','Space Grotesk',sans-serif;font-size:clamp(12px,1.4vw,18px);line-height:1.5;font-weight:500;color:var(--text-primary)}
+.ov-spoken{color:var(--text-tertiary);opacity:.4}
+.ov-active{color:#fff;font-weight:700;text-shadow:0 0 20px rgba(110,86,247,0.8)}
+.ov-next{color:var(--text-secondary);opacity:.75}
+
+/* invisible badge */
+.invis-badge{position:absolute;bottom:-16px;right:24px;display:flex;align-items:center;gap:6px;background:rgba(10,10,18,0.9);border:1px solid rgba(52,211,153,0.28);border-radius:var(--radius-pill);padding:6px 12px;font-family:var(--font-mono);font-size:10px;color:var(--success)}
+.invis-dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+
+/* ── FEATURES ─────────────────────────────────────────────────── */
+.features{padding:140px 48px 100px;max-width:1200px;margin:0 auto}
+.sec-ey{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:16px;text-align:center}
+.sec-h{font-family:var(--font-display);font-size:clamp(28px,3vw,44px);font-weight:700;letter-spacing:-.03em;color:#fff;text-align:center;margin-bottom:72px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--border-subtle)}
+.feat{background:var(--surface-1);padding:40px 36px;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(110,86,247,0.3),transparent);opacity:0;transition:opacity .3s}
+.feat:hover::before{opacity:1}
+.feat-icon{width:44px;height:44px;border-radius:var(--radius-lg);background:rgba(110,86,247,0.1);border:1px solid rgba(110,86,247,0.18);display:flex;align-items:center;justify-content:center;margin-bottom:22px;color:var(--accent)}
+.feat-icon svg{width:20px;height:20px;stroke:currentColor}
+.feat-h{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em;color:#fff;margin-bottom:10px;line-height:1.15}
+.feat-p{font-size:14.5px;color:var(--text-secondary);line-height:1.65;flex:1}
+.feat-tag{margin-top:20px;display:inline-block;font-family:var(--font-mono);font-size:10.5px;color:var(--accent-text);background:rgba(110,86,247,0.1);border:1px solid rgba(110,86,247,0.2);padding:3px 9px;border-radius:var(--radius-pill);align-self:flex-start}
+
+/* ── HOW IT WORKS ─────────────────────────────────────────────── */
+.how{padding:80px 48px 120px;max-width:1200px;margin:0 auto}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
+.steps{display:flex;flex-direction:column;gap:36px}
+.step{display:flex;gap:20px;align-items:flex-start}
+.step-num{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-default);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:500}
+.step-body h3{font-family:var(--font-display);font-weight:700;font-size:17px;color:#fff;margin-bottom:5px;letter-spacing:-.01em}
+.step-body p{font-size:14px;color:var(--text-secondary);line-height:1.65}
+/* mini overlay preview -->*/
+.how-visual{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:28px;display:flex;flex-direction:column;gap:14px}
+.how-ov{background:rgba(10,10,22,0.8);border:1px solid rgba(110,86,247,0.28);border-radius:12px;padding:14px 16px;box-shadow:0 0 32px rgba(110,86,247,0.14)}
+.how-ov-h{font-family:var(--font-mono);font-size:10px;color:var(--accent-text);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.how-ov-txt{font-size:15px;line-height:1.55;font-weight:500}
+.how-ov-sp{color:var(--text-tertiary);opacity:.4}
+.how-ov-ac{color:#fff;font-weight:700;text-shadow:0 0 18px rgba(110,86,247,0.7)}
+.how-ov-nx{color:var(--text-secondary);opacity:.75}
+.how-caption{font-family:var(--font-mono);font-size:10.5px;color:var(--text-tertiary);text-align:center;letter-spacing:.06em}
+
+/* ── OSS ──────────────────────────────────────────────────────── */
+.oss{margin:0 48px 120px;max-width:1104px;margin-left:auto;margin-right:auto;background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--radius-2xl);padding:72px 80px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.oss-left h2{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,2.8vw,40px);letter-spacing:-.03em;color:#fff;line-height:1.08;margin-bottom:18px}
+.oss-left p{font-size:15px;color:var(--text-secondary);line-height:1.7;margin-bottom:28px}
+.oss-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-text);background:rgba(110,86,247,0.1);border:1px solid rgba(110,86,247,0.2);padding:5px 12px;border-radius:var(--radius-pill)}
+.oss-right{display:flex;flex-direction:column;gap:16px}
+.oss-row{display:flex;align-items:center;gap:14px;padding:16px 18px;background:var(--surface-2);border:1px solid var(--border-subtle);border-radius:var(--radius-lg)}
+.oss-row svg{width:18px;height:18px;color:var(--accent);flex-shrink:0}
+.oss-row-body h4{font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:2px}
+.oss-row-body p{font-size:12.5px;color:var(--text-tertiary)}
+
+/* ── FOOTER ───────────────────────────────────────────────────── */
+footer{border-top:1px solid var(--border-subtle);padding:40px 48px;display:flex;align-items:center;max-width:1200px;margin:0 auto}
+.foot-brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+.foot-brand img{width:22px;height:22px}
+.foot-word{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--text-secondary);letter-spacing:-.01em}
+.foot-word span{color:var(--accent)}
+.foot-r{margin-left:auto;display:flex;align-items:center;gap:24px}
+.foot-link{font-size:13px;color:var(--text-tertiary);text-decoration:none;transition:color .15s}
+.foot-link:hover{color:var(--text-primary)}
+.foot-copy{font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);margin-left:24px}
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <a class="nav-brand" href="#">
-    <img src="../../assets/logo-mark.svg" alt="eyeread.in"/>
-    <div class="nav-brand-word">eyeread<span>.in</span></div>
-  </a>
-  <div class="nav-links">
-    <a class="nav-link" href="#">How it works</a>
-    <a class="nav-link" href="#">Features</a>
-    <a class="nav-link" href="#">Open source</a>
-  </div>
-  <div class="nav-right">
-    <a class="nav-gh" href="#">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-      GitHub
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">
+      <img src="../../assets/logos/eyeread-mark-bounded-dark.svg" alt="eyeread.in"/>
+      <span class="nav-word">eyeread<span>.in</span></span>
     </a>
+    <div class="nav-r">
+      <a class="nav-gh" href="https://github.com/omniship-labs/eyeread" target="_blank">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <button class="nav-cta">Download free</button>
+    </div>
   </div>
 </nav>
 
-<!-- Hero -->
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-bg">
-    <div class="hero-bg-glow-1"></div>
-    <div class="hero-bg-glow-2"></div>
+  <div class="hero-glow-top"></div>
+  <div class="hero-glow-btm"></div>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;flex-wrap:wrap;justify-content:center">
+    <div class="eyebrow" style="margin-bottom:0">
+      <span class="eyebrow-dot"></span>
+      Invisible to screen-share
+    </div>
+    <a href="https://github.com/omniship-labs/eyeread" target="_blank" style="display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-pill);font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Star on GitHub
+    </a>
   </div>
-  <div class="hero-grid">
-    <div class="hero-left">
-      <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span>Free · Open source · MIT</div>
-      <h1>Look at the lens.<br/>Not your notes.</h1>
-      <p class="hero-sub">eyeread floats your script over <b>whatever you're sharing</b> — invisible on every recording, every stream, every screen share. Voice tracking follows along so the highlight is always where you are.</p>
-      <div class="cta-row">
-        <a class="btn-primary" href="#">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download free
-        </a>
-        <a class="btn-ghost" href="#">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          View on GitHub
-        </a>
-      </div>
-      <div class="hero-note">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        No account, no subscription, no catch.
+
+  <h1>Look at the lens.<br/><em>Not your notes.</em></h1>
+
+  <p class="hero-sub">
+    eyeread.in floats your script over any screen as a glass overlay.
+    It follows your voice — and never shows up in a recording.
+  </p>
+
+  <div class="cta-row">
+    <a href="#" data-comment-anchor="9ec97972d7-button" style="display:inline-flex;align-items:center;text-decoration:none">
+      <svg height="48" viewBox="0 0 135 40" xmlns="http://www.w3.org/2000/svg"><rect width="135" height="40" rx="8" fill="#000"/><path d="M16.8 20.1c0-3.3 2.7-4.9 2.8-5-1.5-2.2-3.9-2.5-4.7-2.5-2-.2-3.9 1.2-4.9 1.2-1 0-2.6-1.2-4.2-1.1-2.2 0-4.2 1.3-5.3 3.2-2.3 3.9-.6 9.8 1.6 13 1.1 1.6 2.4 3.3 4 3.3 1.6-.1 2.2-1 4.2-1s2.5 1 4.2 1c1.7 0 2.8-1.6 3.9-3.2 1.2-1.8 1.7-3.6 1.7-3.7-.1 0-3.3-1.2-3.3-4.2zm-3-7.8c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.8.9-3.7 2-.8 1-1.5 2.5-1.3 4 1.4.1 2.8-.7 3.7-1.9z" fill="#fff"/><text x="32" y="14" font-family="-apple-system,system-ui,sans-serif" font-size="9" fill="rgba(255,255,255,0.7)">Download on the</text><text x="32" y="28" font-family="-apple-system,system-ui,sans-serif" font-size="15" font-weight="600" fill="#fff">Mac App Store</text></svg>
+    </a>
+    <a class="btn-g" href="https://github.com/omniship-labs/eyeread" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <p class="hero-note">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    Free forever · AGPL-3.0 · No account required
+  </p>
+
+  <!-- demo visual -->
+  <div class="demo-wrap">
+    <div class="demo-badge">
+      <span class="cam-dot"></span>
+      Camera · eyeread.in hidden from recording
+    </div>
+
+    <div class="screen-frame">
+      <!-- before/after reveal slider. Layer 1=base (no overlay), Layer 2=with overlay clipped by clip-path -->
+      <div data-comment-anchor="16ec02db1b-div" style="position:relative;width:100%;height:100%;overflow:hidden;cursor:ew-resize;user-select:none" id="slider-wrap">
+
+        <!-- LAYER 1: base — slide without overlay, always fully visible -->
+        <div style="position:absolute;inset:0;padding:40px 52px;display:flex;flex-direction:column;justify-content:center">
+          <div class="slide-ey">Q3 All-Hands · Acme Corp</div>
+          <div class="slide-h">Building for the<br/>next ten years</div>
+          <div class="slide-bars">
+            <div class="bar" style="height:28%;background:rgba(90,110,180,0.2)"></div>
+            <div class="bar" style="height:45%;background:rgba(90,110,180,0.25)"></div>
+            <div class="bar" style="height:62%;background:rgba(90,110,180,0.3)"></div>
+            <div class="bar hot" style="height:88%"></div>
+            <div class="bar" style="height:72%;background:rgba(90,110,180,0.3)"></div>
+            <div class="bar" style="height:55%;background:rgba(90,110,180,0.25)"></div>
+          </div>
+        </div>
+
+        <!-- LAYER 2: with overlay — full size, clip-path reveals only left portion.
+             The overlay panel is at its natural absolute position within the full frame.
+             clip-path: inset(0 RIGHT% 0 0) hides everything to the right of the handle. -->
+        <div id="slider-overlay-layer" style="position:absolute;inset:0;clip-path:inset(0 40% 0 0)">
+          <!-- duplicate slide bg for visual continuity -->
+          <div style="position:absolute;inset:0;padding:40px 52px;display:flex;flex-direction:column;justify-content:center" data-comment-anchor="33d8a90887-div">
+            <div class="slide-ey">Q3 All-Hands · Acme Corp</div>
+            <div class="slide-h" data-comment-anchor="f703acaf67-div">Building for the<br/>next ten years</div>
+          </div>
+          <!-- The prompter overlay — positioned naturally, clipped with the layer -->
+          <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);width:80%;background:rgba(10,10,22,0.64);backdrop-filter:blur(20px);border:1px solid rgba(110,86,247,0.3);border-radius:14px;box-shadow:0 0 0 1px rgba(110,86,247,0.08),0 20px 60px rgba(110,86,247,0.18);padding:12px 18px 14px">
+            <div class="ov-header"><span class="ov-pulse"></span><span class="ov-timer">01:24</span><span class="ov-tag"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Invisible</span></div>
+            <div class="ov-line"><span class="ov-spoken">We have an incredible team and a clear </span><span class="ov-active">roadmap</span><span class="ov-next"> — what we need now is focus, not just speed. Let the results speak.</span></div>
+          </div>
+        </div>
+
+        <!-- Divider handle -->
+        <div id="slider-line" style="position:absolute;top:0;bottom:0;left:60%;width:2px;background:rgba(255,255,255,0.6);z-index:20;pointer-events:none">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 16px rgba(0,0,0,0.5)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 3 12 9 6"/><polyline points="15 18 21 12 15 6"/></svg>
+          </div>
+        </div>
+
+        <!-- Labels -->
+        <div style="position:absolute;bottom:12px;left:12px;font-family:var(--font-mono);font-size:9.5px;color:rgba(255,255,255,0.5);letter-spacing:.08em;pointer-events:none">WITH OVERLAY</div>
+        <div style="position:absolute;bottom:12px;right:12px;font-family:var(--font-mono);font-size:9.5px;color:rgba(255,255,255,0.28);letter-spacing:.08em;pointer-events:none">WITHOUT</div>
       </div>
     </div>
-    <div class="hero-right">
-      <div class="screen">
-        <div class="screen-inner">
-          <div class="slide-ey">All-hands · Q3 2026</div>
-          <div class="slide-h">We shipped invisible.<br/>Now we scale it.</div>
-          <div class="slide-sub">Three numbers that defined the quarter.</div>
-          <div class="chart-mini">
-            <div class="bm" style="height:42%"></div>
-            <div class="bm" style="height:60%"></div>
-            <div class="bm" style="height:78%"></div>
-            <div class="bm hot" style="height:100%"></div>
-          </div>
-        </div>
-        <!-- floating overlay -->
-        <div class="ov-float">
-          <div class="webcam-pill"><span class="wcam"></span> Camera · eyeread invisible</div>
-          <div class="ovf-head">
-            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);display:flex;align-items:center;gap:5px">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              01:42
-            </span>
-            <span class="ovf-invisible">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-              Invisible
-            </span>
-          </div>
-          <div class="ovf-text">
-            <span class="ovf-s">Before we look at the numbers — </span><span class="ovf-a">what this team shipped</span><span class="ovf-u"> in ninety days is remarkable.</span>
-          </div>
-        </div>
-      </div>
+
+    <div class="invis-badge">
+      <span class="invis-dot"></span>
+      Hidden from all screen-share software
     </div>
   </div>
 </section>
 
-<!-- Features -->
+<!-- FEATURES -->
 <section class="features">
-  <div class="sec-label">What it does</div>
-  <div class="sec-title">The prompter your audience can't see</div>
+  <div class="sec-ey">What makes it different</div>
+  <h2 class="sec-h">Built for how people actually present.</h2>
+
   <div class="feat-grid">
-    <div class="feat">
-      <div class="feat-icon ind">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/></svg>
+    <div class="feat" data-comment-anchor="da4a389930-div">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
       </div>
-      <h3>Invisible to every recorder</h3>
-      <p>eyeread renders outside the OS capture layer. Zoom, Loom, QuickTime, OBS — none of them see it. Your audience never knows it's there.</p>
+      <h3 class="feat-h">Invisible to every recorder</h3>
+      <p class="feat-p">eyeread.in renders outside the captured frame. Zoom, Loom, OBS, QuickTime — none of them see it. Your audience only sees the content.</p>
+      <span class="feat-tag" data-comment-anchor="72e821c36a-span">Screen-share safe</span>
     </div>
+
     <div class="feat">
-      <div class="feat-icon ind">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
       </div>
-      <h3>Voice tracking</h3>
-      <p>It listens. The highlight follows the word you're saying, not a timer. Pause for emphasis — it waits. Speed up — it keeps up.</p>
+      <h3 class="feat-h">Voice tracking</h3>
+      <p class="feat-p">Speak, and the script follows. The current word glows. What you've said fades. No tapping, no foot pedal — just talk.</p>
+      <span class="feat-tag">Auto-scroll</span>
     </div>
+
     <div class="feat">
-      <div class="feat-icon ind">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
       </div>
-      <h3>Near the camera</h3>
-      <p>Anchors at the top of your screen, just below the webcam. Your eyes stay on the lens — not drifting down to notes. You look present.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon grn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </div>
-      <h3>Works on any device</h3>
-      <p>macOS, Windows, any browser — eyeread adapts. Overlay your slides, your call, your recording setup. Any content, any tool.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon grn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      </div>
-      <h3>Timer built in</h3>
-      <p>Count up from first word, or count down to a target. Stay on time without looking at your watch. One less thing to manage.</p>
-    </div>
-    <div class="feat">
-      <div class="feat-icon red">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-      </div>
-      <h3>Free, forever</h3>
-      <p>No trial, no paywall, no "pro" tier. MIT licensed. The full app is yours. If it helps you, donate. If not, it's still yours.</p>
+      <h3 class="feat-h">Near the camera</h3>
+      <p class="feat-p">The overlay anchors just below your webcam. Your eyes naturally land on the lens — not the corner of the screen. You look present.</p>
+      <span class="feat-tag">Eye contact</span>
     </div>
   </div>
 </section>
 
-<!-- Open source -->
-<section class="oss">
-  <div class="oss-card">
-    <div>
-      <div class="oss-eyebrow">Open source · MIT license</div>
-      <div class="oss-title">Built in the open. Kept free on purpose.</div>
-      <p class="oss-body">eyeread.in is <b>fully open source</b>. Read the code, audit it, fork it, contribute to it. No tracking, no telemetry, no subscription hidden in plain sight. The people who find it genuinely useful keep it alive by donating — voluntarily, without pressure.</p>
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="how-grid">
+    <div class="steps">
+      <div class="sec-ey" style="text-align:left">How it works</div>
+      <h2 class="sec-h" style="text-align:left;margin-bottom:40px">Open it. Paste your script. Talk.</h2>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Paste or type your script</h3>
+          <p>Drop in anything — a keynote, a YouTube script, talking points, interview answers. eyeread.in works with plain text.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Position the overlay</h3>
+          <p>Drag it near your camera. Adjust font size, opacity, and speed. It floats above every other window.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Start talking</h3>
+          <p>Voice detection takes over. The active word is highlighted. The text scrolls as you speak. Hit record whenever you're ready.</p>
+        </div>
+      </div>
     </div>
-    <div class="oss-btns">
-      <a class="btn-primary" href="#" style="white-space:nowrap">
-        <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-        View on GitHub
-      </a>
-      <a class="btn-ghost" href="#" style="white-space:nowrap;justify-content:center">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        Donate
-      </a>
+
+    <div class="how-visual">
+      <div class="how-ov">
+        <div class="how-ov-h">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);display:inline-block"></span>
+          Voice tracking active · 00:42
+        </div>
+        <div class="how-ov-txt">
+          <span class="how-ov-sp">Thank you all for being here today. I want to talk about something that </span><span class="how-ov-ac">matters</span><span class="how-ov-nx"> more than any quarterly number — the people we serve and the trust they place in us.</span>
+        </div>
+      </div>
+      <div class="how-caption">↑ The overlay — only you can see this</div>
     </div>
   </div>
 </section>
 
-<footer>
-  <div class="ft-brand"><img src="../../assets/logo-mark.svg" alt=""/>eyeread<span>.in</span></div>
-  <p>Free and open source · MIT License · <a href="#">eyeread.in</a></p>
-  <div class="ft-right">
-    <a href="#">GitHub</a>
-    <a href="#">Privacy</a>
-    <a href="#">Donate</a>
+<!-- OSS -->
+<section class="oss" style="margin-bottom:100px">
+  <div class="oss-left">
+    <h2 style="font-size:clamp(28px,2.8vw,40px);font-weight:700;letter-spacing:-.03em;color:#fff;line-height:1.15;margin-bottom:18px">Free, open source, and honest about it.</h2>
+    <p>eyeread.in is fully open source. Read the code, audit it, fork it, contribute to it. No tracking, no telemetry, no subscription. If it helps you — donate voluntarily.</p>
+    <a href="https://github.com/omniship-labs/eyeread" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:4px;padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-md);font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text-primary);text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      omniship-labs/eyeread
+      <span style="padding:1px 7px;background:rgba(110,86,247,0.2);border-radius:999px;font-family:var(--font-mono);font-size:10.5px;color:var(--accent-text)">AGPL-3.0</span>
+    </a>
+  </div>
+  <div class="oss-right">
+    <div class="oss-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="oss-row-body"><h4>No account required</h4><p>Download and use immediately — no sign-up, no email</p></div>
+    </div>
+    <div class="oss-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="oss-row-body"><h4>No telemetry</h4><p>Nothing leaves your machine. Your scripts stay private.</p></div>
+    </div>
+    <div class="oss-row" data-comment-anchor="5743dc21b0-div">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;color:var(--text-tertiary);flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="oss-row-body"><h4 data-comment-anchor="faa1c7bd92-h4">macOS only · native app</h4><p>The overlay requires OS-level window layering. macOS only for now.</p></div>
+    </div>
+    <div class="oss-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      <div class="oss-row-body"><h4>Donation-supported</h4><p>If eyeread.in helps you, pay it forward — no pressure</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="padding:40px 48px">
+  <a class="foot-brand" href="#">
+    <img src="../../assets/logos/eyeread-mark-bounded-dark.svg" alt="eyeread.in" style="width:22px;height:22px"/>
+    <span class="foot-word">eyeread<span>.in</span></span>
+  </a>
+  <div class="foot-r">
+    <a class="foot-link" href="https://github.com/omniship-labs/eyeread" target="_blank">GitHub</a>
+    <a class="foot-link" href="#">Docs</a>
+    <a class="foot-link" href="#">Discord</a>
+    <a class="foot-link" href="https://github.com/omniship-labs/eyeread/blob/main/LICENSE" target="_blank" style="font-family:var(--font-mono);font-size:11px">AGPL-3.0</a>
+    <span class="foot-copy" data-comment-anchor="5fd30962d1-span">Free forever</span>
   </div>
 </footer>
 
+<script>
+lucide.createIcons();
+
+// Before/after overlay slider — clip-path on full-width overlay layer
+(function(){
+  const wrap = document.getElementById('slider-wrap');
+  const layer = document.getElementById('slider-overlay-layer');
+  const line = document.getElementById('slider-line');
+  if(!wrap || !layer || !line) return;
+  let dragging = false;
+
+  function setPos(clientX) {
+    const r = wrap.getBoundingClientRect();
+    const pct = Math.max(5, Math.min(95, (clientX - r.left) / r.width * 100));
+    layer.style.clipPath = 'inset(0 ' + (100 - pct).toFixed(1) + '% 0 0)';
+    line.style.left = pct.toFixed(1) + '%';
+  }
+
+  wrap.addEventListener('mousedown', e => { dragging = true; setPos(e.clientX); e.preventDefault(); });
+  window.addEventListener('mousemove', e => { if(dragging) setPos(e.clientX); });
+  window.addEventListener('mouseup', () => { dragging = false; });
+  wrap.addEventListener('touchstart', e => { dragging = true; setPos(e.touches[0].clientX); }, {passive:true});
+  window.addEventListener('touchmove', e => { if(dragging) setPos(e.touches[0].clientX); }, {passive:true});
+  window.addEventListener('touchend', () => { dragging = false; });
+})();
+</script>
 </body>
 </html>

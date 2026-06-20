@@ -1,4 +1,4 @@
-The reading panel — the heart of teleprompt.d. Spoken words dim, the active word glows white, upcoming words stay readable. Drive `active` from the voice-detection word index so highlighting tracks speech.
+The reading panel — the heart of eyeread.in. Spoken words dim, the active word glows white, upcoming words stay readable. Drive `active` from the voice-detection word index so highlighting tracks speech.
 
 ```jsx
 <ScriptViewer

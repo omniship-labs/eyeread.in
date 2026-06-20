@@ -81,7 +81,13 @@
     "shortDescription": "Invisible teleprompter",
     "longDescription": "eyeread.in floats your script as a translucent glass overlay on top of whatever you're sharing and stays invisible to screen-share and screen capture. Free, forever.",
     "publisher": "OmniShip",
-    "copyright": "© OmniShip"
+    "copyright": "© OmniShip",
+    "resources": {
+      "icons/iconcomposer/actool-out/Assets.car": "Assets.car"
+    },
+    "macOS": {
+      "infoPlist": "Info.plist"
+    }
   },
   "plugins": {
     "updater": {

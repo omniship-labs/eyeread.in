@@ -1,0 +1,18 @@
+<svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="eyeread.in">
+  <defs>
+  <filter id="lwmlgf" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.5" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+  <filter id="lwmlgs" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+    <clipPath id="lwmlsq"><rect x="2" y="2" width="44" height="44" rx="11"></rect></clipPath>
+    <linearGradient id="lwmlsh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(0,0,0,0.06)"></stop><stop offset="100%" stop-color="rgba(0,0,0,0)"></stop></linearGradient>
+  </defs>
+  
+  <rect x="0" y="0" width="48" height="48" rx="13" fill="rgba(255,255,255,0.28)"></rect>
+  <g clip-path="url(#lwmlsq)">
+    <rect x="2" y="2" width="44" height="22" fill="#1a1a2e"></rect>
+    <rect x="2" y="24" width="44" height="22" fill="#e8ecf4"></rect>
+    <rect x="2" y="22.5" width="44" height="3" fill="#5040d0" filter="url(#lwmlgf)"></rect>
+    <rect x="6" y="23" width="36" height="2.5" fill="rgba(80,64,208,0.5)" filter="url(#lwmlgs)"></rect>
+    <rect x="2" y="2" width="44" height="44" fill="url(#lwmlsh)"></rect>
+  </g>
+  <text x="62" y="33" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="25" letter-spacing="-0.5" fill="#1a1a2e">eyeread<tspan fill="#5040d0">.in</tspan></text>
+</svg>

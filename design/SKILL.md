@@ -14,7 +14,7 @@ Read `readme.md` in this skill first. It is the authoritative guide. The section
 - **Wordmark:** `[eye mark] eyeread.in` — ".in" renders in the indigo accent `#6e56f7`
 - **Pun:** eye = I → the lockup reads "I read in." Intentional.
 - **Domain:** `eyeread.in`
-- **License:** MIT open source, donation-supported. No subscription, no paywall.
+- **License:** AGPL-3.0, open source, donation-supported. No subscription, no paywall.
 
 ---
 
@@ -152,7 +152,7 @@ Script word states:
 - Sentence case everywhere. Mono status labels UPPERCASE.
 - No emoji. No exclamation marks. No "supercharge."
 - Short verbs: "Start reading" · "Hide from screen-share" · "Skip ahead"
-- Open source narrative: transparent, trustworthy. "Free, forever." not "Start for free today!"
+- Open source narrative: transparent, trustworthy. "Open source." not "Start for free today!"
 
 ---
 

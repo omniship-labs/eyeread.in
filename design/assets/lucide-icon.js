@@ -1,4 +1,4 @@
-/* teleprompt.d — Lucide icon helper.
+/* eyeread.in — Lucide icon helper.
    Requires the Lucide UMD script loaded first (window.lucide).
    Exposes:
      tpdIconSVG(name, size=20, strokeWidth=2)  -> SVG markup string

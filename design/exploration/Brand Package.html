@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>eyeread.in — Brand Package</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      background: #06060a;
+      color: #f2f2f7;
+      font-family: 'Space Grotesk', sans-serif;
+      padding: 56px 48px 100px;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .page-head {
+      margin-bottom: 60px
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: #44445a;
+      margin-bottom: 10px
+    }
+
+    .page-title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -.025em
+    }
+
+    .page-sub {
+      font-size: 14px;
+      color: #5a5a72;
+      margin-top: 8px;
+      line-height: 1.55;
+      max-width: 600px
+    }
+
+    .sec {
+      margin-bottom: 72px
+    }
+
+    .sec-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: #3a3a52;
+      margin-bottom: 22px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid #141420
+    }
+
+    /* asset cards */
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-start
+    }
+
+    .card {
+      background: #0f0f18;
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0
+    }
+
+    .card-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden
+    }
+
+    .card-preview img {
+      display: block
+    }
+
+    .card-preview.light {
+      background: #e8edf6
+    }
+
+    .card-preview.checker {
+      background-image: linear-gradient(45deg, #1a1a24 25%, transparent 25%), linear-gradient(-45deg, #1a1a24 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1a1a24 75%), linear-gradient(-45deg, transparent 75%, #1a1a24 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0
+    }
+
+    .card-foot {
+      padding: 11px 14px;
+      border-top: 1px solid rgba(255, 255, 255, .05)
+    }
+
+    .card-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #b0b0c4;
+      margin-bottom: 2px
+    }
+
+    .card-dim {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #44445a
+    }
+
+    .card-dl {
+      margin-left: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #6e56f7;
+      text-decoration: none;
+      opacity: .7;
+      transition: opacity .15s
+    }
+
+    .card-dl:hover {
+      opacity: 1
+    }
+
+    .card-row {
+      display: flex;
+      align-items: center
+    }
+
+    /* wide asset with label only below */
+    .wide-wrap {
+      width: 100%;
+      margin-bottom: 20px
+    }
+
+    .wide-preview {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .07)
+    }
+
+    .wide-preview img {
+      display: block;
+      width: 100%;
+      height: auto
+    }
+
+    .wide-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px
+    }
+
+    .wide-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #b0b0c4
+    }
+
+    .wide-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #44445a
+    }
+
+    .wide-dl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #6e56f7;
+      text-decoration: none;
+      opacity: .7
+    }
+
+    .wide-dl:hover {
+      opacity: 1
+    }
+
+    /* social grid */
+    .social-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px
+    }
+
+    .social-grid.thirds {
+      grid-template-columns: 1fr 1fr 1fr
+    }
+
+    /* banners grid */
+    .banner-row {
+      display: flex;
+      flex-direction: column;
+      gap: 18px
+    }
+
+    /* specs */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px
+    }
+
+    .spec-card {
+      background: #0f0f18;
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 12px;
+      padding: 20px 22px
+    }
+
+    .spec-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #3a3a52;
+      margin-bottom: 14px
+    }
+
+    .spec-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .spec-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      flex-shrink: 0
+    }
+
+    .spec-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #c0c0d4
+    }
+
+    .spec-hex {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #44445a;
+      margin-top: 1px
+    }
+
+    .spec-type {
+      margin-bottom: 10px
+    }
+
+    .spec-type .tname {
+      font-size: 13px;
+      font-weight: 700;
+      color: #d8d8e8;
+      margin-bottom: 2px
+    }
+
+    .spec-type .tmeta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: #44445a
+    }
+
+    .spec-handle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: #8888a0;
+      margin-bottom: 7px
+    }
+
+    .spec-handle strong {
+      color: #c0c0d4
+    }
+
+    .license-note h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c0c0d4;
+      margin-bottom: 6px
+    }
+
+    .license-note p {
+      font-size: 12px;
+      color: #6a6a82;
+      line-height: 1.55
+    }
+
+    .license-note code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #a594ff;
+      background: rgba(110, 86, 247, .12);
+      padding: 2px 6px;
+      border-radius: 4px
+    }
+
+    /* asset rows inside platform cards */
+    .asset-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, .05);
+      margin-bottom: 2px
+    }
+
+    .asset-thumb {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      text-align: center
+    }
+
+    .asset-thumb.wide {
+      align-items: flex-start;
+      text-align: left
+    }
+
+    .thumb-wrap {
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0a0a12;
+      border: 1px solid rgba(255, 255, 255, .07);
+      flex-shrink: 0
+    }
+
+    .thumb-wrap.circle {
+      border-radius: 50%
+    }
+
+    .thumb-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #7a7a92;
+      line-height: 1.5
+    }
+
+    .thumb-meta span {
+      color: #44445a;
+      font-size: 9.5px
+    }
+
+    .dl-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6e56f7;
+      background: rgba(110, 86, 247, .1);
+      border: 1px solid rgba(110, 86, 247, .22);
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .dl-btn:hover {
+      background: rgba(110, 86, 247, .2);
+      color: #a594ff
+    }
+
+    /* platform copy */
+    .copy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+
+    .copy-grid.full {
+      grid-template-columns: 1fr
+    }
+
+    .platform-card {
+      background: #0f0f18;
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .pc-header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .05)
+    }
+
+    .pc-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 17px
+    }
+
+    .pc-meta h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c0c0d4;
+      margin: 0 0 2px
+    }
+
+    .pc-meta .limits {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: #3a3a52
+    }
+
+    .pc-preview {
+      border-bottom: 1px solid rgba(255, 255, 255, .05)
+    }
+
+    .pc-body {
+      padding: 14px 18px 16px
+    }
+
+    .field {
+      margin-bottom: 12px
+    }
+
+    .field:last-child {
+      margin-bottom: 0
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px
+    }
+
+    .field-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #44445a
+    }
+
+    .copy-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6e56f7;
+      background: rgba(110, 86, 247, .1);
+      border: 1px solid rgba(110, 86, 247, .22);
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all .15s;
+      flex-shrink: 0
+    }
+
+    .copy-btn:hover {
+      background: rgba(110, 86, 247, .2);
+      color: #a594ff
+    }
+
+    .copy-btn.done {
+      color: #34d399;
+      background: rgba(52, 211, 153, .1);
+      border-color: rgba(52, 211, 153, .25)
+    }
+
+    .copy-block {
+      background: #09090e;
+      border: 1px solid rgba(255, 255, 255, .06);
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 12px;
+      color: #d0d0e4;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      cursor: pointer;
+      transition: border-color .15s
+    }
+
+    .copy-block:hover {
+      border-color: rgba(110, 86, 247, .3)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="page-head">
+      <div class="eyebrow">eyeread.in · brand package · 2026</div>
+      <div class="page-title">Brand assets</div>
+      <div class="page-sub">Every logo, banner, and social image for eyeread.in. All SVG — scalable to any resolution.
+        Mark: squircle split (top white / bottom dark / indigo cue line). Click any download link to grab the file.
+      </div>
+    </div>
+
+    <!-- ===== MARKS ===== -->
+    <div class="sec">
+      <div class="sec-label">01 — Mark variants</div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-preview" style="padding:28px;background:#09090e;width:200px">
+            <img src="../assets/logos/eyeread-mark-unbounded-dark.svg" width="120" height="120" alt="Mark dark" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Mark · unbounded (dark bg)</div>
+                <div class="card-dim">512 × 512px · SVG · no container · platform clips to circle</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-mark-unbounded-dark.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-preview light" style="padding:28px;width:200px">
+            <img src="../assets/logos/eyeread-mark-unbounded-light.svg" width="120" height="120" alt="Mark light" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Mark · unbounded (light bg)</div>
+                <div class="card-dim">512 × 512px · SVG · no container · for light background avatars</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-mark-unbounded-light.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-preview" style="padding:28px;background:#09090e;width:200px">
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="120" height="120" alt="Mark bounded dark" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Mark · bounded (dark bg)</div>
+                <div class="card-dim">512 × 512px · SVG · squircle clip + glassy border · use in UI</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-mark-bounded-dark.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-preview light" style="padding:28px;width:200px">
+            <img src="../assets/logos/eyeread-mark-bounded-light.svg" width="120" height="120"
+              alt="Mark bounded light" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Mark · bounded (light bg)</div>
+                <div class="card-dim">512 × 512px · SVG · squircle clip, inverted palette</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-mark-bounded-light.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-preview checker" style="padding:28px;width:200px">
+            <img src="../assets/logos/eyeread-mark-unbounded-dark.svg" width="120" height="120" alt="Mark mono" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Mark · unbounded (dark bg)</div>
+                <div class="card-dim">512 × 512px · SVG · no container · platform clips to circle</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-mark-unbounded-dark.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-preview" style="padding:28px;background:#09090e;width:200px">
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="120" height="120" alt="App icon" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">App icon (squircle container)</div>
+                <div class="card-dim">1024 × 1024px · SVG · only this one has its own container</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-mark-bounded-dark.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:22px 24px">
+          <div
+            style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#3a3a52;margin-bottom:12px">
+            Scale proof — all sizes from same SVG</div>
+          <div style="display:flex;align-items:flex-end;gap:14px;margin-bottom:12px">
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="64" height="64" alt="64px" />
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="48" height="48" alt="48px" />
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="32" height="32" alt="32px" />
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="24" height="24" alt="24px" />
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="20" height="20" alt="20px" />
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="16" height="16" alt="16px" />
+            <img src="../assets/logos/eyeread-mark-bounded-dark.svg" width="12" height="12" alt="12px" />
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#44445a">64 · 48 · 32 · 24 · 20 · 16 ·
+            12px — split stays legible at all sizes</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== WORDMARKS ===== -->
+    <div class="sec">
+      <div class="sec-label">02 — Wordmarks</div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-preview" style="padding:24px 28px;background:#09090e">
+            <img src="../assets/logos/eyeread-wordmark-dark.svg" height="54" alt="Wordmark dark" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Wordmark · dark</div>
+                <div class="card-dim">360 × 64px · SVG</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-wordmark-dark.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-preview light" style="padding:24px 28px">
+            <img src="../assets/logos/eyeread-wordmark-light.svg" height="54" alt="Wordmark light" />
+          </div>
+          <div class="card-foot">
+            <div class="card-row">
+              <div>
+                <div class="card-name">Wordmark · light</div>
+                <div class="card-dim">360 × 64px · SVG</div>
+              </div>
+              <a class="card-dl" href="../assets/logos/eyeread-wordmark-light.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SOCIAL / OG ===== -->
+    <div class="sec">
+      <div class="sec-label">03 — Social & OG images</div>
+
+      <div class="wide-wrap">
+        <div class="wide-preview"><img src="../assets/brand/og-image.svg" alt="OG image 1200×630"
+            data-comment-anchor="ee77f39001-img" /></div>
+        <div class="wide-foot">
+          <div><span class="wide-name">OG / GitHub social preview</span></div>
+          <span class="wide-meta">1200 × 630px</span>
+          <a class="wide-dl" href="../assets/brand/og-image.svg" download>↓ Download SVG</a>
+        </div>
+      </div>
+
+      <div class="wide-wrap">
+        <div class="wide-preview"><img src="../assets/brand/twitter-header.svg" alt="Twitter/X header"
+            data-comment-anchor="da008d0fd3-img" /></div>
+        <div class="wide-foot">
+          <div><span class="wide-name">Twitter / X header</span></div>
+          <span class="wide-meta">1500 × 500px</span>
+          <a class="wide-dl" href="../assets/brand/twitter-header.svg" download>↓ Download SVG</a>
+        </div>
+      </div>
+
+      <div class="wide-wrap">
+        <div class="wide-preview"><img src="../assets/brand/linkedin-cover.svg" alt="LinkedIn cover"
+            data-comment-anchor="fb563d690b-img" /></div>
+        <div class="wide-foot">
+          <div><span class="wide-name">LinkedIn company cover</span></div>
+          <span class="wide-meta">1128 × 191px</span>
+          <a class="wide-dl" href="../assets/brand/linkedin-cover.svg" download>↓ Download SVG</a>
+        </div>
+      </div>
+
+      <div class="wide-wrap">
+        <div class="wide-preview"><img src="../assets/brand/readme-banner.svg" alt="README hero image"
+            data-comment-anchor="066db8d4b3-img" /></div>
+        <div class="wide-foot">
+          <div>
+            <span class="wide-name">README.md hero image</span>
+            <span style="font-size:11px;color:#55556a;margin-left:10px">Paste at the top of your GitHub README with
+              <code
+                style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8888a0">![eyeread.in](assets/brand/readme-banner.svg)</code>
+              — not the same as the OG image (different dimensions, no CTA pill)</span>
+          </div>
+          <span class="wide-meta">1280 × 400px</span>
+          <a class="wide-dl" href="../assets/brand/readme-banner.svg" download>↓ Download SVG</a>
+        </div>
+      </div>
+
+      <div class="social-grid">
+        <div>
+          <div class="wide-preview"><img src="../assets/brand/discord-banner.svg" alt="Discord banner"
+              data-comment-anchor="920f2b179f-img" /></div>
+          <div class="wide-foot">
+            <span class="wide-name">Discord server banner</span>
+            <span class="wide-meta">960 × 540px</span>
+            <a class="wide-dl" href="../assets/brand/discord-banner.svg" download>↓ SVG</a>
+          </div>
+        </div>
+        <div style="display:flex;gap:20px;align-items:flex-start">
+          <div>
+            <div class="wide-preview" style="width:200px"><img src="../assets/brand/instagram-post.svg" width="200"
+                alt="Instagram post" /></div>
+            <div class="wide-foot">
+              <span class="wide-name">Instagram post</span>
+              <span class="wide-meta">1080 × 1080px</span>
+              <a class="wide-dl" href="../assets/brand/instagram-post.svg" download>↓ SVG</a>
+            </div>
+          </div>
+          <div>
+            <div class="wide-preview" style="width:160px"><img src="../assets/brand/email-header.svg" width="160"
+                alt="Email header" data-comment-anchor="ecd0dbe1a6-img" /></div>
+            <div class="wide-foot">
+              <span class="wide-name">Email header</span>
+              <span class="wide-meta">600 × 120px</span>
+              <a class="wide-dl" href="../assets/brand/email-header.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BANNERS ===== -->
+    <div class="sec">
+      <div class="sec-label">04 — Display banners</div>
+      <div class="banner-row">
+
+        <div class="wide-wrap">
+          <div class="wide-preview"><img src="../assets/brand/banner-leaderboard.svg" alt="Leaderboard 728×90"
+              data-comment-anchor="b7f7587d22-img" /></div>
+          <div class="wide-foot">
+            <span class="wide-name">Leaderboard</span>
+            <span class="wide-meta">728 × 90px</span>
+            <a class="wide-dl" href="../assets/brand/banner-leaderboard.svg" download>↓ Download SVG</a>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:24px;align-items:flex-start">
+          <div>
+            <div class="wide-preview" style="width:300px"><img src="../assets/brand/banner-300x250.svg" width="300"
+                alt="Medium rectangle" data-comment-anchor="865a3c1c6f-img" /></div>
+            <div class="wide-foot">
+              <span class="wide-name">Medium rectangle</span>
+              <span class="wide-meta">300 × 250px</span>
+              <a class="wide-dl" href="../assets/brand/banner-300x250.svg" download>↓ SVG</a>
+            </div>
+          </div>
+          <div>
+            <div class="wide-preview" style="width:200px"><img src="../assets/brand/banner-300x600.svg" width="200"
+                alt="Half page" data-comment-anchor="4f4051979f-img" /></div>
+            <div class="wide-foot">
+              <span class="wide-name">Half page</span>
+              <span class="wide-meta">300 × 600px</span>
+              <a class="wide-dl" href="../assets/brand/banner-300x600.svg" download>↓ SVG</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SPECS ===== -->
+    <div class="sec">
+      <div class="sec-label">05 — Quick-reference specs</div>
+      <div class="spec-grid">
+
+        <!-- Colors -->
+        <div class="spec-card">
+          <div class="spec-label">Brand colors</div>
+          <div class="spec-row">
+            <div class="spec-swatch" style="background:#f2f2f7;border:1px solid rgba(0,0,0,0.08)"></div>
+            <div>
+              <div class="spec-name">White</div>
+              <div class="spec-hex">#f2f2f7</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-swatch" style="background:#6e56f7;box-shadow:0 0 12px rgba(110,86,247,.5)"></div>
+            <div>
+              <div class="spec-name">Indigo (accent)</div>
+              <div class="spec-hex">#6e56f7</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-swatch" style="background:#0e0e1a;border:1px solid rgba(255,255,255,.12)"></div>
+            <div>
+              <div class="spec-name">Near-black</div>
+              <div class="spec-hex">#0e0e1a</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-swatch" style="background:#09090e"></div>
+            <div>
+              <div class="spec-name">Canvas</div>
+              <div class="spec-hex">#09090e</div>
+            </div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-swatch" style="background:#7a7a92"></div>
+            <div>
+              <div class="spec-name">Secondary text</div>
+              <div class="spec-hex">#7a7a92</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typography -->
+        <div class="spec-card">
+          <div class="spec-label">Typography</div>
+          <div class="spec-type">
+            <div class="tname"
+              style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.02em">Space
+              Grotesk 700</div>
+            <div class="tmeta">Display · headings · wordmark</div>
+          </div>
+          <div class="spec-type">
+            <div class="tname" style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:15px">Space
+              Grotesk 500</div>
+            <div class="tmeta">Body · UI text</div>
+          </div>
+          <div class="spec-type">
+            <div class="tname" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#9090a8">JetBrains
+              Mono 400</div>
+            <div class="tmeta">Labels · timecodes · meta · badges</div>
+          </div>
+          <div class="spec-type">
+            <div class="tname"
+              style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:15px;color:#b0b0c4">Hanken Grotesk
+              500</div>
+            <div class="tmeta">Prompter reading face</div>
+          </div>
+        </div>
+
+        <!-- Handles + license -->
+        <div class="spec-card">
+          <div class="spec-label">Handles</div>
+          <div class="spec-handle"><strong>Web</strong>&nbsp; eyeread.in</div>
+          <div class="spec-handle"><strong>X / Twitter</strong>&nbsp; @eyeread_in</div>
+          <div class="spec-handle"><strong>GitHub org</strong>&nbsp; omniship-labs</div>
+          <div class="spec-handle"><strong>Instagram</strong>&nbsp; @eyeread.in</div>
+          <div class="spec-handle"><strong>Product Hunt</strong>&nbsp; eyeread-in</div>
+          <div class="spec-handle"><strong>npm</strong>&nbsp; eyeread</div>
+          <div class="spec-handle"><strong>Discord</strong>&nbsp; eyeread.in</div>
+          <div class="license-note">
+            <h4>AGPL-3.0</h4>
+            <p>Free and open source. Anyone who uses or modifies eyeread.in must share their changes under the same
+              license. The licensor is the eyeread.in project.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ===== PLATFORM COPY ===== -->
+    <div class="sec">
+      <div class="sec-label">06 — Platform assets & copy</div>
+      <p style="font-size:13px;color:#5a5a72;margin-bottom:28px;max-width:640px">Each platform card shows the exact
+        images it needs with thumbnails you can download, plus all the copy fields. Click Copy on any field to grab the
+        text.</p>
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- GITHUB -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:#1a1a24"><svg width="20" height="20" viewBox="0 0 24 24"
+                fill="#f2f2f7">
+                <path
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>GitHub</h3>
+              <div class="limits">omniship-labs/eyeread · Org profile + repo</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap circle" style="width:72px;height:72px"><img
+                    src="../assets/logos/eyeread-mark-unbounded-dark.svg" width="72" height="72" alt="" /></div>
+                <div class="thumb-meta">Profile avatar<br /><span>500 × 500px</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-unbounded-dark.svg" download="eyeread-mark.svg">↓
+                  SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:240px;height:auto"><img src="../assets/brand/og-image.svg"
+                    width="240" style="height:auto;display:block" alt="" data-comment-anchor="5ea7ece153-img" /></div>
+                <div class="thumb-meta">Social preview (og:image)<br /><span>1200 × 630px</span></div>
+                <a class="dl-btn" href="../assets/brand/og-image.svg" download="eyeread-og.svg">↓ SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:240px;height:auto"><img src="../assets/brand/readme-banner.svg"
+                    width="240" style="height:auto;display:block" alt="" data-comment-anchor="e240de8b39-img" /></div>
+                <div class="thumb-meta">README.md hero<br /><span>1280 × 400px</span></div>
+                <a class="dl-btn" href="../assets/brand/readme-banner.svg" download="eyeread-readme-banner.svg">↓
+                  SVG</a>
+              </div>
+            </div>
+            <div class="copy-grid" style="margin-top:14px">
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Repo description</div><button class="copy-btn"
+                    data-copy="Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking follows along.">Copy</button>
+                </div>
+                <div class="copy-block">Open source teleprompter. Floats your script over any screen, invisible to every
+                  recorder. Voice tracking follows along.</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Topics</div><button class="copy-btn"
+                    data-copy="teleprompter, screen-share, voice-detection, overlay, open-source, agpl">Copy</button>
+                </div>
+                <div class="copy-block">teleprompter, screen-share, voice-detection, overlay, open-source, agpl</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TWITTER / X -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:#000"><svg width="20" height="20" viewBox="0 0 24 24" fill="#f2f2f7">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.261 5.632 5.903-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>Twitter / X</h3>
+              <div class="limits">@eyeread_in</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap circle" style="width:72px;height:72px"><img
+                    src="../assets/logos/eyeread-mark-unbounded-dark.svg" width="72" height="72" alt="" /></div>
+                <div class="thumb-meta">Profile photo<br /><span>400 × 400px</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-unbounded-dark.svg"
+                  download="eyeread-twitter-avatar.svg">↓ SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:240px;height:auto"><img src="../assets/brand/twitter-header.svg"
+                    width="240" style="height:auto;display:block" alt="" data-comment-anchor="bba44d4315-img" /></div>
+                <div class="thumb-meta">Header / banner<br /><span>1500 × 500px</span></div>
+                <a class="dl-btn" href="../assets/brand/twitter-header.svg" download="eyeread-twitter-header.svg">↓
+                  SVG</a>
+              </div>
+            </div>
+            <div class="copy-grid" style="margin-top:14px">
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Display name</div><button class="copy-btn"
+                    data-copy="eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">eyeread.in</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Bio (113 chars)</div><button class="copy-btn"
+                    data-copy="Open source teleprompter. Floats over any screen share, invisible to every recorder. Voice tracking. Look at the lens.">Copy</button>
+                </div>
+                <div class="copy-block">Open source teleprompter. Floats over any screen share, invisible to every
+                  recorder. Voice tracking. Look at the lens.</div>
+              </div>
+              <div class="field" style="grid-column:1/-1">
+                <div class="field-row">
+                  <div class="field-label">Pinned tweet</div><button class="copy-btn" data-copy="eyeread.in — free, open source teleprompter.
+
+Floats over your slides. Invisible to Zoom, Loom, OBS, QuickTime. Voice tracking follows every word.
+
+Look at the lens. Not your notes.
+
+→ eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">eyeread.in — free, open source teleprompter.
+
+                  Floats over your slides. Invisible to Zoom, Loom, OBS, QuickTime. Voice tracking follows every word.
+
+                  Look at the lens. Not your notes.
+
+                  → eyeread.in</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LINKEDIN -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:#0a66c2"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                <path
+                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>LinkedIn</h3>
+              <div class="limits">Company page</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap" style="width:72px;height:72px;border-radius:10px"><img
+                    src="../assets/logos/eyeread-mark-bounded-dark.svg" width="72" height="72" alt="" /></div>
+                <div class="thumb-meta">Company logo<br /><span>300 × 300px</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-bounded-dark.svg"
+                  download="eyeread-linkedin-logo.svg">↓ SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:280px;height:auto"><img src="../assets/brand/linkedin-cover.svg"
+                    width="280" style="height:auto;display:block" alt="" data-comment-anchor="eaea7c157a-img" /></div>
+                <div class="thumb-meta">Cover photo<br /><span>1128 × 191px</span></div>
+                <a class="dl-btn" href="../assets/brand/linkedin-cover.svg" download="eyeread-linkedin-cover.svg">↓
+                  SVG</a>
+              </div>
+            </div>
+            <div class="copy-grid" style="margin-top:14px">
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Tagline (57 chars)</div><button class="copy-btn"
+                    data-copy="Invisible teleprompter. Voice tracking. Open source.">Copy</button>
+                </div>
+                <div class="copy-block">Invisible teleprompter. Voice tracking. Open source.</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">About</div><button class="copy-btn" data-copy="eyeread.in is an open source teleprompter for macOS.
+
+It floats your script as a glass overlay over whatever you're presenting — slides, a Zoom call, a recording — and stays completely invisible to every screen recorder. Zoom, Loom, OBS, QuickTime: none of them see it.
+
+Voice detection tracks what you're saying and highlights the active line in real time. Your eyes stay on the camera, not on your notes.
+
+Free. Open source. AGPL-3.0.
+
+→ eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">eyeread.in is an open source teleprompter for macOS.
+
+                  It floats your script as a glass overlay over whatever you're presenting — slides, a Zoom call, a
+                  recording — and stays completely invisible to every screen recorder. Zoom, Loom, OBS, QuickTime: none
+                  of them see it.
+
+                  Voice detection tracks what you're saying and highlights the active line in real time. Your eyes stay
+                  on the camera, not on your notes.
+
+                  Free. Open source. AGPL-3.0.
+
+                  → eyeread.in</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INSTAGRAM -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"><svg
+                width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>Instagram</h3>
+              <div class="limits">@eyeread.in</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap circle" style="width:72px;height:72px"><img
+                    src="../assets/logos/eyeread-mark-unbounded-dark.svg" width="72" height="72" alt="" /></div>
+                <div class="thumb-meta">Profile pic<br /><span>320 × 320px (circle crop)</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-unbounded-dark.svg"
+                  download="eyeread-instagram-avatar.svg">↓ SVG</a>
+              </div>
+              <div class="asset-thumb">
+                <div class="thumb-wrap" style="width:80px;height:80px"><img src="../assets/brand/instagram-post.svg"
+                    width="80" height="80" alt="" /></div>
+                <div class="thumb-meta">Square post<br /><span>1080 × 1080px</span></div>
+                <a class="dl-btn" href="../assets/brand/instagram-post.svg" download="eyeread-instagram-post.svg">↓
+                  SVG</a>
+              </div>
+            </div>
+            <div class="copy-grid" style="margin-top:14px">
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Bio (91 chars)</div><button class="copy-btn"
+                    data-copy="Open source teleprompter&#10;Invisible on screen share&#10;Voice tracking · Look at the lens&#10;eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">Open source teleprompter
+                  Invisible on screen share
+                  Voice tracking · Look at the lens
+                  eyeread.in</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Website</div><button class="copy-btn"
+                    data-copy="https://eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">https://eyeread.in</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DISCORD -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:#5865f2"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                <path
+                  d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>Discord</h3>
+              <div class="limits">eyeread.in server</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap circle" style="width:72px;height:72px"><img
+                    src="../assets/logos/eyeread-mark-unbounded-dark.svg" width="72" height="72" alt="" /></div>
+                <div class="thumb-meta">Server icon<br /><span>512 × 512px</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-unbounded-dark.svg"
+                  download="eyeread-discord-icon.svg">↓ SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:240px;height:auto"><img src="../assets/brand/discord-banner.svg"
+                    width="240" style="height:auto;display:block" alt="" data-comment-anchor="90450b3e09-img" /></div>
+                <div class="thumb-meta">Server banner<br /><span>960 × 540px</span></div>
+                <a class="dl-btn" href="../assets/brand/discord-banner.svg" download="eyeread-discord-banner.svg">↓
+                  SVG</a>
+              </div>
+            </div>
+            <div class="copy-grid" style="margin-top:14px">
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Server name</div><button class="copy-btn"
+                    data-copy="eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">eyeread.in</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Description</div><button class="copy-btn"
+                    data-copy="Community for eyeread.in — the open source, screen-share-invisible teleprompter. Discuss features, get help, contribute.">Copy</button>
+                </div>
+                <div class="copy-block">Community for eyeread.in — the open source, screen-share-invisible teleprompter.
+                  Discuss features, get help, contribute.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT HUNT -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:#da552f"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                <path
+                  d="M13.604 8.4h-3.405V12h3.405c.995 0 1.801-.806 1.801-1.8S14.6 8.4 13.604 8.4zM12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm1.604 14.4H10.2V18H7.8V6h5.804a4.2 4.2 0 010 8.4z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>Product Hunt</h3>
+              <div class="limits">eyeread-in · Tagline: 60 chars max</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap" style="width:72px;height:72px;border-radius:14px"><img
+                    src="../assets/logos/eyeread-mark-bounded-dark.svg" width="72" height="72" alt="" /></div>
+                <div class="thumb-meta">App icon<br /><span>240 × 240px</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-bounded-dark.svg"
+                  download="eyeread-producthunt-icon.svg">↓ SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:240px;height:auto"><img src="../assets/brand/og-image.svg"
+                    width="240" style="height:auto;display:block" alt="" data-comment-anchor="3d7571622a-img" /></div>
+                <div class="thumb-meta">Thumbnail / gallery image<br /><span>1200 × 630px</span></div>
+                <a class="dl-btn" href="../assets/brand/og-image.svg" download="eyeread-producthunt-thumb.svg">↓ SVG</a>
+              </div>
+            </div>
+            <div class="copy-grid" style="margin-top:14px">
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Tagline (44 chars)</div><button class="copy-btn"
+                    data-copy="Teleprompter invisible on every screen share">Copy</button>
+                </div>
+                <div class="copy-block">Teleprompter invisible on every screen share</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Description</div><button class="copy-btn" data-copy="Most teleprompters are obvious. Your audience can tell you're reading.
+
+eyeread.in floats your script as a glass overlay on top of whatever you're sharing — slides, a Zoom call, a recording. Zoom, Loom, OBS, QuickTime — none of them capture it. Your audience sees a clean presentation. You see your words.
+
+Voice detection listens as you talk. The active line highlights automatically. Look up, not down.
+
+Free. Open source. AGPL-3.0.">Copy</button>
+                </div>
+                <div class="copy-block">Most teleprompters are obvious. Your audience can tell you're reading.
+
+                  eyeread.in floats your script as a glass overlay on top of whatever you're sharing — slides, a Zoom
+                  call, a recording. Zoom, Loom, OBS, QuickTime — none of them capture it. Your audience sees a clean
+                  presentation. You see your words.
+
+                  Voice detection listens as you talk. The active line highlights automatically. Look up, not down.
+
+                  Free. Open source. AGPL-3.0.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APP STORE + CHROME + NPM -->
+        <div class="copy-grid" style="margin:0">
+
+          <div class="platform-card">
+            <div class="pc-header">
+              <div class="pc-icon" style="background:linear-gradient(135deg,#1c84ff,#0e5cd1)"><svg width="20"
+                  height="20" viewBox="0 0 24 24" fill="#fff">
+                  <path
+                    d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                </svg></div>
+              <div class="pc-meta">
+                <h3>App Store (iOS / macOS)</h3>
+                <div class="limits">Name: 30 · Subtitle: 30 · Keywords: 100 chars</div>
+              </div>
+            </div>
+            <div class="pc-body">
+              <div class="asset-row">
+                <div class="asset-thumb">
+                  <div class="thumb-wrap" style="width:72px;height:72px;border-radius:16px"><img
+                      src="../assets/logos/eyeread-mark-bounded-dark.svg" width="72" height="72" alt="" /></div>
+                  <div class="thumb-meta">App icon (use bounded mark)<br /><span>1024 × 1024px</span></div>
+                  <a class="dl-btn" href="../assets/logos/eyeread-mark-bounded-dark.svg"
+                    download="eyeread-app-icon.svg">↓ SVG</a>
+                </div>
+              </div>
+              <div class="field" style="margin-top:12px">
+                <div class="field-row">
+                  <div class="field-label">Name</div><button class="copy-btn" data-copy="eyeread.in">Copy</button>
+                </div>
+                <div class="copy-block">eyeread.in</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Subtitle</div><button class="copy-btn"
+                    data-copy="Invisible Teleprompter">Copy</button>
+                </div>
+                <div class="copy-block">Invisible Teleprompter</div>
+              </div>
+              <div class="field">
+                <div class="field-row">
+                  <div class="field-label">Keywords</div><button class="copy-btn"
+                    data-copy="teleprompter, prompter, screen share, voice, recording, overlay, presentation, speaker">Copy</button>
+                </div>
+                <div class="copy-block">teleprompter, prompter, screen share, voice, recording, overlay, presentation,
+                  speaker</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="platform-card">
+              <div class="pc-header">
+                <div class="pc-icon" style="background:#fff;border:1px solid rgba(0,0,0,.08)"><svg width="20"
+                    height="20" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="4" fill="#4285f4" />
+                    <path d="M12 8h8.66A10 10 0 0112 2v6z" fill="#ea4335" />
+                    <path d="M3.34 8H12V2A10 10 0 003.34 8z" fill="#fbbc05" />
+                    <path d="M3.34 16l4.33-7.5H3.34A10 10 0 002 12a10 10 0 001.34 4z" fill="#34a853" />
+                    <path d="M20.66 16A10 10 0 0112 22v-6l8.66-7.5A10 10 0 0122 12a10 10 0 01-1.34 4z" fill="#34a853" />
+                    <path d="M12 22a10 10 0 01-8.66-6H12v6z" fill="#fbbc05" />
+                  </svg></div>
+                <div class="pc-meta">
+                  <h3>Chrome Web Store</h3>
+                  <div class="limits">Name: 45 · Short desc: 132 chars</div>
+                </div>
+              </div>
+              <div class="pc-body">
+                <div class="asset-row">
+                  <div class="asset-thumb">
+                    <div class="thumb-wrap" style="width:54px;height:54px;border-radius:10px"><img
+                        src="../assets/logos/eyeread-mark-bounded-dark.svg" width="54" height="54" alt="" /></div>
+                    <div class="thumb-meta">Extension icon<br /><span>128 × 128px</span></div><a class="dl-btn"
+                      href="../assets/logos/eyeread-mark-bounded-dark.svg" download="eyeread-chrome-icon.svg">↓ SVG</a>
+                  </div>
+                </div>
+                <div class="field" style="margin-top:12px">
+                  <div class="field-row">
+                    <div class="field-label">Name</div><button class="copy-btn"
+                      data-copy="eyeread.in — Invisible Teleprompter">Copy</button>
+                  </div>
+                  <div class="copy-block">eyeread.in — Invisible Teleprompter</div>
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <div class="field-label">Short description</div><button class="copy-btn"
+                      data-copy="Open source teleprompter. Floats over any tab, invisible to screen recorders. Voice tracking.">Copy</button>
+                  </div>
+                  <div class="copy-block">Open source teleprompter. Floats over any tab, invisible to screen recorders.
+                    Voice tracking.</div>
+                </div>
+              </div>
+            </div>
+            <div class="platform-card">
+              <div class="pc-header">
+                <div class="pc-icon" style="background:#cc3534"><svg width="20" height="20" viewBox="0 0 24 24"
+                    fill="#fff">
+                    <path
+                      d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331z" />
+                  </svg></div>
+                <div class="pc-meta">
+                  <h3>npm</h3>
+                  <div class="limits">Package: eyeread</div>
+                </div>
+              </div>
+              <div class="pc-body">
+                <div class="field">
+                  <div class="field-row">
+                    <div class="field-label">Description</div><button class="copy-btn"
+                      data-copy="Open source teleprompter. Invisible overlay, voice tracking, macOS native. AGPL-3.0.">Copy</button>
+                  </div>
+                  <div class="copy-block">Open source teleprompter. Invisible overlay, voice tracking, macOS native.
+                    AGPL-3.0.</div>
+                </div>
+                <div class="field">
+                  <div class="field-row">
+                    <div class="field-label">Keywords</div><button class="copy-btn"
+                      data-copy="teleprompter, overlay, screen-share, voice-detection, presentation, agpl">Copy</button>
+                  </div>
+                  <div class="copy-block">teleprompter, overlay, screen-share, voice-detection, presentation, agpl</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- WEBSITE META -->
+        <div class="platform-card">
+          <div class="pc-header">
+            <div class="pc-icon" style="background:#6e56f7"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                <path
+                  d="M12 2a10 10 0 100 20A10 10 0 0012 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a7.82 7.82 0 010-4h3.38a16.52 16.52 0 000 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A8.03 8.03 0 015.07 16zm2.95-8H5.07a8.03 8.03 0 014.33-3.56A15.65 15.65 0 008.02 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66a14.6 14.6 0 010-4h4.68a14.6 14.6 0 010 4zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14a16.52 16.52 0 000-4h3.38a7.82 7.82 0 010 4h-3.38z" />
+              </svg></div>
+            <div class="pc-meta">
+              <h3>Website meta tags + favicon</h3>
+              <div class="limits">og:image · twitter:card · favicon</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="asset-row">
+              <div class="asset-thumb">
+                <div class="thumb-wrap" style="width:32px;height:32px;border-radius:8px"><img
+                    src="../assets/logos/eyeread-mark-bounded-dark.svg" width="32" height="32" alt="" /></div>
+                <div class="thumb-meta">Favicon<br /><span>32 × 32px · also 16×16</span></div>
+                <a class="dl-btn" href="../assets/logos/eyeread-mark-bounded-dark.svg" download="eyeread-favicon.svg">↓
+                  SVG</a>
+              </div>
+              <div class="asset-thumb wide">
+                <div class="thumb-wrap" style="width:240px;height:auto"><img src="../assets/brand/og-image.svg"
+                    width="240" style="height:auto;display:block" alt="" data-comment-anchor="9cb45d9034-img" /></div>
+                <div class="thumb-meta">og:image / share preview<br /><span>1200 × 630px</span></div>
+                <a class="dl-btn" href="../assets/brand/og-image.svg" download="eyeread-og-image.svg">↓ SVG</a>
+              </div>
+            </div>
+            <div class="field" style="margin-top:12px">
+              <div class="field-row">
+                <div class="field-label">Full HTML meta block</div><button class="copy-btn"
+                  data-copy='<title>eyeread.in — Invisible Teleprompter</title>&#10;<meta name="description" content="Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking built in. Free.">&#10;<meta property="og:title" content="eyeread.in — Invisible Teleprompter">&#10;<meta property="og:description" content="Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking built in.">&#10;<meta property="og:image" content="https://eyeread.in/og-image.png">&#10;<meta property="og:url" content="https://eyeread.in">&#10;<meta name="twitter:card" content="summary_large_image">&#10;<meta name="twitter:site" content="@eyeread_in">'>Copy</button>
+              </div>
+              <div class="copy-block">&lt;title&gt;eyeread.in — Invisible Teleprompter&lt;/title&gt;
+                &lt;meta name="description" content="Open source teleprompter. Floats your script over any screen,
+                invisible to every recorder. Voice tracking built in. Free."&gt;
+                &lt;meta property="og:title" content="eyeread.in — Invisible Teleprompter"&gt;
+                &lt;meta property="og:description" content="Open source teleprompter. Floats your script over any
+                screen, invisible to every recorder. Voice tracking built in."&gt;
+                &lt;meta property="og:image" content="https://eyeread.in/og-image.png"&gt;
+                &lt;meta property="og:url" content="https://eyeread.in"&gt;
+                &lt;meta name="twitter:card" content="summary_large_image"&gt;
+                &lt;meta name="twitter:site" content="@eyeread_in"&gt;</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const text = btn.dataset.copy
+          .replace(/&#10;/g, '\n')
+          .replace(/\n/g, '\n');
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied ✓';
+          btn.classList.add('done');
+          setTimeout(() => { btn.textContent = orig; btn.classList.remove('done'); }, 1800);
+        });
+      });
+    });
+    document.querySelectorAll('.copy-block').forEach(el => {
+      el.addEventListener('click', () => {
+        const btn = el.previousElementSibling?.querySelector('.copy-btn');
+        if (btn) btn.click();
+      });
+    });
+  </script>
+</body>
+
+</html>

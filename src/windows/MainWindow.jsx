@@ -1,5 +1,18 @@
 import { useCallback, useEffect, useRef, useState, Component } from 'react';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Library as LibraryIcon, FileText, Settings as SettingsIcon, Heart } from 'lucide-react';
+import logoMarkDark from '../assets/logos/eyeread-mark-bounded-dark.svg';
+import logoMarkLight from '../assets/logos/eyeread-mark-bounded-light.svg';
+
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+function useSystemLogo() {
+  const [logo, setLogo] = useState(prefersDark.matches ? logoMarkDark : logoMarkLight);
+  useEffect(() => {
+    const handler = (e) => setLogo(e.matches ? logoMarkDark : logoMarkLight);
+    prefersDark.addEventListener('change', handler);
+    return () => prefersDark.removeEventListener('change', handler);
+  }, []);
+  return logo;
+}
 
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { error: null }; }
@@ -41,6 +54,7 @@ import {
 } from '../lib/tauri';
 
 export function MainWindow() {
+  const logoMark = useSystemLogo();
   const [pane, setPane] = useState('library'); // library | settings
   const { listWidth, handleMouseDown } = useListResize(300);
   const [scripts, setScripts] = useState([]);
@@ -137,7 +151,7 @@ export function MainWindow() {
   // ---- script ops ---------------------------------------------------------
   const selectScript = (id) => {
     setSelId(id);
-    setPane('library'); // stay in library pane, editor appears on right
+    setPane('library');
   };
 
   const createScript = () => {
@@ -173,7 +187,10 @@ export function MainWindow() {
             <div className="tl g" />
           </>
         )}
-        <span className="titlebar-name" data-tauri-drag-region>eyeread.in</span>
+        <div className="titlebar-name" data-tauri-drag-region>
+          <img src={logoMark} alt="" className="titlebar-logo" />
+          <span className="titlebar-wordmark">eyeread<span className="titlebar-wordmark-in">.in</span></span>
+        </div>
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}

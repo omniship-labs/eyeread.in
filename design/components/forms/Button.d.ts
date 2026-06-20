@@ -4,8 +4,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'subtle' | 'dang
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 /**
- * Primary action button for teleprompt.d.
- * @startingPoint section="Forms" subtitle="Accent button with glow, 5 variants × 3 sizes" viewport="700x150"
+ * Primary action button for eyeread.in.
  */
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual style. `primary` = indigo accent w/ glow. */

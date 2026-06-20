@@ -1,0 +1,32 @@
+<svg width="300" height="250" viewBox="0 0 300 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="b250bg" cx="50%" cy="0%" r="80%"><stop offset="0%" stop-color="#0d0b1e"></stop><stop offset="100%" stop-color="#09090e"></stop></radialGradient>
+  </defs>
+  <rect width="300" height="250" fill="url(#b250bg)"></rect>
+  <rect x="0.5" y="0.5" width="299" height="249" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"></rect>
+  <svg x="110" y="22" width="80" height="80" viewBox="0 0 88 88" overflow="visible">
+    <defs>
+      <filter id="b250gf" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+      <filter id="b250gs" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+      <clipPath id="b250sq"><rect x="4" y="4" width="80" height="80" rx="20"></rect></clipPath>
+      <linearGradient id="b250sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.42)"></stop><stop offset="45%" stop-color="rgba(255,255,255,0.10)"></stop><stop offset="100%" stop-color="rgba(255,255,255,0)"></stop></linearGradient>
+    </defs>
+    <rect x="2" y="2" width="84" height="84" rx="22" fill="rgba(255,255,255,0.18)"></rect>
+    <g clip-path="url(#b250sq)">
+      <rect x="4" y="4" width="80" height="40" fill="#f2f2f7"></rect>
+      <rect x="4" y="44" width="80" height="40" fill="#0e0e1a"></rect>
+      <rect x="4" y="41.5" width="80" height="5" fill="#6e56f7" filter="url(#b250gf)"></rect>
+      <rect x="11" y="42" width="66" height="4" fill="rgba(110,86,247,0.5)" filter="url(#b250gs)"></rect>
+      <rect x="4" y="4" width="80" height="80" fill="url(#b250sh)"></rect>
+    </g>
+  </svg>
+  <text x="150" y="128" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="24" letter-spacing="-0.5" fill="#f2f2f7">eyeread<tspan fill="#6e56f7">.in</tspan></text>
+  <text x="150" y="148" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="500" font-size="12" fill="#7a7a92">Invisible teleprompter. Voice tracking.</text>
+  <line x1="50" y1="162" x2="250" y2="162" stroke="rgba(255,255,255,0.06)" stroke-width="1"></line>
+  <rect x="24" y="172" width="12" height="12" rx="6" fill="#6e56f7"></rect>
+  <text x="42" y="182" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-size="12" fill="#c0c0d0">Invisible to screen share</text>
+  <rect x="24" y="192" width="12" height="12" rx="6" fill="#6e56f7"></rect>
+  <text x="42" y="202" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-size="12" fill="#c0c0d0">Voice tracking built in</text>
+  <rect x="36" y="216" width="228" height="28" rx="8" fill="#6e56f7"></rect>
+  <text x="150" y="234" text-anchor="middle" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="14" fill="#ffffff">Download free →</text>
+</svg>
