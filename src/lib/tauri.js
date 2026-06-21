@@ -114,21 +114,29 @@ async function settingsWindow() {
   return WebviewWindow.getByLabel('settings');
 }
 
-/** Open the settings modal near the overlay panel. */
-export async function showSettingsWindow(overlayWin) {
+/**
+ * Open the independent settings window next to the overlay panel.
+ * `protect` mirrors the overlay's screen-share shield so the settings window
+ * is hidden from capture in lockstep with the prompter.
+ */
+export async function showSettingsWindow(protect = true) {
   if (!isTauri) return;
   const win = await settingsWindow();
   if (!win) return;
-  // Position it just to the right of (or below) the overlay
+  // Anchor it just to the right of the overlay window.
   try {
     const { LogicalPosition } = await import('@tauri-apps/api/window');
-    const pos  = await overlayWin.outerPosition();
-    const size = await overlayWin.outerSize();
-    const scale = await overlayWin.scaleFactor();
+    const ov = await overlayWindow();
+    const pos  = await ov.outerPosition();
+    const size = await ov.outerSize();
+    const scale = await ov.scaleFactor();
     const x = Math.round(pos.x / scale + size.width / scale + 8);
     const y = Math.round(pos.y / scale);
     await win.setPosition(new LogicalPosition(x, y));
-  } catch { /* window hidden, skip positioning */ }
+  } catch { /* overlay hidden, skip positioning */ }
+  await win.setContentProtected(protect).catch(() => {});
+  await win.setVisibleOnAllWorkspaces(true).catch(() => {});
+  await win.setAlwaysOnTop(true).catch(() => {});
   await win.show();
   await win.setFocus();
 }
@@ -137,6 +145,13 @@ export async function hideSettingsWindow() {
   if (!isTauri) return;
   const win = await settingsWindow();
   await win?.hide();
+}
+
+/** Keep the settings window's screen-share protection in sync with the shield. */
+export async function setSettingsContentProtected(on) {
+  if (!isTauri) return;
+  const win = await settingsWindow();
+  await win?.setContentProtected(on).catch(() => {});
 }
 
 export async function showAboutWindow() {

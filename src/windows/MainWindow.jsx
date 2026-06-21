@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, Component } from 'react';
-import { Library as LibraryIcon, FileText, Settings as SettingsIcon, Heart, Eye, EyeOff } from 'lucide-react';
+import { Settings as SettingsIcon, Eye, EyeOff } from 'lucide-react';
 import logoMarkDark from '../assets/logos/eyeread-mark-bounded-dark.svg';
 import logoMarkLight from '../assets/logos/eyeread-mark-bounded-light.svg';
 
@@ -109,10 +109,11 @@ export function MainWindow() {
   }, []);
 
   useEffect(() => {
-    let un1, un2, un3;
+    let un1, un2, un3, un4;
     (async () => {
+      // Global layer edits from the overlay or the settings window.
       un1 = await listen('settings:sync', (p) => {
-        if (p?.from === 'overlay') setSettings((s) => ({ ...s, ...p.settings }));
+        if (p?.from === 'overlay' || p?.from === 'settings') setSettings((s) => ({ ...s, ...p.settings }));
       });
       un2 = await listen('overlay:hidden', () => {});
       un3 = await listen('script:patch', (p) => {
@@ -121,8 +122,17 @@ export function MainWindow() {
             ss.map((s) => (s.id === p.id ? { ...s, ...p.patch, updatedAt: Date.now() } : s))
           );
       });
+      // Per-script setting overrides from the overlay or the settings window.
+      un4 = await listen('script:settings', (p) => {
+        if (p?.id)
+          setScripts((ss) =>
+            ss.map((s) =>
+              s.id === p.id ? { ...s, settingsOverrides: p.overrides ?? {}, updatedAt: Date.now() } : s
+            )
+          );
+      });
     })();
-    return () => { un1?.(); un2?.(); un3?.(); };
+    return () => { un1?.(); un2?.(); un3?.(); un4?.(); };
   }, []);
 
   // ---- overlay hotkeys ----------------------------------------------------
@@ -242,7 +252,16 @@ export function MainWindow() {
                   script={sel}
                   settings={settings}
                   onChange={(patch) => updateScript(sel.id, patch)}
-                  onSettings={applySettings}
+                  onScriptSettings={(next) => {
+                    updateScript(sel.id, { settingsOverrides: next });
+                    emitTo('overlay',  'script:settings', { id: sel.id, overrides: next, from: 'main' });
+                    emitTo('settings', 'script:settings', { id: sel.id, overrides: next, from: 'main' });
+                  }}
+                  onResetScript={() => {
+                    updateScript(sel.id, { settingsOverrides: {} });
+                    emitTo('overlay',  'script:settings', { id: sel.id, overrides: {}, from: 'main' });
+                    emitTo('settings', 'script:settings', { id: sel.id, overrides: {}, from: 'main' });
+                  }}
                   onBack={null}
                   onStart={() => startReading(sel)}
                 />

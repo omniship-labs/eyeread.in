@@ -6,10 +6,12 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--surface-0);
+  background: var(--surface-1);
   color: var(--text-primary);
   font-family: var(--font-sans);
   overflow: hidden;
+  border: 1px solid var(--border-default);
+  box-sizing: border-box;
 }
 
 .sw-titlebar {
@@ -30,42 +32,67 @@
   padding-left: 72px; /* clear macOS traffic lights */
 }
 
+.sw-foot {
+  flex-shrink: 0;
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
 .sw-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 4px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.sw-row {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-.sw-row:last-child { border-bottom: none; }
+/* section — mirrors aw-section from AboutWindow */
+.sw-section { width: 100%; margin-bottom: 14px; }
 
-.sw-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
+.sw-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
   margin-bottom: 8px;
+}
+
+.sw-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 2px 0 14px;
+}
+
+/* full-width segmented controls */
+.sw-body .er-seg { width: 100%; }
+.sw-body .er-seg button { flex: 1; }
+
+/* mode detail under the Tracking tab — fixed height so swapping never shifts rows */
+.sw-mode-detail { min-height: 52px; padding-top: 10px; }
+.sw-mode-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.sw-mode-note.warn { color: var(--warning, #f5a524); }
+.sw-mode-note svg { width: 12px; height: 12px; }
+
+/* sub-row inside a section (e.g. Warn after / Count down from) */
+.sw-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
 }
 
 .sw-val {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   color: var(--accent-text);
-}
-
-.sw-switch-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
 }

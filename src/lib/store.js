@@ -27,6 +27,19 @@ export const defaultSettings = {
   highContrast: false, // boost text contrast in overlay
 };
 
+// Prompter settings a script may override. Anything not listed (position,
+// hideFromShare, overlaySize, accessibility) stays global only.
+export const OVERRIDABLE_KEYS = [
+  'voice', 'speed', 'size', 'opacity', 'blur', 'mirror', 'timerMode', 'countFrom',
+];
+
+/**
+ * Resolve the effective settings for a script: the global layer with the
+ * script's partial overrides laid on top (script ▸ global ▸ default — defaults
+ * are already baked into `global`).
+ */
+export const resolveSettings = (global, overrides) => ({ ...global, ...(overrides || {}) });
+
 const seedScripts = () => {
   const now = Date.now();
   return [
@@ -141,7 +154,10 @@ const rowToScript = (r) => ({
   pinned: !!r.pinned,
   updatedAt: r.updated_at,
   ...(r.overlay_w != null ? { overlaySize: { w: r.overlay_w, h: r.overlay_h } } : {}),
+  ...(r.settings ? { settingsOverrides: safeParse(r.settings) } : {}),
 });
+
+const safeParse = (s) => { try { return JSON.parse(s) || {}; } catch { return {}; } };
 
 function lsScripts() {
   return lsReadJSON(LS_SCRIPTS);
@@ -180,11 +196,11 @@ export async function upsertScript(s) {
   }
   const d = await db();
   await d.execute(
-    `INSERT INTO scripts (id, title, text, tag, pinned, overlay_w, overlay_h, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO scripts (id, title, text, tag, pinned, overlay_w, overlay_h, settings, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      ON CONFLICT(id) DO UPDATE SET
        title = $2, text = $3, tag = $4, pinned = $5,
-       overlay_w = $6, overlay_h = $7, updated_at = $8`,
+       overlay_w = $6, overlay_h = $7, settings = $8, updated_at = $9`,
     [
       s.id,
       s.title,
@@ -193,6 +209,9 @@ export async function upsertScript(s) {
       s.pinned ? 1 : 0,
       s.overlaySize?.w ?? null,
       s.overlaySize?.h ?? null,
+      s.settingsOverrides && Object.keys(s.settingsOverrides).length
+        ? JSON.stringify(s.settingsOverrides)
+        : null,
       s.updatedAt,
     ]
   );

@@ -123,6 +123,7 @@ pub fn run() {
                 pinned INTEGER NOT NULL DEFAULT 0,
                 overlay_w INTEGER,
                 overlay_h INTEGER,
+                settings TEXT,
                 updated_at INTEGER NOT NULL
               );
               CREATE TABLE IF NOT EXISTS settings (

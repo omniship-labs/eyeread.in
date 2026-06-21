@@ -226,3 +226,62 @@ textarea {
   opacity: 1;
   background: var(--accent-subtle-bg);
 }
+
+/* ── SettingItem — shared cascade row used in Editor and SettingsWindow ── */
+.si-root {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.si-root:last-child { border-bottom: none; }
+
+.si-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.si-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+.si-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.si-val {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent-text);
+}
+
+/* origin badge — fixed height in both states so toggling never shifts content */
+.si-origin {
+  height: 18px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.si-origin.inherited {
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}
+.si-origin.overridden {
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  color: var(--accent-text);
+  background: var(--accent-subtle-bg);
+  border: 1px solid var(--accent-subtle-border);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.si-origin.overridden:hover { background: var(--surface-hover); }
+.si-origin.overridden svg { width: 10px; height: 10px; }

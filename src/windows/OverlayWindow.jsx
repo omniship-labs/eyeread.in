@@ -14,11 +14,10 @@ import {
   X,
 } from 'lucide-react';
 import { ScriptViewer } from '../components/ScriptViewer';
-import { SettingsDrawer } from './overlay/SettingsDrawer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
 import { useClickThrough } from '../hooks/useClickThrough';
 import { usePanelResize, clampSize } from '../hooks/usePanelResize';
-import { defaultSettings, fetchScripts, fetchSettings, persistSettings } from '../lib/store';
+import { defaultSettings, fetchScripts, fetchSettings, persistSettings, resolveSettings } from '../lib/store';
 import {
   isTauri,
   listen,
@@ -27,6 +26,8 @@ import {
   focusMain,
   fitOverlayToPanel,
   setOverlayContentProtected,
+  showSettingsWindow,
+  setSettingsContentProtected,
 } from '../lib/tauri';
 import { fmtTime } from '../lib/utils';
 
@@ -39,7 +40,6 @@ export function OverlayWindow() {
   const [pointer, setPointer]       = useState(0);
   const [playing, setPlaying]       = useState(false);
   const [elapsed, setElapsed]       = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
   const [interactive, setInteractive]   = useState(true);
   // Always start hidden — toggled explicitly by the user, never from saved prefs
   const [shielded, setShielded]     = useState(true);
@@ -55,19 +55,44 @@ export function OverlayWindow() {
   const settingsBtnRef = useRef(null);
   const scriptRef      = useRef(script);
   scriptRef.current = script;
+  // `settings` is the GLOBAL layer; keep a ref so once-registered listeners and
+  // the gear handler always read the latest global without re-subscribing.
+  const settingsRef    = useRef(settings);
+  settingsRef.current = settings;
 
   const words = useMemo(
     () => (script ? script.text.split(/\s+/).filter(Boolean) : []),
     [script],
   );
 
+  // Effective settings the prompter actually renders: script overrides laid
+  // over global (script ▸ global ▸ default). Read `effective` everywhere below.
+  const effective = useMemo(
+    () => resolveSettings(settings, script?.settingsOverrides),
+    [settings, script],
+  );
+
   // ---- settings --------------------------------------------------------------
+  // Global-layer patch (overlaySize default, etc.) — broadcasts to main/settings.
   const patchSettings = useCallback((patch) => {
     setSettings((s) => {
       const next = { ...s, ...patch };
       persistSettings(next);
       emitTo('main', 'settings:sync', { settings: next, from: 'overlay' });
       return next;
+    });
+  }, []);
+
+  // Per-script override patch — the overlay's quick controls (A−/A+, ⌘±, ↑/↓)
+  // tweak THIS script, not everyone. Persisted via main; mirrored to the open
+  // settings window.
+  const patchScriptOverride = useCallback((patch) => {
+    setScript((prev) => {
+      if (!prev) return prev;
+      const overrides = { ...(prev.settingsOverrides || {}), ...patch };
+      emitTo('main',     'script:settings', { id: prev.id, overrides, from: 'overlay' });
+      emitTo('settings', 'script:settings', { id: prev.id, overrides, from: 'overlay' });
+      return { ...prev, settingsOverrides: overrides };
     });
   }, []);
 
@@ -119,22 +144,28 @@ export function OverlayWindow() {
     });
   }, [setPanelSize]);
 
-  // Close settings on blur
-  useEffect(() => {
-    if (!isTauri) return;
-    let unlisten;
-    (async () => {
-      const { getCurrentWindow } = await import('@tauri-apps/api/window');
-      unlisten = await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
-        if (!focused) setShowSettings(false);
-      });
-    })();
-    return () => unlisten?.();
+  // ---- settings window -------------------------------------------------------
+  // Settings live in their own independent window (never coupled to the panel,
+  // so they can't clip or resize it). Opening mirrors the current shield so the
+  // settings window is hidden from screen-share in lockstep with the prompter.
+  const sendSettingsContext = useCallback(() => {
+    const s = scriptRef.current;
+    emitTo('settings', 'settings:context', {
+      scriptId: s?.id ?? null,
+      scriptTitle: s?.title ?? '',
+      global: settingsRef.current,
+      overrides: s?.settingsOverrides ?? {},
+    });
   }, []);
+
+  const openSettings = useCallback(() => {
+    showSettingsWindow(shielded);
+    sendSettingsContext();
+  }, [shielded, sendSettingsContext]);
 
   // ---- cross-window events ---------------------------------------------------
   useEffect(() => {
-    let un1, un2;
+    let un1, un2, un3;
     (async () => {
       un1 = await listen('overlay:load', (p) => {
         loadedRef.current = true;
@@ -145,25 +176,38 @@ export function OverlayWindow() {
         // Always start hidden on each new launch — user must opt-in to expose
         setShielded(true);
         setOverlayContentProtected(true);
+        setSettingsContentProtected(true);
         jumpToRef.current(0); // resets active + pointer + cancels any slide
         setElapsed(0);
         setPlaying(true);
         setInteractive(true);
+        // Refresh an open settings window with the new script's context.
+        setTimeout(sendSettingsContext, 0);
       });
+      // Global layer changes from the main app or the settings window.
       un2 = await listen('settings:sync', (p) => {
-        if (p?.from === 'main') setSettings((s) => ({ ...s, ...p.settings }));
+        if (p?.from === 'main' || p?.from === 'settings') {
+          setSettings((s) => ({ ...s, ...p.settings }));
+        }
+      });
+      // Per-script override changes from the settings window (or main).
+      un3 = await listen('script:settings', (p) => {
+        if (p?.from === 'overlay') return; // ignore our own echo
+        setScript((prev) =>
+          prev && prev.id === p?.id ? { ...prev, settingsOverrides: p.overrides ?? {} } : prev,
+        );
       });
     })();
-    return () => { un1?.(); un2?.(); };
-  }, [setPanelSize]);
+    return () => { un1?.(); un2?.(); un3?.(); };
+  }, [setPanelSize, sendSettingsContext]);
 
   // ---- voice tracking / auto-scroll ------------------------------------------
   const jumpToRef = useRef((idx) => { setActive(idx); setPointer(idx); }); // fallback before hook mounts
   const { usingVoice, listening, jumpTo } = useVoiceTracking({
     words,
     playing,
-    voiceEnabled: settings.voice,
-    wpm: settings.speed,
+    voiceEnabled: effective.voice,
+    wpm: effective.speed,
     pointer,
     setPointer,
     setActive,
@@ -174,10 +218,10 @@ export function OverlayWindow() {
 
   // ---- timer -----------------------------------------------------------------
   useEffect(() => {
-    if (!playing || settings.timerMode === 'off') return undefined;
+    if (!playing || effective.timerMode === 'off') return undefined;
     const id = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(id);
-  }, [playing, settings.timerMode]);
+  }, [playing, effective.timerMode]);
 
   // ---- scroll active word to centre ------------------------------------------
   useEffect(() => {
@@ -186,7 +230,7 @@ export function OverlayWindow() {
     if (!win || !w) return;
     const target = w.offsetTop - win.clientHeight / 2 + w.offsetHeight / 2;
     win.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
-  }, [active, settings.size, script, panelSize]);
+  }, [active, effective.size, script, panelSize]);
 
   // ---- fit native window width to panel (throttled) --------------------------
   const lastFit = useRef(0);
@@ -247,22 +291,22 @@ export function OverlayWindow() {
       } else if (e.key === 'Escape') {
         close();
       } else if (e.key === 'ArrowUp') {
-        e.preventDefault(); patchSettings({ speed: Math.min(220, settings.speed + 5) });
+        e.preventDefault(); patchScriptOverride({ speed: Math.min(220, effective.speed + 5) });
       } else if (e.key === 'ArrowDown') {
-        e.preventDefault(); patchSettings({ speed: Math.max(80, settings.speed - 5) });
+        e.preventDefault(); patchScriptOverride({ speed: Math.max(80, effective.speed - 5) });
       } else if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
-        e.preventDefault(); patchSettings({ size: Math.min(46, settings.size + 3) });
+        e.preventDefault(); patchScriptOverride({ size: Math.min(46, effective.size + 3) });
       } else if ((e.metaKey || e.ctrlKey) && e.key === '-') {
-        e.preventDefault(); patchSettings({ size: Math.max(22, settings.size - 3) });
+        e.preventDefault(); patchScriptOverride({ size: Math.max(22, effective.size - 3) });
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [settings.speed, settings.size, patchSettings, close]);
+  }, [effective.speed, effective.size, patchScriptOverride, close]);
 
   const timecode =
-    settings.timerMode === 'up'   ? fmtTime(elapsed) :
-    settings.timerMode === 'down' ? fmtTime(settings.countFrom - elapsed) :
+    effective.timerMode === 'up'   ? fmtTime(elapsed) :
+    effective.timerMode === 'down' ? fmtTime(effective.countFrom - elapsed) :
     null;
 
   return (
@@ -277,10 +321,10 @@ export function OverlayWindow() {
           (shielded ? ' shielded' : ' exposed')
         }
         style={{
-          '--ov-alpha': settings.opacity / 100,
+          '--ov-alpha': effective.opacity / 100,
           width: panelSize.w,
-          backdropFilter: `blur(${settings.blur}px) saturate(1.15)`,
-          WebkitBackdropFilter: `blur(${settings.blur}px) saturate(1.15)`,
+          backdropFilter: `blur(${effective.blur}px) saturate(1.15)`,
+          WebkitBackdropFilter: `blur(${effective.blur}px) saturate(1.15)`,
         }}
       >
         <div className="ov-head" data-tauri-drag-region>
@@ -289,14 +333,14 @@ export function OverlayWindow() {
           </span>
           {timecode && (
             <span className="ov-time">
-              {settings.timerMode === 'down' ? <Hourglass size={13} /> : <TimerIcon size={13} />}
+              {effective.timerMode === 'down' ? <Hourglass size={13} /> : <TimerIcon size={13} />}
               {timecode}
             </span>
           )}
           {usingVoice && listening && (
             <span className="ov-voice on"><Mic size={12} />Voice</span>
           )}
-          {settings.voice && playing && !voiceAvailable && (
+          {effective.voice && playing && !voiceAvailable && (
             <span className="ov-voice" title="Voice tracking unavailable — timed scroll">
               <MicOff size={12} />
             </span>
@@ -311,6 +355,7 @@ export function OverlayWindow() {
                 const next = !shielded;
                 setShielded(next);
                 setOverlayContentProtected(next);
+                setSettingsContentProtected(next); // keep settings window in lockstep
               }}
             >
               <EyeOff size={13} />
@@ -333,8 +378,8 @@ export function OverlayWindow() {
               <ScriptViewer
                 text={script.text}
                 active={active}
-                size={settings.size}
-                mirror={settings.mirror}
+                size={effective.size}
+                mirror={effective.mirror}
                 activeWordRef={activeWordRef}
                 onWordClick={onWordClick}
               />
@@ -360,19 +405,19 @@ export function OverlayWindow() {
             className="ic sizebtn"
             title="Smaller text"
             style={{ fontSize: 13 }}
-            onClick={() => patchSettings({ size: Math.max(22, settings.size - 3) })}
+            onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >A</button>
           <button
             className="ic sizebtn"
             title="Larger text"
             style={{ fontSize: 18 }}
-            onClick={() => patchSettings({ size: Math.min(46, settings.size + 3) })}
+            onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >A</button>
           <button
             ref={settingsBtnRef}
-            className={'ic' + (showSettings ? ' on' : '')}
+            className="ic"
             title="Prompter settings"
-            onClick={() => setShowSettings((s) => !s)}
+            onClick={openSettings}
           >
             <SettingsIcon />
           </button>
@@ -383,13 +428,6 @@ export function OverlayWindow() {
           >
             {interactive ? '⌥E' : '⌥E·on'}
           </button>
-        </div>
-
-        <div className={'ov-drawer' + (showSettings ? ' open' : '')}>
-          <SettingsDrawer
-            settings={settings}
-            onPatch={patchSettings}
-          />
         </div>
 
         <div

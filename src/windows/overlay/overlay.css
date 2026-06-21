@@ -279,48 +279,8 @@
 }
 .ov-resize svg { width: 12px; height: 12px; pointer-events: none; }
 
-/* ===== Settings drawer — slides out from the bottom of the panel ===== */
-.ov-drawer {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 220ms cubic-bezier(0.4, 0, 0.2, 1),
-              opacity    180ms ease;
-  opacity: 0;
-  /* Always fully opaque — settings must be readable at any panel opacity */
-  background: rgba(10, 10, 18, 0.92);
-  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-  border-top: 1px solid var(--border-subtle);
-}
-.ov-drawer.open {
-  max-height: 420px; /* tall enough for all controls */
-  opacity: 1;
-}
-/* Rename: was .ov-settings */
-.ov-drawer-content {
-  padding: 16px 20px 20px;
-}
-.ovs-row { margin-bottom: 16px; }
-.ovs-row:last-child { margin-bottom: 0; }
-.ovs-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-.ovs-val { font-family: var(--font-mono); font-size: 11px; color: var(--accent-text); }
-.ovs-switch-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
+/* Settings now live in their own window (see settings-window.css) — the
+   prompter panel no longer hosts any settings UI. */
 
 /* ===== Browser demo backdrop (web preview only) ===== */
 .demo-stage { position: fixed; inset: 0; }
@@ -353,5 +313,4 @@
 }
 .demo-sub { font-size: 19px; color: #93a0c0; margin-top: 18px; max-width: 600px; line-height: 1.5; }
 .overlay-root.demo { justify-content: flex-start; padding-top: 64px; }
-.overlay-root.demo .overlay-panel,
-.overlay-root.demo .ov-drawer { position: relative; z-index: 20; }
+.overlay-root.demo .overlay-panel { position: relative; z-index: 20; }
