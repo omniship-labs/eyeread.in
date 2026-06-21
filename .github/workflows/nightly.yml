@@ -2,6 +2,10 @@
 # daily at 03:00 UTC. Always force-updates the same "nightly" release tag
 # so the updater endpoint URL never changes.
 #
+# The stamp job computes the version string once and passes it to both
+# the build matrix and the publish job, preventing a midnight-crossing race
+# where the two jobs would stamp different dates.
+#
 # Same secrets as the stable workflow are required.
 
 name: Nightly
@@ -17,7 +21,23 @@ permissions:
   contents: write
 
 jobs:
+  stamp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      nightly_version: ${{ steps.compute.outputs.nightly_version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute nightly version
+        id: compute
+        run: |
+          STAMP=$(date -u +"%Y%m%d")
+          BASE=$(node -p "require('./package.json').version")
+          echo "nightly_version=${BASE}-nightly.${STAMP}" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: [stamp]
     strategy:
       fail-fast: false
       matrix:
@@ -28,6 +48,7 @@ jobs:
             runner: macos-13
 
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -51,35 +72,22 @@ jobs:
         run: npx tauri icon src-tauri/icons/icon.png
 
       - name: Stamp nightly version
+        env:
+          NIGHTLY_VERSION: ${{ needs.stamp.outputs.nightly_version }}
         run: |
-          STAMP=$(date -u +"%Y%m%d")
-          BASE=$(node -p "require('./package.json').version")
-          NIGHTLY_VERSION="${BASE}-nightly.${STAMP}"
           node -e "
             const fs = require('fs');
             const p = JSON.parse(fs.readFileSync('package.json'));
-            p.version = '$NIGHTLY_VERSION';
+            p.version = process.env.NIGHTLY_VERSION;
             fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
           "
           sed -i '' "s/^version = \".*\"/version = \"$NIGHTLY_VERSION\"/" src-tauri/Cargo.toml
-          echo "NIGHTLY_VERSION=$NIGHTLY_VERSION" >> $GITHUB_ENV
 
       - name: Import Apple signing certificate
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-        run: |
-          KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain
-          CERT_PATH=$RUNNER_TEMP/cert.p12
-          echo "$APPLE_CERTIFICATE" | base64 --decode > "$CERT_PATH"
-          security create-keychain -p "" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "" "$KEYCHAIN_PATH"
-          security import "$CERT_PATH" -k "$KEYCHAIN_PATH" \
-            -P "$APPLE_CERTIFICATE_PASSWORD" \
-            -T /usr/bin/codesign -T /usr/bin/security
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
-          security set-key-partition-list -S apple-tool:,apple: -k "" "$KEYCHAIN_PATH"
+        uses: ./.github/actions/import-apple-cert
+        with:
+          certificate: ${{ secrets.APPLE_CERTIFICATE }}
+          certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Build, sign & notarize (nightly config)
         env:
@@ -105,8 +113,9 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz.sig
 
   publish:
-    needs: build
+    needs: [stamp, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -115,13 +124,9 @@ jobs:
         with:
           path: artifacts
 
-      - name: Resolve nightly version
-        run: |
-          STAMP=$(date -u +"%Y%m%d")
-          BASE=$(node -p "require('./package.json').version")
-          echo "NIGHTLY_VERSION=${BASE}-nightly.${STAMP}" >> $GITHUB_ENV
-
       - name: Build latest.json
+        env:
+          NIGHTLY_VERSION: ${{ needs.stamp.outputs.nightly_version }}
         run: |
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           REPO="https://github.com/${{ github.repository }}/releases/download/nightly"
@@ -131,7 +136,7 @@ jobs:
 
           cat > latest.json <<EOF
           {
-            "version": "${{ env.NIGHTLY_VERSION }}",
+            "version": "$NIGHTLY_VERSION",
             "notes": "Nightly build — may be unstable.",
             "pub_date": "$DATE",
             "platforms": {
@@ -160,12 +165,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: nightly
-          name: eyeread.in Nightly (${{ env.NIGHTLY_VERSION }})
+          name: eyeread.in Nightly (${{ needs.stamp.outputs.nightly_version }})
           prerelease: true
           draft: false
           body: |
             Automated nightly build from the `dev` branch.
-            Built: ${{ env.NIGHTLY_VERSION }}
+            Built: ${{ needs.stamp.outputs.nightly_version }}
 
             > ⚠️ This build may be unstable. For production use, download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
           files: |

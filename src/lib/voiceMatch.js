@@ -11,14 +11,13 @@
 /** Levenshtein distance, bails early once > maxDist */
 function editDistance(a, b, maxDist = 2) {
   if (Math.abs(a.length - b.length) > maxDist) return maxDist + 1;
-  const m = a.length, n = b.length;
+  const m = a.length,
+    n = b.length;
   const row = Array.from({ length: n + 1 }, (_, i) => i);
   for (let i = 1; i <= m; i++) {
     let prev = i;
     for (let j = 1; j <= n; j++) {
-      const val = a[i - 1] === b[j - 1]
-        ? row[j - 1]
-        : 1 + Math.min(prev, row[j], row[j - 1]);
+      const val = a[i - 1] === b[j - 1] ? row[j - 1] : 1 + Math.min(prev, row[j], row[j - 1]);
       row[j - 1] = prev;
       prev = val;
     }

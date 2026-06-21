@@ -37,7 +37,10 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       for (let alt = 0; alt < res.length; alt++) {
         const t = res[alt]?.transcript?.trim() || '';
         const c = res[alt]?.confidence ?? 0;
-        if (t && c > bestConf) { best = t; bestConf = c; }
+        if (t && c > bestConf) {
+          best = t;
+          bestConf = c;
+        }
       }
       if (!best) return;
       const words = best.split(/\s+/).filter(Boolean);
@@ -56,16 +59,28 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     rec.onend = () => {
       setListening(false);
       if (recRef.current === rec) {
-        try { rec.start(); } catch { /* already starting */ }
+        try {
+          rec.start();
+        } catch {
+          /* already starting */
+        }
       }
     };
 
-    try { rec.start(); } catch { setError('start-failed'); }
+    try {
+      rec.start();
+    } catch {
+      setError('start-failed');
+    }
 
     return () => {
       recRef.current = null;
       rec.onend = null;
-      try { rec.stop(); } catch { /* noop */ }
+      try {
+        rec.stop();
+      } catch {
+        /* noop */
+      }
       setListening(false);
     };
   }, [enabled, language]);

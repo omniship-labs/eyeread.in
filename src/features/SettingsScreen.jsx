@@ -11,8 +11,18 @@ import { requestMicPermission } from '../lib/mic';
 
 export function SettingsScreen({ settings, onSettings }) {
   const {
-    position, hideFromShare, reduceMotion, highContrast,
-    voice, speed, size, opacity, blur, mirror, timerMode, countFrom,
+    position,
+    hideFromShare,
+    reduceMotion,
+    highContrast,
+    voice,
+    speed,
+    size,
+    opacity,
+    blur,
+    mirror,
+    timerMode,
+    countFrom,
   } = settings;
 
   const mode = voice ? 'voice' : 'scroll';
@@ -37,7 +47,7 @@ export function SettingsScreen({ settings, onSettings }) {
           <Segmented
             size="sm"
             options={[
-              { value: 'top',    label: 'Top' },
+              { value: 'top', label: 'Top' },
               { value: 'center', label: 'Center' },
               { value: 'bottom', label: 'Bottom' },
             ]}
@@ -48,7 +58,9 @@ export function SettingsScreen({ settings, onSettings }) {
         <div className="set-row">
           <div className="set-info">
             <b>Hide from screen-share</b>
-            <span>{hideFromShare ? 'Hidden from screen-share' : 'Visible to screen-share'}</span>
+            <span>
+              {hideFromShare ? 'Hidden from screen-share' : 'Visible to screen-share'}
+            </span>
           </div>
           <ShieldToggle
             shielded={hideFromShare}
@@ -71,7 +83,7 @@ export function SettingsScreen({ settings, onSettings }) {
           <Segmented
             size="sm"
             options={[
-              { value: 'voice',  label: 'Voice',  icon: <Mic size={13} /> },
+              { value: 'voice', label: 'Voice', icon: <Mic size={13} /> },
               { value: 'scroll', label: 'Scroll', icon: <TimerIcon size={13} /> },
             ]}
             value={mode}
@@ -89,7 +101,9 @@ export function SettingsScreen({ settings, onSettings }) {
               <span>Default words-per-minute when not voice-tracking</span>
             </div>
             <Slider
-              min={80} max={220} value={speed}
+              min={80}
+              max={220}
+              value={speed}
               ariaLabel="Scroll speed"
               onChange={(v) => onSettings({ speed: v })}
               style={{ width: 140 }}
@@ -103,7 +117,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>Default font size in the overlay</span>
           </div>
           <Slider
-            min={22} max={52} value={size}
+            min={22}
+            max={52}
+            value={size}
             ariaLabel="Text size"
             onChange={(v) => onSettings({ size: v })}
             style={{ width: 140 }}
@@ -116,7 +132,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>Transparency when first launched</span>
           </div>
           <Slider
-            min={10} max={100} value={opacity}
+            min={10}
+            max={100}
+            value={opacity}
             ariaLabel="Overlay opacity"
             onChange={(v) => onSettings({ opacity: v })}
             style={{ width: 140 }}
@@ -129,7 +147,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>Backdrop blur intensity behind the panel</span>
           </div>
           <Slider
-            min={0} max={18} value={blur}
+            min={0}
+            max={18}
+            value={blur}
             ariaLabel="Glass blur"
             onChange={(v) => onSettings({ blur: v })}
             style={{ width: 140 }}
@@ -142,7 +162,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>Flip horizontally for beam-splitter rigs</span>
           </div>
           <Switch
-            size="sm" checked={!!mirror} label="Mirror text"
+            size="sm"
+            checked={!!mirror}
+            label="Mirror text"
             onChange={(v) => onSettings({ mirror: v })}
           />
         </div>
@@ -154,9 +176,9 @@ export function SettingsScreen({ settings, onSettings }) {
           <Segmented
             size="sm"
             options={[
-              { value: 'off',  label: 'Off' },
-              { value: 'up',   label: 'Count up',   icon: <TimerIcon size={13} /> },
-              { value: 'down', label: 'Count down',  icon: <Hourglass size={13} /> },
+              { value: 'off', label: 'Off' },
+              { value: 'up', label: 'Count up', icon: <TimerIcon size={13} /> },
+              { value: 'down', label: 'Count down', icon: <Hourglass size={13} /> },
             ]}
             value={timerMode}
             onChange={(v) => onSettings({ timerMode: v })}
@@ -170,7 +192,10 @@ export function SettingsScreen({ settings, onSettings }) {
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <input
                 className="ep-time-input"
-                type="number" min={1} max={120} value={countFromMins}
+                type="number"
+                min={1}
+                max={120}
+                value={countFromMins}
                 onChange={(e) => onSettings({ countFrom: Math.max(1, +e.target.value) * 60 })}
               />
               <span className="ep-val">min</span>
@@ -182,7 +207,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>Restore defaults</b>
             <span>Reset all reading defaults to built-in values</span>
           </div>
-          <Button variant="link" onClick={restoreDefaults}>Reset ↺</Button>
+          <Button variant="link" onClick={restoreDefaults}>
+            Reset ↺
+          </Button>
         </div>
       </div>
 
@@ -195,7 +222,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>Disables easing and smooth-scroll animations in the overlay</span>
           </div>
           <Switch
-            size="sm" checked={!!reduceMotion} label="Reduce motion"
+            size="sm"
+            checked={!!reduceMotion}
+            label="Reduce motion"
             onChange={(v) => onSettings({ reduceMotion: v })}
           />
         </div>
@@ -205,7 +234,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>Stronger text shadow for legibility over complex backgrounds</span>
           </div>
           <Switch
-            size="sm" checked={!!highContrast} label="High contrast"
+            size="sm"
+            checked={!!highContrast}
+            label="High contrast"
             onChange={(v) => onSettings({ highContrast: v })}
           />
         </div>
@@ -269,7 +300,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>eyeread.in</b>
             <span>Version, credits, and legal</span>
           </div>
-          <span className="set-link" onClick={showAboutWindow}>Open ↗</span>
+          <span className="set-link" onClick={showAboutWindow}>
+            Open ↗
+          </span>
         </div>
       </div>
     </div>

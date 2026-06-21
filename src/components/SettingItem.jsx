@@ -12,7 +12,15 @@ import { Undo2 } from 'lucide-react';
  *   children  — the control (Slider, Switch, Segmented, …) rendered below the label
  *   style     — optional style on the root element
  */
-export function SettingItem({ keys: rawKeys, label, value, overrides, onRevert, children, style }) {
+export function SettingItem({
+  keys: rawKeys,
+  label,
+  value,
+  overrides,
+  onRevert,
+  children,
+  style,
+}) {
   const keys = Array.isArray(rawKeys) ? rawKeys : [rawKeys];
   const isOverridden = keys.some((k) => Object.prototype.hasOwnProperty.call(overrides, k));
 

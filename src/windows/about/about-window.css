@@ -84,7 +84,9 @@
   font-family: var(--font-mono);
   font-size: 12px;
 }
-.aw-link:hover { color: var(--paper-100); }
+.aw-link:hover {
+  color: var(--paper-100);
+}
 
 .aw-divider {
   width: 100%;
@@ -137,7 +139,9 @@
   /* room for the scrollbar so content doesn't sit under it */
   padding-right: 4px;
 }
-.aw-supporters-scroll::-webkit-scrollbar { width: 6px; }
+.aw-supporters-scroll::-webkit-scrollbar {
+  width: 6px;
+}
 .aw-supporters-scroll::-webkit-scrollbar-thumb {
   background: var(--border-default);
   border-radius: 3px;
@@ -166,7 +170,9 @@
   font-size: 13px;
   color: var(--text-secondary);
 }
-.aw-supporter:hover { color: var(--text-primary); }
+.aw-supporter:hover {
+  color: var(--text-primary);
+}
 
 .aw-supporter-avatar {
   width: 18px;

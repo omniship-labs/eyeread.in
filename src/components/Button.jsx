@@ -75,7 +75,9 @@ export function Button({
     size && size !== 'md' ? `tpd-btn--${size}` : '',
     block ? 'tpd-btn--block' : '',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <button type={type} className={cls} disabled={disabled} {...rest}>

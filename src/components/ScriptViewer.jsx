@@ -30,10 +30,11 @@ export function ScriptViewer({
     mirror ? 'er-script--mirror' : '',
     onWordClick ? 'er-script--clickable' : '',
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
-  const inlineStyle =
-    typeof size === 'number' ? { ...style, fontSize: `${size}px` } : style;
+  const inlineStyle = typeof size === 'number' ? { ...style, fontSize: `${size}px` } : style;
 
   return (
     <div className={cls} style={inlineStyle} {...rest}>
@@ -44,14 +45,18 @@ export function ScriptViewer({
         const delta = wc - active; // negative = behind, 0 = peak, positive = ahead
 
         let state;
-        if (delta === 0)       state = 'active';   // peak
-        else if (delta === -1) state = 'near-1';   // one behind — still glowing
-        else if (delta < -1)   state = 'spoken';   // further behind — dim
-        else if (delta === 1)  state = 'near-1';   // one ahead
-        else if (delta === 2)  state = 'near-2';
-        else if (delta === 3)  state = 'near-3';
-        else if (delta === 4)  state = 'near-4';
-        else                   state = 'upcoming'; // far ahead — dim
+        if (delta === 0)
+          state = 'active'; // peak
+        else if (delta === -1)
+          state = 'near-1'; // one behind — still glowing
+        else if (delta < -1)
+          state = 'spoken'; // further behind — dim
+        else if (delta === 1)
+          state = 'near-1'; // one ahead
+        else if (delta === 2) state = 'near-2';
+        else if (delta === 3) state = 'near-3';
+        else if (delta === 4) state = 'near-4';
+        else state = 'upcoming'; // far ahead — dim
 
         return (
           <span
