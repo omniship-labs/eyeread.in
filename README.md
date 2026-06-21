@@ -1,5 +1,7 @@
 # eyeread.in
 
+[![CLA assistant](https://cla-assistant.io/readme/badge/omniship-labs/eyeread.in)](https://cla-assistant.io/omniship-labs/eyeread.in)
+
 > Look at the lens. Not your notes.
 
 A teleprompter that floats your script as a translucent glass overlay on top of whatever
