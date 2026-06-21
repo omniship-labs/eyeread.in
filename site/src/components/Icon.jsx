@@ -16,6 +16,11 @@ import {
   ChevronsLeftRight,
   ArrowRight,
   Globe,
+  Languages,
+  Code,
+  Palette,
+  FileText,
+  Wrench,
 } from 'lucide-react';
 import { Icon as IconifyIcon } from '@iconify/react';
 import githubIcon from '@iconify-icons/mdi/github';
@@ -32,6 +37,11 @@ const LUCIDE = {
   chevrons: ChevronsLeftRight,
   arrow: ArrowRight,
   globe: Globe,
+  languages: Languages,
+  code: Code,
+  palette: Palette,
+  'file-text': FileText,
+  wrench: Wrench,
 };
 
 const BRAND = {

@@ -10,7 +10,7 @@ const initials = (name = '?') =>
     .join('')
     .toUpperCase() || '?';
 
-function Avatar({ member, size }) {
+export function Avatar({ member, size }) {
   const [broken, setBroken] = useState(false);
   const showImg = member.image && !broken;
   const chip = (
@@ -38,7 +38,7 @@ function Avatar({ member, size }) {
   );
 }
 
-function Group({ label, icon, members, size, large }) {
+export function Group({ label, icon, members, size, large }) {
   if (!members.length) return null;
   return (
     <div className="sp-group">

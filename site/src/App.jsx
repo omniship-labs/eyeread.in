@@ -6,6 +6,7 @@ import Features from './components/Features.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
 import OpenSource from './components/OpenSource.jsx';
 import Sponsors from './components/Sponsors.jsx';
+import Credits from './components/Credits.jsx';
 import Footer from './components/Footer.jsx';
 
 export default function App() {
@@ -20,6 +21,8 @@ export default function App() {
         <HowItWorks data={config.how} />
         <OpenSource data={config.oss} links={config.links} />
         <Sponsors data={config.sponsors} />
+        {/* Self-hides until credits.js has entries — inject buckets on demand. */}
+        <Credits />
       </main>
       <Footer config={config} />
     </>

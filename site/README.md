@@ -30,6 +30,8 @@ site/
     │   ├── en.js           # English (source of truth — mirror its shape)
     │   └── fr de es ru zh ja hi mr ta te kn ml .js
     ├── assets.js           # brand SVGs imported from design/
+    ├── data/
+    │   └── credits.js      # contributor credits, bucketed by kind of work
     ├── styles/             # base.css, layout.css, components.css (marketing-only)
     ├── hooks/
     │   ├── useSponsors.js      # live Open Collective fetch
@@ -39,6 +41,7 @@ site/
         ├── LanguageSwitcher.jsx
         ├── Nav.jsx  Hero.jsx  Demo.jsx  Features.jsx
         ├── HowItWorks.jsx  OpenSource.jsx  Sponsors.jsx
+        ├── Credits.jsx     # contributor credits (reuses Sponsors' avatars)
         └── Brand.jsx  Footer.jsx
 ```
 
@@ -91,6 +94,31 @@ Configure it in `config.js → sponsors`:
 
 If the request fails or there are no backers yet, the section shows a friendly
 link to Open Collective instead of breaking.
+
+## Credits / contributors
+
+Contributors are credited in **buckets by kind of work** — `translation`,
+`code`, `design`, `review`, `docs`, `infra`. Edit one file, `data/credits.js`:
+
+```js
+export const credits = [
+  { name: 'Ada', profile: 'https://github.com/ada', roles: ['code', 'review'] },
+  { name: 'Kuvempu', roles: ['translation'], langs: ['kn'] },
+];
+```
+
+`<Credits>` (in `App.jsx`, after Sponsors) groups people by bucket and reuses
+the sponsor avatar visuals. It **self-hides** while the list is empty, so it can
+live in the page permanently and surface only once there are entries. Inject on
+demand:
+
+- `<Credits />` — all non-empty buckets, full section
+- `<Credits only={['translation']} />` — a single bucket, drop it anywhere
+- `<Credits bare />` — just the grouped avatars, no section/heading wrapper
+
+`groupCredits(only)` / `groupContributors(people, only)` expose the same grouping
+for programmatic use. Bucket order, labels, and icons live in `creditBuckets`;
+add a bucket there (with an `Icon` name) and tag people with its id.
 
 ## SEO & per-locale pages
 
