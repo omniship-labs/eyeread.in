@@ -1,9 +1,10 @@
 /* ============================================================
    Screen-share compatibility matrix — SINGLE SOURCE OF TRUTH.
    ------------------------------------------------------------
-   Rendered on the marketing site (components/Compat.jsx) and into
-   the repo README (scripts/gen-compat.mjs). Add a row — or fill in
-   the verifiers — whenever a tester confirms a setup.
+   Rendered on the marketing site (components/Compat.jsx) at
+   /#compatibility. The README links to that live matrix rather than
+   duplicating it. Add a row — or fill in the verifiers — whenever a
+   tester confirms a setup.
 
    On macOS and Windows invisibility is OS-guaranteed; rows there
    record which OS versions have been confirmed by a real human. On
