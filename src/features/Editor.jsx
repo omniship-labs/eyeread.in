@@ -1,4 +1,4 @@
-import { Play, Mic, MicOff, Timer as TimerIcon, Undo2 } from 'lucide-react';
+import { Play, Mic, MicOff, Timer as TimerIcon } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Slider } from '../components/Slider';
 import { Switch } from '../components/Switch';

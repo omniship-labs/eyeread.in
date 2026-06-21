@@ -1,4 +1,4 @@
-import { Mic, MicOff, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';

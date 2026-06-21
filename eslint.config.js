@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default [
-  { ignores: ['dist', 'node_modules', 'src-tauri', 'design', 'public'] },
+  { ignores: ['dist', 'node_modules', 'src-tauri', 'design', 'public', '.claude', 'scripts'] },
   js.configs.recommended,
   {
     files: ['src/**/*.{js,jsx}'],
@@ -25,7 +25,7 @@ export default [
     },
   },
   {
-    files: ['src/**/*.test.js', 'vite.config.js', 'eslint.config.js'],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    files: ['vite.config.js', 'eslint.config.js'],
+    languageOptions: { globals: { ...globals.node } },
   },
 ];
