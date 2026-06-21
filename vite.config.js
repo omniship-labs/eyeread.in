@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
@@ -24,5 +25,10 @@ export default defineConfig({
     // WKWebView on macOS / WebView2 on Windows
     target: ['es2021', 'safari15'],
     outDir: 'dist',
+  },
+  // Vitest (unit tests). Playwright specs in site/tests/ share the *.spec.js
+  // extension but must not run under Vitest — exclude that dir.
+  test: {
+    exclude: [...configDefaults.exclude, 'site/tests/**'],
   },
 });
