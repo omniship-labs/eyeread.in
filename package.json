@@ -12,6 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "site:tokens": "node site/scripts/sync-tokens.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

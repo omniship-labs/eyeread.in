@@ -1,0 +1,54 @@
+# Deploy the marketing site (site/) to GitHub Pages.
+# The site is a static, zero-build bundle: we just refresh the vendored
+# design tokens from design/tokens/ and publish the folder as-is.
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'design/tokens/**'
+      - '.github/workflows/deploy-site.yml'
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+# Pages needs these permissions; concurrency keeps deploys serialized.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Regenerate site/css/tokens.css from the design system so the deployed
+      # site can never drift from design/tokens/.
+      - run: npm run site:tokens
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

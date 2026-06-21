@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Static SEO/share meta. Kept in sync with config.meta by main.js at runtime,
+       but present here so crawlers and share scrapers see real content. -->
+    <title>eyeread.in — Look at the lens.</title>
+    <meta
+      name="description"
+      content="Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking built in. Free."
+    />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="eyeread.in — Look at the lens." />
+    <meta
+      property="og:description"
+      content="Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking built in."
+    />
+    <meta property="og:image" content="https://eyeread.in/og-image.png" />
+    <meta property="og:url" content="https://eyeread.in" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@eyeread_in" />
+
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <noscript>
+      <div
+        style="
+          max-width: 640px;
+          margin: 80px auto;
+          padding: 0 24px;
+          text-align: center;
+          color: #f2f2f7;
+          font-family: sans-serif;
+        "
+      >
+        <h1 style="font-size: 32px; margin-bottom: 16px">
+          eyeread.in — Look at the lens. Not your notes.
+        </h1>
+        <p style="color: #a8a8ba; line-height: 1.6; margin-bottom: 24px">
+          An open source teleprompter that floats your script over any screen as a glass
+          overlay, invisible to every screen recorder, with voice tracking built in. Free,
+          AGPL-3.0.
+        </p>
+        <p>
+          <a href="https://github.com/omniship-labs/eyeread" style="color: #b6a8ff"
+            >View on GitHub →</a
+          >
+        </p>
+      </div>
+    </noscript>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

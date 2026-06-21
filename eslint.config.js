@@ -25,7 +25,16 @@ export default [
     },
   },
   {
-    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.mjs'],
+    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.mjs', 'site/scripts/**/*.mjs'],
     languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // Marketing site: standalone browser ES modules under site/js/.
+    files: ['site/js/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: { ...globals.browser },
+    },
   },
 ];
