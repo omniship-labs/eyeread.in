@@ -25,7 +25,10 @@ describe('credits buckets', () => {
   it('groups people by bucket, in bucket order, dropping empty buckets', () => {
     const groups = groupContributors(sample);
     expect(groups.map((g) => g.id)).toEqual(['translation', 'code', 'review']);
-    expect(groups.find((g) => g.id === 'code').members.map((m) => m.name)).toEqual(['Ada', 'Grace']);
+    expect(groups.find((g) => g.id === 'code').members.map((m) => m.name)).toEqual([
+      'Ada',
+      'Grace',
+    ]);
     expect(groups.find((g) => g.id === 'translation').members).toHaveLength(1);
   });
 

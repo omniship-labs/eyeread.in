@@ -113,8 +113,7 @@ export default {
   sponsors: {
     eyebrow: '由社区支持',
     heading: '支持者与赞助者',
-    subhead:
-      'eyeread.in 完全由那些相信诚实、开放工具的人资助。正是这些人让它保持免费。',
+    subhead: 'eyeread.in 完全由那些相信诚实、开放工具的人资助。正是这些人让它保持免费。',
     ctaLabel: '成为支持者',
     loadingMessage: '正在加载支持者…',
     emptyMessage: '成为第一个支持 eyeread.in 的人 →',

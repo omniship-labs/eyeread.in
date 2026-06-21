@@ -119,7 +119,8 @@ export default {
     ctaLabel: 'మద్దతుదారు అవ్వండి',
     loadingMessage: 'మద్దతుదారులను లోడ్ చేస్తోంది…',
     emptyMessage: 'eyeread.in కు మద్దతు ఇచ్చే మొదటి వ్యక్తి అవ్వండి →',
-    errorMessage: 'ప్రస్తుతం మద్దతుదారులను లోడ్ చేయలేకపోయాం. వారిని Open Collective లో చూడండి →',
+    errorMessage:
+      'ప్రస్తుతం మద్దతుదారులను లోడ్ చేయలేకపోయాం. వారిని Open Collective లో చూడండి →',
     sponsorsLabel: 'స్పాన్సర్‌లు',
     backersLabel: 'మద్దతుదారులు',
   },

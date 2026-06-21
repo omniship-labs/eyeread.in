@@ -31,7 +31,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const abs = (path) => `${SITE_URL}${path}`;
 
 const esc = (s) =>
-  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 
 // Replace the content="…" of a specific <meta>, matched by its name/property attr.
 const setMeta = (html, attrSel, value) =>
@@ -60,7 +64,9 @@ function renderLocale(template, locale) {
 
   // hreflang alternates (+ x-default) and og:locale:alternate, before </head>.
   const hreflangs = [
-    ...locales.map((l) => `<link rel="alternate" hreflang="${l.code}" href="${abs(localePath(l.code))}" />`),
+    ...locales.map(
+      (l) => `<link rel="alternate" hreflang="${l.code}" href="${abs(localePath(l.code))}" />`
+    ),
     `<link rel="alternate" hreflang="x-default" href="${abs('/')}" />`,
   ];
   const ogAlternates = locales

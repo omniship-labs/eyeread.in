@@ -119,7 +119,8 @@ export default {
     ctaLabel: 'ಬೆಂಬಲಿಗರಾಗಿ',
     loadingMessage: 'ಬೆಂಬಲಿಗರನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…',
     emptyMessage: 'eyeread.in ಅನ್ನು ಬೆಂಬಲಿಸುವ ಮೊದಲಿಗರಾಗಿ →',
-    errorMessage: 'ಸದ್ಯಕ್ಕೆ ಬೆಂಬಲಿಗರನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಅವರನ್ನು Open Collective ನಲ್ಲಿ ನೋಡಿ →',
+    errorMessage:
+      'ಸದ್ಯಕ್ಕೆ ಬೆಂಬಲಿಗರನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಅವರನ್ನು Open Collective ನಲ್ಲಿ ನೋಡಿ →',
     sponsorsLabel: 'ಪ್ರಾಯೋಜಕರು',
     backersLabel: 'ಬೆಂಬಲಿಗರು',
   },
