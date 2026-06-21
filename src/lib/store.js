@@ -30,7 +30,14 @@ export const defaultSettings = {
 // Prompter settings a script may override. Anything not listed (position,
 // hideFromShare, overlaySize, accessibility) stays global only.
 export const OVERRIDABLE_KEYS = [
-  'voice', 'speed', 'size', 'opacity', 'blur', 'mirror', 'timerMode', 'countFrom',
+  'voice',
+  'speed',
+  'size',
+  'opacity',
+  'blur',
+  'mirror',
+  'timerMode',
+  'countFrom',
 ];
 
 /**
@@ -157,7 +164,13 @@ const rowToScript = (r) => ({
   ...(r.settings ? { settingsOverrides: safeParse(r.settings) } : {}),
 });
 
-const safeParse = (s) => { try { return JSON.parse(s) || {}; } catch { return {}; } };
+const safeParse = (s) => {
+  try {
+    return JSON.parse(s) || {};
+  } catch {
+    return {};
+  }
+};
 
 function lsScripts() {
   return lsReadJSON(LS_SCRIPTS);

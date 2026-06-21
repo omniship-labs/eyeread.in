@@ -19,15 +19,19 @@ import { isTauri, listen, emitTo, hideSettingsWindow } from '../lib/tauri';
 
 const sliderFill = (value, min, max) => {
   const pct = ((value - min) / (max - min)) * 100;
-  return { background: `linear-gradient(90deg, var(--accent) ${pct}%, var(--surface-3) ${pct}%)` };
+  return {
+    background: `linear-gradient(90deg, var(--accent) ${pct}%, var(--surface-3) ${pct}%)`,
+  };
 };
 
 export function SettingsWindow() {
-  const [global, setGlobal]       = useState(defaultSettings);
+  const [global, setGlobal] = useState(defaultSettings);
   const [overrides, setOverrides] = useState({});
-  const [scriptId, setScriptId]   = useState(null);
+  const [scriptId, setScriptId] = useState(null);
 
-  useEffect(() => { fetchSettings().then(setGlobal); }, []);
+  useEffect(() => {
+    fetchSettings().then(setGlobal);
+  }, []);
 
   useEffect(() => {
     let unA, unB, unC;
@@ -44,7 +48,11 @@ export function SettingsWindow() {
         if (p?.from !== 'settings' && p?.id === scriptId) setOverrides(p.overrides ?? {});
       });
     })();
-    return () => { unA?.(); unB?.(); unC?.(); };
+    return () => {
+      unA?.();
+      unB?.();
+      unC?.();
+    };
   }, [scriptId]);
 
   useEffect(() => {
@@ -62,11 +70,25 @@ export function SettingsWindow() {
   // ---- mutations -------------------------------------------------------------
   const broadcast = (next) => {
     emitTo('overlay', 'script:settings', { id: scriptId, overrides: next, from: 'settings' });
-    emitTo('main',    'script:settings', { id: scriptId, overrides: next, from: 'settings' });
+    emitTo('main', 'script:settings', { id: scriptId, overrides: next, from: 'settings' });
   };
-  const patch   = (p)       => setOverrides((o) => { const n = { ...o, ...p }; broadcast(n); return n; });
-  const revert  = (...keys) => setOverrides((o) => { const n = { ...o }; keys.forEach((k) => delete n[k]); broadcast(n); return n; });
-  const resetAll = ()       => { setOverrides({}); broadcast({}); };
+  const patch = (p) =>
+    setOverrides((o) => {
+      const n = { ...o, ...p };
+      broadcast(n);
+      return n;
+    });
+  const revert = (...keys) =>
+    setOverrides((o) => {
+      const n = { ...o };
+      keys.forEach((k) => delete n[k]);
+      broadcast(n);
+      return n;
+    });
+  const resetAll = () => {
+    setOverrides({});
+    broadcast({});
+  };
 
   // ---- helpers ---------------------------------------------------------------
   const has = (k) => Object.prototype.hasOwnProperty.call(overrides, k);
@@ -78,7 +100,13 @@ export function SettingsWindow() {
   const countFromMins = Math.round((val('countFrom') ?? 300) / 60);
 
   const si = (keys, label, value, children) => (
-    <SettingItem keys={keys} label={label} value={value} overrides={overrides} onRevert={revert}>
+    <SettingItem
+      keys={keys}
+      label={label}
+      value={value}
+      overrides={overrides}
+      onRevert={revert}
+    >
       {children}
     </SettingItem>
   );
@@ -90,12 +118,15 @@ export function SettingsWindow() {
       </div>
 
       <div className="sw-body">
-        {si('voice', 'Tracking', null,
+        {si(
+          'voice',
+          'Tracking',
+          null,
           <>
             <Segmented
               size="md"
               options={[
-                { value: 'voice',  label: 'Voice',  icon: <Mic size={14} /> },
+                { value: 'voice', label: 'Voice', icon: <Mic size={14} /> },
                 { value: 'scroll', label: 'Scroll', icon: <TimerIcon size={14} /> },
               ]}
               value={mode}
@@ -108,15 +139,29 @@ export function SettingsWindow() {
             <div className="sw-mode-detail">
               {mode === 'voice' ? (
                 <span className={'sw-mode-note' + (voiceAvailable ? '' : ' warn')}>
-                  {voiceAvailable
-                    ? <><Mic size={12} /> Scroll follows your speech</>
-                    : <><MicOff size={12} /> Mic unavailable — scroll will pause</>}
+                  {voiceAvailable ? (
+                    <>
+                      <Mic size={12} /> Scroll follows your speech
+                    </>
+                  ) : (
+                    <>
+                      <MicOff size={12} /> Mic unavailable — scroll will pause
+                    </>
+                  )}
                 </span>
               ) : (
-                si('speed', 'Scroll speed', `${val('speed')} wpm`,
+                si(
+                  'speed',
+                  'Scroll speed',
+                  `${val('speed')} wpm`,
                   <input
-                    type="range" className="er-slider" min={80} max={220} value={val('speed')}
-                    aria-label="Scroll speed" onChange={(e) => set('speed', +e.target.value)}
+                    type="range"
+                    className="er-slider"
+                    min={80}
+                    max={220}
+                    value={val('speed')}
+                    aria-label="Scroll speed"
+                    onChange={(e) => set('speed', +e.target.value)}
                     style={sliderFill(val('speed'), 80, 220)}
                   />
                 )
@@ -124,32 +169,73 @@ export function SettingsWindow() {
             </div>
           </>
         )}
-        {si('size', 'Text size', `${val('size')}px`,
-          <input type="range" className="er-slider" min={22} max={46} value={val('size')}
-            aria-label="Text size" onChange={(e) => set('size', +e.target.value)}
-            style={sliderFill(val('size'), 22, 46)} />
+        {si(
+          'size',
+          'Text size',
+          `${val('size')}px`,
+          <input
+            type="range"
+            className="er-slider"
+            min={22}
+            max={46}
+            value={val('size')}
+            aria-label="Text size"
+            onChange={(e) => set('size', +e.target.value)}
+            style={sliderFill(val('size'), 22, 46)}
+          />
         )}
-        {si('opacity', 'Overlay opacity', `${val('opacity')}%`,
-          <input type="range" className="er-slider" min={10} max={100} value={val('opacity')}
-            aria-label="Overlay opacity" onChange={(e) => set('opacity', +e.target.value)}
-            style={sliderFill(val('opacity'), 10, 100)} />
+        {si(
+          'opacity',
+          'Overlay opacity',
+          `${val('opacity')}%`,
+          <input
+            type="range"
+            className="er-slider"
+            min={10}
+            max={100}
+            value={val('opacity')}
+            aria-label="Overlay opacity"
+            onChange={(e) => set('opacity', +e.target.value)}
+            style={sliderFill(val('opacity'), 10, 100)}
+          />
         )}
-        {si('blur', 'Glass blur', `${val('blur')}px`,
-          <input type="range" className="er-slider" min={0} max={18} value={val('blur')}
-            aria-label="Glass blur" onChange={(e) => set('blur', +e.target.value)}
-            style={sliderFill(val('blur'), 0, 18)} />
+        {si(
+          'blur',
+          'Glass blur',
+          `${val('blur')}px`,
+          <input
+            type="range"
+            className="er-slider"
+            min={0}
+            max={18}
+            value={val('blur')}
+            aria-label="Glass blur"
+            onChange={(e) => set('blur', +e.target.value)}
+            style={sliderFill(val('blur'), 0, 18)}
+          />
         )}
-        {si('mirror', 'Mirror text', null,
-          <Switch size="sm" checked={!!val('mirror')} label="Mirror text" onChange={(v) => set('mirror', v)} />
+        {si(
+          'mirror',
+          'Mirror text',
+          null,
+          <Switch
+            size="sm"
+            checked={!!val('mirror')}
+            label="Mirror text"
+            onChange={(v) => set('mirror', v)}
+          />
         )}
-        {si(['timerMode', 'countFrom'], 'Timer', null,
+        {si(
+          ['timerMode', 'countFrom'],
+          'Timer',
+          null,
           <>
             <Segmented
               size="md"
               options={[
-                { value: 'off',  label: 'Off' },
-                { value: 'up',   label: 'Count up',   icon: <TimerIcon size={14} /> },
-                { value: 'down', label: 'Count down',  icon: <Hourglass size={14} /> },
+                { value: 'off', label: 'Off' },
+                { value: 'up', label: 'Count up', icon: <TimerIcon size={14} /> },
+                { value: 'down', label: 'Count down', icon: <Hourglass size={14} /> },
               ]}
               value={val('timerMode')}
               onChange={(v) => set('timerMode', v)}
@@ -160,7 +246,10 @@ export function SettingsWindow() {
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <input
                     className="ep-time-input"
-                    type="number" min={1} max={120} value={countFromMins}
+                    type="number"
+                    min={1}
+                    max={120}
+                    value={countFromMins}
                     onChange={(e) => set('countFrom', Math.max(1, +e.target.value) * 60)}
                   />
                   <span className="sw-val">min</span>

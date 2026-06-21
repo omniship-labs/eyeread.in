@@ -6,9 +6,9 @@ import './about/about-window.css';
 
 const OC_URL = 'https://opencollective.com/eyereadin';
 
-const REPO_URL    = 'https://github.com/omniship-labs/eyeread.in';
-const MJ_URL      = 'https://m.halinge.in';
-const TERMS_URL   = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS.md';
+const REPO_URL = 'https://github.com/omniship-labs/eyeread.in';
+const MJ_URL = 'https://m.halinge.in';
+const TERMS_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS.md';
 const PRIVACY_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/PRIVACY.md';
 
 function getVersion() {
@@ -17,7 +17,9 @@ function getVersion() {
     if (typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ !== 'stable') {
       return `${ver} · ${__RELEASE_CHANNEL__}`;
     }
-  } catch { /* */ }
+  } catch {
+    /* */
+  }
   return ver;
 }
 
@@ -29,7 +31,9 @@ export function AboutWindow() {
     let unlisten;
     listen('settings:sync', (p) => {
       if (p?.settings?.hideFromShare !== undefined) setShielded(p.settings.hideFromShare);
-    }).then((fn) => { unlisten = fn; });
+    }).then((fn) => {
+      unlisten = fn;
+    });
     return () => unlisten?.();
   }, []);
 
@@ -47,7 +51,9 @@ export function AboutWindow() {
 
       <div className="aw-credit">
         Created with ❤️ by{' '}
-        <span className="aw-link" onClick={() => openExternal(MJ_URL)}>MJ</span>
+        <span className="aw-link" onClick={() => openExternal(MJ_URL)}>
+          MJ
+        </span>
       </div>
 
       <div className="aw-divider" />
@@ -56,15 +62,21 @@ export function AboutWindow() {
         <div className="aw-section-label">Source &amp; License</div>
         <div className="aw-row">
           <span>Open source · AGPL-3.0</span>
-          <span className="aw-link" onClick={() => openExternal(REPO_URL)}>GitHub ↗</span>
+          <span className="aw-link" onClick={() => openExternal(REPO_URL)}>
+            GitHub ↗
+          </span>
         </div>
       </div>
 
       <div className="aw-section">
         <div className="aw-section-label">Legal</div>
         <div className="aw-row">
-          <span className="aw-link" onClick={() => openExternal(TERMS_URL)}>Terms of use ↗</span>
-          <span className="aw-link" onClick={() => openExternal(PRIVACY_URL)}>Privacy policy ↗</span>
+          <span className="aw-link" onClick={() => openExternal(TERMS_URL)}>
+            Terms of use ↗
+          </span>
+          <span className="aw-link" onClick={() => openExternal(PRIVACY_URL)}>
+            Privacy policy ↗
+          </span>
         </div>
       </div>
 
@@ -95,7 +107,9 @@ export function AboutWindow() {
         ) : (
           <div className="aw-supporters-empty">
             Be the first to{' '}
-            <span className="aw-link" onClick={() => openExternal(OC_URL)}>support eyeread.in ↗</span>
+            <span className="aw-link" onClick={() => openExternal(OC_URL)}>
+              support eyeread.in ↗
+            </span>
           </div>
         )}
       </div>

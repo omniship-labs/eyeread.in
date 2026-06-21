@@ -10,17 +10,17 @@
 
 ## Key file locations
 
-| Path | What it is |
-|---|---|
-| `design/styles.css` | Master CSS token file (colors, spacing, typography, effects) |
-| `design/tokens/` | Token source files broken out by category |
-| `design/components/` | Design-system components (display, forms, navigation, prompter) |
-| `design/exploration/` | Full-page HTML prototypes |
-| `src/components/` | Production component implementations (mirror `design/components/`) |
-| `src/features/` | Screen-level React components |
-| `src/windows/` | Per-window entry points (Main, Overlay, Settings) |
-| `src/styles/app.css` | App-level globals; component CSS uses `er-*` class prefix |
-| `src-tauri/` | Rust/Tauri backend |
+| Path                  | What it is                                                         |
+| --------------------- | ------------------------------------------------------------------ |
+| `design/styles.css`   | Master CSS token file (colors, spacing, typography, effects)       |
+| `design/tokens/`      | Token source files broken out by category                          |
+| `design/components/`  | Design-system components (display, forms, navigation, prompter)    |
+| `design/exploration/` | Full-page HTML prototypes                                          |
+| `src/components/`     | Production component implementations (mirror `design/components/`) |
+| `src/features/`       | Screen-level React components                                      |
+| `src/windows/`        | Per-window entry points (Main, Overlay, Settings)                  |
+| `src/styles/app.css`  | App-level globals; component CSS uses `er-*` class prefix          |
+| `src-tauri/`          | Rust/Tauri backend                                                 |
 
 ## Dev commands
 
@@ -48,12 +48,12 @@ The design medium is **HTML/CSS/JS** — these are prototypes, not production co
 
 Some `src/components/` files intentionally differ from their `design/components/` counterparts. Treat src as authoritative for production logic; treat design as authoritative for visual spec. Known divergences:
 
-| Component | Status | Notes |
-|---|---|---|
-| `ScriptViewer` | **src is ahead** | Design has 3 word states (spoken/upcoming/active). Src has an 8-state bell-curve model plus `activeWordRef` and `onWordClick` — keep the src behaviour. |
-| `Segmented` | **src is simplified** | Design supports `icon`, `block` prop, `sm` size, `tpd-seg` classes. Src uses `er-seg` with a minimal API — missing features should be backfilled from design when needed. |
-| `Slider` | **src is simplified** | Design has `label`, `formatValue`, `suffix`, `step` props and a labelled wrapper div. Src is a bare `<input type=range er-slider>` — missing wrapper/label features. |
-| `Switch` | **different DOM pattern** | Design uses `<label>` + hidden `<input type=checkbox>`. Src uses `<button role=switch>` — visually equivalent, but different semantics. Prefer src pattern going forward. |
+| Component      | Status                    | Notes                                                                                                                                                                     |
+| -------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ScriptViewer` | **src is ahead**          | Design has 3 word states (spoken/upcoming/active). Src has an 8-state bell-curve model plus `activeWordRef` and `onWordClick` — keep the src behaviour.                   |
+| `Segmented`    | **src is simplified**     | Design supports `icon`, `block` prop, `sm` size, `tpd-seg` classes. Src uses `er-seg` with a minimal API — missing features should be backfilled from design when needed. |
+| `Slider`       | **src is simplified**     | Design has `label`, `formatValue`, `suffix`, `step` props and a labelled wrapper div. Src is a bare `<input type=range er-slider>` — missing wrapper/label features.      |
+| `Switch`       | **different DOM pattern** | Design uses `<label>` + hidden `<input type=checkbox>`. Src uses `<button role=switch>` — visually equivalent, but different semantics. Prefer src pattern going forward. |
 
 ## Missing components (design exists, src not yet implemented)
 

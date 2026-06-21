@@ -46,7 +46,7 @@ Open an issue to discuss anything large before writing code.
 - [ ] `npm test` passes
 - [ ] `npm run lint` passes
 - [ ] `npm run format` has been run
-- [ ] The PR description explains *why*, not just *what*
+- [ ] The PR description explains _why_, not just _what_
 - [ ] New logic has tests where practical
 
 ## Commit style

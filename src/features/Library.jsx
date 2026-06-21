@@ -4,7 +4,16 @@ import { wordCount, readingMins } from '../lib/utils';
 
 const TABS = ['all', 'recent', 'pinned'];
 
-export function Library({ scripts, selId, settings, onSelect, onCreate, onTogglePin, onDelete, width }) {
+export function Library({
+  scripts,
+  selId,
+  settings,
+  onSelect,
+  onCreate,
+  onTogglePin,
+  onDelete,
+  width,
+}) {
   const [tab, setTab] = useState('all');
   const [query, setQuery] = useState('');
 
@@ -19,7 +28,10 @@ export function Library({ scripts, selId, settings, onSelect, onCreate, onToggle
   if (tab === 'all') list = [...list].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
   return (
-    <div className="lib" style={width ? { width, minWidth: width, maxWidth: width } : undefined}>
+    <div
+      className="lib"
+      style={width ? { width, minWidth: width, maxWidth: width } : undefined}
+    >
       <div className="lib-top">
         <div className="lib-title">Scripts</div>
         <div className="lib-search-row">
@@ -65,21 +77,33 @@ export function Library({ scripts, selId, settings, onSelect, onCreate, onToggle
               <div className="sc-title">{s.title}</div>
               <div className="sc-footer">
                 <div className="sc-stats">
-                  <div className="sc-stat"><Type size={11} />{wordCount(s.text)}w</div>
-                  <div className="sc-stat"><Clock size={11} />{readingMins(s.text, settings.speed)}m</div>
+                  <div className="sc-stat">
+                    <Type size={11} />
+                    {wordCount(s.text)}w
+                  </div>
+                  <div className="sc-stat">
+                    <Clock size={11} />
+                    {readingMins(s.text, settings.speed)}m
+                  </div>
                 </div>
                 <div className="sc-actions">
                   <button
                     className={'sc-act' + (s.pinned ? ' sc-act-active' : '')}
                     title={s.pinned ? 'Unpin' : 'Pin'}
-                    onClick={(e) => { e.stopPropagation(); onTogglePin(s.id, !s.pinned); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTogglePin(s.id, !s.pinned);
+                    }}
                   >
                     <Pin size={13} />
                   </button>
                   <button
                     className="sc-act"
                     title="Delete"
-                    onClick={(e) => { e.stopPropagation(); onDelete(s.id); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(s.id);
+                    }}
                   >
                     <Trash2 size={13} />
                   </button>

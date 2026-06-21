@@ -13,12 +13,15 @@ export function useListResize(defaultWidth = 300) {
   const startX = useRef(0);
   const startW = useRef(0);
 
-  const handleMouseDown = useCallback((e) => {
-    dragging.current = true;
-    startX.current = e.clientX;
-    startW.current = listWidth;
-    e.preventDefault();
-  }, [listWidth]);
+  const handleMouseDown = useCallback(
+    (e) => {
+      dragging.current = true;
+      startX.current = e.clientX;
+      startW.current = listWidth;
+      e.preventDefault();
+    },
+    [listWidth]
+  );
 
   useEffect(() => {
     const onMove = (e) => {

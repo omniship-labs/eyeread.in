@@ -44,9 +44,9 @@ We plan to add optional crash reporting so we can fix bugs faster. When we do:
 
 ## Data stored on your device
 
-| What | Where | Controlled by |
-|---|---|---|
-| Scripts | `~/Library/Application Support/in.eyeread.app/eyeread.db` | You — delete the app to remove |
+| What     | Where                                                        | Controlled by                  |
+| -------- | ------------------------------------------------------------ | ------------------------------ |
+| Scripts  | `~/Library/Application Support/in.eyeread.app/eyeread.db`    | You — delete the app to remove |
 | Settings | `~/Library/Application Support/in.eyeread.app/settings.json` | You — delete the app to remove |
 
 You can delete all App data at any time by uninstalling eyeread.in and removing
