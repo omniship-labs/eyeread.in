@@ -13,14 +13,16 @@ import es from './es.js';
 import hi from './hi.js';
 import kn from './kn.js';
 import mr from './mr.js';
-import bho from './bho.js';
-import tcy from './tcy.js';
 import ml from './ml.js';
 import ta from './ta.js';
 import te from './te.js';
 import zh from './zh.js';
 import ja from './ja.js';
 import ru from './ru.js';
+
+// NOTE: Bhojpuri and Tulu were dropped pending native-speaker review (their
+// machine translation was low-confidence). To add a language, create its
+// bundle, import it here, add a `locales` entry, and add it to `resources`.
 
 export const DEFAULT_LOCALE = 'en';
 
@@ -41,11 +43,9 @@ export const locales = [
   { code: 'ja', label: 'Japanese', native: '日本語', region: 'East Asia', og: 'ja_JP' },
   { code: 'hi', label: 'Hindi', native: 'हिन्दी', region: 'India', og: 'hi_IN' },
   { code: 'mr', label: 'Marathi', native: 'मराठी', region: 'India', og: 'mr_IN' },
-  { code: 'bho', label: 'Bhojpuri', native: 'भोजपुरी', region: 'India', og: 'bho_IN' },
   { code: 'ta', label: 'Tamil', native: 'தமிழ்', region: 'India', og: 'ta_IN' },
   { code: 'te', label: 'Telugu', native: 'తెలుగు', region: 'India', og: 'te_IN' },
   { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ', region: 'India', og: 'kn_IN' },
-  { code: 'tcy', label: 'Tulu', native: 'ತುಳು', region: 'India', og: 'tcy_IN' },
   { code: 'ml', label: 'Malayalam', native: 'മലയാളം', region: 'India', og: 'ml_IN' },
 ];
 
@@ -68,8 +68,6 @@ export const resources = {
   hi: { translation: hi },
   kn: { translation: kn },
   mr: { translation: mr },
-  bho: { translation: bho },
-  tcy: { translation: tcy },
   ml: { translation: ml },
   ta: { translation: ta },
   te: { translation: te },
