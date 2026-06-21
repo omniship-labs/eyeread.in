@@ -1,9 +1,10 @@
 /* One <Icon name="..." /> entry point so config stays framework-agnostic
    (it just names icons as strings).
-   - Generic UI icons: lucide-react (bundled).
-   - Brand marks (GitHub, Apple): lucide dropped brand icons, so these come
-     from the Iconify CDN via the <iconify-icon> web component (loaded in
-     index.html). It renders inline SVG, so currentColor still applies. */
+   - Generic UI icons: lucide-react.
+   - Brand marks (GitHub, Apple): lucide ships none, so these come from
+     Iconify's Material Design Icons — imported per-icon and bundled at build
+     time (offline, tree-shaken to just these two, no runtime CDN). They render
+     as inline SVG, so currentColor still applies. */
 import {
   EyeOff,
   Mic,
@@ -15,6 +16,9 @@ import {
   ChevronsLeftRight,
   ArrowRight,
 } from 'lucide-react';
+import { Icon as IconifyIcon } from '@iconify/react';
+import githubIcon from '@iconify-icons/mdi/github';
+import appleIcon from '@iconify-icons/mdi/apple';
 
 const LUCIDE = {
   'eye-off': EyeOff,
@@ -28,15 +32,14 @@ const LUCIDE = {
   arrow: ArrowRight,
 };
 
-// Brand marks served from the Iconify CDN (Material Design Icons set).
 const BRAND = {
-  github: 'mdi:github',
-  apple: 'mdi:apple',
+  github: githubIcon,
+  apple: appleIcon,
 };
 
 export function Icon({ name, size = 24 }) {
   if (BRAND[name]) {
-    return <iconify-icon icon={BRAND[name]} width={size} height={size} aria-hidden="true" />;
+    return <IconifyIcon icon={BRAND[name]} width={size} height={size} aria-hidden="true" />;
   }
   const Lucide = LUCIDE[name];
   return Lucide ? <Lucide size={size} /> : null;
