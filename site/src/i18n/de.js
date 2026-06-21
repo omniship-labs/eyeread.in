@@ -112,6 +112,30 @@ export default {
     ],
   },
 
+  compat: {
+    eyebrow: 'Von der Community geprüft',
+    heading: 'Welche Versionen unterstützt werden – und wer es bestätigt hat',
+    subhead:
+      'macOS und Windows bieten vom Betriebssystem erzwungene Unsichtbarkeit; Linux ist best-effort und hängt von deinem Compositor ab. Das haben Tester jeweils bestätigt – füge deins hinzu.',
+    cols: {
+      version: 'OS-Version',
+      environment: 'Umgebung',
+      result: 'Bildschirmübertragung',
+      verifiedBy: 'Geprüft von',
+      appVersion: 'App',
+    },
+    status: {
+      hidden: 'Verborgen',
+      partial: 'Teilweise',
+      visible: 'Sichtbar',
+      untested: 'Ungetestet',
+    },
+    guaranteed: 'OS-garantiert',
+    bestEffort: 'best-effort',
+    untestedLabel: 'Tester gesucht',
+    ctaLabel: 'Deine Konfiguration prüfen →',
+  },
+
   sponsors: {
     eyebrow: 'Von der Community unterstützt',
     heading: 'Unterstützer & Sponsoren',

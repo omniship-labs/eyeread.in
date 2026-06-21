@@ -112,6 +112,30 @@ export default {
     ],
   },
 
+  compat: {
+    eyebrow: 'Verificado por la comunidad',
+    heading: 'Qué versiones son compatibles — y quién lo confirmó',
+    subhead:
+      'macOS y Windows tienen invisibilidad garantizada por el SO; Linux es de mejor esfuerzo y depende de tu compositor. Esto es lo que han verificado los testers en cada uno: añade el tuyo.',
+    cols: {
+      version: 'Versión del SO',
+      environment: 'Entorno',
+      result: 'Pantalla compartida',
+      verifiedBy: 'Verificado por',
+      appVersion: 'App',
+    },
+    status: {
+      hidden: 'Oculto',
+      partial: 'Parcial',
+      visible: 'Visible',
+      untested: 'Sin probar',
+    },
+    guaranteed: 'Garantizado por el SO',
+    bestEffort: 'mejor esfuerzo',
+    untestedLabel: 'Se buscan testers',
+    ctaLabel: 'Verifica tu configuración →',
+  },
+
   sponsors: {
     eyebrow: 'Respaldado por la comunidad',
     heading: 'Patrocinadores y mecenas',

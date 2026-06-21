@@ -110,6 +110,30 @@ export default {
     ],
   },
 
+  compat: {
+    eyebrow: '社区验证',
+    heading: '支持哪些版本——以及由谁确认',
+    subhead:
+      'macOS 和 Windows 拥有操作系统保障的隐身；Linux 为尽力而为，取决于你的合成器。以下是测试者在各平台上验证的结果——欢迎补充。',
+    cols: {
+      version: '系统版本',
+      environment: '环境',
+      result: '屏幕共享',
+      verifiedBy: '验证者',
+      appVersion: '版本',
+    },
+    status: {
+      hidden: '已隐藏',
+      partial: '部分',
+      visible: '可见',
+      untested: '未测试',
+    },
+    guaranteed: '系统保障',
+    bestEffort: '尽力而为',
+    untestedLabel: '招募测试者',
+    ctaLabel: '验证你的环境 →',
+  },
+
   sponsors: {
     eyebrow: '由社区支持',
     heading: '支持者与赞助者',

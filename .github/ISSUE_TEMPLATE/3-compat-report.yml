@@ -1,0 +1,105 @@
+name: Compatibility report
+description: Tell us whether screen-share invisibility works on your OS / setup.
+title: '[Compat]: '
+labels: ['compatibility', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping verify eyeread.in! Confirmed reports get added to the
+        compatibility matrix on the site and in the README — with credit to you.
+
+        **How to test (please actually do this):**
+        1. Open the overlay and make sure **Hide from screen-share** is ON.
+        2. Start a real screen share or recording — **Zoom, Google Meet, Teams,
+           OBS, or QuickTime** — sharing your **whole screen**.
+        3. Look at the captured/recorded output: is the overlay there or not?
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS
+        - Windows
+        - Linux
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS version
+      description: e.g. "macOS 15 Sequoia", "Windows 11 23H2", "Ubuntu 24.04 LTS"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: >
+        macOS/Windows: chip or arch (Apple Silicon / Intel / x64).
+        Linux: desktop + session, e.g. "GNOME · Wayland", "KDE Plasma 6 · X11".
+        Run `echo $XDG_SESSION_TYPE` if unsure whether you're on Wayland or X11.
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: eyeread.in version
+      placeholder: 'e.g. 0.1.0'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result — was the overlay hidden from the capture?
+      options:
+        - Hidden — excluded from capture (works)
+        - Partial — hidden in some capture tools but not others
+        - Visible — the overlay showed up in the capture (does NOT work)
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tools
+    attributes:
+      label: Which capture tools did you test?
+      multiple: true
+      options:
+        - Zoom
+        - Google Meet
+        - Microsoft Teams
+        - OBS Studio
+        - QuickTime
+        - Discord
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Evidence / notes
+      description: >
+        Anything useful — which tools differed, a screenshot of the captured
+        output, compositor quirks, etc. (Don't paste anything you wouldn't want public.)
+
+  - type: input
+    id: credit
+    attributes:
+      label: GitHub handle for credit (optional)
+      description: How you'd like to be listed in the compatibility matrix.
+      placeholder: '@yourname'
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I actually started a real screen share / recording and checked the captured output (not just the local screen).
+          required: true

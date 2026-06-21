@@ -112,6 +112,30 @@ export default {
     ],
   },
 
+  compat: {
+    eyebrow: 'समुदाय-सत्यापित',
+    heading: 'कौन-सी वर्शन समर्थित हैं — और किसने पुष्टि की',
+    subhead:
+      'macOS और Windows पर अदृश्यता OS द्वारा सुनिश्चित होती है; Linux सर्वोत्तम-प्रयास है और आपके कंपोज़िटर पर निर्भर करता है। हर एक पर टेस्टरों ने यह सत्यापित किया है — अपना जोड़ें।',
+    cols: {
+      version: 'OS वर्शन',
+      environment: 'एनवायरनमेंट',
+      result: 'स्क्रीन-शेयर',
+      verifiedBy: 'किसने सत्यापित किया',
+      appVersion: 'ऐप',
+    },
+    status: {
+      hidden: 'छिपा',
+      partial: 'आंशिक',
+      visible: 'दृश्य',
+      untested: 'अपरीक्षित',
+    },
+    guaranteed: 'OS-सुनिश्चित',
+    bestEffort: 'सर्वोत्तम-प्रयास',
+    untestedLabel: 'टेस्टर चाहिए',
+    ctaLabel: 'अपना सेटअप सत्यापित करें →',
+  },
+
   sponsors: {
     eyebrow: 'समुदाय द्वारा समर्थित',
     heading: 'समर्थक और प्रायोजक',

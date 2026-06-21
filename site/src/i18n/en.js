@@ -126,6 +126,30 @@ export default {
     ],
   },
 
+  compat: {
+    eyebrow: 'Verified by the community',
+    heading: 'Which versions are supported — and who confirmed it',
+    subhead:
+      'macOS and Windows get OS-enforced invisibility; Linux is best-effort and depends on your compositor. Here’s what testers have verified on each — add yours.',
+    cols: {
+      version: 'OS version',
+      environment: 'Environment',
+      result: 'Screen-share',
+      verifiedBy: 'Verified by',
+      appVersion: 'App',
+    },
+    status: {
+      hidden: 'Hidden',
+      partial: 'Partial',
+      visible: 'Visible',
+      untested: 'Untested',
+    },
+    guaranteed: 'OS-guaranteed',
+    bestEffort: 'best-effort',
+    untestedLabel: 'Testers wanted',
+    ctaLabel: 'Verify your setup →',
+  },
+
   sponsors: {
     eyebrow: 'Backed by the community',
     heading: 'Backers & sponsors',

@@ -112,6 +112,30 @@ export default {
     ],
   },
 
+  compat: {
+    eyebrow: 'Vérifié par la communauté',
+    heading: 'Quelles versions sont prises en charge — et qui l’a confirmé',
+    subhead:
+      'macOS et Windows offrent une invisibilité garantie par l’OS ; Linux est au mieux-effort et dépend de votre compositeur. Voici ce que les testeurs ont vérifié sur chacun — ajoutez le vôtre.',
+    cols: {
+      version: 'Version de l’OS',
+      environment: 'Environnement',
+      result: 'Partage d’écran',
+      verifiedBy: 'Vérifié par',
+      appVersion: 'App',
+    },
+    status: {
+      hidden: 'Masqué',
+      partial: 'Partiel',
+      visible: 'Visible',
+      untested: 'Non testé',
+    },
+    guaranteed: 'Garanti par l’OS',
+    bestEffort: 'au mieux-effort',
+    untestedLabel: 'Testeurs recherchés',
+    ctaLabel: 'Vérifier votre config →',
+  },
+
   sponsors: {
     eyebrow: 'Soutenu par la communauté',
     heading: 'Contributeurs et sponsors',
