@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon.jsx';
-import { locales } from '../i18n/index.js';
+import { locales, localeGroups } from '../i18n/index.js';
 
 /* Native <select> language picker — keyboard- and screen-reader-friendly
    out of the box. Changing it calls i18next.changeLanguage(), which the
@@ -20,10 +20,14 @@ export default function LanguageSwitcher({ label }) {
         value={current}
         onChange={(e) => i18n.changeLanguage(e.target.value)}
       >
-        {locales.map((l) => (
-          <option key={l.code} value={l.code}>
-            {l.native}
-          </option>
+        {localeGroups.map((group) => (
+          <optgroup key={group.region} label={group.region}>
+            {group.locales.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.native}
+              </option>
+            ))}
+          </optgroup>
         ))}
       </select>
     </label>

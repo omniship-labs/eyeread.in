@@ -38,23 +38,32 @@ import ru from './ru.js';
 export const DEFAULT_LOCALE = 'en';
 
 // Display order + native names for the language switcher.
+// `region` groups them into <optgroup>s in the switcher.
 export const locales = [
-  { code: 'en', label: 'English', native: 'English' },
-  { code: 'fr', label: 'French', native: 'Français' },
-  { code: 'de', label: 'German', native: 'Deutsch' },
-  { code: 'es', label: 'Spanish', native: 'Español' },
-  { code: 'ru', label: 'Russian', native: 'Русский' },
-  { code: 'zh', label: 'Chinese', native: '中文' },
-  { code: 'ja', label: 'Japanese', native: '日本語' },
-  { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { code: 'mr', label: 'Marathi', native: 'मराठी' },
-  { code: 'bho', label: 'Bhojpuri', native: 'भोजपुरी' },
-  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
-  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
-  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
-  { code: 'tcy', label: 'Tulu', native: 'ತುಳು' },
-  { code: 'ml', label: 'Malayalam', native: 'മലയാളം' },
+  { code: 'en', label: 'English', native: 'English', region: 'Europe' },
+  { code: 'fr', label: 'French', native: 'Français', region: 'Europe' },
+  { code: 'de', label: 'German', native: 'Deutsch', region: 'Europe' },
+  { code: 'es', label: 'Spanish', native: 'Español', region: 'Europe' },
+  { code: 'ru', label: 'Russian', native: 'Русский', region: 'Europe' },
+  { code: 'zh', label: 'Chinese', native: '中文', region: 'East Asia' },
+  { code: 'ja', label: 'Japanese', native: '日本語', region: 'East Asia' },
+  { code: 'hi', label: 'Hindi', native: 'हिन्दी', region: 'India' },
+  { code: 'mr', label: 'Marathi', native: 'मराठी', region: 'India' },
+  { code: 'bho', label: 'Bhojpuri', native: 'भोजपुरी', region: 'India' },
+  { code: 'ta', label: 'Tamil', native: 'தமிழ்', region: 'India' },
+  { code: 'te', label: 'Telugu', native: 'తెలుగు', region: 'India' },
+  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ', region: 'India' },
+  { code: 'tcy', label: 'Tulu', native: 'ತುಳು', region: 'India' },
+  { code: 'ml', label: 'Malayalam', native: 'മലയാളം', region: 'India' },
 ];
+
+// Regions in first-appearance order, each with its locales — for grouped UIs.
+export const localeGroups = locales.reduce((groups, locale) => {
+  const group = groups.find((g) => g.region === locale.region);
+  if (group) group.locales.push(locale);
+  else groups.push({ region: locale.region, locales: [locale] });
+  return groups;
+}, []);
 
 const resources = {
   en: { translation: en },
