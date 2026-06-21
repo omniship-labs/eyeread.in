@@ -124,12 +124,13 @@ This project uses **[CLA Assistant](https://cla-assistant.io)** to manage
 signatures automatically.
 
 When you open a pull request, the CLA Assistant bot will check whether you
-have signed. If not, it will post a comment asking you to sign by commenting:
+have signed. If not, it will post a status check with a link to sign. Signing
+takes one click via GitHub OAuth — no account on a third-party service required
+beyond your existing GitHub account. Your GitHub username and the date of
+signing are recorded in a private Gist managed by CLA Assistant.
 
-> `I have read the CLA Document and I hereby sign the CLA`
-
-Your GitHub username and the date of signing will be recorded in
-`.github/cla-signatures.json` in this repository.
+The canonical CLA document is hosted at:
+https://gist.github.com/mhalinge/d195a1c90660ab82e3d9a8c83053ab83
 
 **Corporate contributors:** if you are contributing on behalf of a company,
 please open an issue so we can arrange a separate corporate CLA before your
