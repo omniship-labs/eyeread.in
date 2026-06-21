@@ -21,14 +21,18 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SVG = resolve(ROOT, 'design', 'assets', 'brand', 'og-image.svg');
 const OUT = resolve(ROOT, 'site', 'public', 'og-image.png');
 
-// Weights the og card actually uses (700 wordmark, 500 subtitle).
-const FONT_FILES = [
-  'node_modules/@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2',
-  'node_modules/@fontsource/space-grotesk/files/space-grotesk-latin-500-normal.woff2',
+// Weights the og card actually uses (700 wordmark, 500 subtitle). Resolved
+// through the package's exports so this works regardless of cwd or whether
+// node_modules is hoisted (monorepo) — not a hard-coded node_modules path.
+const FONT_SPECS = [
+  '@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2',
+  '@fontsource/space-grotesk/files/space-grotesk-latin-500-normal.woff2',
 ];
 
 const svg = await readFile(SVG, 'utf8');
-const fontBuffers = await Promise.all(FONT_FILES.map((p) => readFile(resolve(ROOT, p))));
+const fontBuffers = await Promise.all(
+  FONT_SPECS.map((spec) => readFile(fileURLToPath(import.meta.resolve(spec))))
+);
 
 const resvg = new Resvg(svg, {
   font: { fontBuffers, loadSystemFonts: false, defaultFontFamily: 'Space Grotesk' },
