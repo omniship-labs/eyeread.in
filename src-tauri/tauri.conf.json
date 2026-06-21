@@ -110,7 +110,7 @@
     "updater": {
       "pubkey": "",
       "endpoints": [
-        "https://releases.eyeread.in/{{target}}/{{arch}}/{{current_version}}"
+        "https://github.com/omniship-labs/eyeread.in/releases/latest/download/latest.json"
       ]
     }
   }

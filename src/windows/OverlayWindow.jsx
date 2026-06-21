@@ -17,7 +17,13 @@ import { ScriptViewer } from '../components/ScriptViewer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
 import { useClickThrough } from '../hooks/useClickThrough';
 import { usePanelResize, clampSize } from '../hooks/usePanelResize';
-import { defaultSettings, fetchScripts, fetchSettings, persistSettings, resolveSettings } from '../lib/store';
+import {
+  defaultSettings,
+  fetchScripts,
+  fetchSettings,
+  persistSettings,
+  resolveSettings,
+} from '../lib/store';
 import {
   isTauri,
   listen,
@@ -31,40 +37,39 @@ import {
 import { fmtTime } from '../lib/utils';
 
 export function OverlayWindow() {
-  const [script, setScript]         = useState(null);
-  const [settings, setSettings]     = useState(defaultSettings);
+  const [script, setScript] = useState(null);
+  const [settings, setSettings] = useState(defaultSettings);
   // `active`  = word currently being said (peak of bell curve)
   // `pointer` = lookahead search position for voice matching
-  const [active, setActive]         = useState(0);
-  const [pointer, setPointer]       = useState(0);
-  const [playing, setPlaying]       = useState(false);
-  const [elapsed, setElapsed]       = useState(0);
-  const [interactive, setInteractive]   = useState(true);
+  const [active, setActive] = useState(0);
+  const [pointer, setPointer] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [interactive, setInteractive] = useState(true);
   const loadedRef = useRef(false);
 
-
-  const windowRef      = useRef(null);
-  const activeWordRef  = useRef(null);
-  const panelRef       = useRef(null);
-  const gripRef        = useRef(null);
+  const windowRef = useRef(null);
+  const activeWordRef = useRef(null);
+  const panelRef = useRef(null);
+  const gripRef = useRef(null);
   const settingsBtnRef = useRef(null);
-  const scriptRef      = useRef(script);
+  const scriptRef = useRef(script);
   scriptRef.current = script;
   // `settings` is the GLOBAL layer; keep a ref so once-registered listeners and
   // the gear handler always read the latest global without re-subscribing.
-  const settingsRef    = useRef(settings);
+  const settingsRef = useRef(settings);
   settingsRef.current = settings;
 
   const words = useMemo(
     () => (script ? script.text.split(/\s+/).filter(Boolean) : []),
-    [script],
+    [script]
   );
 
   // Effective settings the prompter actually renders: script overrides laid
   // over global (script ▸ global ▸ default). Read `effective` everywhere below.
   const effective = useMemo(
     () => resolveSettings(settings, script?.settingsOverrides),
-    [settings, script],
+    [settings, script]
   );
 
   // ---- settings --------------------------------------------------------------
@@ -85,7 +90,7 @@ export function OverlayWindow() {
     setScript((prev) => {
       if (!prev) return prev;
       const overrides = { ...(prev.settingsOverrides || {}), ...patch };
-      emitTo('main',     'script:settings', { id: prev.id, overrides, from: 'overlay' });
+      emitTo('main', 'script:settings', { id: prev.id, overrides, from: 'overlay' });
       emitTo('settings', 'script:settings', { id: prev.id, overrides, from: 'overlay' });
       return { ...prev, settingsOverrides: overrides };
     });
@@ -101,7 +106,7 @@ export function OverlayWindow() {
         emitTo('main', 'script:patch', { id: s.id, patch: { overlaySize: size } });
       }
       patchSettings({ overlaySize: size });
-    },
+    }
   );
 
   // ---- interaction modes -----------------------------------------------------
@@ -110,7 +115,10 @@ export function OverlayWindow() {
   useEffect(() => {
     if (!isTauri) {
       const onKey = (e) => {
-        if (e.altKey && e.code === 'KeyE') { e.preventDefault(); setInteractive((i) => !i); }
+        if (e.altKey && e.code === 'KeyE') {
+          e.preventDefault();
+          setInteractive((i) => !i);
+        }
       };
       window.addEventListener('keydown', onKey);
       return () => window.removeEventListener('keydown', onKey);
@@ -163,7 +171,7 @@ export function OverlayWindow() {
     (async () => {
       un1 = await listen('overlay:load', (p) => {
         loadedRef.current = true;
-        if (p?.script)   setScript(p.script);
+        if (p?.script) setScript(p.script);
         if (p?.settings) setSettings(p.settings);
         const size = p?.script?.overlaySize ?? p?.settings?.overlaySize;
         if (size) setPanelSize(clampSize(size));
@@ -184,15 +192,22 @@ export function OverlayWindow() {
       un3 = await listen('script:settings', (p) => {
         if (p?.from === 'overlay') return; // ignore our own echo
         setScript((prev) =>
-          prev && prev.id === p?.id ? { ...prev, settingsOverrides: p.overrides ?? {} } : prev,
+          prev && prev.id === p?.id ? { ...prev, settingsOverrides: p.overrides ?? {} } : prev
         );
       });
     })();
-    return () => { un1?.(); un2?.(); un3?.(); };
+    return () => {
+      un1?.();
+      un2?.();
+      un3?.();
+    };
   }, [setPanelSize, sendSettingsContext]);
 
   // ---- voice tracking / auto-scroll ------------------------------------------
-  const jumpToRef = useRef((idx) => { setActive(idx); setPointer(idx); }); // fallback before hook mounts
+  const jumpToRef = useRef((idx) => {
+    setActive(idx);
+    setPointer(idx);
+  }); // fallback before hook mounts
   const { usingVoice, listening, jumpTo } = useVoiceTracking({
     words,
     playing,
@@ -204,7 +219,9 @@ export function OverlayWindow() {
     language: script?.language,
   });
   // Keep ref current so overlay:load listener (registered once) always calls latest jumpTo
-  useEffect(() => { jumpToRef.current = jumpTo; }, [jumpTo]);
+  useEffect(() => {
+    jumpToRef.current = jumpTo;
+  }, [jumpTo]);
 
   // ---- timer -----------------------------------------------------------------
   useEffect(() => {
@@ -216,7 +233,7 @@ export function OverlayWindow() {
   // ---- scroll active word to centre ------------------------------------------
   useEffect(() => {
     const win = windowRef.current;
-    const w   = activeWordRef.current;
+    const w = activeWordRef.current;
     if (!win || !w) return;
     const target = w.offsetTop - win.clientHeight / 2 + w.offsetHeight / 2;
     win.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
@@ -232,7 +249,10 @@ export function OverlayWindow() {
       fitOverlayToPanel(panelSize);
       return undefined;
     }
-    const t = setTimeout(() => { lastFit.current = Date.now(); fitOverlayToPanel(panelSize); }, 130);
+    const t = setTimeout(() => {
+      lastFit.current = Date.now();
+      fitOverlayToPanel(panelSize);
+    }, 130);
     return () => clearTimeout(t);
   }, [panelSize]);
 
@@ -267,27 +287,35 @@ export function OverlayWindow() {
     focusMain();
   }, []);
 
-  const onWordClick = useCallback((idx) => {
-    setPointer(idx);
-    jumpTo(idx);
-  }, [jumpTo]);
+  const onWordClick = useCallback(
+    (idx) => {
+      setPointer(idx);
+      jumpTo(idx);
+    },
+    [jumpTo]
+  );
 
   // ---- keyboard --------------------------------------------------------------
   useEffect(() => {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.code === 'Space') {
-        e.preventDefault(); setPlaying((p) => !p);
+        e.preventDefault();
+        setPlaying((p) => !p);
       } else if (e.key === 'Escape') {
         close();
       } else if (e.key === 'ArrowUp') {
-        e.preventDefault(); patchScriptOverride({ speed: Math.min(220, effective.speed + 5) });
+        e.preventDefault();
+        patchScriptOverride({ speed: Math.min(220, effective.speed + 5) });
       } else if (e.key === 'ArrowDown') {
-        e.preventDefault(); patchScriptOverride({ speed: Math.max(80, effective.speed - 5) });
+        e.preventDefault();
+        patchScriptOverride({ speed: Math.max(80, effective.speed - 5) });
       } else if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
-        e.preventDefault(); patchScriptOverride({ size: Math.min(46, effective.size + 3) });
+        e.preventDefault();
+        patchScriptOverride({ size: Math.min(46, effective.size + 3) });
       } else if ((e.metaKey || e.ctrlKey) && e.key === '-') {
-        e.preventDefault(); patchScriptOverride({ size: Math.max(22, effective.size - 3) });
+        e.preventDefault();
+        patchScriptOverride({ size: Math.max(22, effective.size - 3) });
       }
     };
     window.addEventListener('keydown', onKey);
@@ -295,9 +323,11 @@ export function OverlayWindow() {
   }, [effective.speed, effective.size, patchScriptOverride, close]);
 
   const timecode =
-    effective.timerMode === 'up'   ? fmtTime(elapsed) :
-    effective.timerMode === 'down' ? fmtTime(effective.countFrom - elapsed) :
-    null;
+    effective.timerMode === 'up'
+      ? fmtTime(elapsed)
+      : effective.timerMode === 'down'
+        ? fmtTime(effective.countFrom - elapsed)
+        : null;
 
   return (
     <div className={'overlay-root' + (!isTauri ? ' demo' : '')}>
@@ -318,17 +348,34 @@ export function OverlayWindow() {
         }}
       >
         <div className="ov-head" data-tauri-drag-region>
-          <span ref={gripRef} className="grip" data-tauri-drag-region title="Drag to move · Esc to hide">
-            <i /><i /><i /><i /><i /><i />
+          <span
+            ref={gripRef}
+            className="grip"
+            data-tauri-drag-region
+            title="Drag to move · Esc to hide"
+          >
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
           </span>
           {timecode && (
             <span className="ov-time">
-              {effective.timerMode === 'down' ? <Hourglass size={13} /> : <TimerIcon size={13} />}
+              {effective.timerMode === 'down' ? (
+                <Hourglass size={13} />
+              ) : (
+                <TimerIcon size={13} />
+              )}
               {timecode}
             </span>
           )}
           {usingVoice && listening && (
-            <span className="ov-voice on"><Mic size={12} />Voice</span>
+            <span className="ov-voice on">
+              <Mic size={12} />
+              Voice
+            </span>
           )}
           {effective.voice && playing && !voiceAvailable && (
             <span className="ov-voice" title="Voice tracking unavailable — timed scroll">
@@ -375,8 +422,12 @@ export function OverlayWindow() {
         </div>
 
         <div className="ov-foot">
-          <button className="ic" title="Restart" onClick={restart}><RotateCcw /></button>
-          <button className="ic" title="Back 5 words" onClick={skipBack}><ChevronLeft /></button>
+          <button className="ic" title="Restart" onClick={restart}>
+            <RotateCcw />
+          </button>
+          <button className="ic" title="Back 5 words" onClick={skipBack}>
+            <ChevronLeft />
+          </button>
           <button
             className="ic accent"
             title={playing ? 'Pause (Space)' : 'Play (Space)'}
@@ -384,20 +435,26 @@ export function OverlayWindow() {
           >
             {playing ? <Pause /> : <Play />}
           </button>
-          <button className="ic" title="Skip 5 words ahead" onClick={skip}><ChevronsRight /></button>
+          <button className="ic" title="Skip 5 words ahead" onClick={skip}>
+            <ChevronsRight />
+          </button>
           <span className="sep" />
           <button
             className="ic sizebtn"
             title="Smaller text"
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
-          >A</button>
+          >
+            A
+          </button>
           <button
             className="ic sizebtn"
             title="Larger text"
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
-          >A</button>
+          >
+            A
+          </button>
           <button
             ref={settingsBtnRef}
             className="ic"
@@ -420,14 +477,17 @@ export function OverlayWindow() {
           onPointerDown={startResize}
           title="Drag to resize"
         >
-          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <svg
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
             <path d="M11 5 5 11M11 9l-2 2" />
           </svg>
         </div>
-
-
       </div>
-
     </div>
   );
 }

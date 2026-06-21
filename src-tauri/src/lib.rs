@@ -16,7 +16,6 @@ fn set_app_protected(app: AppHandle, protected: bool) {
     }
 }
 
-
 /// Open the About window — called from JS menu listener or Settings screen.
 #[tauri::command]
 fn show_about_window(app: AppHandle) {
@@ -53,12 +52,12 @@ async fn install_update(app: AppHandle) -> Result<(), String> {
 }
 
 fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
-    let about       = MenuItem::with_id(app, "about", "About eyeread.in", true, None::<&str>)?;
-    let hide        = PredefinedMenuItem::hide(app, None)?;
+    let about = MenuItem::with_id(app, "about", "About eyeread.in", true, None::<&str>)?;
+    let hide = PredefinedMenuItem::hide(app, None)?;
     let hide_others = PredefinedMenuItem::hide_others(app, None)?;
-    let show_all    = PredefinedMenuItem::show_all(app, None)?;
-    let sep         = PredefinedMenuItem::separator(app)?;
-    let quit        = PredefinedMenuItem::quit(app, None)?;
+    let show_all = PredefinedMenuItem::show_all(app, None)?;
+    let sep = PredefinedMenuItem::separator(app)?;
+    let quit = PredefinedMenuItem::quit(app, None)?;
 
     let app_submenu = Submenu::with_items(
         app,

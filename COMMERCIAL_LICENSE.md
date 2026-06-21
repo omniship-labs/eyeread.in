@@ -37,4 +37,4 @@ Please include a brief description of your intended use case and company.
 
 ---
 
-*Copyright (C) 2026 Mrithyunjay Halinge ("MJ"), operating as OmniShip Labs. All rights reserved.*
+_Copyright (C) 2026 Mrithyunjay Halinge ("MJ"), operating as OmniShip Labs. All rights reserved._

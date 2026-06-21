@@ -20,11 +20,14 @@
   max-width: calc(100vw - 48px);
   border-radius: var(--radius-xl);
   border: 1px solid var(--accent-subtle-border);
-  box-shadow: 0 0 0 1px rgba(110, 86, 247, 0.35), 0 8px 32px rgba(0,0,0,0.45);
+  box-shadow:
+    0 0 0 1px rgba(110, 86, 247, 0.35),
+    0 8px 32px rgba(0, 0, 0, 0.45);
   background: rgba(10, 10, 18, var(--ov-alpha, 0.62));
   backdrop-filter: var(--blur-glass);
   -webkit-backdrop-filter: var(--blur-glass);
-  transition: opacity var(--dur-slow) var(--ease-out),
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
     transform var(--dur-slow) var(--ease-out),
     background var(--dur-slow) var(--ease-out),
     border-color var(--dur-slow) var(--ease-out),
@@ -45,23 +48,32 @@
 }
 /* HIDDEN (shielded) — violet tint */
 .overlay-panel.shielded::before {
-  background: rgba(110, 86, 247, 0.10);
+  background: rgba(110, 86, 247, 0.1);
 }
 /* VISIBLE (exposed to screen-share) — red warning tint */
 .overlay-panel.exposed::before {
   background: rgba(239, 68, 68, 0.13);
 }
 /* Make sure panel children sit above the tint layer */
-.overlay-panel > * { position: relative; z-index: 1; }
+.overlay-panel > * {
+  position: relative;
+  z-index: 1;
+}
 
 /* Also tint the border and shadow */
 .overlay-panel.shielded {
   border-color: rgba(110, 86, 247, 0.45);
-  box-shadow: 0 0 0 1px rgba(110, 86, 247, 0.45), 0 8px 32px rgba(0,0,0,0.45), 0 0 28px rgba(110, 86, 247, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(110, 86, 247, 0.45),
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(110, 86, 247, 0.18);
 }
 .overlay-panel.exposed {
   border-color: rgba(239, 68, 68, 0.45);
-  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.45), 0 8px 32px rgba(0,0,0,0.45), 0 0 28px rgba(239, 68, 68, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.45),
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(239, 68, 68, 0.18);
 }
 
 /* Pass-through mode (⌥E): same glass — only the chrome recedes, and the
@@ -93,8 +105,12 @@
   padding: 12px 12px 0;
   overflow: hidden;
 }
-.ov-head .ov-time { flex-shrink: 0; }
-.ov-head .ov-voice { flex-shrink: 0; }
+.ov-head .ov-time {
+  flex-shrink: 0;
+}
+.ov-head .ov-voice {
+  flex-shrink: 0;
+}
 .grip {
   display: grid;
   grid-template-columns: repeat(2, 3px);
@@ -119,7 +135,10 @@
   gap: 6px;
   font-variant-numeric: tabular-nums;
 }
-.ov-time svg { width: 13px; height: 13px; }
+.ov-time svg {
+  width: 13px;
+  height: 13px;
+}
 .ov-voice {
   display: inline-flex;
   align-items: center;
@@ -130,8 +149,13 @@
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-.ov-voice svg { width: 12px; height: 12px; }
-.ov-voice.on { color: var(--accent-text); }
+.ov-voice svg {
+  width: 12px;
+  height: 12px;
+}
+.ov-voice.on {
+  color: var(--accent-text);
+}
 .ov-invisible {
   margin-left: auto;
   display: inline-flex;
@@ -148,17 +172,31 @@
   border-radius: var(--radius-pill);
   white-space: nowrap;
 }
-.ov-invisible svg { width: 13px; height: 13px; }
+.ov-invisible svg {
+  width: 13px;
+  height: 13px;
+}
 
-.ov-body { padding: 8px 22px 4px; position: relative; }
+.ov-body {
+  padding: 8px 22px 4px;
+  position: relative;
+}
 .ov-window {
   height: 168px; /* overridden inline — resizable */
   overflow: hidden;
   position: relative;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    #000 22%,
+    #000 72%,
+    transparent 100%
+  );
   mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
 }
-.ov-window .er-script { padding: 56px 0; }
+.ov-window .er-script {
+  padding: 56px 0;
+}
 .ov-empty {
   height: 168px;
   display: flex;
@@ -191,19 +229,47 @@
   transition: all var(--dur-fast) var(--ease-out);
   padding: 0;
 }
-.ic:hover { background: var(--surface-hover); color: var(--text-primary); }
-.ic svg { width: 19px; height: 19px; }
-.ic.accent { background: var(--accent); color: #fff; box-shadow: var(--glow-accent-sm); }
-.ic.accent:hover { background: var(--accent-hover); }
+.ic:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.ic svg {
+  width: 19px;
+  height: 19px;
+}
+.ic.accent {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--glow-accent-sm);
+}
+.ic.accent:hover {
+  background: var(--accent-hover);
+}
 .ic.on {
   background: var(--accent-subtle-bg);
   color: var(--accent-text);
   border-color: var(--accent-subtle-border);
 }
-.sep { width: 1px; height: 22px; background: var(--border-default); margin: 0 3px; }
-.sizebtn { font-family: var(--font-display); font-weight: 700; }
-.ic.ic-sm { width: 26px; height: 26px; border-radius: var(--radius-sm); flex: none; }
-.ic.ic-sm svg { width: 14px; height: 14px; }
+.sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border-default);
+  margin: 0 3px;
+}
+.sizebtn {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.ic.ic-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+.ic.ic-sm svg {
+  width: 14px;
+  height: 14px;
+}
 
 /* screen-share shield button — shows HIDDEN / VISIBLE label */
 .ic.ov-shield {
@@ -218,8 +284,14 @@
   color: var(--text-tertiary);
   white-space: nowrap;
 }
-.ic.ov-shield svg { width: 13px; height: 13px; flex-shrink: 0; }
-.ic.ov-shield .ov-shield-label { display: inline; }
+.ic.ov-shield svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.ic.ov-shield .ov-shield-label {
+  display: inline;
+}
 /* HIDDEN = shielded → accent purple pill */
 .ic.ov-shield.on {
   color: var(--accent-text);
@@ -269,7 +341,9 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  transition: opacity var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
   touch-action: none;
 }
 .ov-resize:hover,
@@ -277,17 +351,25 @@
   opacity: 1;
   color: var(--accent-text);
 }
-.ov-resize svg { width: 12px; height: 12px; pointer-events: none; }
+.ov-resize svg {
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
 
 /* Settings now live in their own window (see settings-window.css) — the
    prompter panel no longer hosts any settings UI. */
 
 /* ===== Browser demo backdrop (web preview only) ===== */
-.demo-stage { position: fixed; inset: 0; }
+.demo-stage {
+  position: fixed;
+  inset: 0;
+}
 .demo-shared {
   position: absolute;
   inset: 0;
-  background: radial-gradient(1200px 600px at 80% -10%, rgba(76, 108, 200, 0.18), transparent 60%),
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(76, 108, 200, 0.18), transparent 60%),
     radial-gradient(900px 500px at 10% 110%, rgba(110, 86, 247, 0.12), transparent 60%),
     linear-gradient(135deg, #0e1424 0%, #0a0d18 60%, #0c0a16 100%);
   padding: 64px 84px;
@@ -311,6 +393,18 @@
   max-width: 760px;
   line-height: 1.04;
 }
-.demo-sub { font-size: 19px; color: #93a0c0; margin-top: 18px; max-width: 600px; line-height: 1.5; }
-.overlay-root.demo { justify-content: flex-start; padding-top: 64px; }
-.overlay-root.demo .overlay-panel { position: relative; z-index: 20; }
+.demo-sub {
+  font-size: 19px;
+  color: #93a0c0;
+  margin-top: 18px;
+  max-width: 600px;
+  line-height: 1.5;
+}
+.overlay-root.demo {
+  justify-content: flex-start;
+  padding-top: 64px;
+}
+.overlay-root.demo .overlay-panel {
+  position: relative;
+  z-index: 20;
+}

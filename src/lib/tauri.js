@@ -1,8 +1,7 @@
 // Thin platform layer. Everything works in a plain browser too (for design
 // review / web demo) via BroadcastChannel + window.open fallbacks.
 
-export const isTauri =
-  typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 // Screen-share invisibility (contentProtected) only works on macOS.
 // userAgent is reliable here; navigator.platform is deprecated and empty in modern WebKit.
@@ -62,9 +61,11 @@ export async function positionOverlay(position = 'top') {
   // extra padding-top in overlay-root gives the box-shadow room to render.
   const SHADOW_PAD = 40;
   const y =
-    position === 'center' ? my + (mh - OVERLAY_H) / 2 - SHADOW_PAD
-    : position === 'bottom' ? my + mh - OVERLAY_H - 24 - SHADOW_PAD
-    : my + 12 - SHADOW_PAD; // top — just under the webcam
+    position === 'center'
+      ? my + (mh - OVERLAY_H) / 2 - SHADOW_PAD
+      : position === 'bottom'
+        ? my + mh - OVERLAY_H - 24 - SHADOW_PAD
+        : my + 12 - SHADOW_PAD; // top — just under the webcam
   await win.setPosition(new LogicalPosition(Math.round(x), Math.round(y)));
 }
 
@@ -120,13 +121,15 @@ export async function showSettingsWindow() {
   try {
     const { LogicalPosition } = await import('@tauri-apps/api/window');
     const ov = await overlayWindow();
-    const pos  = await ov.outerPosition();
+    const pos = await ov.outerPosition();
     const size = await ov.outerSize();
     const scale = await ov.scaleFactor();
     const x = Math.round(pos.x / scale + size.width / scale + 8);
     const y = Math.round(pos.y / scale);
     await win.setPosition(new LogicalPosition(x, y));
-  } catch { /* overlay hidden, skip positioning */ }
+  } catch {
+    /* overlay hidden, skip positioning */
+  }
   await win.setVisibleOnAllWorkspaces(true).catch(() => {});
   await win.setAlwaysOnTop(true).catch(() => {});
   await win.show();
@@ -174,7 +177,10 @@ export async function fitOverlayToPanel(panel) {
     await win.setSize(new LogicalSize(newW, size.height / scale));
     // compensate horizontally so the panel stays centred
     await win.setPosition(
-      new LogicalPosition(Math.round(pos.x / scale + (oldW - newW) / 2), Math.round(pos.y / scale))
+      new LogicalPosition(
+        Math.round(pos.x / scale + (oldW - newW) / 2),
+        Math.round(pos.y / scale)
+      )
     );
   } catch {
     /* window hidden mid-call */
@@ -209,7 +215,6 @@ export async function setAppProtected(on) {
   await invoke('set_app_protected', { protected: on });
 }
 
-
 // Serialize hotkey registration so StrictMode double-invocation can't race.
 const hotkeyQueue = {};
 function withHotkeyLock(combo, fn) {
@@ -226,7 +231,9 @@ export function registerOverlayHotkey(toggle) {
   return withHotkeyLock(combo, async () => {
     const { register, unregister } = await import('@tauri-apps/plugin-global-shortcut');
     await unregister(combo).catch(() => {});
-    await register(combo, (event) => { if (event.state === 'Pressed') toggle(); });
+    await register(combo, (event) => {
+      if (event.state === 'Pressed') toggle();
+    });
     return () => unregister(combo).catch(() => {});
   });
 }

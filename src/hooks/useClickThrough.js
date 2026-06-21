@@ -38,9 +38,7 @@ export function useClickThrough(refs, enabled = true) {
     const PAD = 10; // hysteresis so hover states wake up before you arrive
 
     (async () => {
-      const { getCurrentWindow, cursorPosition } = await import(
-        '@tauri-apps/api/window'
-      );
+      const { getCurrentWindow, cursorPosition } = await import('@tauri-apps/api/window');
       if (cancelled) return;
       win = getCurrentWindow();
 
@@ -60,10 +58,7 @@ export function useClickThrough(refs, enabled = true) {
             if (!el) return false;
             const b = el.getBoundingClientRect();
             return (
-              x >= b.left - PAD &&
-              x <= b.right + PAD &&
-              y >= b.top - PAD &&
-              y <= b.bottom + PAD
+              x >= b.left - PAD && x <= b.right + PAD && y >= b.top - PAD && y <= b.bottom + PAD
             );
           });
 

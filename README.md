@@ -37,10 +37,10 @@ Cross-platform support will be added if a reliable solution becomes available.
 
 The app is a single React codebase that runs in two Tauri windows, selected by `?window=` query param at startup.
 
-| Window | Purpose | Notable config |
-|---|---|---|
-| `main` | Script library, editor, settings | Standard window with macOS overlay title bar |
-| `overlay` | The floating glass prompter | Transparent, frameless, always-on-top, `contentProtected: true`, visible across all Spaces |
+| Window    | Purpose                          | Notable config                                                                             |
+| --------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
+| `main`    | Script library, editor, settings | Standard window with macOS overlay title bar                                               |
+| `overlay` | The floating glass prompter      | Transparent, frameless, always-on-top, `contentProtected: true`, visible across all Spaces |
 
 **Storage.** Scripts are stored in SQLite (`eyeread.db` via `tauri-plugin-sql`), settings in
 `settings.json` (`tauri-plugin-store`), both in the user's app data directory. The two windows
@@ -54,14 +54,14 @@ configured wpm where speech recognition is unavailable (e.g. WKWebView).
 
 **Hotkeys.**
 
-| Shortcut | Action |
-|---|---|
-| ⌘ Shift E | Show / hide overlay (system-wide) |
-| ⌥ E | Toggle click-through (system-wide) |
-| Space | Play / pause scroll |
-| ↑ / ↓ | Scroll speed up / down |
-| ⌘ + / ⌘ − | Text size up / down |
-| Esc | Hide overlay |
+| Shortcut  | Action                             |
+| --------- | ---------------------------------- |
+| ⌘ Shift E | Show / hide overlay (system-wide)  |
+| ⌥ E       | Toggle click-through (system-wide) |
+| Space     | Play / pause scroll                |
+| ↑ / ↓     | Scroll speed up / down             |
+| ⌘ + / ⌘ − | Text size up / down                |
+| Esc       | Hide overlay                       |
 
 ## Getting started
 
@@ -116,9 +116,9 @@ src-tauri/            Tauri 2 shell — window config, capabilities, Info.plist
 
 Builds are published automatically via GitHub Actions on two channels:
 
-| Channel | Trigger | Bundle ID |
-|---|---|---|
-| **Stable** | `v*` tag on `main` | `in.eyeread.app` |
+| Channel     | Trigger                     | Bundle ID                |
+| ----------- | --------------------------- | ------------------------ |
+| **Stable**  | `v*` tag on `main`          | `in.eyeread.app`         |
 | **Nightly** | Push to `dev` or daily cron | `in.eyeread.app.nightly` |
 
 Both channels install side-by-side. Nightly builds are stamped with the date

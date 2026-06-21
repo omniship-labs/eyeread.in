@@ -16,14 +16,32 @@ function useSystemLogo() {
 }
 
 class ErrorBoundary extends Component {
-  constructor(props) { super(props); this.state = { error: null }; }
-  static getDerivedStateFromError(e) { return { error: e }; }
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(e) {
+    return { error: e };
+  }
   render() {
     if (this.state.error) {
       return (
-        <div style={{ flex: 1, padding: 24, color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: 13, overflow: 'auto' }}>
-          <div style={{ color: '#ff5f57', marginBottom: 12, fontWeight: 700 }}>Render error</div>
-          <pre style={{ whiteSpace: 'pre-wrap', color: 'var(--text-secondary)' }}>{this.state.error?.stack || String(this.state.error)}</pre>
+        <div
+          style={{
+            flex: 1,
+            padding: 24,
+            color: 'var(--text-primary)',
+            fontFamily: 'monospace',
+            fontSize: 13,
+            overflow: 'auto',
+          }}
+        >
+          <div style={{ color: '#ff5f57', marginBottom: 12, fontWeight: 700 }}>
+            Render error
+          </div>
+          <pre style={{ whiteSpace: 'pre-wrap', color: 'var(--text-secondary)' }}>
+            {this.state.error?.stack || String(this.state.error)}
+          </pre>
         </div>
       );
     }
@@ -114,7 +132,8 @@ export function MainWindow() {
     (async () => {
       // Global layer edits from the overlay or the settings window.
       un1 = await listen('settings:sync', (p) => {
-        if (p?.from === 'overlay' || p?.from === 'settings') setSettings((s) => ({ ...s, ...p.settings }));
+        if (p?.from === 'overlay' || p?.from === 'settings')
+          setSettings((s) => ({ ...s, ...p.settings }));
       });
       un2 = await listen('overlay:hidden', () => {});
       un3 = await listen('script:patch', (p) => {
@@ -128,12 +147,19 @@ export function MainWindow() {
         if (p?.id)
           setScripts((ss) =>
             ss.map((s) =>
-              s.id === p.id ? { ...s, settingsOverrides: p.overrides ?? {}, updatedAt: Date.now() } : s
+              s.id === p.id
+                ? { ...s, settingsOverrides: p.overrides ?? {}, updatedAt: Date.now() }
+                : s
             )
           );
       });
     })();
-    return () => { un1?.(); un2?.(); un3?.(); un4?.(); };
+    return () => {
+      un1?.();
+      un2?.();
+      un3?.();
+      un4?.();
+    };
   }, []);
 
   // ---- overlay hotkeys ----------------------------------------------------
@@ -150,15 +176,29 @@ export function MainWindow() {
   }, []);
 
   useEffect(() => {
-    let cleanup; let cancelled = false;
-    registerOverlayHotkey(toggleOverlay).then((fn) => { if (!cancelled) cleanup = fn; else fn?.(); });
-    return () => { cancelled = true; cleanup?.(); };
+    let cleanup;
+    let cancelled = false;
+    registerOverlayHotkey(toggleOverlay).then((fn) => {
+      if (!cancelled) cleanup = fn;
+      else fn?.();
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, [toggleOverlay]);
 
   useEffect(() => {
-    let cleanup; let cancelled = false;
-    registerInteractiveHotkey().then((fn) => { if (!cancelled) cleanup = fn; else fn?.(); });
-    return () => { cancelled = true; cleanup?.(); };
+    let cleanup;
+    let cancelled = false;
+    registerInteractiveHotkey().then((fn) => {
+      if (!cancelled) cleanup = fn;
+      else fn?.();
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, []);
 
   // ---- script ops ---------------------------------------------------------
@@ -202,7 +242,9 @@ export function MainWindow() {
         )}
         <div className="titlebar-name" data-tauri-drag-region>
           <img src={logoMark} alt="" className="titlebar-logo" />
-          <span className="titlebar-wordmark">eyeread<span className="titlebar-wordmark-in">.in</span></span>
+          <span className="titlebar-wordmark">
+            eyeread<span className="titlebar-wordmark-in">.in</span>
+          </span>
         </div>
         <ShieldToggle
           shielded={settings.hideFromShare}
@@ -251,13 +293,29 @@ export function MainWindow() {
                   onChange={(patch) => updateScript(sel.id, patch)}
                   onScriptSettings={(next) => {
                     updateScript(sel.id, { settingsOverrides: next });
-                    emitTo('overlay',  'script:settings', { id: sel.id, overrides: next, from: 'main' });
-                    emitTo('settings', 'script:settings', { id: sel.id, overrides: next, from: 'main' });
+                    emitTo('overlay', 'script:settings', {
+                      id: sel.id,
+                      overrides: next,
+                      from: 'main',
+                    });
+                    emitTo('settings', 'script:settings', {
+                      id: sel.id,
+                      overrides: next,
+                      from: 'main',
+                    });
                   }}
                   onResetScript={() => {
                     updateScript(sel.id, { settingsOverrides: {} });
-                    emitTo('overlay',  'script:settings', { id: sel.id, overrides: {}, from: 'main' });
-                    emitTo('settings', 'script:settings', { id: sel.id, overrides: {}, from: 'main' });
+                    emitTo('overlay', 'script:settings', {
+                      id: sel.id,
+                      overrides: {},
+                      from: 'main',
+                    });
+                    emitTo('settings', 'script:settings', {
+                      id: sel.id,
+                      overrides: {},
+                      from: 'main',
+                    });
                   }}
                   onBack={null}
                   onStart={() => startReading(sel)}

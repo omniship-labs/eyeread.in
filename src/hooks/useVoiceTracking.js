@@ -17,7 +17,7 @@ export function useVoiceTracking({
   playing,
   voiceEnabled,
   wpm,
-  pointer,    // owned by caller
+  pointer, // owned by caller
   setPointer,
   setActive,
   language,
@@ -25,91 +25,111 @@ export function useVoiceTracking({
   const normWords = useMemo(() => words.map(normalizeWord), [words]);
 
   // ---- refs that must always reflect latest values --------------------------
-  const pointerRef   = useRef(pointer);
+  const pointerRef = useRef(pointer);
   const normWordsRef = useRef(normWords);
-  const playingRef   = useRef(playing);
-  const wpmRef       = useRef(wpm);
-  useEffect(() => { pointerRef.current   = pointer;   }, [pointer]);
-  useEffect(() => { normWordsRef.current = normWords; }, [normWords]);
-  useEffect(() => { playingRef.current   = playing;   }, [playing]);
-  useEffect(() => { wpmRef.current       = wpm;       }, [wpm]);
+  const playingRef = useRef(playing);
+  const wpmRef = useRef(wpm);
+  useEffect(() => {
+    pointerRef.current = pointer;
+  }, [pointer]);
+  useEffect(() => {
+    normWordsRef.current = normWords;
+  }, [normWords]);
+  useEffect(() => {
+    playingRef.current = playing;
+  }, [playing]);
+  useEffect(() => {
+    wpmRef.current = wpm;
+  }, [wpm]);
 
   // ---- graceful slide -------------------------------------------------------
   // activeRef tracks where the highlight currently is inside this hook so the
   // slide timer always has the true position regardless of React render timing.
-  const activeRef  = useRef(0);
-  const slideRef   = useRef(null);
-  const targetRef  = useRef(0);
+  const activeRef = useRef(0);
+  const slideRef = useRef(null);
+  const targetRef = useRef(0);
 
   const cancelSlide = useCallback(() => {
-    if (slideRef.current) { clearTimeout(slideRef.current); slideRef.current = null; }
+    if (slideRef.current) {
+      clearTimeout(slideRef.current);
+      slideRef.current = null;
+    }
   }, []);
 
-  const slideTo = useCallback((target) => {
-    targetRef.current = target;
-    // Cancel any in-flight tick and restart — recalculates speed for new gap
-    cancelSlide();
+  const slideTo = useCallback(
+    (target) => {
+      targetRef.current = target;
+      // Cancel any in-flight tick and restart — recalculates speed for new gap
+      cancelSlide();
 
-    const tick = () => {
-      if (!playingRef.current || activeRef.current >= targetRef.current) {
-        slideRef.current = null;
-        return;
-      }
-      activeRef.current += 1;
-      setActive(activeRef.current);
+      const tick = () => {
+        if (!playingRef.current || activeRef.current >= targetRef.current) {
+          slideRef.current = null;
+          return;
+        }
+        activeRef.current += 1;
+        setActive(activeRef.current);
 
-      // Variable speed: compress interval when lagging behind
-      const gap          = targetRef.current - activeRef.current;
+        // Variable speed: compress interval when lagging behind
+        const gap = targetRef.current - activeRef.current;
+        const baseMsPerWord = Math.round(60000 / Math.max(40, wpmRef.current));
+        const speedup = gap <= 1 ? 1 : gap <= 3 ? 1.8 : 3;
+        slideRef.current = setTimeout(tick, Math.round(baseMsPerWord / speedup));
+      };
+
+      const gap = targetRef.current - activeRef.current;
       const baseMsPerWord = Math.round(60000 / Math.max(40, wpmRef.current));
-      const speedup      = gap <= 1 ? 1 : gap <= 3 ? 1.8 : 3;
-      slideRef.current   = setTimeout(tick, Math.round(baseMsPerWord / speedup));
-    };
-
-    const gap          = targetRef.current - activeRef.current;
-    const baseMsPerWord = Math.round(60000 / Math.max(40, wpmRef.current));
-    const speedup      = gap <= 1 ? 1 : gap <= 3 ? 1.8 : 3;
-    slideRef.current   = setTimeout(tick, Math.round(baseMsPerWord / speedup));
-  }, [cancelSlide, setActive]);
+      const speedup = gap <= 1 ? 1 : gap <= 3 ? 1.8 : 3;
+      slideRef.current = setTimeout(tick, Math.round(baseMsPerWord / speedup));
+    },
+    [cancelSlide, setActive]
+  );
 
   // jumpTo: instant move with no slide — for restart / skip / word-click / reset
-  const jumpTo = useCallback((idx) => {
-    cancelSlide();
-    activeRef.current  = idx;
-    targetRef.current  = idx;
-    pointerRef.current = idx;
-    setPointer(idx);
-    setActive(idx);
-  }, [cancelSlide, setPointer, setActive]);
+  const jumpTo = useCallback(
+    (idx) => {
+      cancelSlide();
+      activeRef.current = idx;
+      targetRef.current = idx;
+      pointerRef.current = idx;
+      setPointer(idx);
+      setActive(idx);
+    },
+    [cancelSlide, setPointer, setActive]
+  );
 
   // ---- voice matching -------------------------------------------------------
   // onWords is kept in a ref so useSpeechRecognition never needs to restart
   // when normWords or other deps change — the ref is always current.
   const onWordsRef = useRef(null);
-  onWordsRef.current = useCallback((heardWords) => {
-    const nw = normWordsRef.current;
-    const normalized = heardWords.map(normalizeWord).filter(Boolean);
+  onWordsRef.current = useCallback(
+    (heardWords) => {
+      const nw = normWordsRef.current;
+      const normalized = heardWords.map(normalizeWord).filter(Boolean);
 
-    const searchFrom = Math.min(pointerRef.current, activeRef.current + 2);
-    let p = searchFrom;
+      const searchFrom = Math.min(pointerRef.current, activeRef.current + 2);
+      let p = searchFrom;
 
-    for (const hw of normalized) {
-      if (!hw) continue;
-      const windowEnd = Math.min(nw.length, p + 3);
-      for (let j = p; j < windowEnd; j++) {
-        if (!nw[j]) continue;
-        if (wordMatches(nw[j], hw)) {
-          p = j + 1;
-          break;
+      for (const hw of normalized) {
+        if (!hw) continue;
+        const windowEnd = Math.min(nw.length, p + 3);
+        for (let j = p; j < windowEnd; j++) {
+          if (!nw[j]) continue;
+          if (wordMatches(nw[j], hw)) {
+            p = j + 1;
+            break;
+          }
         }
       }
-    }
 
-    if (p > pointerRef.current) {
-      pointerRef.current = p;
-      setPointer(p);
-      slideTo(Math.min(p - 1, nw.length - 1));
-    }
-  }, [setPointer, slideTo]);
+      if (p > pointerRef.current) {
+        pointerRef.current = p;
+        setPointer(p);
+        slideTo(Math.min(p - 1, nw.length - 1));
+      }
+    },
+    [setPointer, slideTo]
+  );
 
   // Stable wrapper so useSpeechRecognition never re-subscribes
   const onWords = useCallback((hw) => onWordsRef.current(hw), []);
@@ -122,7 +142,7 @@ export function useVoiceTracking({
     if (!playing || voiceEnabled) return undefined;
     const ms = Math.round(60000 / Math.max(40, wpm));
     const id = setInterval(() => {
-      const nw   = normWordsRef.current;
+      const nw = normWordsRef.current;
       const next = Math.min(pointerRef.current + 1, nw.length - 1);
       pointerRef.current = next;
       setPointer(next);

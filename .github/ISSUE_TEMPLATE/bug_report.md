@@ -9,9 +9,10 @@ A clear description of what went wrong.
 
 **To reproduce**
 Steps to reproduce:
-1. 
-2. 
-3. 
+
+1.
+2.
+3.
 
 **Expected behaviour**
 What you expected to happen.
@@ -23,6 +24,7 @@ What actually happened.
 If applicable — especially helpful for overlay positioning or visibility issues.
 
 **Environment**
+
 - eyeread.in version: (check Settings → About)
 - macOS version:
 - Mac model (e.g. M3 MacBook Pro, Intel Mac mini):

@@ -12,7 +12,11 @@ export default [
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
-      globals: { ...globals.browser, __RELEASE_CHANNEL__: 'readonly' },
+      globals: {
+        ...globals.browser,
+        __RELEASE_CHANNEL__: 'readonly',
+        __APP_VERSION__: 'readonly',
+      },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     settings: { react: { version: 'detect' } },
