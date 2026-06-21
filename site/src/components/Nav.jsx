@@ -16,7 +16,8 @@ export default function Nav({ config }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Icon name="github" size={15} /> {nav.githubLabel}
+            <Icon name="github" size={15} />
+            <span className="btn-label">{nav.githubLabel}</span>
           </a>
           <a className="btn btn-accent btn-sm" href={links.download}>
             {nav.cta}
