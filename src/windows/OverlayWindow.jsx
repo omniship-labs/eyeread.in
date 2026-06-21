@@ -45,8 +45,6 @@ export function OverlayWindow() {
   const [shielded, setShielded]     = useState(true);
   const loadedRef = useRef(false);
 
-  // Enforce hidden on mount — belt-and-suspenders for the Tauri side
-  useEffect(() => { setOverlayContentProtected(true); }, []);
 
   const windowRef      = useRef(null);
   const activeWordRef  = useRef(null);
@@ -133,7 +131,7 @@ export function OverlayWindow() {
       if (!loadedRef.current) {
         setSettings(st);
         setPanelSize(clampSize(st.overlaySize ?? defaultSettings.overlaySize));
-        // Do NOT apply hideFromShare here — always start hidden regardless of saved pref
+        setOverlayContentProtected(st.hideFromShare);
       }
     });
     fetchScripts().then((sc) => {
@@ -188,6 +186,9 @@ export function OverlayWindow() {
       un2 = await listen('settings:sync', (p) => {
         if (p?.from === 'main' || p?.from === 'settings') {
           setSettings((s) => ({ ...s, ...p.settings }));
+          if (p.settings?.hideFromShare !== undefined) {
+            setOverlayContentProtected(p.settings.hideFromShare);
+          }
         }
       });
       // Per-script override changes from the settings window (or main).

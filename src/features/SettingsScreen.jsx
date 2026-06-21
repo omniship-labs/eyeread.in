@@ -3,7 +3,7 @@ import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { setOverlayContentProtected, setMainProtected, showAboutWindow } from '../lib/tauri';
+import { setMainProtected, showAboutWindow } from '../lib/tauri';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
@@ -55,7 +55,6 @@ export function SettingsScreen({ settings, onSettings }) {
             shielded={hideFromShare}
             onChange={(v) => {
               onSettings({ hideFromShare: v });
-              setOverlayContentProtected(v);
               setMainProtected(v);
             }}
           />
