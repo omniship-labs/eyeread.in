@@ -34,7 +34,7 @@ export default {
     subhead:
       'eyeread.in floats your script over any screen as a glass overlay. It follows your voice — and never shows up in a recording.',
     note: 'Free forever · AGPL-3.0 · No account required',
-    primaryCta: 'Download for macOS',
+    primaryCta: 'Download for macOS & Windows',
     secondaryCta: 'View on GitHub',
   },
 
@@ -116,8 +116,8 @@ export default {
         body: 'Nothing leaves your machine. Your scripts stay private.',
       },
       {
-        title: 'macOS only · native app',
-        body: 'The overlay requires OS-level window layering. macOS only for now.',
+        title: 'macOS & Windows · native app',
+        body: 'OS-enforced invisibility on macOS and Windows. Linux is experimental.',
       },
       {
         title: 'Donation-supported',

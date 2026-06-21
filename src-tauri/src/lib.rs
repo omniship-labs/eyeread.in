@@ -7,6 +7,12 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
 
 /// Toggle screen-capture invisibility on every app window at once.
+///
+/// Maps to the OS-level capture-exclusion primitive per platform:
+///   • macOS   → NSWindow.sharingType = .none
+///   • Windows → SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE)
+///   • Linux   → no-op (no portable compositor-level exclusion exists)
+/// All of this is handled inside Tauri/tao's `set_content_protected`.
 #[tauri::command]
 fn set_app_protected(app: AppHandle, protected: bool) {
     for label in ["main", "about", "settings", "overlay"] {

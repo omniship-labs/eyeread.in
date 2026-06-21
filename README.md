@@ -10,28 +10,40 @@ Voice tracking follows you as you speak and highlights the exact word you're on.
 
 Free, forever. Open source under **AGPL-3.0**.
 
-**macOS only.** This is a deliberate product decision, not a technical shortcut —
-see [Why macOS only?](#why-macos-only) below.
+**macOS and Windows** get OS-enforced invisibility. **Linux** is best-effort and
+experimental — see [Platform support](#platform-support) below.
 
 Built with **Tauri 2 + React 18 + Vite**.
 
 ---
 
-## Why macOS only?
+## Platform support
 
 The screen-share invisibility feature relies on excluding the overlay window from the OS
-capture pipeline before any capture software sees it. macOS exposes a compositor-level API
-(`NSWindowSharingTypeNone` / `CGWindowSharingType`) that marks a window's backing buffer as
-capture-excluded. Tauri's `macOSPrivateApi` + `contentProtected` flags hook directly into this.
+capture pipeline before any capture software sees it.
 
-No equivalent exists on other platforms:
+| Platform    | Status              | Mechanism                                                                                       |
+| ----------- | ------------------- | ----------------------------------------------------------------------------------------------- |
+| **macOS**   | ✅ Fully supported  | `NSWindow.sharingType = .none` (compositor-level). Needs `macOSPrivateApi` + `contentProtected`. |
+| **Windows** | ✅ Fully supported  | `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` — Windows 10 2004+.                            |
+| **Linux**   | ⚠️ Experimental     | No portable exclusion exists — outcome depends entirely on the compositor.                        |
 
-- **Windows** has `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)`, but DXGI capture — used
-  by OBS, Zoom, Teams, and most modern tools — bypasses it entirely.
-- **Linux** has no compositor-level capture exclusion in X11 or Wayland.
+**Windows.** `WDA_EXCLUDEFROMCAPTURE` is enforced by the Desktop Window Manager *before* any
+capture API runs, so the window is excluded from **DXGI Desktop Duplication, Windows.Graphics.Capture,
+and BitBlt** alike — i.e. Zoom, Teams, Google Meet, Discord, and OBS all see nothing, while the
+window stays fully visible to you locally. (This is the same primitive other "invisible" apps use.
+The older `WDA_MONITOR` flag only painted the window black and *could* be bypassed by DXGI — hence
+the long-standing myth that Windows can't do this. `WDA_EXCLUDEFROMCAPTURE` is the fix for exactly
+that.) Tauri's `contentProtected` maps straight to it.
 
-Shipping a broken version of the core feature would be worse than not shipping at all.
-Cross-platform support will be added if a reliable solution becomes available.
+**Linux.** Capture happens inside the compositor — PipeWire + `xdg-desktop-portal`'s `ScreenCast`
+on Wayland, or the raw framebuffer on X11 — and there is **no standard, cross-compositor protocol
+to mark a single window as capture-excluded**. On most setups the overlay will *not* be hidden, so
+the app makes you explicitly acknowledge the risk before enabling it and always recommends a test
+recording. Treat Linux invisibility as unreliable.
+
+> **Universal caveat (all platforms):** capture exclusion only defeats *software* capture. A phone
+> camera or hardware capture card pointed at the screen still sees everything.
 
 ## Architecture
 
@@ -62,6 +74,9 @@ configured wpm where speech recognition is unavailable (e.g. WKWebView).
 | ↑ / ↓     | Scroll speed up / down             |
 | ⌘ + / ⌘ − | Text size up / down                |
 | Esc       | Hide overlay                       |
+
+On Windows and Linux, **⌘ → Ctrl** and **⌥ → Alt** (the shortcuts are registered as
+`CommandOrControl` / `Alt`, so they work cross-platform).
 
 ## Getting started
 
@@ -108,7 +123,7 @@ src-tauri/            Tauri 2 shell — window config, capabilities, Info.plist
 
 ## Known limitations
 
-- Screen-share invisibility requires the native macOS build. The web demo overlay is visible to screen capture.
+- Screen-share invisibility requires the native build (macOS or Windows). The web demo overlay is visible to screen capture, and Linux is best-effort only (see [Platform support](#platform-support)).
 - The overlay window captures mouse clicks within its bounds by default. Use ⌥E to enable full click-through.
 - Voice tracking quality depends on the platform speech engine. Timed scroll is the automatic fallback.
 

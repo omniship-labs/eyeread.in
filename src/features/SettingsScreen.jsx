@@ -3,7 +3,8 @@ import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { setAppProtected, showAboutWindow } from '../lib/tauri';
+import { showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
+import { useShareProtection } from '../hooks/useShareProtection';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
@@ -27,6 +28,19 @@ export function SettingsScreen({ settings, onSettings }) {
 
   const mode = voice ? 'voice' : 'scroll';
   const countFromMins = Math.round((countFrom ?? 300) / 60);
+
+  const { setShielded, consentModal } = useShareProtection(settings, onSettings);
+
+  // Hotkey hint symbols differ per platform (⌘/⌥ on macOS, Ctrl/Alt elsewhere).
+  const modKey = isMacOS ? '⌘' : 'Ctrl';
+  const altKey = isMacOS ? '⌥' : 'Alt';
+
+  // Describe the screen-share state, flagging Linux as best-effort.
+  const shareHint = isLinux
+    ? 'Experimental on Linux — depends on your compositor'
+    : hideFromShare
+      ? 'Hidden from screen-share'
+      : 'Visible to screen-share';
 
   const restoreDefaults = () => {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
@@ -58,17 +72,9 @@ export function SettingsScreen({ settings, onSettings }) {
         <div className="set-row">
           <div className="set-info">
             <b>Hide from screen-share</b>
-            <span>
-              {hideFromShare ? 'Hidden from screen-share' : 'Visible to screen-share'}
-            </span>
+            <span>{shareHint}</span>
           </div>
-          <ShieldToggle
-            shielded={hideFromShare}
-            onChange={(v) => {
-              onSettings({ hideFromShare: v });
-              setAppProtected(v);
-            }}
-          />
+          <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
         </div>
       </div>
 
@@ -250,14 +256,14 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>Show / hide overlay</b>
             <span>Toggle the prompter — works system-wide</span>
           </div>
-          <span className="hotkey">⌘ + Shift + E</span>
+          <span className="hotkey">{modKey} + Shift + E</span>
         </div>
         <div className="set-row">
           <div className="set-info">
             <b>Interact / click-through</b>
             <span>Lets clicks pass through the glass — works system-wide</span>
           </div>
-          <span className="hotkey">⌥ + E</span>
+          <span className="hotkey">{altKey} + E</span>
         </div>
         <div className="set-row">
           <div className="set-info">
@@ -271,8 +277,8 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>Increase / decrease text size</b>
           </div>
           <span style={{ display: 'flex', gap: 8 }}>
-            <span className="hotkey">⌘ + +</span>
-            <span className="hotkey">⌘ + −</span>
+            <span className="hotkey">{modKey} + +</span>
+            <span className="hotkey">{modKey} + −</span>
           </span>
         </div>
         <div className="set-row">
@@ -305,6 +311,7 @@ export function SettingsScreen({ settings, onSettings }) {
           </span>
         </div>
       </div>
+      {consentModal}
     </div>
   );
 }

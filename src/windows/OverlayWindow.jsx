@@ -31,9 +31,10 @@ import {
   hideOverlay,
   focusMain,
   fitOverlayToPanel,
-  setAppProtected,
+  shieldActive,
   showSettingsWindow,
 } from '../lib/tauri';
+import { useShareProtection } from '../hooks/useShareProtection';
 import { fmtTime } from '../lib/utils';
 
 export function OverlayWindow() {
@@ -82,6 +83,9 @@ export function OverlayWindow() {
       return next;
     });
   }, []);
+
+  // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
+  const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
 
   // Per-script override patch — the overlay's quick controls (A−/A+, ⌘±, ↑/↓)
   // tweak THIS script, not everyone. Persisted via main; mirrored to the open
@@ -338,7 +342,7 @@ export function OverlayWindow() {
         className={
           'overlay-panel' +
           (interactive ? '' : ' ghost') +
-          (settings.hideFromShare ? ' shielded' : ' exposed')
+          (shieldActive(settings) ? ' shielded' : ' exposed')
         }
         style={{
           '--ov-alpha': effective.opacity / 100,
@@ -384,14 +388,11 @@ export function OverlayWindow() {
           )}
           <span style={{ marginLeft: 'auto', display: 'flex', gap: 4, alignItems: 'center' }}>
             <ShieldToggle
-              className={'ic ic-sm ov-shield' + (settings.hideFromShare ? ' on' : '')}
-              shielded={settings.hideFromShare}
+              className={'ic ic-sm ov-shield' + (shieldActive(settings) ? ' on' : '')}
+              shielded={shieldActive(settings)}
               size={13}
               showLabel
-              onChange={(next) => {
-                patchSettings({ hideFromShare: next });
-                setAppProtected(next);
-              }}
+              onChange={setShielded}
             />
             <button className="ic ic-sm" title="Close prompter (⌘⇧E to reopen)" onClick={close}>
               <X />
@@ -488,6 +489,7 @@ export function OverlayWindow() {
           </svg>
         </div>
       </div>
+      {consentModal}
     </div>
   );
 }
