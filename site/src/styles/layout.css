@@ -1,0 +1,272 @@
+/* ============================================================
+   eyeread.in · marketing site — layout & sections
+   Structural rules: nav, hero, section rhythm, grids, footer.
+   ============================================================ */
+
+/* ── NAV ─────────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-sticky);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-12);
+  background: rgba(10, 10, 15, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: var(--container-lg);
+  margin: 0 auto;
+}
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand img {
+  width: 28px;
+  height: 28px;
+}
+.brand-word {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+}
+.brand-word span {
+  color: var(--accent);
+}
+.brand-word-sm {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+/* ── SECTION RHYTHM ──────────────────────────────────────── */
+.section {
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  padding: 120px var(--space-12);
+}
+.sec-ey {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+.sec-h {
+  font-size: clamp(28px, 3vw, 44px);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tighter);
+  color: #fff;
+  text-align: center;
+  margin-bottom: var(--space-16);
+}
+.sec-ey-l,
+.sec-h-l {
+  text-align: left;
+}
+
+/* ── HERO ────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 96px var(--space-12) 80px;
+  text-align: center;
+  overflow: hidden;
+}
+.glow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.glow-top {
+  top: -120px;
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(110, 86, 247, 0.24) 0%, transparent 68%);
+  filter: blur(60px);
+}
+.glow-btm {
+  bottom: -200px;
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(76, 60, 200, 0.12) 0%, transparent 70%);
+  filter: blur(80px);
+}
+.hero-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-7);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.hero h1 {
+  font-size: clamp(44px, 5.5vw, 80px);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tighter);
+  line-height: var(--leading-none);
+  color: #fff;
+  max-width: 860px;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+.hero-sub {
+  margin-top: var(--space-5);
+  font-size: clamp(15px, 1.5vw, 20px);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+  max-width: 520px;
+}
+.cta-row {
+  margin-top: var(--space-10);
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.hero-note {
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: center;
+}
+
+/* ── FEATURES ────────────────────────────────────────────── */
+.features {
+  padding-top: 140px;
+}
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── HOW IT WORKS ────────────────────────────────────────── */
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: center;
+}
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  list-style: none;
+  margin-top: var(--space-10);
+}
+.step {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
+/* ── OSS ─────────────────────────────────────────────────── */
+.oss {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: 72px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.oss-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── SPONSORS ────────────────────────────────────────────── */
+.sponsors {
+  text-align: center;
+}
+.sponsors-sub {
+  max-width: 540px;
+  margin: -40px auto 48px;
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--space-10) var(--space-12);
+  display: flex;
+  align-items: center;
+  max-width: var(--container-lg);
+  margin: 0 auto;
+}
+.footer-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 880px) {
+  .nav {
+    padding: 0 var(--space-5);
+  }
+  .section {
+    padding: 80px var(--space-5);
+  }
+  .feat-grid {
+    grid-template-columns: 1fr;
+  }
+  .how-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+  }
+  .oss {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    padding: 40px var(--space-7);
+  }
+  .footer {
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-8) var(--space-5);
+  }
+  .footer-right {
+    margin-left: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+}
