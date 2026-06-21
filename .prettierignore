@@ -4,6 +4,3 @@ src-tauri/target
 src-tauri/gen
 design
 .playwright-mcp
-
-# Generated from design/tokens by site/scripts/sync-tokens.mjs
-site/css/tokens.css

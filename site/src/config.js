@@ -8,10 +8,10 @@
 
 export const config = {
   // ---- Brand & global links ----------------------------------
+  // (the logo SVG is imported from design/ in src/assets.js)
   brand: {
     name: 'eyeread',
     tld: '.in',
-    logo: 'assets/logos/eyeread-mark-bounded-dark.svg',
   },
 
   links: {
@@ -174,16 +174,6 @@ export const config = {
       },
     ],
     copy: 'Free forever',
-  },
-
-  // ---- <head> meta (also used for social share cards) --------
-  meta: {
-    title: 'eyeread.in — Look at the lens.',
-    description:
-      'Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking built in. Free.',
-    url: 'https://eyeread.in',
-    ogImage: 'https://eyeread.in/og-image.png',
-    twitter: '@eyeread_in',
   },
 };
 

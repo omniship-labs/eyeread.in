@@ -10,9 +10,6 @@ src-tauri/gen
 # src/data/sponsors.json IS committed so the app import always resolves.
 public/sponsors/
 
-# Marketing site borrows these from design/ + public/ at build time
-# (site/scripts/build.mjs). Generated, never committed — single source of truth.
-site/css/tokens.css
-site/assets/logos/
-site/assets/og-image.svg
-site/assets/favicon.svg
+# Marketing site build output (Vite). Tokens + assets are imported from
+# design/ at build time, so nothing is vendored here.
+site/dist

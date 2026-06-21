@@ -2,62 +2,53 @@
 
 The public landing page for **eyeread.in**, deployed to GitHub Pages.
 
-It is a **standalone static site** — separate from the Tauri desktop app under
-`src/`. It recreates the marketing prototype at
-`design/ui_kits/marketing/index.html` as fresh, organized, production code
-(it does **not** reuse the prototype's markup). There is **no build step**:
-the browser loads ES modules directly.
+It's a **Vite + React app** (the same stack as the desktop app under `src/`),
+kept as a separate build so it deploys on its own. It recreates the marketing
+prototype at `design/ui_kits/marketing/index.html` as fresh component-based code.
+
+**No vendored copies.** Design tokens and brand assets are imported straight
+from `design/` and bundled by Vite at build time — `design/` stays the single
+source of truth, nothing is duplicated into `site/`.
 
 ## Layout
 
 ```
 site/
-├── index.html            # shell: <head> meta + #app mount + <noscript> fallback
-├── css/
-│   ├── base.css          # reset + element defaults              (source)
-│   ├── layout.css        # nav, hero, section grids, footer       (source)
-│   ├── components.css    # buttons, badges, demo, cards, sponsors (source)
-│   └── tokens.css        # GENERATED from design/tokens/ — not committed
-├── js/
-│   ├── config.js         # ← EDIT CONTENT HERE (copy, links, features, steps…)
-│   ├── icons.js          # inline SVG icon set (no icon-lib dependency)
-│   ├── render.js         # config → DOM
-│   ├── sponsors.js       # live Open Collective backers/sponsors fetch
-│   ├── demo.js           # before/after reveal slider
-│   └── main.js           # entry point
-├── assets/               # COPIED from design/ + public/ — not committed
-└── scripts/
-    └── build.mjs         # assembles tokens.css + assets from their sources
+├── index.html              # Vite entry: <head> meta + #root
+├── vite.config.js          # standalone build (root: site/, outDir: site/dist)
+└── src/
+    ├── main.jsx            # imports design/styles.css (tokens) + mounts React
+    ├── App.jsx             # composes the sections
+    ├── config.js           # ← EDIT CONTENT HERE (copy, links, features, steps…)
+    ├── assets.js           # brand SVGs imported from design/
+    ├── styles/             # base.css, layout.css, components.css (marketing-only)
+    ├── hooks/
+    │   └── useSponsors.js  # live Open Collective fetch
+    └── components/
+        ├── Icon.jsx        # lucide-react + inline brand marks (GitHub/Apple)
+        ├── Nav.jsx  Hero.jsx  Demo.jsx  Features.jsx
+        ├── HowItWorks.jsx  OpenSource.jsx  Sponsors.jsx
+        └── Brand.jsx  Footer.jsx
 ```
-
-Hand-written **source** lives in `index.html`, `css/{base,layout,components}.css`,
-and `js/`. Everything the site borrows from elsewhere in the repo —
-`css/tokens.css` and everything under `assets/` — is generated/copied at build
-time and is **git-ignored**, so there are no committed duplicates to drift.
 
 ## Editing content
 
 All copy, links, features, steps, and the Open Collective settings live in
-**`js/config.js`** — the single source of truth. Change it there; the page
-re-renders from it. No need to touch markup or CSS for routine content edits.
+**`src/config.js`** — the single source of truth. Components render from it, so
+routine content edits never touch markup or styles.
 
-## Build (assemble borrowed artifacts)
+## Design tokens & assets
 
-`scripts/build.mjs` regenerates `css/tokens.css` from `design/tokens/` and copies
-the brand assets from `design/assets/` + `public/` into `assets/`, so the site
-can never drift from those sources:
-
-```bash
-npm run site:build
-```
-
-The deploy workflow runs this automatically before publishing. Run it once
-locally before serving (see below).
+`main.jsx` imports `design/styles.css` (the design system's blessed entry point)
+for tokens, and `assets.js` imports brand SVGs from `design/assets/`. Vite
+bundles both — change the design system and the site follows on the next build,
+with zero copies to keep in sync. The marketing-only styling lives in
+`src/styles/` and layers on top of the tokens.
 
 ## Live backers & sponsors
 
-The Backers & sponsors section fetches financial contributors **in the browser**
-from Open Collective at page load, so it is always current with no rebuild:
+`hooks/useSponsors.js` fetches financial contributors **in the browser** from
+Open Collective at page load, so the section is always current with no rebuild:
 
 ```
 https://opencollective.com/<slug>/members/all.json
@@ -72,19 +63,17 @@ Configure it in `config.js → sponsors`:
 If the request fails or there are no backers yet, the section shows a friendly
 link to Open Collective instead of breaking.
 
-## Running locally
-
-Assemble the borrowed artifacts once, then serve over HTTP (ES modules don't
-load from `file://`):
+## Commands
 
 ```bash
-npm run site:build                       # generate tokens.css + copy assets
-cd site && python3 -m http.server 8000   # then open http://localhost:8000
+npm run site:dev       # dev server with HMR
+npm run site:build     # production build → site/dist
+npm run site:preview   # preview the production build
 ```
 
 ## Deployment
 
-Pushes to `main` that touch `site/**`, `design/tokens/**`, or `design/assets/**`
-trigger `.github/workflows/deploy-site.yml`, which runs `npm run site:build` and
-publishes `site/` to GitHub Pages. Enable it once under
+Pushes to `main` that touch `site/**`, `design/**`, or the lockfile trigger
+`.github/workflows/deploy-site.yml`, which runs `npm run site:build` and
+publishes `site/dist` to GitHub Pages. Enable it once under
 **Settings → Pages → Source → GitHub Actions**.

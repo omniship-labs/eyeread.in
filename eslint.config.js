@@ -4,10 +4,11 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default [
-  { ignores: ['dist', 'node_modules', 'src-tauri', 'design', 'public', '.claude'] },
+  { ignores: ['**/dist', 'node_modules', 'src-tauri', 'design', 'public', '.claude'] },
   js.configs.recommended,
   {
-    files: ['src/**/*.{js,jsx}'],
+    // React apps: the Tauri frontend (src/) and the marketing site (site/src/).
+    files: ['src/**/*.{js,jsx}', 'site/src/**/*.{js,jsx}'],
     plugins: { react, 'react-hooks': reactHooks },
     languageOptions: {
       ecmaVersion: 2022,
@@ -25,16 +26,7 @@ export default [
     },
   },
   {
-    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.mjs', 'site/scripts/**/*.mjs'],
+    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.mjs', 'site/vite.config.js'],
     languageOptions: { globals: { ...globals.node } },
-  },
-  {
-    // Marketing site: standalone browser ES modules under site/js/.
-    files: ['site/js/**/*.js'],
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      globals: { ...globals.browser },
-    },
   },
 ];

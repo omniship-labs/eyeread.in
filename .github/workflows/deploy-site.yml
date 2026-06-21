@@ -1,6 +1,6 @@
-# Deploy the marketing site (site/) to GitHub Pages.
-# The site is a static, zero-build bundle: we just refresh the vendored
-# design tokens from design/tokens/ and publish the folder as-is.
+# Build the marketing site (Vite + React, in site/) and deploy to GitHub Pages.
+# Design tokens and brand assets are imported from design/ and bundled by Vite,
+# so there are no vendored copies to keep in sync.
 name: Deploy site
 
 on:
@@ -8,8 +8,10 @@ on:
     branches: [main]
     paths:
       - 'site/**'
-      - 'design/tokens/**'
-      - 'design/assets/**'
+      - 'design/**'
+      - 'public/favicon.svg'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/deploy-site.yml'
   # Allow manual runs from the Actions tab.
   workflow_dispatch:
@@ -33,16 +35,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      # Assemble the borrowed artifacts (design tokens + brand assets) into
-      # site/ so the published bundle can never drift from their sources.
+      - run: npm ci
       - run: npm run site:build
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: site/dist
 
   deploy:
     needs: build
