@@ -15,9 +15,9 @@ export const config = {
   },
 
   links: {
-    github: 'https://github.com/omniship-labs/eyeread',
-    repo: 'omniship-labs/eyeread',
-    license: 'https://github.com/omniship-labs/eyeread/blob/main/LICENSE',
+    github: 'https://github.com/omniship-labs/eyeread.in',
+    repo: 'omniship-labs/eyeread.in',
+    license: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE',
     docs: '#',
     discord: '#',
     download: '#',
@@ -40,7 +40,10 @@ export const config = {
       'eyeread.in floats your script over any screen as a glass overlay. It follows your voice — and never shows up in a recording.',
     note: 'Free forever · AGPL-3.0 · No account required',
     primaryCta: { label: 'Download for macOS', href: '#' },
-    secondaryCta: { label: 'View on GitHub', href: 'https://github.com/omniship-labs/eyeread' },
+    secondaryCta: {
+      label: 'View on GitHub',
+      href: 'https://github.com/omniship-labs/eyeread.in',
+    },
   },
 
   // ---- Live demo (before/after reveal) -----------------------
@@ -164,12 +167,12 @@ export const config = {
   // ---- Footer -------------------------------------------------
   footer: {
     links: [
-      { label: 'GitHub', href: 'https://github.com/omniship-labs/eyeread' },
+      { label: 'GitHub', href: 'https://github.com/omniship-labs/eyeread.in' },
       { label: 'Docs', href: '#' },
       { label: 'Discord', href: '#' },
       {
         label: 'AGPL-3.0',
-        href: 'https://github.com/omniship-labs/eyeread/blob/main/LICENSE',
+        href: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE',
         mono: true,
       },
     ],
