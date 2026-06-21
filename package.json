@@ -39,7 +39,7 @@
   "devDependencies": {
     "@eslint/js": "^9.30.0",
     "@resvg/resvg-js": "^2.6.2",
-    "@tauri-apps/cli": "^2.9.0",
+    "@tauri-apps/cli": "^2.11.3",
     "@vitejs/plugin-react": "^4.6.0",
     "eslint": "^9.30.0",
     "eslint-plugin-react": "^7.37.0",
