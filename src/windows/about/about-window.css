@@ -123,6 +123,15 @@
   font-style: italic;
 }
 
+.aw-testers {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+.aw-tester {
+  color: var(--text-secondary);
+}
+
 .aw-section-supporters {
   display: flex;
   flex-direction: column;

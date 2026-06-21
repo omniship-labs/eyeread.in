@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { openExternal, listen } from '../lib/tauri';
 import { fetchSettings } from '../lib/store';
+import { getTesters } from '../lib/credits';
 import sponsors from '../data/sponsors.json';
 import './about/about-window.css';
 
 const OC_URL = 'https://opencollective.com/eyereadin';
 
 const REPO_URL = 'https://github.com/omniship-labs/eyeread.in';
+const COMPAT_REPORT_URL =
+  'https://github.com/omniship-labs/eyeread.in/issues/new?template=3-compat-report.yml';
 const MJ_URL = 'https://m.halinge.in';
 const TERMS_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS.md';
 const PRIVACY_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/PRIVACY.md';
@@ -25,6 +28,7 @@ function getVersion() {
 
 export function AboutWindow() {
   const [shielded, setShielded] = useState(true);
+  const testers = getTesters();
 
   useEffect(() => {
     fetchSettings().then((s) => setShielded(s.hideFromShare));
@@ -78,6 +82,33 @@ export function AboutWindow() {
             Privacy policy ↗
           </span>
         </div>
+      </div>
+
+      <div className="aw-section">
+        <div className="aw-section-label">Tested by</div>
+        {testers.length > 0 ? (
+          <div className="aw-testers">
+            {testers.map((t, i) => (
+              <span key={t.profile || t.name}>
+                {i > 0 && ', '}
+                {t.profile ? (
+                  <span className="aw-link" onClick={() => openExternal(t.profile)}>
+                    @{t.name}
+                  </span>
+                ) : (
+                  <span className="aw-tester">@{t.name}</span>
+                )}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <div className="aw-supporters-empty">
+            Help verify screen-share invisibility —{' '}
+            <span className="aw-link" onClick={() => openExternal(COMPAT_REPORT_URL)}>
+              test your setup ↗
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="aw-divider" />

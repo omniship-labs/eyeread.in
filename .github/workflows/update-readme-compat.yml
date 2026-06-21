@@ -1,0 +1,40 @@
+# Refresh the README compatibility matrix from site/src/data/compat.js once per
+# release (and on demand). Keeps the in-repo matrix current without a live
+# generator on every push.
+name: Update README compat matrix
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Regenerate matrix
+        run: node scripts/gen-compat.mjs
+
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain README.md)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add README.md
+            git commit -m "docs: refresh compatibility matrix [skip ci]"
+            git push origin main
+          else
+            echo "README compatibility matrix already up to date."
+          fi
