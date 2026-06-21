@@ -15,3 +15,8 @@ public/sponsors/
 site/dist
 # og-image.png is rasterized from design/ at build time (site/scripts/og-image.mjs)
 site/public/og-image.png
+
+# Playwright — captured screenshots + reports/traces are artifacts, not sources.
+site/tests/screenshots/
+test-results/
+playwright-report/
