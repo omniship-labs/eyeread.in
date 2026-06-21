@@ -1,0 +1,74 @@
+# Playwright responsiveness tests for the marketing site (site/).
+# Scoped to site-related paths so the Chromium download + browser run only
+# happens on PRs/pushes that can actually affect the rendered page — Rust-app
+# or unrelated changes skip it.
+name: Site E2E
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'site/**'
+      - 'design/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'playwright.config.js'
+      - '.github/workflows/site-e2e.yml'
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'design/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'playwright.config.js'
+      - '.github/workflows/site-e2e.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - run: npm run site:test
+      - name: Upload screenshots & report
+        id: artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            site/tests/screenshots/
+            playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore
+      # Sticky comment (created once, updated on each run) linking to the
+      # downloadable screenshots + report. PR-only; fork PRs get a read-only
+      # token so this is best-effort there.
+      - name: Comment screenshot link on PR
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: site-e2e-screenshots
+          message: |
+            ### 📸 Site responsiveness screenshots — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
+
+            Playwright captured full-page screenshots at **desktop / tablet / mobile** viewports.
+
+            **[⬇️ Download screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (unzip → `home-desktop.png`, `home-tablet.png`, `home-mobile.png`)
+
+            <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>

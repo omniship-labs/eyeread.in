@@ -17,6 +17,8 @@
     "site:dev": "npm run site:og && vite --config site/vite.config.js",
     "site:build": "npm run site:og && vite build --config site/vite.config.js && node site/scripts/prerender.mjs",
     "site:preview": "vite preview --config site/vite.config.js",
+    "site:test": "playwright test",
+    "site:test:update": "playwright test --update-snapshots",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
@@ -42,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",
+    "@playwright/test": "^1.61.0",
     "@resvg/resvg-js": "^2.6.2",
     "@tauri-apps/cli": "^2.11.3",
     "@vitejs/plugin-react": "^4.6.0",
