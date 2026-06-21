@@ -25,9 +25,8 @@ import {
   hideOverlay,
   focusMain,
   fitOverlayToPanel,
-  setOverlayContentProtected,
+  setAppProtected,
   showSettingsWindow,
-  setSettingsContentProtected,
 } from '../lib/tauri';
 import { fmtTime } from '../lib/utils';
 
@@ -41,8 +40,6 @@ export function OverlayWindow() {
   const [playing, setPlaying]       = useState(false);
   const [elapsed, setElapsed]       = useState(0);
   const [interactive, setInteractive]   = useState(true);
-  // Always start hidden — toggled explicitly by the user, never from saved prefs
-  const [shielded, setShielded]     = useState(true);
   const loadedRef = useRef(false);
 
 
@@ -131,7 +128,6 @@ export function OverlayWindow() {
       if (!loadedRef.current) {
         setSettings(st);
         setPanelSize(clampSize(st.overlaySize ?? defaultSettings.overlaySize));
-        setOverlayContentProtected(st.hideFromShare);
       }
     });
     fetchScripts().then((sc) => {
@@ -157,9 +153,9 @@ export function OverlayWindow() {
   }, []);
 
   const openSettings = useCallback(() => {
-    showSettingsWindow(shielded);
+    showSettingsWindow();
     sendSettingsContext();
-  }, [shielded, sendSettingsContext]);
+  }, [sendSettingsContext]);
 
   // ---- cross-window events ---------------------------------------------------
   useEffect(() => {
@@ -171,10 +167,6 @@ export function OverlayWindow() {
         if (p?.settings) setSettings(p.settings);
         const size = p?.script?.overlaySize ?? p?.settings?.overlaySize;
         if (size) setPanelSize(clampSize(size));
-        // Always start hidden on each new launch — user must opt-in to expose
-        setShielded(true);
-        setOverlayContentProtected(true);
-        setSettingsContentProtected(true);
         jumpToRef.current(0); // resets active + pointer + cancels any slide
         setElapsed(0);
         setPlaying(true);
@@ -186,9 +178,6 @@ export function OverlayWindow() {
       un2 = await listen('settings:sync', (p) => {
         if (p?.from === 'main' || p?.from === 'settings') {
           setSettings((s) => ({ ...s, ...p.settings }));
-          if (p.settings?.hideFromShare !== undefined) {
-            setOverlayContentProtected(p.settings.hideFromShare);
-          }
         }
       });
       // Per-script override changes from the settings window (or main).
@@ -319,7 +308,7 @@ export function OverlayWindow() {
         className={
           'overlay-panel' +
           (interactive ? '' : ' ghost') +
-          (shielded ? ' shielded' : ' exposed')
+          (settings.hideFromShare ? ' shielded' : ' exposed')
         }
         style={{
           '--ov-alpha': effective.opacity / 100,
@@ -348,14 +337,13 @@ export function OverlayWindow() {
           )}
           <span style={{ marginLeft: 'auto', display: 'flex', gap: 4, alignItems: 'center' }}>
             <ShieldToggle
-              className={'ic ic-sm ov-shield' + (shielded ? ' on' : '')}
-              shielded={shielded}
+              className={'ic ic-sm ov-shield' + (settings.hideFromShare ? ' on' : '')}
+              shielded={settings.hideFromShare}
               size={13}
-              label={shielded ? 'HIDDEN' : 'VISIBLE'}
+              showLabel
               onChange={(next) => {
-                setShielded(next);
-                setOverlayContentProtected(next);
-                setSettingsContentProtected(next);
+                patchSettings({ hideFromShare: next });
+                setAppProtected(next);
               }}
             />
             <button className="ic ic-sm" title="Close prompter (⌘⇧E to reopen)" onClick={close}>

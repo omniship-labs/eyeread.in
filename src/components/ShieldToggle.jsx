@@ -11,7 +11,7 @@ import { Eye, EyeOff } from 'lucide-react';
  *   size      — icon size in px (default 14)
  *   label     — optional text rendered beside the icon
  */
-export function ShieldToggle({ shielded, onChange, className = 'tl-shield', size = 14, label }) {
+export function ShieldToggle({ shielded, onChange, className = 'tl-shield', size = 14, showLabel = false }) {
   return (
     <button
       className={`${className}${shielded ? ' shielded' : ' exposed'}`}
@@ -19,7 +19,7 @@ export function ShieldToggle({ shielded, onChange, className = 'tl-shield', size
       title={shielded ? 'Hidden from screen share — click to expose' : 'Visible in screen share — click to hide'}
     >
       {shielded ? <EyeOff size={size} /> : <Eye size={size} />}
-      {label && <span className="ov-shield-label">{label}</span>}
+      {showLabel && <span className="ov-shield-label">{shielded ? 'HIDDEN' : 'VISIBLE'}</span>}
     </button>
   );
 }

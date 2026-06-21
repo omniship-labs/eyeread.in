@@ -6,10 +6,10 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
 
-/// Toggle screen-capture invisibility on all app windows (overlay manages itself).
+/// Toggle screen-capture invisibility on every app window at once.
 #[tauri::command]
-fn set_main_protected(app: AppHandle, protected: bool) {
-    for label in ["main", "about", "settings"] {
+fn set_app_protected(app: AppHandle, protected: bool) {
+    for label in ["main", "about", "settings", "overlay"] {
         if let Some(win) = app.get_webview_window(label) {
             let _ = win.set_content_protected(protected);
         }
@@ -179,7 +179,7 @@ pub fn run() {
             check_for_update,
             install_update,
             show_about_window,
-            set_main_protected,
+            set_app_protected,
         ])
         .setup(|app| {
             build_tray(&app.handle().clone())?;

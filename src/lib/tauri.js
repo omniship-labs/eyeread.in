@@ -85,9 +85,6 @@ export async function showOverlay(script, settings) {
       const { LogicalSize } = await import('@tauri-apps/api/window');
       await win.setSize(new LogicalSize(OVERLAY_W, OVERLAY_H + 420)).catch(() => {});
     }
-    // Always protect before showing — the overlay:load event will apply the
-    // real preference once the window is visible, avoiding a flash of exposed state.
-    await win.setContentProtected(true);
     // follow the user across desktops / Spaces, stay above everything
     await win.setVisibleOnAllWorkspaces(true).catch(() => {});
     await win.setAlwaysOnTop(true).catch(() => {});
@@ -114,12 +111,8 @@ async function settingsWindow() {
   return WebviewWindow.getByLabel('settings');
 }
 
-/**
- * Open the independent settings window next to the overlay panel.
- * `protect` mirrors the overlay's screen-share shield so the settings window
- * is hidden from capture in lockstep with the prompter.
- */
-export async function showSettingsWindow(protect = true) {
+/** Open the independent settings window next to the overlay panel. */
+export async function showSettingsWindow() {
   if (!isTauri) return;
   const win = await settingsWindow();
   if (!win) return;
@@ -134,7 +127,6 @@ export async function showSettingsWindow(protect = true) {
     const y = Math.round(pos.y / scale);
     await win.setPosition(new LogicalPosition(x, y));
   } catch { /* overlay hidden, skip positioning */ }
-  await win.setContentProtected(protect).catch(() => {});
   await win.setVisibleOnAllWorkspaces(true).catch(() => {});
   await win.setAlwaysOnTop(true).catch(() => {});
   await win.show();
@@ -145,13 +137,6 @@ export async function hideSettingsWindow() {
   if (!isTauri) return;
   const win = await settingsWindow();
   await win?.hide();
-}
-
-/** Keep the settings window's screen-share protection in sync with the shield. */
-export async function setSettingsContentProtected(on) {
-  if (!isTauri) return;
-  const win = await settingsWindow();
-  await win?.setContentProtected(on).catch(() => {});
 }
 
 export async function showAboutWindow() {
@@ -217,16 +202,11 @@ export async function isOverlayVisible() {
   return win ? win.isVisible() : false;
 }
 
-export async function setOverlayContentProtected(on) {
-  if (!isTauri) return;
-  const win = await overlayWindow();
-  await win?.setContentProtected(on);
-}
-
-export async function setMainProtected(on) {
+/** Toggle screen-share invisibility on every app window atomically. */
+export async function setAppProtected(on) {
   if (!isTauri) return;
   const { invoke } = await import('@tauri-apps/api/core');
-  await invoke('set_main_protected', { protected: on });
+  await invoke('set_app_protected', { protected: on });
 }
 
 

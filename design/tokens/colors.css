@@ -98,4 +98,12 @@
   --warning: var(--amber-500);
   --danger:  var(--signal-500);
   --focus-ring: rgba(110,86,247,0.55);
+
+  /* Exposed (screen-share visible) state */
+  --exposed-text:          var(--signal-400);
+  --exposed-subtle-bg:     rgba(255,77,106,0.10);
+  --exposed-subtle-bg-dim: rgba(255,77,106,0.02);
+  --exposed-subtle-border: rgba(255,77,106,0.28);
+  --exposed-subtle-border-dim: rgba(255,77,106,0.06);
+  --exposed-hover-bg:      rgba(255,77,106,0.18);
 }

@@ -3,7 +3,7 @@ import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { setMainProtected, showAboutWindow } from '../lib/tauri';
+import { setAppProtected, showAboutWindow } from '../lib/tauri';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
@@ -36,7 +36,6 @@ export function SettingsScreen({ settings, onSettings }) {
           </div>
           <Segmented
             size="sm"
-            style={{ width: 200 }}
             options={[
               { value: 'top',    label: 'Top' },
               { value: 'center', label: 'Center' },
@@ -49,13 +48,13 @@ export function SettingsScreen({ settings, onSettings }) {
         <div className="set-row">
           <div className="set-info">
             <b>Hide from screen-share</b>
-            <span>Entire app is invisible to all capture software</span>
+            <span>{hideFromShare ? 'Hidden from screen-share' : 'Visible to screen-share'}</span>
           </div>
           <ShieldToggle
             shielded={hideFromShare}
             onChange={(v) => {
               onSettings({ hideFromShare: v });
-              setMainProtected(v);
+              setAppProtected(v);
             }}
           />
         </div>
@@ -71,7 +70,6 @@ export function SettingsScreen({ settings, onSettings }) {
           </div>
           <Segmented
             size="sm"
-            style={{ width: 200 }}
             options={[
               { value: 'voice',  label: 'Voice',  icon: <Mic size={13} /> },
               { value: 'scroll', label: 'Scroll', icon: <TimerIcon size={13} /> },
@@ -155,7 +153,6 @@ export function SettingsScreen({ settings, onSettings }) {
           </div>
           <Segmented
             size="sm"
-            style={{ width: 200 }}
             options={[
               { value: 'off',  label: 'Off' },
               { value: 'up',   label: 'Count up',   icon: <TimerIcon size={13} /> },

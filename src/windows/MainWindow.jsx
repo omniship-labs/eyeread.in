@@ -52,7 +52,7 @@ import {
   isOverlayVisible,
   registerOverlayHotkey,
   registerInteractiveHotkey,
-  setMainProtected,
+  setAppProtected,
 } from '../lib/tauri';
 
 export function MainWindow() {
@@ -77,7 +77,7 @@ export function MainWindow() {
       setSettings(st);
       savedRef.current = new Map(sc.map((s) => [s.id, s]));
       setReady(true);
-      setMainProtected(st.hideFromShare);
+      setAppProtected(st.hideFromShare);
     });
   }, []);
 
@@ -208,7 +208,7 @@ export function MainWindow() {
           shielded={settings.hideFromShare}
           onChange={(next) => {
             applySettings({ hideFromShare: next });
-            setMainProtected(next);
+            setAppProtected(next);
           }}
         />
         <button

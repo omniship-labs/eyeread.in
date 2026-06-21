@@ -130,13 +130,37 @@
 }
 /* Exposed — red warning, matches overlay exposed state */
 .tl-shield.exposed {
-  background: rgba(239, 68, 68, 0.10);
-  color: rgba(239, 68, 68, 0.80);
-  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: var(--exposed-subtle-bg);
+  color: var(--exposed-text);
+  border: 1px solid var(--exposed-subtle-border);
+  animation: sos-blink 5s ease-in-out infinite;
 }
 .tl-shield.exposed:hover {
-  background: rgba(239, 68, 68, 0.18);
-  color: rgba(239, 68, 68, 1);
+  background: var(--exposed-hover-bg);
+  color: var(--danger);
+  animation: none;
+}
+
+/* SOS morse: ···−−−··· on background + border only, icon stays visible */
+@keyframes sos-blink {
+  0%,100%  { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  8%       { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  16%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  24%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  32%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  40%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  48%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  54%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  62%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  68%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  76%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  82%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  87%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  89%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  91%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  93%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
+  95%      { background: var(--exposed-subtle-bg);     border-color: var(--exposed-subtle-border); }
+  97%      { background: var(--exposed-subtle-bg-dim); border-color: var(--exposed-subtle-border-dim); }
 }
 
 /* ── Two-panel layout ── */
