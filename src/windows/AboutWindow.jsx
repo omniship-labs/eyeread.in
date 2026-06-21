@@ -12,12 +12,13 @@ const TERMS_URL   = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS
 const PRIVACY_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/PRIVACY.md';
 
 function getVersion() {
+  const ver = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
   try {
     if (typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ !== 'stable') {
-      return `0.1.0 · ${__RELEASE_CHANNEL__}`;
+      return `${ver} · ${__RELEASE_CHANNEL__}`;
     }
   } catch { /* */ }
-  return '0.1.0';
+  return ver;
 }
 
 export function AboutWindow() {
