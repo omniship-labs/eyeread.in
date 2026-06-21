@@ -155,11 +155,11 @@ export const config = {
     subhead:
       'eyeread.in is funded entirely by people who believe in honest, open tools. These are the humans keeping it free.',
     // Open Collective slug — change this to point at a different collective.
-    collectiveSlug: 'eyereadin',
+    collectiveSlug: 'omniship',
     // Lifetime total (USD) at or above which a contributor is shown as a Sponsor.
     sponsorThreshold: 100,
     ctaLabel: 'Become a backer',
-    ctaHref: 'https://opencollective.com/eyereadin',
+    ctaHref: 'https://opencollective.com/omniship',
     emptyMessage: 'Be the first to back eyeread.in →',
     errorMessage: 'Couldn’t load backers right now. View them on Open Collective →',
   },
