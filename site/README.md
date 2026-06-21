@@ -23,7 +23,7 @@ site/
     ├── i18n/               # ← EDIT COPY HERE — one bundle per language
     │   ├── index.js        # i18next setup: detection + persistence + registry
     │   ├── en.js           # English (source of truth — mirror its shape)
-    │   └── fr.js de.js es.js hi.js kn.js
+    │   └── fr de es ru zh ja hi mr bho ta te kn tcy ml .js
     ├── assets.js           # brand SVGs imported from design/
     ├── styles/             # base.css, layout.css, components.css (marketing-only)
     ├── hooks/
@@ -38,8 +38,9 @@ site/
 
 ## Editing content
 
-The page is **multilingual** (English, French, German, Spanish, Hindi, Kannada),
-powered by [i18next](https://www.i18next.com/) + react-i18next.
+The page is **multilingual** (English, French, German, Spanish, Russian,
+Chinese, Japanese, Hindi, Marathi, Bhojpuri, Tamil, Telugu, Kannada, Tulu,
+Malayalam), powered by [i18next](https://www.i18next.com/) + react-i18next.
 
 - **Translatable copy** lives per-language in **`src/i18n/*.js`**. `en.js` is the
   source of truth; every other locale mirrors its exact shape (same keys, same

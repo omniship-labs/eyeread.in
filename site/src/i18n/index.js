@@ -25,6 +25,15 @@ import de from './de.js';
 import es from './es.js';
 import hi from './hi.js';
 import kn from './kn.js';
+import mr from './mr.js';
+import bho from './bho.js';
+import tcy from './tcy.js';
+import ml from './ml.js';
+import ta from './ta.js';
+import te from './te.js';
+import zh from './zh.js';
+import ja from './ja.js';
+import ru from './ru.js';
 
 export const DEFAULT_LOCALE = 'en';
 
@@ -34,8 +43,17 @@ export const locales = [
   { code: 'fr', label: 'French', native: 'Français' },
   { code: 'de', label: 'German', native: 'Deutsch' },
   { code: 'es', label: 'Spanish', native: 'Español' },
+  { code: 'ru', label: 'Russian', native: 'Русский' },
+  { code: 'zh', label: 'Chinese', native: '中文' },
+  { code: 'ja', label: 'Japanese', native: '日本語' },
   { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
+  { code: 'mr', label: 'Marathi', native: 'मराठी' },
+  { code: 'bho', label: 'Bhojpuri', native: 'भोजपुरी' },
+  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
+  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
   { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
+  { code: 'tcy', label: 'Tulu', native: 'ತುಳು' },
+  { code: 'ml', label: 'Malayalam', native: 'മലയാളം' },
 ];
 
 const resources = {
@@ -45,6 +63,15 @@ const resources = {
   es: { translation: es },
   hi: { translation: hi },
   kn: { translation: kn },
+  mr: { translation: mr },
+  bho: { translation: bho },
+  tcy: { translation: tcy },
+  ml: { translation: ml },
+  ta: { translation: ta },
+  te: { translation: te },
+  zh: { translation: zh },
+  ja: { translation: ja },
+  ru: { translation: ru },
 };
 
 i18n
