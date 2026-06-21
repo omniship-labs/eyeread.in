@@ -10,6 +10,21 @@
   overflow: hidden;
   background: var(--bg-base);
   border-radius: 0;
+  position: relative;
+}
+.app-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: background var(--dur-slow) var(--ease-out);
+}
+.app-shell.exposed::before {
+  background: rgba(239, 68, 68, 0.07);
+}
+.app-shell.shielded::before {
+  background: transparent;
 }
 
 /* ── Title bar (real traffic lights live in the native overlay) ── */
@@ -88,6 +103,41 @@
 .tl-settings:hover { background: var(--surface-hover); color: var(--text-primary); }
 .tl-settings.active { color: var(--accent-text); background: var(--accent-subtle-bg); }
 .tl-settings svg { width: 15px; height: 15px; }
+
+/* ── Shield button — screen-share protection toggle ── */
+.tl-shield {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+/* Protected — violet, matches overlay shielded state */
+.tl-shield.shielded {
+  background: rgba(110, 86, 247, 0.12);
+  color: rgba(110, 86, 247, 0.85);
+  border: 1px solid rgba(110, 86, 247, 0.30);
+}
+.tl-shield.shielded:hover {
+  background: rgba(110, 86, 247, 0.20);
+  color: rgba(110, 86, 247, 1);
+}
+/* Exposed — red warning, matches overlay exposed state */
+.tl-shield.exposed {
+  background: rgba(239, 68, 68, 0.10);
+  color: rgba(239, 68, 68, 0.80);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+.tl-shield.exposed:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: rgba(239, 68, 68, 1);
+}
 
 /* ── Two-panel layout ── */
 .lib {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, Component } from 'react';
-import { Library as LibraryIcon, FileText, Settings as SettingsIcon, Heart } from 'lucide-react';
+import { Library as LibraryIcon, FileText, Settings as SettingsIcon, Heart, Eye, EyeOff } from 'lucide-react';
 import logoMarkDark from '../assets/logos/eyeread-mark-bounded-dark.svg';
 import logoMarkLight from '../assets/logos/eyeread-mark-bounded-light.svg';
 
@@ -51,6 +51,7 @@ import {
   isOverlayVisible,
   registerOverlayHotkey,
   registerInteractiveHotkey,
+  setMainProtected,
 } from '../lib/tauri';
 
 export function MainWindow() {
@@ -75,6 +76,7 @@ export function MainWindow() {
       setSettings(st);
       savedRef.current = new Map(sc.map((s) => [s.id, s]));
       setReady(true);
+      setMainProtected(st.hideFromShare);
     });
   }, []);
 
@@ -177,7 +179,7 @@ export function MainWindow() {
   };
 
   return (
-    <div className="app-shell">
+    <div className={'app-shell' + (settings.hideFromShare ? ' shielded' : ' exposed')}>
       {/* Titlebar — only the inner span is the drag region, not the whole bar */}
       <div className="titlebar">
         {!isTauri && (
@@ -191,6 +193,17 @@ export function MainWindow() {
           <img src={logoMark} alt="" className="titlebar-logo" />
           <span className="titlebar-wordmark">eyeread<span className="titlebar-wordmark-in">.in</span></span>
         </div>
+        <button
+          className={'tl-shield' + (settings.hideFromShare ? ' shielded' : ' exposed')}
+          onClick={() => {
+            const next = !settings.hideFromShare;
+            applySettings({ hideFromShare: next });
+            setMainProtected(next);
+          }}
+          title={settings.hideFromShare ? 'Hidden from screen share' : 'Visible in screen share'}
+        >
+          {settings.hideFromShare ? <EyeOff size={14} /> : <Eye size={14} />}
+        </button>
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}

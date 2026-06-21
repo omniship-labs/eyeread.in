@@ -5,9 +5,9 @@ export const isTauri =
   typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
 // Screen-share invisibility (contentProtected) only works on macOS.
-// navigator.userAgent is available synchronously — no async Tauri call needed.
+// userAgent is reliable here; navigator.platform is deprecated and empty in modern WebKit.
 export const isMacOS =
-  typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
 
 const OVERLAY_W = 660;
 const OVERLAY_H = 420;
@@ -207,6 +207,13 @@ export async function setOverlayContentProtected(on) {
   const win = await overlayWindow();
   await win?.setContentProtected(on);
 }
+
+export async function setMainProtected(on) {
+  if (!isTauri) return;
+  const { invoke } = await import('@tauri-apps/api/core');
+  await invoke('set_main_protected', { protected: on });
+}
+
 
 // Serialize hotkey registration so StrictMode double-invocation can't race.
 const hotkeyQueue = {};

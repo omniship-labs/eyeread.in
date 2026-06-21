@@ -1,4 +1,6 @@
-import { openExternal } from '../lib/tauri';
+import { useEffect, useState } from 'react';
+import { openExternal, listen } from '../lib/tauri';
+import { fetchSettings } from '../lib/store';
 import sponsors from '../data/sponsors.json';
 import './about/about-window.css';
 
@@ -19,8 +21,19 @@ function getVersion() {
 }
 
 export function AboutWindow() {
+  const [shielded, setShielded] = useState(true);
+
+  useEffect(() => {
+    fetchSettings().then((s) => setShielded(s.hideFromShare));
+    let unlisten;
+    listen('settings:sync', (p) => {
+      if (p?.settings?.hideFromShare !== undefined) setShielded(p.settings.hideFromShare);
+    }).then((fn) => { unlisten = fn; });
+    return () => unlisten?.();
+  }, []);
+
   return (
-    <div className="aw-root">
+    <div className={'aw-root' + (shielded ? ' shielded' : ' exposed')}>
       {/* drag region — clear strip at top, avoids traffic lights */}
       <div className="aw-titlebar" data-tauri-drag-region />
 

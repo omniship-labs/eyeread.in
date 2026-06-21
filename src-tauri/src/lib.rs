@@ -6,6 +6,17 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
 
+/// Toggle screen-capture invisibility on all app windows (overlay manages itself).
+#[tauri::command]
+fn set_main_protected(app: AppHandle, protected: bool) {
+    for label in ["main", "about", "settings"] {
+        if let Some(win) = app.get_webview_window(label) {
+            let _ = win.set_content_protected(protected);
+        }
+    }
+}
+
+
 /// Open the About window — called from JS menu listener or Settings screen.
 #[tauri::command]
 fn show_about_window(app: AppHandle) {
@@ -163,7 +174,12 @@ pub fn run() {
                 .add_migrations("sqlite:eyeread.db", migrations)
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![check_for_update, install_update, show_about_window])
+        .invoke_handler(tauri::generate_handler![
+            check_for_update,
+            install_update,
+            show_about_window,
+            set_main_protected,
+        ])
         .setup(|app| {
             build_tray(&app.handle().clone())?;
             Ok(())

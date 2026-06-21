@@ -1,3 +1,13 @@
+.aw-root.exposed::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(239, 68, 68, 0.07);
+  pointer-events: none;
+  z-index: 9999;
+  transition: background var(--dur-slow) var(--ease-out);
+}
+
 .aw-root {
   display: flex;
   flex-direction: column;

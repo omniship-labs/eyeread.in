@@ -1,7 +1,7 @@
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { setOverlayContentProtected, showAboutWindow } from '../lib/tauri';
+import { setOverlayContentProtected, setMainProtected, showAboutWindow } from '../lib/tauri';
 
 export function SettingsScreen({ settings, onSettings }) {
   const { position, opacity, mirror, hideFromShare, reduceMotion, highContrast } = settings;
@@ -48,7 +48,7 @@ export function SettingsScreen({ settings, onSettings }) {
         <div className="set-row">
           <div className="set-info">
             <b>Hide from screen-share</b>
-            <span>Overlay is invisible to all capture software</span>
+            <span>Entire app is invisible to all capture software</span>
           </div>
           <Switch
             size="sm"
@@ -57,6 +57,7 @@ export function SettingsScreen({ settings, onSettings }) {
             onChange={(v) => {
               onSettings({ hideFromShare: v });
               setOverlayContentProtected(v);
+              setMainProtected(v);
             }}
           />
         </div>
