@@ -6,13 +6,13 @@ import {
   ChevronLeft,
   ChevronsRight,
   Settings as SettingsIcon,
-  EyeOff,
   Timer as TimerIcon,
   Hourglass,
   Mic,
   MicOff,
   X,
 } from 'lucide-react';
+import { ShieldToggle } from '../components/ShieldToggle';
 import { ScriptViewer } from '../components/ScriptViewer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
 import { useClickThrough } from '../hooks/useClickThrough';
@@ -346,21 +346,17 @@ export function OverlayWindow() {
             </span>
           )}
           <span style={{ marginLeft: 'auto', display: 'flex', gap: 4, alignItems: 'center' }}>
-            <button
+            <ShieldToggle
               className={'ic ic-sm ov-shield' + (shielded ? ' on' : '')}
-              title={shielded
-                ? 'Hidden from screen-share — click to expose'
-                : 'Visible in screen-share — click to hide'}
-              onClick={() => {
-                const next = !shielded;
+              shielded={shielded}
+              size={13}
+              label={shielded ? 'HIDDEN' : 'VISIBLE'}
+              onChange={(next) => {
                 setShielded(next);
                 setOverlayContentProtected(next);
-                setSettingsContentProtected(next); // keep settings window in lockstep
+                setSettingsContentProtected(next);
               }}
-            >
-              <EyeOff size={13} />
-              <span className="ov-shield-label">{shielded ? 'HIDDEN' : 'VISIBLE'}</span>
-            </button>
+            />
             <button className="ic ic-sm" title="Close prompter (⌘⇧E to reopen)" onClick={close}>
               <X />
             </button>
