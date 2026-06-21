@@ -27,7 +27,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   e2e:
@@ -44,6 +46,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - run: npm run site:test
       - name: Upload screenshots & report
+        id: artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
@@ -53,3 +56,20 @@ jobs:
             playwright-report/
           retention-days: 14
           if-no-files-found: ignore
+      # Sticky comment (created once, updated on each run) linking to the
+      # downloadable screenshots + report. PR-only; fork PRs get a read-only
+      # token so this is best-effort there.
+      - name: Comment screenshot link on PR
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: site-e2e-screenshots
+          message: |
+            ### 📸 Site responsiveness screenshots — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
+
+            Playwright captured full-page screenshots at **desktop / tablet / mobile** viewports.
+
+            **[⬇️ Download screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (unzip → `home-desktop.png`, `home-tablet.png`, `home-mobile.png`)
+
+            <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>
+
