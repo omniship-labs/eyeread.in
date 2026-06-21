@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in は、あなたの原稿をガラスのようなオーバーレイとしてどんな画面の上にも浮かべます。あなたの声に追従し、録画には決して映りません。',
     note: 'ずっと無料 · AGPL-3.0 · アカウント不要',
-    primaryCta: 'macOS 版をダウンロード',
+    primaryCta: 'macOS・Windows 版をダウンロード',
     secondaryCta: 'GitHub で見る',
   },
 
@@ -101,8 +101,8 @@ export default {
         body: '何ひとつあなたの端末から外へ出ません。原稿はプライベートのままです。',
       },
       {
-        title: 'macOS のみ · ネイティブアプリ',
-        body: 'オーバーレイには OS レベルのウィンドウ重ね合わせが必要です。今のところ macOS のみ。',
+        title: 'macOS・Windows · ネイティブアプリ',
+        body: 'macOS と Windows では OS レベルで不可視化を保証。Linux は実験的です。',
       },
       {
         title: '寄付で支えられる',

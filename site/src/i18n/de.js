@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in blendet dein Skript als gläsernes Overlay über jeden Bildschirm ein. Es folgt deiner Stimme – und taucht in keiner Aufnahme auf.',
     note: 'Für immer kostenlos · AGPL-3.0 · Kein Konto erforderlich',
-    primaryCta: 'Für macOS herunterladen',
+    primaryCta: 'Für macOS & Windows herunterladen',
     secondaryCta: 'Auf GitHub ansehen',
   },
 
@@ -102,8 +102,8 @@ export default {
         body: 'Nichts verlässt deinen Rechner. Deine Skripte bleiben privat.',
       },
       {
-        title: 'Nur macOS · native App',
-        body: 'Das Overlay erfordert Fenster-Layering auf OS-Ebene. Vorerst nur macOS.',
+        title: 'macOS & Windows · native App',
+        body: 'Vom Betriebssystem erzwungene Unsichtbarkeit auf macOS und Windows. Linux ist experimentell.',
       },
       {
         title: 'Spendenfinanziert',

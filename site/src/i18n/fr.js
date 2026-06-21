@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in fait flotter votre script sur n’importe quel écran sous forme de calque en verre. Il suit votre voix — et n’apparaît jamais dans un enregistrement.',
     note: 'Gratuit pour toujours · AGPL-3.0 · Aucun compte requis',
-    primaryCta: 'Télécharger pour macOS',
+    primaryCta: 'Télécharger pour macOS et Windows',
     secondaryCta: 'Voir sur GitHub',
   },
 
@@ -102,8 +102,8 @@ export default {
         body: 'Rien ne quitte votre machine. Vos scripts restent privés.',
       },
       {
-        title: 'macOS uniquement · app native',
-        body: 'Le calque nécessite une superposition de fenêtres au niveau de l’OS. macOS uniquement pour l’instant.',
+        title: 'macOS et Windows · app native',
+        body: 'Invisibilité garantie par l’OS sur macOS et Windows. Linux est expérimental.',
       },
       {
         title: 'Soutenu par les dons',
