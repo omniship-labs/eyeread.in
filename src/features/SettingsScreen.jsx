@@ -4,6 +4,7 @@ import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
 import { setOverlayContentProtected, setMainProtected, showAboutWindow } from '../lib/tauri';
+import { ShieldToggle } from '../components/ShieldToggle';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
@@ -50,10 +51,8 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>Hide from screen-share</b>
             <span>Entire app is invisible to all capture software</span>
           </div>
-          <Switch
-            size="sm"
-            checked={hideFromShare}
-            label="Hide from screen-share"
+          <ShieldToggle
+            shielded={hideFromShare}
             onChange={(v) => {
               onSettings({ hideFromShare: v });
               setOverlayContentProtected(v);

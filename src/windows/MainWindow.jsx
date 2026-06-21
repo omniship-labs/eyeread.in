@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, Component } from 'react';
-import { Settings as SettingsIcon, Eye, EyeOff } from 'lucide-react';
+import { Settings as SettingsIcon } from 'lucide-react';
+import { ShieldToggle } from '../components/ShieldToggle';
 import logoMarkDark from '../assets/logos/eyeread-mark-bounded-dark.svg';
 import logoMarkLight from '../assets/logos/eyeread-mark-bounded-light.svg';
 
@@ -203,17 +204,13 @@ export function MainWindow() {
           <img src={logoMark} alt="" className="titlebar-logo" />
           <span className="titlebar-wordmark">eyeread<span className="titlebar-wordmark-in">.in</span></span>
         </div>
-        <button
-          className={'tl-shield' + (settings.hideFromShare ? ' shielded' : ' exposed')}
-          onClick={() => {
-            const next = !settings.hideFromShare;
+        <ShieldToggle
+          shielded={settings.hideFromShare}
+          onChange={(next) => {
             applySettings({ hideFromShare: next });
             setMainProtected(next);
           }}
-          title={settings.hideFromShare ? 'Hidden from screen share' : 'Visible in screen share'}
-        >
-          {settings.hideFromShare ? <EyeOff size={14} /> : <Eye size={14} />}
-        </button>
+        />
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
