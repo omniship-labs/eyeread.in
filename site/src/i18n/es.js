@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Spanish (es). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — Mira al objetivo.',
+    description:
+      'Teleprompter de código abierto. Muestra tu guion sobre cualquier pantalla, invisible para todo grabador. Seguimiento de voz integrado. Gratis.',
+  },
+
   nav: {
     cta: 'Descargar gratis',
     githubLabel: 'GitHub',

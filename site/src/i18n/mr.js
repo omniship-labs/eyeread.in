@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Marathi (mr). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — लेन्सकडे पाहा.',
+    description:
+      'ओपन सोर्स टेलिप्रॉम्प्टर. तुमची स्क्रिप्ट कोणत्याही स्क्रीनवर तरंगवते, प्रत्येक रेकॉर्डरसाठी अदृश्य. व्हॉइस ट्रॅकिंग अंतर्भूत. मोफत.',
+  },
+
   nav: {
     cta: 'मोफत डाउनलोड करा',
     githubLabel: 'GitHub',

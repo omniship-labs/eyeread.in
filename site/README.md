@@ -16,18 +16,24 @@ source of truth, nothing is duplicated into `site/`.
 site/
 ├── index.html              # Vite entry: <head> meta + #root
 ├── vite.config.js          # standalone build (root: site/, outDir: site/dist)
+├── scripts/
+│   ├── og-image.mjs        # rasterize the social card (build time)
+│   └── prerender.mjs       # per-locale static pages + hreflang + sitemap (post-build)
 └── src/
     ├── main.jsx            # imports design/styles.css (tokens) + i18n + mounts React
     ├── App.jsx             # composes the sections (reads useConfig())
     ├── config.js           # non-translatable structure + buildConfig()/useConfig()
     ├── i18n/               # ← EDIT COPY HERE — one bundle per language
-    │   ├── index.js        # i18next setup: detection + persistence + registry
+    │   ├── registry.js     # pure locale data (bundles, regions, URLs) — Node-safe
+    │   ├── index.js        # live i18next instance: detection + persistence
+    │   ├── i18n.test.js    # asserts every locale matches en's shape
     │   ├── en.js           # English (source of truth — mirror its shape)
     │   └── fr de es ru zh ja hi mr bho ta te kn tcy ml .js
     ├── assets.js           # brand SVGs imported from design/
     ├── styles/             # base.css, layout.css, components.css (marketing-only)
     ├── hooks/
-    │   └── useSponsors.js  # live Open Collective fetch
+    │   ├── useSponsors.js      # live Open Collective fetch
+    │   └── useDocumentMeta.js  # sync <head> title/description on language switch
     └── components/
         ├── Icon.jsx        # lucide-react + inline brand marks (GitHub/Apple)
         ├── LanguageSwitcher.jsx
@@ -86,6 +92,30 @@ Configure it in `config.js → sponsors`:
 If the request fails or there are no backers yet, the section shows a friendly
 link to Open Collective instead of breaking.
 
+## SEO & per-locale pages
+
+Because the page is a client-rendered SPA, crawlers and link scrapers would
+otherwise only ever see the English `<head>`. To fix that,
+`site/scripts/prerender.mjs` runs **after** `vite build` and, for every locale,
+writes a static page:
+
+- default locale → `dist/index.html`; others → `dist/<code>/index.html`
+- localized `<title>`, `description`, and `og:`/`twitter:` tags (the brand name
+  `eyeread.in` stays constant — only the tagline localizes)
+- `<html lang>` set, which the i18next **htmlTag** detector reads, so landing on
+  `/es/` from a search result boots the site in Spanish
+- a `canonical` URL plus full **hreflang** alternates (+ `x-default`) and
+  `og:locale` / `og:locale:alternate`
+
+It also emits `dist/sitemap.xml` (with hreflang alternates) and `dist/robots.txt`.
+At runtime, in-session language switches keep the `<head>` in sync via
+`hooks/useDocumentMeta.js`. The canonical origin lives in `i18n/registry.js`
+(`SITE_URL`).
+
+> The social `og:image` is **not** localized: the card font (Space Grotesk) is
+> Latin-only and can't render Devanagari/Tamil/CJK, so all locales share the
+> brand card. `og:locale` still varies per page.
+
 ## Social share image (og:image)
 
 Scrapers don't render SVG `og:image`s, so `site/scripts/og-image.mjs` rasterizes
@@ -100,7 +130,7 @@ SVG and the card follows; the `og:image` meta lives in `index.html`.
 ```bash
 npm run site:og        # (re)generate the og:image PNG from the design SVG
 npm run site:dev       # dev server with HMR (runs site:og first)
-npm run site:build     # production build → site/dist (runs site:og first)
+npm run site:build     # production build → site/dist (og:image + per-locale prerender)
 npm run site:preview   # preview the production build
 ```
 

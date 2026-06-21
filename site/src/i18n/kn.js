@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Kannada (kn). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — ಲೆನ್ಸ್ ಕಡೆಗೆ ನೋಡಿ.',
+    description:
+      'ಓಪನ್ ಸೋರ್ಸ್ ಟೆಲಿಪ್ರಾಂಪ್ಟರ್. ನಿಮ್ಮ ಸ್ಕ್ರಿಪ್ಟ್ ಅನ್ನು ಯಾವುದೇ ಪರದೆಯ ಮೇಲೆ ತೇಲಿಸುತ್ತದೆ, ಪ್ರತಿ ರೆಕಾರ್ಡರ್‌ಗೆ ಅದೃಶ್ಯ. ಧ್ವನಿ ಟ್ರ್ಯಾಕಿಂಗ್ ಅಂತರ್ನಿರ್ಮಿತ. ಉಚಿತ.',
+  },
+
   nav: {
     cta: 'ಉಚಿತವಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
     githubLabel: 'GitHub',

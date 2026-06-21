@@ -14,7 +14,7 @@
     "tauri": "tauri",
     "site:og": "node site/scripts/og-image.mjs",
     "site:dev": "npm run site:og && vite --config site/vite.config.js",
-    "site:build": "npm run site:og && vite build --config site/vite.config.js",
+    "site:build": "npm run site:og && vite build --config site/vite.config.js && node site/scripts/prerender.mjs",
     "site:preview": "vite preview --config site/vite.config.js",
     "test": "vitest run",
     "test:watch": "vitest",

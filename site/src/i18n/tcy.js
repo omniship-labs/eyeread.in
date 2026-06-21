@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Tulu (tcy), Kannada script. Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — ಲೆನ್ಸ್‌ಗ್ ತೂಲೆ.',
+    description:
+      'ಓಪನ್ ಸೋರ್ಸ್ ಟೆಲಿಪ್ರಾಂಪ್ಟರ್. ಈರೆನ ಸ್ಕ್ರಿಪ್ಟ್‌ನ್ ಒವ್ವೇ ಪರದೆದ ಮಿತ್ತ್ ತೇಲಾವುಂಡು, ಮಸ್ತ್ ರೆಕಾರ್ಡರ್‌ಗ್ ಅದೃಶ್ಯ. ಸ್ವರ ಟ್ರ್ಯಾಕಿಂಗ್ ಒಳಗೆ ಉಂಡು. ಉಚಿತ.',
+  },
+
   nav: {
     cta: 'ಉಚಿತವಾದ್ ಡೌನ್‌ಲೋಡ್ ಮಲ್ಪುಲೆ',
     githubLabel: 'GitHub',

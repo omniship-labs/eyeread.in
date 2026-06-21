@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Russian (ru). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — Смотрите в объектив.',
+    description:
+      'Телесуфлёр с открытым кодом. Показывает ваш сценарий поверх любого экрана, невидим для любой записи. Отслеживание голоса встроено. Бесплатно.',
+  },
+
   nav: {
     cta: 'Скачать бесплатно',
     githubLabel: 'GitHub',

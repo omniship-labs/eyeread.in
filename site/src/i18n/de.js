@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — German (de). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — Schau ins Objektiv.',
+    description:
+      'Open-Source-Teleprompter. Blendet dein Skript über jeden Bildschirm ein, unsichtbar für jeden Recorder. Sprachsteuerung integriert. Kostenlos.',
+  },
+
   nav: {
     cta: 'Kostenlos herunterladen',
     githubLabel: 'GitHub',

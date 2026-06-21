@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Telugu (te). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — లెన్స్ వైపు చూడండి.',
+    description:
+      'ఓపెన్ సోర్స్ టెలీప్రాంప్టర్. మీ స్క్రిప్ట్‌ను ఏ స్క్రీన్ పైనైనా తేలుతుంది, ప్రతి రికార్డర్‌కు అదృశ్యం. వాయిస్ ట్రాకింగ్ అంతర్నిర్మితం. ఉచితం.',
+  },
+
   nav: {
     cta: 'ఉచితంగా డౌన్‌లోడ్ చేయండి',
     githubLabel: 'GitHub',

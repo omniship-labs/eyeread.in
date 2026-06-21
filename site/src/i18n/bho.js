@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Bhojpuri (bho). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — लेंस के ओर देखीं।',
+    description:
+      'ओपन सोर्स टेलीप्रॉम्प्टर। राउर स्क्रिप्ट के कौनो भी स्क्रीन पर तैरावेला, हर रिकॉर्डर खातिर अदृश्य। वॉइस ट्रैकिंग अंतर्निहित। मुफ्त।',
+  },
+
   nav: {
     cta: 'मुफ्त डाउनलोड करीं',
     githubLabel: 'GitHub',

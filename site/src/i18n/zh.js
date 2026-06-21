@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Chinese, Simplified (zh). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — 看向镜头。',
+    description:
+      '开源提词器。将你的讲稿浮于任意屏幕之上，对任何录制软件都不可见。内置语音跟踪。免费。',
+  },
+
   nav: {
     cta: '免费下载',
     githubLabel: 'GitHub',

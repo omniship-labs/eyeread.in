@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — French (fr). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — Regardez l’objectif.',
+    description:
+      'Téléprompteur open source. Fait flotter votre script sur n’importe quel écran, invisible pour tout enregistreur. Suivi vocal intégré. Gratuit.',
+  },
+
   nav: {
     cta: 'Télécharger gratuitement',
     githubLabel: 'GitHub',

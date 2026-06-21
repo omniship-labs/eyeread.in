@@ -14,6 +14,13 @@
    ============================================================ */
 
 export default {
+  // <head> — brand name stays "eyeread.in" in every language; tagline localizes.
+  meta: {
+    title: 'eyeread.in — Look at the lens.',
+    description:
+      'Open source teleprompter. Floats your script over any screen, invisible to every recorder. Voice tracking built in. Free.',
+  },
+
   nav: {
     cta: 'Download free',
     githubLabel: 'GitHub',

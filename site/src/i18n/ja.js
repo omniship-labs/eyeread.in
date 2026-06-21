@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Japanese (ja). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — レンズを見て。',
+    description:
+      'オープンソースのテレプロンプター。原稿をどんな画面の上にも浮かべ、あらゆる録画に映りません。音声トラッキング内蔵。無料。',
+  },
+
   nav: {
     cta: '無料でダウンロード',
     githubLabel: 'GitHub',

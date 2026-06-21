@@ -72,6 +72,8 @@ export function buildConfig(m) {
     brand: shared.brand,
     links: shared.links,
 
+    meta: m.meta,
+
     nav: m.nav,
 
     hero: {

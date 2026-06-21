@@ -1,6 +1,12 @@
 /* eyeread.in · marketing site — Malayalam (ml). Mirrors en.js. */
 
 export default {
+  meta: {
+    title: 'eyeread.in — ലെൻസിലേക്ക് നോക്കൂ.',
+    description:
+      'ഓപ്പൺ സോഴ്സ് ടെലിപ്രോംപ്റ്റർ. നിങ്ങളുടെ സ്ക്രിപ്റ്റിനെ ഏത് സ്ക്രീനിനു മുകളിലും ഒഴുക്കുന്നു, എല്ലാ റെക്കോർഡറിനും അദൃശ്യം. വോയ്സ് ട്രാക്കിംഗ് ഉൾച്ചേർത്തത്. സൗജന്യം.',
+  },
+
   nav: {
     cta: 'സൗജന്യമായി ഡൗൺലോഡ് ചെയ്യൂ',
     githubLabel: 'GitHub',
