@@ -67,7 +67,7 @@ export default function Sponsors({ data }) {
       <p className="sponsors-sub">{data.subhead}</p>
 
       <div className="sp-mount">
-        {status === 'loading' && <div className="sp-status">Loading backers…</div>}
+        {status === 'loading' && <div className="sp-status">{data.loadingMessage}</div>}
         {status === 'empty' && (
           <a
             className="sp-status"
@@ -90,8 +90,8 @@ export default function Sponsors({ data }) {
         )}
         {status === 'ready' && (
           <>
-            <Group label="Sponsors" icon="heart" members={sponsors} size={64} large />
-            <Group label="Backers" icon="star" members={backers} size={44} />
+            <Group label={data.sponsorsLabel} icon="heart" members={sponsors} size={64} large />
+            <Group label={data.backersLabel} icon="star" members={backers} size={44} />
           </>
         )}
       </div>

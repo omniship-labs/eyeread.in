@@ -1,0 +1,144 @@
+/* ============================================================
+   eyeread.in · marketing site — English (en) · SOURCE LOCALE
+   ------------------------------------------------------------
+   This is the canonical message bundle. Every other locale file
+   mirrors this exact shape — same keys, same array lengths.
+   Only translatable copy lives here; icons, links, the Open
+   Collective slug, and other non-translatable structure are
+   woven in by buildConfig() in ../config.js.
+
+   When adding a string, add it here FIRST, then to every other
+   locale. Headlines and slide titles are arrays of lines.
+   Teleprompter lines split into spoken → active → upcoming so
+   the active word can be highlighted.
+   ============================================================ */
+
+export default {
+  nav: {
+    cta: 'Download free',
+    githubLabel: 'GitHub',
+  },
+
+  hero: {
+    eyebrow: 'Invisible to screen-share',
+    star: 'Star on GitHub',
+    // `emphasis` items render in the accent color.
+    headline: ['Look at the lens.', { emphasis: 'Not your notes.' }],
+    subhead:
+      'eyeread.in floats your script over any screen as a glass overlay. It follows your voice — and never shows up in a recording.',
+    note: 'Free forever · AGPL-3.0 · No account required',
+    primaryCta: 'Download for macOS',
+    secondaryCta: 'View on GitHub',
+  },
+
+  demo: {
+    cameraBadge: 'Camera · eyeread.in hidden from recording',
+    invisibleBadge: 'Hidden from all screen-share software',
+    slide: {
+      eyebrow: 'Q3 All-Hands · Acme Corp',
+      heading: ['Building for the', 'next ten years'],
+    },
+    overlay: {
+      timer: '01:24',
+      tag: 'Invisible',
+      spoken: 'We have an incredible team and a clear ',
+      active: 'roadmap',
+      upcoming: ' — what we need now is focus, not just speed. Let the results speak.',
+    },
+  },
+
+  features: {
+    eyebrow: 'What makes it different',
+    heading: 'Built for how people actually present.',
+    items: [
+      {
+        title: 'Invisible to every recorder',
+        body: 'eyeread.in renders outside the captured frame. Zoom, Loom, OBS, QuickTime — none of them see it. Your audience only sees the content.',
+        tag: 'Screen-share safe',
+      },
+      {
+        title: 'Voice tracking',
+        body: "Speak, and the script follows. The current word glows. What you've said fades. No tapping, no foot pedal — just talk.",
+        tag: 'Auto-scroll',
+      },
+      {
+        title: 'Near the camera',
+        body: 'The overlay anchors just below your webcam. Your eyes naturally land on the lens — not the corner of the screen. You look present.',
+        tag: 'Eye contact',
+      },
+    ],
+  },
+
+  how: {
+    eyebrow: 'How it works',
+    heading: 'Open it. Paste your script. Talk.',
+    steps: [
+      {
+        title: 'Paste or type your script',
+        body: 'Drop in anything — a keynote, a YouTube script, talking points, interview answers. eyeread.in works with plain text.',
+      },
+      {
+        title: 'Position the overlay',
+        body: 'Drag it near your camera. Adjust font size, opacity, and speed. It floats above every other window.',
+      },
+      {
+        title: 'Start talking',
+        body: 'Voice detection takes over. The active word is highlighted. The text scrolls as you speak. Hit record whenever you’re ready.',
+      },
+    ],
+    preview: {
+      header: 'Voice tracking active · 00:42',
+      spoken: 'Thank you all for being here today. I want to talk about something that ',
+      active: 'matters',
+      upcoming:
+        ' more than any quarterly number — the people we serve and the trust they place in us.',
+      caption: '↑ The overlay — only you can see this',
+    },
+  },
+
+  oss: {
+    heading: 'Free, open source, and honest about it.',
+    body: 'eyeread.in is fully open source. Read the code, audit it, fork it, contribute to it. No tracking, no telemetry, no subscription. If it helps you — donate voluntarily.',
+    guarantees: [
+      {
+        title: 'No account required',
+        body: 'Download and use immediately — no sign-up, no email',
+      },
+      {
+        title: 'No telemetry',
+        body: 'Nothing leaves your machine. Your scripts stay private.',
+      },
+      {
+        title: 'macOS only · native app',
+        body: 'The overlay requires OS-level window layering. macOS only for now.',
+      },
+      {
+        title: 'Donation-supported',
+        body: 'If eyeread.in helps you, pay it forward — no pressure',
+      },
+    ],
+  },
+
+  sponsors: {
+    eyebrow: 'Backed by the community',
+    heading: 'Backers & sponsors',
+    subhead:
+      'eyeread.in is funded entirely by people who believe in honest, open tools. These are the humans keeping it free.',
+    ctaLabel: 'Become a backer',
+    loadingMessage: 'Loading backers…',
+    emptyMessage: 'Be the first to back eyeread.in →',
+    errorMessage: 'Couldn’t load backers right now. View them on Open Collective →',
+    sponsorsLabel: 'Sponsors',
+    backersLabel: 'Backers',
+  },
+
+  footer: {
+    // Order matches shared.footerLinks (hrefs) in ../config.js.
+    links: ['GitHub', 'Docs', 'Discord', 'AGPL-3.0'],
+    copy: 'Free forever',
+  },
+
+  switcher: {
+    label: 'Language',
+  },
+};

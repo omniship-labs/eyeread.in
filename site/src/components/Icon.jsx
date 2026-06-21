@@ -15,6 +15,7 @@ import {
   Star,
   ChevronsLeftRight,
   ArrowRight,
+  Globe,
 } from 'lucide-react';
 import { Icon as IconifyIcon } from '@iconify/react';
 import githubIcon from '@iconify-icons/mdi/github';
@@ -30,6 +31,7 @@ const LUCIDE = {
   star: Star,
   chevrons: ChevronsLeftRight,
   arrow: ArrowRight,
+  globe: Globe,
 };
 
 const BRAND = {

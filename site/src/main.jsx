@@ -9,6 +9,8 @@ import './styles/base.css';
 import './styles/layout.css';
 import './styles/components.css';
 
+// Initialise i18next (language detection + resources) before the app mounts.
+import './i18n/index.js';
 import App from './App.jsx';
 import { logoMark } from './assets.js';
 

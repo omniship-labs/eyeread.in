@@ -17,15 +17,20 @@ site/
 ├── index.html              # Vite entry: <head> meta + #root
 ├── vite.config.js          # standalone build (root: site/, outDir: site/dist)
 └── src/
-    ├── main.jsx            # imports design/styles.css (tokens) + mounts React
-    ├── App.jsx             # composes the sections
-    ├── config.js           # ← EDIT CONTENT HERE (copy, links, features, steps…)
+    ├── main.jsx            # imports design/styles.css (tokens) + i18n + mounts React
+    ├── App.jsx             # composes the sections (reads useConfig())
+    ├── config.js           # non-translatable structure + buildConfig()/useConfig()
+    ├── i18n/               # ← EDIT COPY HERE — one bundle per language
+    │   ├── index.js        # i18next setup: detection + persistence + registry
+    │   ├── en.js           # English (source of truth — mirror its shape)
+    │   └── fr.js de.js es.js hi.js kn.js
     ├── assets.js           # brand SVGs imported from design/
     ├── styles/             # base.css, layout.css, components.css (marketing-only)
     ├── hooks/
     │   └── useSponsors.js  # live Open Collective fetch
     └── components/
         ├── Icon.jsx        # lucide-react + inline brand marks (GitHub/Apple)
+        ├── LanguageSwitcher.jsx
         ├── Nav.jsx  Hero.jsx  Demo.jsx  Features.jsx
         ├── HowItWorks.jsx  OpenSource.jsx  Sponsors.jsx
         └── Brand.jsx  Footer.jsx
@@ -33,9 +38,26 @@ site/
 
 ## Editing content
 
-All copy, links, features, steps, and the Open Collective settings live in
-**`src/config.js`** — the single source of truth. Components render from it, so
-routine content edits never touch markup or styles.
+The page is **multilingual** (English, French, German, Spanish, Hindi, Kannada),
+powered by [i18next](https://www.i18next.com/) + react-i18next.
+
+- **Translatable copy** lives per-language in **`src/i18n/*.js`**. `en.js` is the
+  source of truth; every other locale mirrors its exact shape (same keys, same
+  array lengths). To edit copy, edit the relevant locale file(s). To add a string,
+  add it to `en.js` first, then to every other locale.
+- **Non-translatable structure** — brand, links, icons, and the Open Collective
+  settings — lives in **`src/config.js`**. `buildConfig()` weaves the active
+  locale's strings together with this shared structure, and `useConfig()` exposes
+  the result to components (re-rendering on language change).
+
+### Adding a language
+
+1. Add a bundle `src/i18n/<code>.js` (copy `en.js` and translate).
+2. Import it in `src/i18n/index.js` and add `{ code, label, native }` to `locales`.
+
+The visitor's language is auto-detected from the browser on first visit and their
+choice from the in-nav switcher is remembered in `localStorage`
+(`eyeread.locale`); `<html lang>` follows the active language.
 
 ## Design tokens & assets
 
