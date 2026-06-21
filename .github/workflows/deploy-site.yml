@@ -9,6 +9,7 @@ on:
     paths:
       - 'site/**'
       - 'design/tokens/**'
+      - 'design/assets/**'
       - '.github/workflows/deploy-site.yml'
   # Allow manual runs from the Actions tab.
   workflow_dispatch:
@@ -33,9 +34,9 @@ jobs:
         with:
           node-version: 22
 
-      # Regenerate site/css/tokens.css from the design system so the deployed
-      # site can never drift from design/tokens/.
-      - run: npm run site:tokens
+      # Assemble the borrowed artifacts (design tokens + brand assets) into
+      # site/ so the published bundle can never drift from their sources.
+      - run: npm run site:build
 
       - uses: actions/configure-pages@v5
 

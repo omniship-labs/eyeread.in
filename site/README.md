@@ -14,10 +14,10 @@ the browser loads ES modules directly.
 site/
 ├── index.html            # shell: <head> meta + #app mount + <noscript> fallback
 ├── css/
-│   ├── tokens.css        # GENERATED from design/tokens/ — do not edit by hand
-│   ├── base.css          # reset + element defaults
-│   ├── layout.css        # nav, hero, section grids, footer
-│   └── components.css     # buttons, badges, demo, feature cards, sponsors
+│   ├── base.css          # reset + element defaults              (source)
+│   ├── layout.css        # nav, hero, section grids, footer       (source)
+│   ├── components.css    # buttons, badges, demo, cards, sponsors (source)
+│   └── tokens.css        # GENERATED from design/tokens/ — not committed
 ├── js/
 │   ├── config.js         # ← EDIT CONTENT HERE (copy, links, features, steps…)
 │   ├── icons.js          # inline SVG icon set (no icon-lib dependency)
@@ -25,10 +25,15 @@ site/
 │   ├── sponsors.js       # live Open Collective backers/sponsors fetch
 │   ├── demo.js           # before/after reveal slider
 │   └── main.js           # entry point
-├── assets/               # logos, favicon, og image
+├── assets/               # COPIED from design/ + public/ — not committed
 └── scripts/
-    └── sync-tokens.mjs   # regenerates css/tokens.css from design/tokens/
+    └── build.mjs         # assembles tokens.css + assets from their sources
 ```
+
+Hand-written **source** lives in `index.html`, `css/{base,layout,components}.css`,
+and `js/`. Everything the site borrows from elsewhere in the repo —
+`css/tokens.css` and everything under `assets/` — is generated/copied at build
+time and is **git-ignored**, so there are no committed duplicates to drift.
 
 ## Editing content
 
@@ -36,16 +41,18 @@ All copy, links, features, steps, and the Open Collective settings live in
 **`js/config.js`** — the single source of truth. Change it there; the page
 re-renders from it. No need to touch markup or CSS for routine content edits.
 
-## Design tokens
+## Build (assemble borrowed artifacts)
 
-`css/tokens.css` is **generated** from the design system's `design/tokens/`
-(the source of truth), so the site never drifts from it:
+`scripts/build.mjs` regenerates `css/tokens.css` from `design/tokens/` and copies
+the brand assets from `design/assets/` + `public/` into `assets/`, so the site
+can never drift from those sources:
 
 ```bash
-npm run site:tokens   # regenerate site/css/tokens.css
+npm run site:build
 ```
 
-The deploy workflow runs this automatically before publishing.
+The deploy workflow runs this automatically before publishing. Run it once
+locally before serving (see below).
 
 ## Live backers & sponsors
 
@@ -67,15 +74,17 @@ link to Open Collective instead of breaking.
 
 ## Running locally
 
-ES modules need to be served over HTTP (not `file://`):
+Assemble the borrowed artifacts once, then serve over HTTP (ES modules don't
+load from `file://`):
 
 ```bash
-cd site && python3 -m http.server 8000
-# then open http://localhost:8000
+npm run site:build                       # generate tokens.css + copy assets
+cd site && python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
 ## Deployment
 
-Pushes to `main` that touch `site/**` (or the design tokens) trigger
-`.github/workflows/deploy-site.yml`, which publishes `site/` to GitHub Pages.
-Enable it once under **Settings → Pages → Source → GitHub Actions**.
+Pushes to `main` that touch `site/**`, `design/tokens/**`, or `design/assets/**`
+trigger `.github/workflows/deploy-site.yml`, which runs `npm run site:build` and
+publishes `site/` to GitHub Pages. Enable it once under
+**Settings → Pages → Source → GitHub Actions**.

@@ -9,3 +9,10 @@ src-tauri/gen
 # Sponsor avatars are downloaded at build time by scripts/fetch-sponsors.mjs.
 # src/data/sponsors.json IS committed so the app import always resolves.
 public/sponsors/
+
+# Marketing site borrows these from design/ + public/ at build time
+# (site/scripts/build.mjs). Generated, never committed — single source of truth.
+site/css/tokens.css
+site/assets/logos/
+site/assets/og-image.svg
+site/assets/favicon.svg
