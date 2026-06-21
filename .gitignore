@@ -13,3 +13,5 @@ public/sponsors/
 # Marketing site build output (Vite). Tokens + assets are imported from
 # design/ at build time, so nothing is vendored here.
 site/dist
+# og-image.png is rasterized from design/ at build time (site/scripts/og-image.mjs)
+site/public/og-image.png

@@ -63,17 +63,31 @@ Configure it in `config.js → sponsors`:
 If the request fails or there are no backers yet, the section shows a friendly
 link to Open Collective instead of breaking.
 
+## Social share image (og:image)
+
+Scrapers don't render SVG `og:image`s, so `site/scripts/og-image.mjs` rasterizes
+`design/assets/brand/og-image.svg` to a PNG at build time (using the real Space
+Grotesk font from `@fontsource`, so it's faithful and deterministic). Output is
+`site/public/og-image.png` — git-ignored, regenerated on every build, copied to
+the site root by Vite → `https://get.eyeread.in/og-image.png`. Update the design
+SVG and the card follows; the `og:image` meta lives in `index.html`.
+
 ## Commands
 
 ```bash
-npm run site:dev       # dev server with HMR
-npm run site:build     # production build → site/dist
+npm run site:og        # (re)generate the og:image PNG from the design SVG
+npm run site:dev       # dev server with HMR (runs site:og first)
+npm run site:build     # production build → site/dist (runs site:og first)
 npm run site:preview   # preview the production build
 ```
 
 ## Deployment
 
+The site is served at **get.eyeread.in** (GitHub Pages custom domain). The domain
+is pinned by `site/public/CNAME`, which Vite copies to the build root.
+
 Pushes to `main` that touch `site/**`, `design/**`, or the lockfile trigger
 `.github/workflows/deploy-site.yml`, which runs `npm run site:build` and
 publishes `site/dist` to GitHub Pages. Enable it once under
-**Settings → Pages → Source → GitHub Actions**.
+**Settings → Pages → Source → GitHub Actions**, then point a `get` CNAME DNS
+record at the Pages host.
