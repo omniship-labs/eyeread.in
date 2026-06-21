@@ -14,7 +14,7 @@
     "tauri": "tauri",
     "site:og": "node site/scripts/og-image.mjs",
     "site:dev": "npm run site:og && vite --config site/vite.config.js",
-    "site:build": "npm run site:og && vite build --config site/vite.config.js",
+    "site:build": "npm run site:og && vite build --config site/vite.config.js && node site/scripts/prerender.mjs",
     "site:preview": "vite preview --config site/vite.config.js",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -32,9 +32,12 @@
     "@tauri-apps/plugin-opener": "^2.5.0",
     "@tauri-apps/plugin-sql": "^2.3.0",
     "@tauri-apps/plugin-store": "^2.4.0",
+    "i18next": "^26.3.1",
+    "i18next-browser-languagedetector": "^8.2.1",
     "lucide-react": "^1.21.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",

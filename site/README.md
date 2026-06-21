@@ -16,26 +16,58 @@ source of truth, nothing is duplicated into `site/`.
 site/
 ├── index.html              # Vite entry: <head> meta + #root
 ├── vite.config.js          # standalone build (root: site/, outDir: site/dist)
+├── scripts/
+│   ├── og-image.mjs        # rasterize the social card (build time)
+│   └── prerender.mjs       # per-locale static pages + hreflang + sitemap (post-build)
 └── src/
-    ├── main.jsx            # imports design/styles.css (tokens) + mounts React
-    ├── App.jsx             # composes the sections
-    ├── config.js           # ← EDIT CONTENT HERE (copy, links, features, steps…)
+    ├── main.jsx            # imports design/styles.css (tokens) + i18n + mounts React
+    ├── App.jsx             # composes the sections (reads useConfig())
+    ├── config.js           # non-translatable structure + buildConfig()/useConfig()
+    ├── i18n/               # ← EDIT COPY HERE — one bundle per language
+    │   ├── registry.js     # pure locale data (bundles, regions, URLs) — Node-safe
+    │   ├── index.js        # live i18next instance: detection + persistence
+    │   ├── i18n.test.js    # asserts every locale matches en's shape
+    │   ├── en.js           # English (source of truth — mirror its shape)
+    │   └── fr de es ru zh ja hi mr ta te kn ml .js
     ├── assets.js           # brand SVGs imported from design/
+    ├── data/
+    │   └── credits.js      # contributor credits, bucketed by kind of work
     ├── styles/             # base.css, layout.css, components.css (marketing-only)
     ├── hooks/
-    │   └── useSponsors.js  # live Open Collective fetch
+    │   ├── useSponsors.js      # live Open Collective fetch
+    │   └── useDocumentMeta.js  # sync <head> title/description on language switch
     └── components/
         ├── Icon.jsx        # lucide-react + inline brand marks (GitHub/Apple)
+        ├── LanguageSwitcher.jsx
         ├── Nav.jsx  Hero.jsx  Demo.jsx  Features.jsx
         ├── HowItWorks.jsx  OpenSource.jsx  Sponsors.jsx
+        ├── Credits.jsx     # contributor credits (reuses Sponsors' avatars)
         └── Brand.jsx  Footer.jsx
 ```
 
 ## Editing content
 
-All copy, links, features, steps, and the Open Collective settings live in
-**`src/config.js`** — the single source of truth. Components render from it, so
-routine content edits never touch markup or styles.
+The page is **multilingual** (English, French, German, Spanish, Russian,
+Chinese, Japanese, Hindi, Marathi, Tamil, Telugu, Kannada, Malayalam), powered
+by [i18next](https://www.i18next.com/) + react-i18next.
+
+- **Translatable copy** lives per-language in **`src/i18n/*.js`**. `en.js` is the
+  source of truth; every other locale mirrors its exact shape (same keys, same
+  array lengths). To edit copy, edit the relevant locale file(s). To add a string,
+  add it to `en.js` first, then to every other locale.
+- **Non-translatable structure** — brand, links, icons, and the Open Collective
+  settings — lives in **`src/config.js`**. `buildConfig()` weaves the active
+  locale's strings together with this shared structure, and `useConfig()` exposes
+  the result to components (re-rendering on language change).
+
+### Adding a language
+
+1. Add a bundle `src/i18n/<code>.js` (copy `en.js` and translate).
+2. Import it in `src/i18n/index.js` and add `{ code, label, native }` to `locales`.
+
+The visitor's language is auto-detected from the browser on first visit and their
+choice from the in-nav switcher is remembered in `localStorage`
+(`eyeread.locale`); `<html lang>` follows the active language.
 
 ## Design tokens & assets
 
@@ -63,6 +95,55 @@ Configure it in `config.js → sponsors`:
 If the request fails or there are no backers yet, the section shows a friendly
 link to Open Collective instead of breaking.
 
+## Credits / contributors
+
+Contributors are credited in **buckets by kind of work** — `translation`,
+`code`, `design`, `review`, `docs`, `infra`. Edit one file, `data/credits.js`:
+
+```js
+export const credits = [
+  { name: 'Ada', profile: 'https://github.com/ada', roles: ['code', 'review'] },
+  { name: 'Kuvempu', roles: ['translation'], langs: ['kn'] },
+];
+```
+
+`<Credits>` (in `App.jsx`, after Sponsors) groups people by bucket and reuses
+the sponsor avatar visuals. It **self-hides** while the list is empty, so it can
+live in the page permanently and surface only once there are entries. Inject on
+demand:
+
+- `<Credits />` — all non-empty buckets, full section
+- `<Credits only={['translation']} />` — a single bucket, drop it anywhere
+- `<Credits bare />` — just the grouped avatars, no section/heading wrapper
+
+`groupCredits(only)` / `groupContributors(people, only)` expose the same grouping
+for programmatic use. Bucket order, labels, and icons live in `creditBuckets`;
+add a bucket there (with an `Icon` name) and tag people with its id.
+
+## SEO & per-locale pages
+
+Because the page is a client-rendered SPA, crawlers and link scrapers would
+otherwise only ever see the English `<head>`. To fix that,
+`site/scripts/prerender.mjs` runs **after** `vite build` and, for every locale,
+writes a static page:
+
+- default locale → `dist/index.html`; others → `dist/<code>/index.html`
+- localized `<title>`, `description`, and `og:`/`twitter:` tags (the brand name
+  `eyeread.in` stays constant — only the tagline localizes)
+- `<html lang>` set, which the i18next **htmlTag** detector reads, so landing on
+  `/es/` from a search result boots the site in Spanish
+- a `canonical` URL plus full **hreflang** alternates (+ `x-default`) and
+  `og:locale` / `og:locale:alternate`
+
+It also emits `dist/sitemap.xml` (with hreflang alternates) and `dist/robots.txt`.
+At runtime, in-session language switches keep the `<head>` in sync via
+`hooks/useDocumentMeta.js`. The canonical origin lives in `i18n/registry.js`
+(`SITE_URL`).
+
+> The social `og:image` is **not** localized: the card font (Space Grotesk) is
+> Latin-only and can't render Devanagari/Tamil/CJK, so all locales share the
+> brand card. `og:locale` still varies per page.
+
 ## Social share image (og:image)
 
 Scrapers don't render SVG `og:image`s, so `site/scripts/og-image.mjs` rasterizes
@@ -77,7 +158,7 @@ SVG and the card follows; the `og:image` meta lives in `index.html`.
 ```bash
 npm run site:og        # (re)generate the og:image PNG from the design SVG
 npm run site:dev       # dev server with HMR (runs site:og first)
-npm run site:build     # production build → site/dist (runs site:og first)
+npm run site:build     # production build → site/dist (og:image + per-locale prerender)
 npm run site:preview   # preview the production build
 ```
 

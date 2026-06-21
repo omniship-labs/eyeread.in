@@ -588,3 +588,51 @@
   box-shadow: var(--glow-accent-sm);
   border-color: var(--accent-subtle-border);
 }
+
+/* ── LANGUAGE SWITCHER ───────────────────────────────────── */
+/* A globe icon + native <select>, styled to read like a ghost button.
+   The real <select> sits on top (transparent) so the OS dropdown and
+   keyboard behaviour stay native, while we paint the chrome around it. */
+.lang-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-sm);
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.lang-switch:hover,
+.lang-switch:focus-within {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+.lang-switch svg {
+  flex-shrink: 0;
+}
+.lang-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  outline: none;
+}
+/* Options render in the OS menu — force readable colors on dark UIs. */
+.lang-select option {
+  color: #111;
+  background: #fff;
+}
