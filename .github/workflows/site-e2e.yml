@@ -72,4 +72,3 @@ jobs:
             **[⬇️ Download screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (unzip → `home-desktop.png`, `home-tablet.png`, `home-mobile.png`)
 
             <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>
-
