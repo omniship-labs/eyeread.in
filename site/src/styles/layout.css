@@ -270,3 +270,23 @@
     gap: var(--space-4);
   }
 }
+
+/* Phones — collapse the GitHub button to an icon so the download CTA
+   never overflows off-screen. */
+@media (max-width: 560px) {
+  .nav {
+    padding: 0 var(--space-4);
+  }
+  .nav-right {
+    gap: var(--space-2);
+  }
+  /* GitHub button → icon only */
+  .nav-right .btn-ghost .btn-label {
+    display: none;
+  }
+  .nav-right .btn-ghost.btn-sm {
+    padding: 0;
+    width: var(--control-h-sm);
+    justify-content: center;
+  }
+}

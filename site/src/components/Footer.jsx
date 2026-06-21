@@ -1,11 +1,13 @@
 import Brand from './Brand.jsx';
+import LanguageSwitcher from './LanguageSwitcher.jsx';
 
 export default function Footer({ config }) {
-  const { brand, footer } = config;
+  const { brand, footer, switcher } = config;
   return (
     <footer className="footer">
       <Brand brand={brand} size={22} small />
       <div className="footer-right">
+        <LanguageSwitcher label={switcher.label} />
         {footer.links.map((l) => (
           <a
             className={`footer-link${l.mono ? ' mono' : ''}`}

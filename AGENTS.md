@@ -30,7 +30,22 @@ npm run tauri     # Full Tauri app (frontend + native shell)
 npm run build     # Production build
 npm run lint      # ESLint
 npm run test      # Vitest
+npm run format    # Prettier (write); use `npx prettier --check .` to verify
 ```
+
+## Before you push — IMPORTANT
+
+CI (`.github/workflows/ci.yml`) fails the build on lint or formatting errors,
+so always run both gates locally before pushing and fix anything they report:
+
+```bash
+npm run lint
+npx prettier --check .
+```
+
+Prettier checks more than code — YAML workflows, JSON, and Markdown are all
+formatted, so a stray trailing newline in a `.github/workflows/*.yml` file
+will fail CI. Run `npm run format` to auto-fix, then re-run the check.
 
 ## What you should do — IMPORTANT
 
