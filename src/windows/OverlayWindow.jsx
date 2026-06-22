@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n/index.js';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { ScriptViewer } from '../components/ScriptViewer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
@@ -178,7 +179,7 @@ export function OverlayWindow() {
 
   // ---- cross-window events ---------------------------------------------------
   useEffect(() => {
-    let un1, un2, un3;
+    let un1, un2, un3, un4;
     (async () => {
       un1 = await listen('overlay:load', (p) => {
         loadedRef.current = true;
@@ -192,6 +193,10 @@ export function OverlayWindow() {
         setInteractive(true);
         // Refresh an open settings window with the new script's context.
         setTimeout(sendSettingsContext, 0);
+      });
+      // Live language change from the main window's LanguageSwitcher.
+      un4 = await listen('locale:changed', (p) => {
+        if (p?.lng) i18n.changeLanguage(p.lng); // i18next-browser-languagedetector persists to localStorage
       });
       // Global layer changes from the main app or the settings window.
       un2 = await listen('settings:sync', (p) => {
@@ -211,6 +216,7 @@ export function OverlayWindow() {
       un1?.();
       un2?.();
       un3?.();
+      un4?.();
     };
   }, [setPanelSize, sendSettingsContext]);
 

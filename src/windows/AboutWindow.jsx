@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { openExternal, listen } from '../lib/tauri';
+import i18n from '../i18n/index.js';
 import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
@@ -51,6 +52,9 @@ export function AboutWindow() {
       if (p?.settings?.reduceMotion !== undefined) setReduceMotion(!!p.settings.reduceMotion);
     }).then((fn) => {
       unlisten = fn;
+    });
+    listen('locale:changed', (p) => {
+      if (p?.lng) i18n.changeLanguage(p.lng);
     });
     return () => unlisten?.();
   }, []);
