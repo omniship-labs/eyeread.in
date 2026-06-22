@@ -12,7 +12,7 @@ first PR — it takes about 30 seconds.
 ## Setup
 
 ```bash
-# Prerequisites: Rust (stable), Node 22+
+# Prerequisites: Rust (stable), Node 24+
 # https://v2.tauri.app/start/prerequisites/
 
 git clone https://github.com/omniship-labs/eyeread.in
