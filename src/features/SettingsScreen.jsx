@@ -19,6 +19,8 @@ export function SettingsScreen({ settings, onSettings }) {
     hideFromShare,
     reduceMotion,
     highContrast,
+    dyslexicFont,
+    uiScale = 100,
     voice,
     speed,
     size,
@@ -206,6 +208,9 @@ export function SettingsScreen({ settings, onSettings }) {
                 type="number"
                 min={1}
                 max={120}
+                aria-label={
+                  timerMode === 'down' ? t('reading.countDownFrom') : t('reading.warnAfter')
+                }
                 value={countFromMins}
                 onChange={(e) => onSettings({ countFrom: Math.max(1, +e.target.value) * 60 })}
               />
@@ -261,6 +266,35 @@ export function SettingsScreen({ settings, onSettings }) {
             checked={!!highContrast}
             label={t('settings.highContrast')}
             onChange={(v) => onSettings({ highContrast: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.dyslexicFont')}</b>
+            <span>{t('settings.dyslexicFontHint')}</span>
+          </div>
+          <Switch
+            size="sm"
+            checked={!!dyslexicFont}
+            label={t('settings.dyslexicFont')}
+            onChange={(v) => onSettings({ dyslexicFont: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.appTextSize')}</b>
+            <span>{t('settings.appTextSizeHint')}</span>
+          </div>
+          <Segmented
+            size="sm"
+            options={[
+              { value: 90, label: t('settings.scaleSmall') },
+              { value: 100, label: t('settings.scaleDefault') },
+              { value: 115, label: t('settings.scaleLarge') },
+              { value: 130, label: t('settings.scaleLarger') },
+            ]}
+            value={uiScale}
+            onChange={(v) => onSettings({ uiScale: v })}
           />
         </div>
       </div>
@@ -323,9 +357,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>eyeread.in</b>
             <span>{t('settings.aboutHint')}</span>
           </div>
-          <span className="set-link" onClick={showAboutWindow}>
+          <button type="button" className="set-link" onClick={showAboutWindow}>
             {t('settings.open')}
-          </span>
+          </button>
         </div>
       </div>
       {consentModal}

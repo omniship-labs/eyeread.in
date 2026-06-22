@@ -1,0 +1,24 @@
+# Code owners — review is required on these paths before merge.
+#
+# These files control CI, signing, release config, and licensing. A change to
+# any of them could expose secrets or alter what ships, so they must be reviewed
+# by a maintainer regardless of who opens the PR. Pair this with a branch
+# protection rule on `main`/`dev` that requires review from Code Owners.
+#
+# NOTE: update the handle below if the maintainer's GitHub username differs.
+
+# CI / release automation and the actions they call
+/.github/                       @mhalinge
+
+# Signing, updater, and bundle configuration
+/src-tauri/tauri.conf.json          @mhalinge
+/src-tauri/tauri.nightly.conf.json  @mhalinge
+/src-tauri/Cargo.toml               @mhalinge
+/src-tauri/capabilities/            @mhalinge
+
+# Licensing & legal
+/LICENSE        @mhalinge
+/CLA.md         @mhalinge
+/COMMERCIAL_LICENSE.md  @mhalinge
+/TERMS.md       @mhalinge
+/PRIVACY.md     @mhalinge

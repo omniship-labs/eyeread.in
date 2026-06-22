@@ -1,0 +1,369 @@
+# Release strategy
+
+How eyeread.in is built, signed, and distributed — per OS, and where each
+artifact lands. The CI that implements this lives in
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) (stable) and
+[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml) (nightly).
+
+The product's whole value — staying invisible to screen capture — depends on
+OS-level primitives, so platform coverage and store eligibility are shaped more
+by those primitives than by reach. Read the [Platform support](../README.md#platform-support)
+table first; it explains why macOS/Windows are first-class and Linux is
+best-effort.
+
+## Channels
+
+| Channel     | Trigger                         | Bundle ID                | Updater endpoint                        |
+| ----------- | ------------------------------- | ------------------------ | --------------------------------------- |
+| **Stable**  | `v*` tag (or workflow dispatch) | `in.eyeread.app`         | `releases/latest/.../latest.json`       |
+| **Nightly** | Push to `dev` or daily cron     | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
+
+Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
+and matches the running OS/arch to a `platforms` key.
+
+## Build matrix
+
+| OS          | Targets (Rust triple)                               | Bundles            | Updater key(s)                      |
+| ----------- | --------------------------------------------------- | ------------------ | ----------------------------------- |
+| **macOS**   | `aarch64-apple-darwin`, `x86_64-apple-darwin`       | `dmg` + `updater`  | `darwin-aarch64`, `darwin-x86_64`   |
+| **Windows** | `x86_64-pc-windows-msvc`, `aarch64-pc-windows-msvc` | `nsis` + `updater` | `windows-x86_64`, `windows-aarch64` |
+| **Linux**   | `x86_64-unknown-linux-gnu`                          | `appimage`, `deb`  | `linux-x86_64` (AppImage)           |
+
+Separate per-arch downloads (not a macOS Universal binary): smaller files, and
+the updater already keys on arch.
+
+## Per-OS detail
+
+### macOS — fully supported
+
+- **Signing:** Apple Developer ID + notarization + stapling (see the
+  `import-apple-cert` action and the `APPLE_*` secrets). This is mandatory —
+  Gatekeeper blocks unsigned/unnotarized apps.
+- **Invisibility:** capture exclusion uses `NSWindow.sharingType = .none` —
+  this is **public** AppKit API, mapped from Tauri's `contentProtected`, and is
+  _not_ itself an App Store blocker.
+- **Mac App Store: blocked by the transparent overlay, not by invisibility.**
+  The glass overlay window needs `app.macOSPrivateApi: true` (in
+  `tauri.conf.json`) plus the Rust `macos-private-api` feature. Tauri documents
+  that enabling this **"will prevent your application from being accepted into
+  the App Store."** The sandbox MAS also requires would separately strain
+  global-shortcut and always-on-top-across-Spaces behaviour. So the _current_
+  build is MAS-ineligible — direct Developer ID distribution only.
+
+  **Could MAS ever happen?** Only as a separate, sandboxed build variant that
+  earns its way past the private-API flag:
+  1. Make the overlay MAS-eligible — see the spike below. This is the
+     load-bearing blocker, and it is **not** a config tweak.
+  2. Adopt the **App Sandbox** with entitlements and re-verify global shortcuts,
+     always-on-top across Spaces, SQLite in the container, and capture exclusion
+     all still work sandboxed.
+  3. Ship it as a **parallel MAS target** (App Store provisioning, no
+     self-updater — MAS handles updates), kept alongside the Developer ID build.
+
+  Treat MAS as a future discoverability play, not a near-term channel — and
+  never as a replacement for the direct build.
+
+  #### Spike: can we drop `macOSPrivateApi`? — No (without a native overlay)
+
+  The overlay is rendered by a **transparent WKWebView** (`transparent: true`).
+  For an HTML overlay to show the desktop through it, the _webview itself_ must
+  not paint its background. The only known way to do that on macOS is the
+  **private** Key-Value-Coding call `webView.setValue(false, forKey:
+"drawsBackground")` — which is exactly what Tauri's `macos-private-api`
+  feature does under the hood. Findings:
+
+  - **No public API exists** to make a macOS WKWebView background transparent.
+    Apple's feedback request for one (FB7539179 / feedback-assistant #81) has
+    sat open since 2020 with no public API added; CSS `background: transparent`
+    alone does **not** work — the webview still paints opaque unless
+    `drawsBackground` is false.
+  - **Tauri won't solve it for us.** The request to achieve transparency via
+    public APIs / Metal (tauri-apps/tauri #13680) was **closed as not planned**.
+  - `NSWindow` transparency itself _is_ public (`setOpaque:NO`, clear
+    `backgroundColor`); the private dependency is **solely** the webview content
+    layer.
+
+  **Conclusion:** you cannot keep the React/HTML overlay _and_ turn off
+  `macOSPrivateApi`. The only MAS-eligible route is to **re-render the overlay
+  natively** (a transparent `NSWindow` drawing the script with AppKit / Core
+  Text / `NSVisualEffectView` instead of a webview) — a real feature rewrite
+  that forks the overlay into a web build (direct + Windows + Linux) and a
+  native build (MAS only), doubling that surface. Given the direct Developer ID
+  build already reaches 100% of Macs, **the spike's recommendation is to not
+  pursue MAS** until there's concrete demand that only the App Store can serve.
+
+- **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `10.15` (Catalina). This
+  also sets the build's deployment target.
+
+### Windows — fully supported
+
+- **Invisibility:** `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` (Win10
+  2004+), which Tauri's `contentProtected` maps to.
+- **Installer:** NSIS in `currentUser` mode — no admin prompt, right for an
+  overlay utility.
+- **Code signing (Authenticode):** wired for **Azure Trusted Signing** and
+  **gated on secrets** — when they're absent the installer is still
+  Tauri-signed (so the updater works) but SmartScreen shows "Unknown
+  publisher." Set these repository secrets to switch Authenticode on:
+  - `AZURE_TRUSTED_SIGNING_ENDPOINT` — e.g. `https://eus.codesigning.azure.net/`
+  - `AZURE_TRUSTED_SIGNING_ACCOUNT` — Trusted Signing account name
+  - `AZURE_TRUSTED_SIGNING_PROFILE` — certificate profile name
+  - `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` — service
+    principal for the signing identity (Azure credential chain)
+
+  CI installs `trusted-signing-cli` and injects a `bundle.windows.signCommand`
+  override only when `AZURE_TRUSTED_SIGNING_ENDPOINT` is set, so unsigned local
+  and fork builds keep working. Azure Trusted Signing (~$10/mo, cloud-based) is
+  preferred over an EV cert on a hardware token, which can't run unattended in
+  CI.
+
+- **arm64:** cross-compiled from the x64 `windows-latest` runner. WebView2 is
+  arch-independent at runtime.
+- **Minimum OS:** Windows 10 version 2004 (build 19041) — the floor for
+  `WDA_EXCLUDEFROMCAPTURE`. There's no Tauri config to hard-gate the OS version,
+  so the app checks at runtime and the invisibility feature degrades gracefully
+  on older builds. The installer pins a minimum WebView2 runtime
+  (`minimumWebview2Version`).
+
+### Linux — experimental
+
+- **Status:** shipped so the README's "testers wanted" campaign has real
+  downloads, but invisibility is **unreliable** — there is no portable,
+  cross-compositor capture-exclusion protocol. The app makes users acknowledge
+  this before enabling the overlay.
+- **Formats:** **AppImage** (portable, distro-agnostic — the recommended format
+  for testers and the updater's Linux artifact) plus **.deb** for
+  Debian/Ubuntu.
+- **glibc floor / minimum OS:** built on `ubuntu-22.04` (glibc 2.35). The
+  AppImage runs on distros of that vintage or newer — roughly Ubuntu 22.04+,
+  Debian 12+, Fedora 36+. Older distros are out of scope.
+
+## Minimum OS versions
+
+| OS      | Minimum                                   | Enforced by                              |
+| ------- | ----------------------------------------- | ---------------------------------------- |
+| macOS   | 10.15 Catalina                            | `bundle.macOS.minimumSystemVersion`      |
+| Windows | 10 v2004 (build 19041)                    | runtime check (feature) + WebView2 floor |
+| Linux   | Ubuntu 22.04 / Debian 12 / glibc 2.35 era | build host (`ubuntu-22.04`)              |
+
+## Accounts, secrets & cost (the cheap path)
+
+Total recurring cost for full trust on all three OSes: **≈ $99/yr (Apple) +
+≈ $120/yr (Azure Trusted Signing) = ~$219/yr.** Linux is free.
+
+| OS      | Account to create                                                | Cost          | Why it's the cheap option                                                    |
+| ------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------- |
+| macOS   | [Apple Developer Program](https://developer.apple.com/programs/) | **$99/yr**    | Only way to notarize. No cheaper legit path; skipping = Gatekeeper warnings. |
+| Windows | [Azure](https://portal.azure.com) → Trusted Signing              | **~$9.99/mo** | Cheapest real Authenticode (EV certs are $200–600/yr). No hardware token.    |
+| Linux   | None (GitHub) / Flathub via GitHub PR                            | **Free**      | AppImage/deb on GitHub Releases; Flathub is a free PR.                       |
+
+### macOS — one-time setup
+
+1. Join the **Apple Developer Program** ($99/yr).
+2. In the dev portal, create a **Developer ID Application** certificate; export
+   it as a password-protected `.p12`.
+3. Create an **app-specific password** at <https://appleid.apple.com> (for
+   notarization).
+4. Note your 10-char **Team ID** (Membership page).
+
+Secrets to add (repo → Settings → Secrets and variables → Actions):
+
+- `APPLE_CERTIFICATE` — `base64 -i cert.p12` output
+- `APPLE_CERTIFICATE_PASSWORD` — the `.p12` password
+- `APPLE_SIGNING_IDENTITY` — e.g. `Developer ID Application: Your Name (TEAMID)`
+- `APPLE_ID` — your Apple ID email
+- `APPLE_ID_PASSWORD` — the app-specific password
+- `APPLE_TEAM_ID` — the 10-char team ID
+
+### Windows — one-time setup (Azure Trusted Signing)
+
+1. Create a free **Azure account**; add a pay-as-you-go subscription.
+2. Create a **Trusted Signing account** (~$9.99/mo) and a **certificate
+   profile**. _Eligibility:_ a registered org verified ≥ 3 years, **or**
+   individual identity validation — budget a few days for Microsoft's identity
+   check.
+3. In **Entra ID**, register an **app (service principal)** and give it the
+   _Trusted Signing Certificate Profile Signer_ role; create a client secret.
+
+Secrets to add:
+
+- `AZURE_TRUSTED_SIGNING_ENDPOINT` — e.g. `https://eus.codesigning.azure.net/`
+- `AZURE_TRUSTED_SIGNING_ACCOUNT` — Trusted Signing account name
+- `AZURE_TRUSTED_SIGNING_PROFILE` — certificate profile name
+- `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` — the service principal
+
+Until these are set, Windows builds are Tauri-signed only (updater works,
+SmartScreen warns) — nothing breaks.
+
+### Shared — Tauri updater key (free, do this first)
+
+The updater won't verify downloads until a public key is set. Run
+`npm run tauri signer generate` once, then:
+
+- Paste the **public key** into `plugins.updater.pubkey` in `tauri.conf.json`
+  (currently empty — must be filled before the updater is trusted).
+- Add the **private key** + passphrase as secrets:
+  - `TAURI_SIGNING_PRIVATE_KEY`
+  - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
+
+### Free-but-worse fallbacks (if you can't pay yet)
+
+- **macOS unsigned:** ship the `.dmg` without notarization — users must
+  right-click → Open or run `xattr -dr com.apple.quarantine`. Bad first-run UX.
+- **Windows unsigned:** Tauri-signed only; SmartScreen warns and winget won't
+  accept it. The Azure ~$10/mo is the smallest spend that removes both problems.
+
+## Handling secrets
+
+The threat to manage: this is a **public, AGPL** repo that accepts fork PRs, and
+the signing keys can sign software as you. Treat them accordingly.
+
+- **Scope secrets to environments, not the repo.** Put every signing secret in
+  the `release` and `nightly` **environments** (repo → Settings → Environments),
+  _not_ in repo-wide Actions secrets. Environment secrets are only readable by
+  jobs that declare that `environment:` — which the build jobs now do — so PR/CI
+  jobs can never see them. (The Tauri **public** key is not a secret; it lives in
+  `tauri.conf.json`.)
+- **Restrict where secrets can be used.** On the `release` environment add a
+  **deployment tag rule** (`v*`); on `nightly`, a **deployment branch rule**
+  (`dev` only). Now the secrets are unreachable from any fork, branch, or tag
+  outside those rules.
+- **Prefer OIDC over a stored Azure secret (free hardening).** Instead of
+  `AZURE_CLIENT_SECRET`, configure a **federated credential** in Entra ID for
+  this repo's environment and add `permissions: id-token: write` +
+  `azure/login@v2`. `trusted-signing-cli` then authenticates with a short-lived
+  token and there's no long-lived secret to leak or rotate. Recommended once the
+  basic path works.
+- **Rotation & expiry.** Azure client secrets and the federated trust expire —
+  calendar a renewal. Apple certs expire yearly; the app-specific password can
+  be revoked from appleid.apple.com.
+- **Back up the irreplaceable keys offline.** Store the **Tauri updater private
+  key** + passphrase and the Apple `.p12` in a password manager / offline vault.
+  Losing the Tauri key means you can never push an update to already-installed
+  apps — there is no recovery.
+- **Never log them.** Jobs pass secrets via `env:` only; don't `echo` them. The
+  Azure endpoint/account/profile written into `signCommand` args are identifiers,
+  not credentials — fine to appear in logs.
+
+## Contributor onboarding & fork safety
+
+The model: **anyone can contribute code; no contributor can reach a signing
+key.** It mostly already holds — here's how to keep it that way.
+
+- **CI for PRs is secret-free by design.** `ci.yml` runs on `pull_request`
+  (lint/test/build only) and never touches signing. GitHub does not pass
+  secrets to fork-PR runs, and the environment scoping above is the backstop.
+- **Guard the privileged trigger.** `welcome.yml` uses `pull_request_target`
+  (which _does_ run with repo context) but only posts a greeting and never
+  checks out PR code — keep it that way. Never add `pull_request_target` +
+  checkout of the PR head; that's the classic secret-exfiltration hole.
+- **CODEOWNERS gates the dangerous files.** `.github/CODEOWNERS` requires
+  maintainer review for `.github/`, the Tauri/signing config, and licensing —
+  so a PR can't quietly rewrite the release workflow to print secrets. Pair it
+  with a branch rule that **requires review from Code Owners**.
+- **Require approval to run workflows from first-time contributors** (repo →
+  Settings → Actions → "Require approval for all outside collaborators"). Stops
+  a drive-by PR from running CI at all until a maintainer eyeballs it.
+- **CLA is already enforced** (cla-assistant) — keep it; it's your legal basis
+  for the dual AGPL/commercial license.
+- **Branch protection on `main` and `dev`:** require CI to pass + at least one
+  review + Code Owner review; disallow force-push. `dev` feeds nightly and
+  `main` feeds tags, so protecting them protects the signed channels.
+
+## Should you gate releases? Yes — here's the layering
+
+Gate by _consequence_, cheaply:
+
+1. **Stable already ships as a draft** (`draft: true`) — the human "publish"
+   click is your final gate. Keep it; don't auto-publish stable.
+2. **Tag protection.** Restrict who can push `v*` tags (Settings → Tags) so only
+   maintainers can trigger a stable build.
+3. **Environment rules** (above) gate _secret access_ to the right ref —
+   the most important control, and free.
+4. **Optional required reviewers on `release`.** Add yourself as a required
+   reviewer so even a correctly-tagged build pauses for one approval before
+   signing runs. Worth it for a solo maintainer who wants a deliberate "go".
+   Leave `nightly` reviewer-free so automation isn't blocked.
+
+Net: nightly is automatic but ref-locked to `dev`; stable needs a protected tag,
+runs in a gated environment, and still won't go public until you publish the
+draft.
+
+## Where we distribute
+
+### Canonical (own it now)
+
+- **GitHub Releases** — source of truth; feeds the Tauri auto-updater via
+  `latest.json`. Already implemented.
+- **Direct download on `get.eyeread.in`** — should OS/arch-detect and deep-link
+  the matching GitHub asset. Highest-conversion channel.
+
+### Package managers (after Windows signing lands)
+
+- **macOS → Homebrew Cask** — `brew install --cask eyeread`. Easy once
+  notarized; submit to `homebrew/cask`.
+- **Windows → winget** — submit a manifest to `microsoft/winget-pkgs`. Requires
+  the Authenticode-signed installer above.
+- **Linux → Flathub** (best reach) and optionally **AUR** for Arch.
+
+### Deferred / not pursued
+
+- **Microsoft Store (MSIX)** — possible, but the capture-exclusion API may draw
+  review questions; revisit later.
+- **Snap, Chocolatey** — only if the community asks.
+- **Mac App Store** — blocked by the `macOSPrivateApi` transparent-window flag;
+  only viable as a separate sandboxed variant that drops it (see macOS above).
+
+## Beta / QA distribution (the TestFlight question)
+
+**TestFlight does not fit this app.** TestFlight ships builds through App Store
+Connect, which means an App Store / Mac App Store distribution provisioning
+profile, the App Store sandbox, and an upload-time private-API scan (external
+testing also needs Beta App Review). The invisibility core relies on the private
+`NSWindow.sharingType` API (`macOSPrivateApi`), which is exactly what that scan
+rejects — the same blocker as the Mac App Store. So there is **no TestFlight path
+for the desktop app**. (TestFlight is iOS-first anyway; eyeread.in is
+desktop-only. If a mobile companion without the capture-exclusion feature is ever
+built, TestFlight would apply to _that_, not to this binary.)
+
+The good news: for a directly-distributed, notarized app you don't need it — the
+**`nightly` channel already is our TestFlight equivalent**, and avoiding review
+is a feature, not a gap. Map of what TestFlight gives vs. how we cover it:
+
+| TestFlight capability      | Our equivalent (no store)                                              |
+| -------------------------- | ---------------------------------------------------------------------- |
+| Beta build distribution    | `nightly` GitHub pre-release (Developer ID-signed + notarized)         |
+| Auto-update for testers    | Tauri updater on the nightly endpoint (works once `pubkey` is set)     |
+| Tester management / groups | GitHub (watchers), a Discord/mailing list, or a private `beta` channel |
+| Crash reports & feedback   | Add `tauri-plugin-sentry` (or similar) + the compat-report issue form  |
+| Staged rollout             | Promote nightly → optional `beta` (RC) → stable                        |
+| 90-day build expiry        | N/A — direct builds don't expire                                       |
+
+### Optional: a third `beta` (release-candidate) channel
+
+Two channels (nightly, stable) are enough today. If you want a calmer pre-release
+ring than nightly without touching stable, add a `beta` channel that mirrors the
+release workflow but triggers on `v*-beta.*` tags, publishes a **pre-release**
+(not draft), and serves its own `latest.json` under a `beta` tag with bundle id
+`in.eyeread.app.beta`. Opt-in users point the updater at the beta endpoint.
+Worth it only once there's a tester base asking for RCs.
+
+### Crash/feedback telemetry (the real TestFlight value)
+
+The one thing the store gives that we don't yet: structured crash + feedback.
+Cheapest privacy-respecting path is **self-hosted Sentry (GlitchTip) or the
+free Sentry tier** wired via `tauri-plugin-sentry`, opt-in, with the policy
+noted in `PRIVACY.md`. This is the highest-value beta addition — prioritise it
+over a separate beta channel.
+
+## Suggested execution order
+
+1. **Azure Trusted Signing** for Windows — set the secrets; unblocks winget and
+   kills SmartScreen friction. (CI scaffold already merged.)
+2. **Linux + Windows arm64 builds** — done; verify a release produces all
+   artifacts and a valid `latest.json`.
+3. **Homebrew Cask + winget** submissions (both consume signed GitHub assets).
+4. **Flathub** for Linux.
+5. **`get.eyeread.in` download page** with OS/arch auto-detect.
+6. **Opt-in crash/feedback telemetry** (`tauri-plugin-sentry`) — the genuine
+   TestFlight value; do before a dedicated `beta` channel.

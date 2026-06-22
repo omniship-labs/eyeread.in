@@ -14,7 +14,10 @@
     "empty": "Aún no hay guiones. Pega uno para empezar.",
     "pin": "Fijar",
     "unpin": "Desfijar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "searchLabel": "Buscar guiones",
+    "filterScripts": "Filtrar guiones",
+    "cardLabel": "{{title}}, {{words}} palabras, unos {{mins}} min"
   },
   "editor": {
     "textareaPlaceholder": "Pega o escribe tu guion aquí…",
@@ -87,7 +90,15 @@
     "languageHint": "Idioma de la interfaz",
     "about": "Acerca de",
     "aboutHint": "Versión, créditos y aspectos legales",
-    "open": "Abrir ↗"
+    "open": "Abrir ↗",
+    "dyslexicFont": "Lectura para dislexia",
+    "dyslexicFontHint": "Fuente OpenDyslexic con más espaciado en el teleprompter",
+    "appTextSize": "Tamaño del texto de la app",
+    "appTextSizeHint": "Escala toda la interfaz de la app",
+    "scaleSmall": "Pequeño",
+    "scaleDefault": "Predeterminado",
+    "scaleLarge": "Grande",
+    "scaleLarger": "Más grande"
   },
   "overlay": {
     "dragHint": "Arrastra para mover · Esc para ocultar",
@@ -108,7 +119,10 @@
     "resize": "Arrastra para redimensionar",
     "demoEyebrow": "T3 · Reunión general de la empresa",
     "demoTitle": "Entregamos lo invisible. Ahora lo escalamos.",
-    "demoSub": "Tres cifras que definieron el trimestre — y hacia dónde nos lleva la siguiente."
+    "demoSub": "Tres cifras que definieron el trimestre — y hacia dónde nos lleva la siguiente.",
+    "controls": "Controles del teleprompter",
+    "scriptRegion": "Guion: {{title}}",
+    "untitledScript": "Sin título"
   },
   "prompter": {
     "title": "Ajustes del teleprónter",

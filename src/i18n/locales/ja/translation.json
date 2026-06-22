@@ -14,7 +14,10 @@
     "empty": "まだスクリプトがありません。貼り付けて始めましょう。",
     "pin": "ピン留め",
     "unpin": "ピン留め解除",
-    "delete": "削除"
+    "delete": "削除",
+    "searchLabel": "原稿を検索",
+    "filterScripts": "原稿をフィルター",
+    "cardLabel": "{{title}}、{{words}}語、約{{mins}}分"
   },
   "editor": {
     "textareaPlaceholder": "ここにスクリプトを貼り付けるか入力…",
@@ -87,7 +90,15 @@
     "languageHint": "インターフェースの言語",
     "about": "情報",
     "aboutHint": "バージョン、クレジット、法的情報",
-    "open": "開く ↗"
+    "open": "開く ↗",
+    "dyslexicFont": "ディスレクシア対応の表示",
+    "dyslexicFontHint": "プロンプターで OpenDyslexic フォントと広めの字間を使用",
+    "appTextSize": "アプリの文字サイズ",
+    "appTextSizeHint": "アプリ全体の表示を拡大縮小します",
+    "scaleSmall": "小",
+    "scaleDefault": "標準",
+    "scaleLarge": "大",
+    "scaleLarger": "特大"
   },
   "overlay": {
     "dragHint": "ドラッグで移動 · Esc で非表示",
@@ -108,7 +119,10 @@
     "resize": "ドラッグでサイズ変更",
     "demoEyebrow": "第3四半期 · 全社ミーティング",
     "demoTitle": "私たちは見えないものを届けた。今度はそれを拡大する。",
-    "demoSub": "この四半期を定義した3つの数字 — そして次の数字が私たちをどこへ導くか。"
+    "demoSub": "この四半期を定義した3つの数字 — そして次の数字が私たちをどこへ導くか。",
+    "controls": "プロンプター操作",
+    "scriptRegion": "原稿: {{title}}",
+    "untitledScript": "無題"
   },
   "prompter": {
     "title": "プロンプター設定",

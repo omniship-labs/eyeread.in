@@ -14,7 +14,10 @@
     "empty": "Noch keine Skripte. Füge eins ein, um zu starten.",
     "pin": "Anheften",
     "unpin": "Lösen",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "searchLabel": "Skripte durchsuchen",
+    "filterScripts": "Skripte filtern",
+    "cardLabel": "{{title}}, {{words}} Wörter, etwa {{mins}} Min"
   },
   "editor": {
     "textareaPlaceholder": "Füge dein Skript hier ein oder tippe es…",
@@ -87,7 +90,15 @@
     "languageHint": "Oberflächensprache",
     "about": "Über",
     "aboutHint": "Version, Mitwirkende und Rechtliches",
-    "open": "Öffnen ↗"
+    "open": "Öffnen ↗",
+    "dyslexicFont": "Legasthenie-freundliches Lesen",
+    "dyslexicFontHint": "OpenDyslexic-Schrift mit größeren Abständen im Prompter",
+    "appTextSize": "App-Textgröße",
+    "appTextSizeHint": "Skaliert die gesamte App-Oberfläche",
+    "scaleSmall": "Klein",
+    "scaleDefault": "Standard",
+    "scaleLarge": "Groß",
+    "scaleLarger": "Größer"
   },
   "overlay": {
     "dragHint": "Ziehen zum Verschieben · Esc zum Ausblenden",
@@ -108,7 +119,10 @@
     "resize": "Ziehen zum Anpassen der Größe",
     "demoEyebrow": "Q3 · Unternehmens-Townhall",
     "demoTitle": "Wir haben Unsichtbares geliefert. Jetzt skalieren wir es.",
-    "demoSub": "Drei Zahlen, die das Quartal geprägt haben — und wohin uns die nächste führt."
+    "demoSub": "Drei Zahlen, die das Quartal geprägt haben — und wohin uns die nächste führt.",
+    "controls": "Prompter-Steuerung",
+    "scriptRegion": "Skript: {{title}}",
+    "untitledScript": "Unbenannt"
   },
   "prompter": {
     "title": "Teleprompter-Einstellungen",
