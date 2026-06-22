@@ -28,7 +28,7 @@ export function Library({
   // Arrow-key roving between tabs (ARIA tablist keyboard pattern).
   const onTabKeyDown = (e) => {
     const i = TABS.indexOf(tab);
-    let next = i;
+    let next;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % TABS.length;
     else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp')
       next = (i - 1 + TABS.length) % TABS.length;
