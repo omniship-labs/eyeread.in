@@ -30,10 +30,7 @@
     "invisibleBadge": "ಎಲ್ಲಾ ಸ್ಕ್ರೀನ್-ಶೇರ್ ಸಾಫ್ಟ್‌ವೇರ್‌ನಿಂದ ಮರೆಯಾಗಿದೆ",
     "slide": {
       "eyebrow": "Q3 ಆಲ್-ಹ್ಯಾಂಡ್ಸ್ · Acme Corp",
-      "heading": [
-        "ಮುಂದಿನ ಹತ್ತು ವರ್ಷಗಳಿಗೆ",
-        "ನಿರ್ಮಾಣ"
-      ]
+      "heading": ["ಮುಂದಿನ ಹತ್ತು ವರ್ಷಗಳಿಗೆ", "ನಿರ್ಮಾಣ"]
     },
     "overlay": {
       "timer": "01:24",
@@ -145,12 +142,7 @@
     "backersLabel": "ಬೆಂಬಲಿಗರು"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "ದಾಖಲೆಗಳು",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "ದಾಖಲೆಗಳು", "Discord", "AGPL-3.0"],
     "copy": "ಎಂದೆಂದಿಗೂ ಉಚಿತ"
   },
   "switcher": {

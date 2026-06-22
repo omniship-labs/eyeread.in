@@ -14,9 +14,9 @@ function Headline({ parts }) {
 }
 
 const OS_CONFIG = {
-  macos:   { icon: 'apple',   size: 17, labelKey: 'primaryCtaMac' },
+  macos: { icon: 'apple', size: 17, labelKey: 'primaryCtaMac' },
   windows: { icon: 'windows', size: 15, labelKey: 'primaryCtaWindows' },
-  other:   { icon: null,      size: 0,  labelKey: 'primaryCta' },
+  other: { icon: null, size: 0, labelKey: 'primaryCta' },
 };
 
 export default function Hero({ config }) {

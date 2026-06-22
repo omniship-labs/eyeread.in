@@ -30,10 +30,7 @@
     "invisibleBadge": "Masqué de tous les logiciels de partage d’écran",
     "slide": {
       "eyebrow": "Réunion plénière T3 · Acme Corp",
-      "heading": [
-        "Bâtir pour les",
-        "dix prochaines années"
-      ]
+      "heading": ["Bâtir pour les", "dix prochaines années"]
     },
     "overlay": {
       "timer": "01:24",
@@ -145,12 +142,7 @@
     "backersLabel": "Contributeurs"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "Docs",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "Docs", "Discord", "AGPL-3.0"],
     "copy": "Gratuit pour toujours"
   },
   "switcher": {

@@ -30,10 +30,7 @@
     "invisibleBadge": "Oculto de todo software de pantalla compartida",
     "slide": {
       "eyebrow": "Reunión general T3 · Acme Corp",
-      "heading": [
-        "Construyendo para los",
-        "próximos diez años"
-      ]
+      "heading": ["Construyendo para los", "próximos diez años"]
     },
     "overlay": {
       "timer": "01:24",
@@ -145,12 +142,7 @@
     "backersLabel": "Patrocinadores"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "Docs",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "Docs", "Discord", "AGPL-3.0"],
     "copy": "Gratis para siempre"
   },
   "switcher": {
