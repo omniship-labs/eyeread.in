@@ -12,9 +12,9 @@ const UA = {
 
 // Each case: [os, expectedHeroText, expectLinuxBanner]
 const cases = [
-  { os: 'macos',   heroText: 'Download for macOS',   linux: false },
+  { os: 'macos', heroText: 'Download for macOS', linux: false },
   { os: 'windows', heroText: 'Download for Windows', linux: false },
-  { os: 'linux',   heroText: null,                   linux: true  },
+  { os: 'linux', heroText: null, linux: true },
 ];
 
 for (const { os, heroText, linux } of cases) {
