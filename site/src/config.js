@@ -26,7 +26,7 @@ export const shared = {
     github: 'https://github.com/omniship-labs/eyeread.in',
     repo: 'omniship-labs/eyeread.in',
     license: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE',
-    docs: '#',
+    docs: '/docs',
     discord: '#',
     download: '#',
   },
@@ -65,7 +65,7 @@ export const shared = {
   // Footer link destinations, in the same order as each locale's footer.links.
   footerLinks: [
     { href: 'https://github.com/omniship-labs/eyeread.in' },
-    { href: '#' },
+    { href: '/docs' },
     { href: '#' },
     { href: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE', mono: true },
   ],

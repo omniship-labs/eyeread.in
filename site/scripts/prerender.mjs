@@ -26,6 +26,7 @@ import {
   SITE_URL,
   DEFAULT_LOCALE,
 } from '../src/i18n/registry.js';
+import { docsPages, docsPath, docsMeta } from '../src/docs/registry.js';
 
 const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const abs = (path) => `${SITE_URL}${path}`;
@@ -41,6 +42,11 @@ const esc = (s) =>
 const setMeta = (html, attrSel, value) =>
   html.replace(new RegExp(`(<meta\\s+${attrSel}\\s+content=")[^"]*(")`), `$1${esc(value)}$2`);
 
+// The bundle ships with relative ("./assets/…") references for the site root.
+// Pages that live in a subdirectory (/es/…, /docs/…) need them root-absolute
+// so they still resolve.
+const rootAbsolute = (html) => html.replace(/(src|href)="\.\//g, '$1="/');
+
 function renderLocale(template, locale) {
   const { code, og } = locale;
   const { title, description } = resources[code].translation.meta;
@@ -50,7 +56,7 @@ function renderLocale(template, locale) {
 
   // Non-default locales live in a subdirectory (/es/…); make the bundle's
   // relative "./assets/…" references root-absolute so they still resolve.
-  if (code !== DEFAULT_LOCALE) html = html.replace(/(src|href)="\.\//g, '$1="/');
+  if (code !== DEFAULT_LOCALE) html = rootAbsolute(html);
 
   html = html.replace('<html lang="en">', `<html lang="${code}">`);
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
@@ -78,6 +84,25 @@ function renderLocale(template, locale) {
   return html;
 }
 
+// Developer docs are English-only and live under /docs/. Each route gets a
+// static page (root-absolute assets) with its own title/description/canonical,
+// so deep links and crawlers resolve before the client router ever runs.
+function renderDocs(template, page) {
+  const { title, description } = docsMeta(page.key);
+  const url = abs(docsPath(page.slug));
+
+  let html = rootAbsolute(template);
+  html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
+  html = setMeta(html, 'name="description"', description);
+  html = setMeta(html, 'property="og:title"', title);
+  html = setMeta(html, 'property="og:description"', description);
+  html = setMeta(html, 'property="og:url"', url);
+  html = setMeta(html, 'name="twitter:title"', title);
+  html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`);
+
+  return html;
+}
+
 function sitemap() {
   const urls = locales
     .map((l) => {
@@ -90,7 +115,11 @@ function sitemap() {
       return `  <url>\n    <loc>${abs(localePath(l.code))}</loc>\n${alts}\n    <xhtml:link rel="alternate" hreflang="x-default" href="${abs('/')}"/>\n  </url>`;
     })
     .join('\n');
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
+  // Docs are English-only — a plain <loc> per page, no hreflang alternates.
+  const docs = docsPages
+    .map((p) => `  <url>\n    <loc>${abs(docsPath(p.slug))}</loc>\n  </url>`)
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n${docs}\n</urlset>\n`;
 }
 
 const template = await readFile(resolve(DIST, 'index.html'), 'utf8');
@@ -105,10 +134,26 @@ for (const locale of locales) {
   await writeFile(out, html);
 }
 
+// Static page per docs route (dist/docs/index.html, dist/docs/<slug>/index.html).
+for (const page of docsPages) {
+  const html = renderDocs(template, page);
+  const out = page.slug
+    ? resolve(DIST, 'docs', page.slug, 'index.html')
+    : resolve(DIST, 'docs', 'index.html');
+  await mkdir(dirname(out), { recursive: true });
+  await writeFile(out, html);
+}
+
+// SPA fallback: GitHub Pages serves 404.html for any unmatched path. Ship the
+// bundle (root-absolute assets) so a deep link still boots the client router.
+await writeFile(resolve(DIST, '404.html'), rootAbsolute(template));
+
 await writeFile(resolve(DIST, 'sitemap.xml'), sitemap());
 await writeFile(
   resolve(DIST, 'robots.txt'),
   `User-agent: *\nAllow: /\n\nSitemap: ${abs('/sitemap.xml')}\n`
 );
 
-console.log(`[site:prerender] wrote ${locales.length} locale pages + sitemap.xml + robots.txt`);
+console.log(
+  `[site:prerender] wrote ${locales.length} locale pages + ${docsPages.length} docs pages + 404.html + sitemap.xml + robots.txt`
+);

@@ -19,6 +19,15 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { DEFAULT_LOCALE, locales, resources } from './registry.js';
+import { DOCS_NS, docsResources } from '../docs/registry.js';
+
+// Developer docs are English-only for now; they live in their own `docs`
+// namespace so they never affect the marketing `translation` shape. Other
+// locales have no `docs` bundle, so they fall back to English (fallbackLng).
+const withDocs = {
+  ...resources,
+  [DEFAULT_LOCALE]: { ...resources[DEFAULT_LOCALE], [DOCS_NS]: docsResources[DEFAULT_LOCALE] },
+};
 
 // Re-export the registry so existing app imports (`from './i18n/index.js'`)
 // keep working, while build scripts can import './registry.js' directly.
@@ -35,7 +44,9 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources,
+    resources: withDocs,
+    ns: ['translation', DOCS_NS],
+    defaultNS: 'translation',
     fallbackLng: DEFAULT_LOCALE,
     supportedLngs: locales.map((l) => l.code),
     // Match "en-US" → "en" etc. so browser regional tags still resolve.
