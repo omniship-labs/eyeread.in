@@ -103,11 +103,13 @@
       "icons/iconcomposer/actool-out/Assets.car": "Assets.car"
     },
     "macOS": {
-      "infoPlist": "Info.plist"
+      "infoPlist": "Info.plist",
+      "minimumSystemVersion": "10.15"
     },
     "windows": {
       "nsis": {
-        "installMode": "currentUser"
+        "installMode": "currentUser",
+        "minimumWebview2Version": "110.0.1531.0"
       }
     }
   },

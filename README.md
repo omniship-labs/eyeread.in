@@ -28,6 +28,8 @@ capture pipeline before any capture software sees it.
 | **Windows** | ✅ Fully supported | `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` — Windows 10 2004+.                           |
 | **Linux**   | ⚠️ Experimental    | No portable exclusion exists — outcome depends entirely on the compositor.                       |
 
+**Minimum OS versions:** macOS 10.15 Catalina · Windows 10 v2004 (build 19041, required for capture exclusion) · Linux from the Ubuntu 22.04 / Debian 12 / glibc 2.35 era.
+
 **Windows.** `WDA_EXCLUDEFROMCAPTURE` is enforced by the Desktop Window Manager _before_ any
 capture API runs, so the window is excluded from **DXGI Desktop Duplication, Windows.Graphics.Capture,
 and BitBlt** alike — i.e. Zoom, Teams, Google Meet, Discord, and OBS all see nothing, while the
@@ -151,9 +153,18 @@ Builds are published automatically via GitHub Actions on two channels:
 | **Stable**  | `v*` tag on `main`          | `in.eyeread.app`         |
 | **Nightly** | Push to `dev` or daily cron | `in.eyeread.app.nightly` |
 
+Each channel builds for **macOS** (Apple Silicon + Intel), **Windows** (x64 +
+arm64), and **Linux** (x86_64, experimental). Bundles per OS: `.dmg` on macOS,
+NSIS installer on Windows, AppImage + `.deb` on Linux. The in-app updater reads
+`latest.json` and matches your OS/arch.
+
 Both channels install side-by-side. Nightly builds are stamped with the date
 (e.g. `0.1.0-nightly.20260612`) so the in-app updater treats each nightly as a distinct
-release. See `.github/workflows/` for CI configuration and required secrets.
+release.
+
+See **[docs/RELEASE_STRATEGY.md](docs/RELEASE_STRATEGY.md)** for the full
+per-OS strategy (signing, store eligibility, distribution channels), and
+`.github/workflows/` for CI configuration and required secrets.
 
 ---
 

@@ -29,7 +29,6 @@ export const shared = {
     docs: '#',
     discord: '#',
     download: '#',
-    appStore: '#',
   },
 
   // Hero CTA destinations (labels come from the locale).

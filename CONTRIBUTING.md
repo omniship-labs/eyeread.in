@@ -33,11 +33,19 @@ npm run tauri dev
 - Accessibility improvements
 - Tests for logic in `src/lib/` and `src/hooks/`
 
+Linux is officially experimental — see [Platform support](README.md#platform-support).
+**Compatibility reports and compositor testing on Linux are especially welcome.**
+
 ## What we're probably not looking for (ask first)
 
-- Linux ports — see [Platform support](README.md#platform-support) in the README (Windows is already supported; Linux is experimental)
 - New UI screens or major feature additions without prior discussion
 - Changes to the design tokens in `design/` — those come from the design source of truth
+- Changes to CI, signing, or release config (`.github/`, `src-tauri/tauri*.conf.json`) —
+  these are code-owned and gated; open an issue first
+
+> **Release secrets never reach fork PRs.** CI on a pull request runs lint/test/build
+> only — no signing secrets are exposed. Signed builds run from `dev`/tags inside
+> protected environments. See [docs/RELEASE_STRATEGY.md](docs/RELEASE_STRATEGY.md).
 
 Open an issue to discuss anything large before writing code.
 
