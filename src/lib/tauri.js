@@ -93,15 +93,15 @@ export async function positionOverlay(position = 'top') {
   const mx = monitor.position.x / scale;
   const my = monitor.position.y / scale;
   const x = mx + (mw - OVERLAY_W) / 2;
-  // Shift the window 40px above where the panel should visually appear — the
-  // extra padding-top in overlay-root gives the box-shadow room to render.
-  const SHADOW_PAD = 40;
+  // Shift center/bottom positions up so the panel appears at the intended
+  // visual location (the CSS has a small top pad for the drag region).
+  const SHADOW_PAD = 22;
   const y =
     position === 'center'
       ? my + (mh - OVERLAY_H) / 2 - SHADOW_PAD
       : position === 'bottom'
         ? my + mh - OVERLAY_H - 24 - SHADOW_PAD
-        : my + 12 - SHADOW_PAD; // top — just under the webcam
+        : my; // top — padding-top:0 in CSS, so panel starts at the window top; no offset needed
   await win.setPosition(new LogicalPosition(Math.round(x), Math.round(y)));
 }
 
