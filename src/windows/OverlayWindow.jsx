@@ -350,7 +350,13 @@ export function OverlayWindow() {
         : null;
 
   return (
-    <div className={'overlay-root' + (!isTauri ? ' demo' : '') + (effective.position === 'top' ? ' pos-top' : '')}>
+    <div
+      className={
+        'overlay-root' +
+        (!isTauri ? ' demo' : '') +
+        (effective.position === 'top' ? ' pos-top' : '')
+      }
+    >
       {!isTauri && <DemoBackdrop />}
 
       <div

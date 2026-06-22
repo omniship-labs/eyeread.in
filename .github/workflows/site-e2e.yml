@@ -56,6 +56,33 @@ jobs:
             playwright-report/
           retention-days: 14
           if-no-files-found: ignore
+      - name: Upload desktop screenshot
+        id: artifact_desktop
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-desktop
+          path: site/tests/screenshots/home-desktop.png
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Upload tablet screenshot
+        id: artifact_tablet
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-tablet
+          path: site/tests/screenshots/home-tablet.png
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Upload mobile screenshot
+        id: artifact_mobile
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-mobile
+          path: site/tests/screenshots/home-mobile.png
+          retention-days: 14
+          if-no-files-found: ignore
       # Sticky comment (created once, updated on each run) linking to the
       # downloadable screenshots + report. PR-only; fork PRs get a read-only
       # token so this is best-effort there.
@@ -69,6 +96,12 @@ jobs:
 
             Playwright captured full-page screenshots at **desktop / tablet / mobile** viewports.
 
-            **[⬇️ Download screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (unzip → `home-desktop.png`, `home-tablet.png`, `home-mobile.png`)
+            | Viewport | Direct download |
+            |----------|----------------|
+            | Desktop (1280×800) | [⬇️ home-desktop.png](${{ steps.artifact_desktop.outputs.artifact-url }}) |
+            | Tablet (768×1024) | [⬇️ home-tablet.png](${{ steps.artifact_tablet.outputs.artifact-url }}) |
+            | Mobile (390×844) | [⬇️ home-mobile.png](${{ steps.artifact_mobile.outputs.artifact-url }}) |
+
+            **[⬇️ Download all screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (zip)
 
             <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>
