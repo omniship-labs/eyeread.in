@@ -32,10 +32,18 @@ import './styles/app.css';
 import './windows/main/main-window.css';
 import './windows/overlay/overlay.css';
 import './windows/settings/settings-window.css';
-import { App } from './App';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Initialise i18next (language detection + resources) before the app mounts.
+import './i18n/index.js';
+import { App } from './App';
+import { initPlatform } from './lib/tauri';
+
+// Resolve the real OS via Tauri before any component reads the platform flags.
+// In the web demo initPlatform() is a no-op and returns immediately.
+initPlatform().then(() => {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+});

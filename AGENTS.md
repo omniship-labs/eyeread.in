@@ -75,7 +75,7 @@ Some `src/components/` files intentionally differ from their `design/components/
 These components exist under `design/components/` but have no counterpart in `src/components/` yet:
 
 - **display:** `Avatar`, `Badge`, `Card`
-- **forms:** `Button`, `IconButton`, `Input`
+- **forms:** `IconButton`, `Input`
 - **navigation:** `Tabs`
 
 When implementing any of these, use the design file as the visual spec and follow the `er-*` CSS class prefix convention used in the rest of src.

@@ -6,23 +6,24 @@
    build time (scripts/prerender.mjs) as well as from the app.
    index.js layers the live i18next instance on top of this.
    ============================================================ */
-import en from './en.js';
-import fr from './fr.js';
-import de from './de.js';
-import es from './es.js';
-import hi from './hi.js';
-import kn from './kn.js';
-import mr from './mr.js';
-import ml from './ml.js';
-import ta from './ta.js';
-import te from './te.js';
-import zh from './zh.js';
-import ja from './ja.js';
-import ru from './ru.js';
+import en from './locales/en/translation.json' with { type: 'json' };
+import fr from './locales/fr/translation.json' with { type: 'json' };
+import de from './locales/de/translation.json' with { type: 'json' };
+import es from './locales/es/translation.json' with { type: 'json' };
+import hi from './locales/hi/translation.json' with { type: 'json' };
+import kn from './locales/kn/translation.json' with { type: 'json' };
+import mr from './locales/mr/translation.json' with { type: 'json' };
+import ml from './locales/ml/translation.json' with { type: 'json' };
+import ta from './locales/ta/translation.json' with { type: 'json' };
+import te from './locales/te/translation.json' with { type: 'json' };
+import zh from './locales/zh/translation.json' with { type: 'json' };
+import ja from './locales/ja/translation.json' with { type: 'json' };
+import ru from './locales/ru/translation.json' with { type: 'json' };
 
 // NOTE: Bhojpuri and Tulu were dropped pending native-speaker review (their
 // machine translation was low-confidence). To add a language, create its
-// bundle, import it here, add a `locales` entry, and add it to `resources`.
+// locales/<lng>/translation.json, import it here, add a `locales` entry, and
+// add it to `resources`.
 
 export const DEFAULT_LOCALE = 'en';
 

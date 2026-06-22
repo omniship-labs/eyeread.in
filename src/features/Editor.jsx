@@ -1,4 +1,5 @@
 import { Play, Mic, MicOff, Timer as TimerIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Slider } from '../components/Slider';
 import { Switch } from '../components/Switch';
@@ -37,6 +38,7 @@ export function Editor({
   onResetScript,
   onStart,
 }) {
+  const { t } = useTranslation();
   const overrides = script.settingsOverrides ?? {};
   const effective = resolveSettings(settings, overrides);
   const { size, speed, voice, opacity, blur, mirror } = effective;
@@ -77,7 +79,7 @@ export function Editor({
           <div className="ed-stats">
             <span>{wordCount(script.text)}w</span>
             <span>
-              ~{readingMins(script.text, speed)} min at {speed} wpm
+              {t('editor.readStats', { mins: readingMins(script.text, speed), wpm: speed })}
             </span>
           </div>
         </div>
@@ -87,17 +89,17 @@ export function Editor({
             aria-label="Script text"
             value={script.text}
             onChange={(e) => onChange({ text: e.target.value })}
-            placeholder="Paste or type your script here…"
+            placeholder={t('editor.textareaPlaceholder')}
           />
 
           <div className="ed-panel">
             <Button block iconLeft={<Play size={16} />} onClick={onStart}>
-              Start reading
+              {t('editor.startReading')}
             </Button>
 
             <div className="ep-card">
               <div className="ep-label">
-                Reading
+                {t('editor.reading')}
                 <Button
                   variant="link"
                   style={{
@@ -108,21 +110,25 @@ export function Editor({
                   }}
                   onClick={onResetScript}
                 >
-                  Reset all to global
+                  {t('editor.resetAllToGlobal')}
                 </Button>
               </div>
 
               {si(
                 'voice',
-                'Tracking',
+                t('reading.tracking'),
                 null,
                 <>
                   <Segmented
                     size="sm"
                     style={{ width: '100%', marginBottom: 0 }}
                     options={[
-                      { value: 'voice', label: 'Voice', icon: <Mic size={14} /> },
-                      { value: 'scroll', label: 'Scroll', icon: <TimerIcon size={14} /> },
+                      { value: 'voice', label: t('reading.voice'), icon: <Mic size={14} /> },
+                      {
+                        value: 'scroll',
+                        label: t('reading.scroll'),
+                        icon: <TimerIcon size={14} />,
+                      },
                     ]}
                     value={mode}
                     onChange={(m) => {
@@ -136,24 +142,24 @@ export function Editor({
                       <span className={'ep-mode-note' + (voiceAvailable ? '' : ' warn')}>
                         {voiceAvailable ? (
                           <>
-                            <Mic size={12} /> Scroll follows your speech
+                            <Mic size={12} /> {t('reading.scrollFollowsSpeech')}
                           </>
                         ) : (
                           <>
-                            <MicOff size={12} /> Mic unavailable — scroll will pause
+                            <MicOff size={12} /> {t('reading.micUnavailable')}
                           </>
                         )}
                       </span>
                     ) : (
                       si(
                         'speed',
-                        'Scroll speed',
+                        t('reading.scrollSpeed'),
                         `${speed} wpm`,
                         <Slider
                           min={80}
                           max={220}
                           value={speed}
-                          ariaLabel="Scroll speed"
+                          ariaLabel={t('reading.scrollSpeed')}
                           onChange={(v) => set('speed', v)}
                         />
                       )
@@ -164,67 +170,67 @@ export function Editor({
 
               {si(
                 'size',
-                'Text size',
+                t('reading.textSize'),
                 `${size}px`,
                 <Slider
                   min={22}
                   max={52}
                   value={size}
-                  ariaLabel="Text size"
+                  ariaLabel={t('reading.textSize')}
                   onChange={(v) => set('size', v)}
                 />
               )}
 
               {si(
                 'opacity',
-                'Overlay opacity',
+                t('reading.overlayOpacity'),
                 `${opacity}%`,
                 <Slider
                   min={10}
                   max={100}
                   value={opacity}
-                  ariaLabel="Overlay opacity"
+                  ariaLabel={t('reading.overlayOpacity')}
                   onChange={(v) => set('opacity', v)}
                 />
               )}
 
               {si(
                 'blur',
-                'Glass blur',
+                t('reading.glassBlur'),
                 `${blur}px`,
                 <Slider
                   min={0}
                   max={18}
                   value={blur}
-                  ariaLabel="Glass blur"
+                  ariaLabel={t('reading.glassBlur')}
                   onChange={(v) => set('blur', v)}
                 />
               )}
 
               {si(
                 'mirror',
-                'Mirror text',
+                t('reading.mirrorText'),
                 null,
                 <Switch
                   size="sm"
                   checked={!!mirror}
                   onChange={(v) => set('mirror', v)}
-                  label="Mirror text"
+                  label={t('reading.mirrorText')}
                 />
               )}
 
               {si(
                 ['timerMode', 'countFrom'],
-                'Timer',
+                t('reading.timer'),
                 null,
                 <>
                   <Segmented
                     size="sm"
                     style={{ width: '100%' }}
                     options={[
-                      { value: 'off', label: 'Off' },
-                      { value: 'up', label: 'Up' },
-                      { value: 'down', label: 'Down' },
+                      { value: 'off', label: t('reading.off') },
+                      { value: 'up', label: t('reading.up') },
+                      { value: 'down', label: t('reading.down') },
                     ]}
                     value={effective.timerMode}
                     onChange={(v) => set('timerMode', v)}
@@ -232,7 +238,9 @@ export function Editor({
                   {effective.timerMode !== 'off' && (
                     <div className="ep-row" style={{ marginTop: 10, marginBottom: 0 }}>
                       <span>
-                        {effective.timerMode === 'down' ? 'Count down from' : 'Warn after'}
+                        {effective.timerMode === 'down'
+                          ? t('reading.countDownFrom')
+                          : t('reading.warnAfter')}
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                         <input
@@ -252,7 +260,7 @@ export function Editor({
             </div>
 
             <div className="ep-card">
-              <div className="ep-label">Language</div>
+              <div className="ep-label">{t('editor.language')}</div>
               <select
                 className="ep-select"
                 aria-label="Script language"

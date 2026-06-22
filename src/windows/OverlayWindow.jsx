@@ -12,6 +12,7 @@ import {
   MicOff,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { ScriptViewer } from '../components/ScriptViewer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
@@ -39,6 +40,7 @@ import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 
 export function OverlayWindow() {
+  const { t } = useTranslation();
   const [script, setScript] = useState(null);
   const [settings, setSettings] = useState(defaultSettings);
   // `active`  = word currently being said (peak of bell curve)
@@ -364,7 +366,7 @@ export function OverlayWindow() {
             ref={gripRef}
             className="grip"
             data-tauri-drag-region
-            title="Drag to move · Esc to hide"
+            title={t('overlay.dragHint')}
             aria-hidden="true"
           >
             <i />
@@ -387,11 +389,11 @@ export function OverlayWindow() {
           {usingVoice && listening && (
             <span className="ov-voice on">
               <Mic size={12} />
-              Voice
+              {t('reading.voice')}
             </span>
           )}
           {effective.voice && playing && !voiceAvailable && (
-            <span className="ov-voice" title="Voice tracking unavailable — timed scroll">
+            <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
               <MicOff size={12} />
             </span>
           )}
@@ -405,8 +407,8 @@ export function OverlayWindow() {
             />
             <button
               className="ic ic-sm"
-              title="Close prompter (⌘⇧E to reopen)"
-              aria-label="Close prompter"
+              title={t('overlay.close')}
+              aria-label={t('overlay.close')}
               onClick={close}
             >
               <X />
@@ -421,7 +423,9 @@ export function OverlayWindow() {
               ref={windowRef}
               style={{ height: panelSize.h }}
               role="region"
-              aria-label={`Script: ${script?.title || 'Untitled'}`}
+              aria-label={t('overlay.scriptRegion', {
+                title: script?.title || t('overlay.untitledScript'),
+              })}
               dir={['ar', 'he', 'fa', 'ur'].includes(script?.language) ? 'rtl' : 'ltr'}
             >
               <ScriptViewer
@@ -437,26 +441,31 @@ export function OverlayWindow() {
               />
             </div>
           ) : (
-            <div className="ov-empty">No scripts yet. Paste one to start.</div>
+            <div className="ov-empty">{t('library.empty')}</div>
           )}
         </div>
 
-        <div className="ov-foot" role="toolbar" aria-label="Prompter controls">
-          <button className="ic" title="Restart" aria-label="Restart" onClick={restart}>
+        <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
+          <button
+            className="ic"
+            title={t('overlay.restart')}
+            aria-label={t('overlay.restart')}
+            onClick={restart}
+          >
             <RotateCcw />
           </button>
           <button
             className="ic"
-            title="Back 5 words"
-            aria-label="Back 5 words"
+            title={t('overlay.back5')}
+            aria-label={t('overlay.back5')}
             onClick={skipBack}
           >
             <ChevronLeft />
           </button>
           <button
             className="ic accent"
-            title={playing ? 'Pause (Space)' : 'Play (Space)'}
-            aria-label={playing ? 'Pause' : 'Play'}
+            title={playing ? t('overlay.pause') : t('overlay.play')}
+            aria-label={playing ? t('overlay.pause') : t('overlay.play')}
             aria-pressed={playing}
             onClick={() => setPlaying((p) => !p)}
           >
@@ -464,8 +473,8 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic"
-            title="Skip 5 words ahead"
-            aria-label="Skip 5 words ahead"
+            title={t('overlay.skip5')}
+            aria-label={t('overlay.skip5')}
             onClick={skip}
           >
             <ChevronsRight />
@@ -473,8 +482,8 @@ export function OverlayWindow() {
           <span className="sep" />
           <button
             className="ic sizebtn"
-            title="Smaller text"
-            aria-label="Decrease text size"
+            title={t('overlay.smaller')}
+            aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >
@@ -482,8 +491,8 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic sizebtn"
-            title="Larger text"
-            aria-label="Increase text size"
+            title={t('overlay.larger')}
+            aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >
@@ -492,16 +501,20 @@ export function OverlayWindow() {
           <button
             ref={settingsBtnRef}
             className="ic"
-            title="Prompter settings"
-            aria-label="Prompter settings"
+            title={t('overlay.prompterSettings')}
+            aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
             <SettingsIcon />
           </button>
           <button
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
-            title={interactive ? 'Enable click-through (⌥E)' : 'Disable click-through (⌥E)'}
-            aria-label={interactive ? 'Enable click-through' : 'Disable click-through'}
+            title={
+              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+            }
+            aria-label={
+              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+            }
             aria-pressed={!interactive}
             onClick={() => setInteractive((i) => !i)}
           >
@@ -512,7 +525,7 @@ export function OverlayWindow() {
         <div
           className={'ov-resize' + (resizing ? ' dragging' : '')}
           onPointerDown={startResize}
-          title="Drag to resize"
+          title={t('overlay.resize')}
           aria-hidden="true"
         >
           <svg
@@ -532,14 +545,13 @@ export function OverlayWindow() {
 }
 
 function DemoBackdrop() {
+  const { t } = useTranslation();
   return (
     <div className="demo-stage">
       <div className="demo-shared">
-        <div className="demo-eyebrow">Q3 &middot; Company All-Hands</div>
-        <h1 className="demo-title">We shipped invisible. Now we scale it.</h1>
-        <p className="demo-sub">
-          Three numbers that defined the quarter &mdash; and where the next one takes us.
-        </p>
+        <div className="demo-eyebrow">{t('overlay.demoEyebrow')}</div>
+        <h1 className="demo-title">{t('overlay.demoTitle')}</h1>
+        <p className="demo-sub">{t('overlay.demoSub')}</p>
       </div>
     </div>
   );

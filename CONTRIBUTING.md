@@ -12,7 +12,7 @@ first PR — it takes about 30 seconds.
 ## Setup
 
 ```bash
-# Prerequisites: Rust (stable), Node 22+
+# Prerequisites: Rust (stable), Node 24+
 # https://v2.tauri.app/start/prerequisites/
 
 git clone https://github.com/omniship-labs/eyeread.in
@@ -35,7 +35,7 @@ npm run tauri dev
 
 ## What we're probably not looking for (ask first)
 
-- Windows or Linux ports — see [Why macOS only?](README.md#why-macos-only) in the README
+- Linux ports — see [Platform support](README.md#platform-support) in the README (Windows is already supported; Linux is experimental)
 - New UI screens or major feature additions without prior discussion
 - Changes to the design tokens in `design/` — those come from the design source of truth
 

@@ -5,6 +5,9 @@
   "description": "eyeread.in — free teleprompter that floats your script as a glass overlay, invisible to screen-share. Open source under AGPL-3.0.",
   "license": "AGPL-3.0",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "vite",
     "sponsors": "node scripts/fetch-sponsors.mjs",
@@ -32,6 +35,7 @@
     "@iconify/react": "^6.0.2",
     "@tauri-apps/api": "^2.9.0",
     "@tauri-apps/plugin-global-shortcut": "^2.3.0",
+    "@tauri-apps/plugin-os": "^2.0.0",
     "@tauri-apps/plugin-opener": "^2.5.0",
     "@tauri-apps/plugin-sql": "^2.3.0",
     "@tauri-apps/plugin-store": "^2.4.0",

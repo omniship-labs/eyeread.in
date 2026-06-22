@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState, Component } from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { ShieldToggle } from '../components/ShieldToggle';
 import logoMarkDark from '../assets/logos/eyeread-mark-bounded-dark.svg';
 import logoMarkLight from '../assets/logos/eyeread-mark-bounded-light.svg';
@@ -37,7 +39,7 @@ class ErrorBoundary extends Component {
           }}
         >
           <div style={{ color: '#ff5f57', marginBottom: 12, fontWeight: 700 }}>
-            Render error
+            {i18n.t('app.renderError')}
           </div>
           <pre style={{ whiteSpace: 'pre-wrap', color: 'var(--text-secondary)' }}>
             {this.state.error?.stack || String(this.state.error)}
@@ -77,6 +79,7 @@ import { useShareProtection } from '../hooks/useShareProtection';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 
 export function MainWindow() {
+  const { t } = useTranslation();
   const logoMark = useSystemLogo();
   const [pane, setPane] = useState('library'); // library | settings
   const { listWidth, handleMouseDown } = useListResize(300);
@@ -260,8 +263,8 @@ export function MainWindow() {
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
-          title="Settings"
-          aria-label="Settings"
+          title={t('app.settings')}
+          aria-label={t('app.settings')}
           aria-pressed={pane === 'settings'}
         >
           <SettingsIcon size={15} aria-hidden="true" />
@@ -334,7 +337,7 @@ export function MainWindow() {
                 />
               ) : (
                 <div className="editor-empty">
-                  <span>Create or select a script to get started</span>
+                  <span>{t('app.editorEmpty')}</span>
                 </div>
               )}
             </div>

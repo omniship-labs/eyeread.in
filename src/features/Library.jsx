@@ -1,8 +1,14 @@
 import { useRef, useState } from 'react';
 import { Search, Plus, FileText, Type, Clock, Pin, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { wordCount, readingMins } from '../lib/utils';
 
 const TABS = ['all', 'recent', 'pinned'];
+const TAB_LABELS = {
+  all: 'library.tabAll',
+  recent: 'library.tabRecent',
+  pinned: 'library.tabPinned',
+};
 
 export function Library({
   scripts,
@@ -14,6 +20,7 @@ export function Library({
   onDelete,
   width,
 }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('all');
   const [query, setQuery] = useState('');
   const tabRefs = useRef([]);
@@ -49,39 +56,39 @@ export function Library({
       style={width ? { width, minWidth: width, maxWidth: width } : undefined}
     >
       <div className="lib-top">
-        <div className="lib-title">Scripts</div>
+        <div className="lib-title">{t('library.title')}</div>
         <div className="lib-search-row">
           <div className="lib-search">
             <Search size={16} aria-hidden="true" />
             <input
               type="search"
-              aria-label="Search scripts"
-              placeholder="Search scripts…"
+              aria-label={t('library.searchLabel')}
+              placeholder={t('library.searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <button className="lib-btn" onClick={onCreate} aria-label="New script">
+          <button className="lib-btn" onClick={onCreate} aria-label={t('library.newScript')}>
             <Plus size={16} aria-hidden="true" />
-            <span className="lib-btn-label">New script</span>
+            <span className="lib-btn-label">{t('library.newScript')}</span>
           </button>
         </div>
-        <div className="lib-tabs" role="tablist" aria-label="Filter scripts">
-          {TABS.map((t, i) => (
+        <div className="lib-tabs" role="tablist" aria-label={t('library.filterScripts')}>
+          {TABS.map((tabKey, i) => (
             <button
-              key={t}
+              key={tabKey}
               ref={(el) => (tabRefs.current[i] = el)}
               type="button"
               role="tab"
-              id={`lib-tab-${t}`}
-              aria-selected={tab === t}
+              id={`lib-tab-${tabKey}`}
+              aria-selected={tab === tabKey}
               aria-controls="lib-list"
-              tabIndex={tab === t ? 0 : -1}
-              className={'lib-tab' + (tab === t ? ' active' : '')}
-              onClick={() => setTab(t)}
+              tabIndex={tab === tabKey ? 0 : -1}
+              className={'lib-tab' + (tab === tabKey ? ' active' : '')}
+              onClick={() => setTab(tabKey)}
               onKeyDown={onTabKeyDown}
             >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              {t(TAB_LABELS[tabKey])}
             </button>
           ))}
         </div>
@@ -92,19 +99,18 @@ export function Library({
         role="tabpanel"
         aria-labelledby={`lib-tab-${tab}`}
       >
-        {list.length === 0 && (
-          <div className="lib-empty">No scripts yet. Paste one to start.</div>
-        )}
+        {list.length === 0 && <div className="lib-empty">{t('library.empty')}</div>}
         {list.map((s) => (
           <div
             key={s.id}
             role="button"
             tabIndex={0}
             aria-current={selId === s.id ? 'true' : undefined}
-            aria-label={`${s.title}, ${wordCount(s.text)} words, about ${readingMins(
-              s.text,
-              settings.speed
-            )} minutes`}
+            aria-label={t('library.cardLabel', {
+              title: s.title,
+              words: wordCount(s.text),
+              mins: readingMins(s.text, settings.speed),
+            })}
             className={'script-card' + (selId === s.id ? ' selected' : '')}
             onClick={() => onSelect(s.id)}
             onKeyDown={(e) => {
@@ -133,8 +139,8 @@ export function Library({
                 <div className="sc-actions">
                   <button
                     className={'sc-act' + (s.pinned ? ' sc-act-active' : '')}
-                    title={s.pinned ? 'Unpin' : 'Pin'}
-                    aria-label={s.pinned ? `Unpin ${s.title}` : `Pin ${s.title}`}
+                    title={s.pinned ? t('library.unpin') : t('library.pin')}
+                    aria-label={`${s.pinned ? t('library.unpin') : t('library.pin')}: ${s.title}`}
                     aria-pressed={!!s.pinned}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -145,8 +151,8 @@ export function Library({
                   </button>
                   <button
                     className="sc-act"
-                    title="Delete"
-                    aria-label={`Delete ${s.title}`}
+                    title={t('library.delete')}
+                    aria-label={`${t('library.delete')}: ${s.title}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(s.id);
