@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 32px 32px; /* top: enough for box-shadow to render without clipping */
+  padding: 22px 32px 32px;
   position: relative;
   overflow: visible;
 }
@@ -399,6 +399,9 @@
   margin-top: 18px;
   max-width: 600px;
   line-height: 1.5;
+}
+.overlay-root.pos-top {
+  padding-top: 0;
 }
 .overlay-root.demo {
   justify-content: flex-start;
