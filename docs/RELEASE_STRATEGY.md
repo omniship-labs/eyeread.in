@@ -52,9 +52,8 @@ the updater already keys on arch.
 
   **Could MAS ever happen?** Only as a separate, sandboxed build variant that
   earns its way past the private-API flag:
-  1. Re-implement window transparency with **public APIs only** (custom
-     `NSWindow`/`NSVisualEffectView` via a small native plugin) so
-     `macOSPrivateApi` can be turned off. This is the hard, load-bearing part.
+  1. Make the overlay MAS-eligible — see the spike below. This is the
+     load-bearing blocker, and it is **not** a config tweak.
   2. Adopt the **App Sandbox** with entitlements and re-verify global shortcuts,
      always-on-top across Spaces, SQLite in the container, and capture exclusion
      all still work sandboxed.
@@ -63,6 +62,35 @@ the updater already keys on arch.
 
   Treat MAS as a future discoverability play, not a near-term channel — and
   never as a replacement for the direct build.
+
+  #### Spike: can we drop `macOSPrivateApi`? — No (without a native overlay)
+
+  The overlay is rendered by a **transparent WKWebView** (`transparent: true`).
+  For an HTML overlay to show the desktop through it, the *webview itself* must
+  not paint its background. The only known way to do that on macOS is the
+  **private** Key-Value-Coding call `webView.setValue(false, forKey:
+  "drawsBackground")` — which is exactly what Tauri's `macos-private-api`
+  feature does under the hood. Findings:
+
+  - **No public API exists** to make a macOS WKWebView background transparent.
+    Apple's feedback request for one (FB7539179 / feedback-assistant #81) has
+    sat open since 2020 with no public API added; CSS `background: transparent`
+    alone does **not** work — the webview still paints opaque unless
+    `drawsBackground` is false.
+  - **Tauri won't solve it for us.** The request to achieve transparency via
+    public APIs / Metal (tauri-apps/tauri #13680) was **closed as not planned**.
+  - `NSWindow` transparency itself *is* public (`setOpaque:NO`, clear
+    `backgroundColor`); the private dependency is **solely** the webview content
+    layer.
+
+  **Conclusion:** you cannot keep the React/HTML overlay *and* turn off
+  `macOSPrivateApi`. The only MAS-eligible route is to **re-render the overlay
+  natively** (a transparent `NSWindow` drawing the script with AppKit / Core
+  Text / `NSVisualEffectView` instead of a webview) — a real feature rewrite
+  that forks the overlay into a web build (direct + Windows + Linux) and a
+  native build (MAS only), doubling that surface. Given the direct Developer ID
+  build already reaches 100% of Macs, **the spike's recommendation is to not
+  pursue MAS** until there's concrete demand that only the App Store can serve.
 - **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `10.15` (Catalina). This
   also sets the build's deployment target.
 
