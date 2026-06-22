@@ -151,9 +151,18 @@ Builds are published automatically via GitHub Actions on two channels:
 | **Stable**  | `v*` tag on `main`          | `in.eyeread.app`         |
 | **Nightly** | Push to `dev` or daily cron | `in.eyeread.app.nightly` |
 
+Each channel builds for **macOS** (Apple Silicon + Intel), **Windows** (x64 +
+arm64), and **Linux** (x86_64, experimental). Bundles per OS: `.dmg` on macOS,
+NSIS installer on Windows, AppImage + `.deb` on Linux. The in-app updater reads
+`latest.json` and matches your OS/arch.
+
 Both channels install side-by-side. Nightly builds are stamped with the date
 (e.g. `0.1.0-nightly.20260612`) so the in-app updater treats each nightly as a distinct
-release. See `.github/workflows/` for CI configuration and required secrets.
+release.
+
+See **[docs/RELEASE_STRATEGY.md](docs/RELEASE_STRATEGY.md)** for the full
+per-OS strategy (signing, store eligibility, distribution channels), and
+`.github/workflows/` for CI configuration and required secrets.
 
 ---
 

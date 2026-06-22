@@ -51,6 +51,12 @@ jobs:
           - target: x86_64-pc-windows-msvc
             runner: windows-latest
             bundles: nsis,updater
+          - target: aarch64-pc-windows-msvc
+            runner: windows-latest
+            bundles: nsis,updater
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-22.04
+            bundles: appimage,deb,updater
 
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
@@ -70,6 +76,16 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
 
       - run: npm ci
 
@@ -99,6 +115,34 @@ jobs:
           certificate: ${{ secrets.APPLE_CERTIFICATE }}
           certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
+      - name: Configure Windows code signing (Azure Trusted Signing)
+        if: runner.os == 'Windows'
+        shell: bash
+        env:
+          AZURE_ENDPOINT: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
+          AZURE_ACCOUNT: ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT }}
+          AZURE_CERT_PROFILE: ${{ secrets.AZURE_TRUSTED_SIGNING_PROFILE }}
+        run: |
+          # Gated on secrets — see release.yml for details.
+          if [ -z "$AZURE_ENDPOINT" ]; then
+            echo "::notice::Azure Trusted Signing not configured — Windows installer will be Tauri-signed only."
+            exit 0
+          fi
+          cargo install trusted-signing-cli --locked
+          cat > sign.windows.conf.json <<EOF
+          {
+            "bundle": {
+              "windows": {
+                "signCommand": {
+                  "cmd": "trusted-signing-cli",
+                  "args": ["-e", "$AZURE_ENDPOINT", "-a", "$AZURE_ACCOUNT", "-c", "$AZURE_CERT_PROFILE", "%1"]
+                }
+              }
+            }
+          }
+          EOF
+          echo "WINDOWS_SIGN_CONFIG=--config sign.windows.conf.json" >> "$GITHUB_ENV"
+
       - name: Build, sign & notarize (nightly config)
         shell: bash
         env:
@@ -109,11 +153,15 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
           npm run tauri build -- \
             --target ${{ matrix.target }} \
             --bundles ${{ matrix.bundles }} \
-            --config src-tauri/tauri.nightly.conf.json
+            --config src-tauri/tauri.nightly.conf.json \
+            $WINDOWS_SIGN_CONFIG
 
       - uses: actions/upload-artifact@v4
         with:
@@ -125,6 +173,9 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz.sig
             src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe
             src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe.sig
+            src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
+            src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage.sig
+            src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
 
   publish:
     needs: [stamp, build]
@@ -148,6 +199,8 @@ jobs:
           ARM_SIG=$(cat artifacts/nightly-aarch64-apple-darwin/*.app.tar.gz.sig)
           X86_SIG=$(cat artifacts/nightly-x86_64-apple-darwin/*.app.tar.gz.sig)
           WIN_SIG=$(cat artifacts/nightly-x86_64-pc-windows-msvc/*-setup.exe.sig)
+          WINARM_SIG=$(cat artifacts/nightly-aarch64-pc-windows-msvc/*-setup.exe.sig)
+          LINUX_SIG=$(cat artifacts/nightly-x86_64-unknown-linux-gnu/*.AppImage.sig)
 
           cat > latest.json <<EOF
           {
@@ -166,6 +219,14 @@ jobs:
               "windows-x86_64": {
                 "url": "$REPO/eyeread.in_nightly_x64-setup.exe",
                 "signature": "$WIN_SIG"
+              },
+              "windows-aarch64": {
+                "url": "$REPO/eyeread.in_nightly_arm64-setup.exe",
+                "signature": "$WINARM_SIG"
+              },
+              "linux-x86_64": {
+                "url": "$REPO/eyeread.in_nightly_amd64.AppImage",
+                "signature": "$LINUX_SIG"
               }
             }
           }
@@ -179,10 +240,19 @@ jobs:
             cp "${src}.sig" "eyeread.in_nightly_${arch}.app.tar.gz.sig"
             cp $(ls artifacts/nightly-${arch}-apple-darwin/*.dmg) "eyeread.in_nightly_${arch}.dmg"
           done
-          # Windows installer — pin to a stable name (the `nightly` tag is reused).
+          # Windows installers — pin to stable names (the `nightly` tag is reused).
           win_src=$(ls artifacts/nightly-x86_64-pc-windows-msvc/*-setup.exe)
           cp "$win_src" "eyeread.in_nightly_x64-setup.exe"
           cp "${win_src}.sig" "eyeread.in_nightly_x64-setup.exe.sig"
+          winarm_src=$(ls artifacts/nightly-aarch64-pc-windows-msvc/*-setup.exe)
+          cp "$winarm_src" "eyeread.in_nightly_arm64-setup.exe"
+          cp "${winarm_src}.sig" "eyeread.in_nightly_arm64-setup.exe.sig"
+
+          # Linux AppImage + deb — pin to stable names too.
+          lin_src=$(ls artifacts/nightly-x86_64-unknown-linux-gnu/*.AppImage)
+          cp "$lin_src" "eyeread.in_nightly_amd64.AppImage"
+          cp "${lin_src}.sig" "eyeread.in_nightly_amd64.AppImage.sig"
+          cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/*.deb)" "eyeread.in_nightly_amd64.deb"
 
       - name: Publish / update nightly release
         uses: softprops/action-gh-release@v2
@@ -205,4 +275,9 @@ jobs:
             eyeread.in_nightly_x86_64.dmg
             eyeread.in_nightly_x64-setup.exe
             eyeread.in_nightly_x64-setup.exe.sig
+            eyeread.in_nightly_arm64-setup.exe
+            eyeread.in_nightly_arm64-setup.exe.sig
+            eyeread.in_nightly_amd64.AppImage
+            eyeread.in_nightly_amd64.AppImage.sig
+            eyeread.in_nightly_amd64.deb
             latest.json
