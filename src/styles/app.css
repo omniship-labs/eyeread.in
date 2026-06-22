@@ -31,6 +31,60 @@ textarea {
   -webkit-user-select: text;
 }
 
+/* ---- Accessibility: keyboard focus ------------------------- */
+/* A visible focus ring for keyboard users on every interactive element.
+   Scoped to :focus-visible so it never shows for mouse/touch clicks. */
+:where(
+  button,
+  [role='button'],
+  [role='tab'],
+  a[href],
+  input,
+  textarea,
+  select,
+  [tabindex]
+):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Screen-reader-only text — visually hidden but exposed to assistive tech. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Accessibility: reduce motion -------------------------- */
+/* Honour both the OS-level preference and the in-app toggle (which adds the
+   .reduce-motion class to <html>). Animations/transitions collapse to an
+   instant change; smooth scrolling done in JS reads the setting directly. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
 /* ---- Switch (.sw-wrap pattern) ----------------------------- */
 .er-switch {
   position: relative;
@@ -216,6 +270,51 @@ textarea {
 .er-script__w--near-4 {
   color: var(--prompt-active);
   opacity: 0.38;
+}
+
+/* High contrast — lift the dim states well clear of the background and add a
+   solid dark halo so words stay legible over busy shared content. */
+.er-script--contrast .er-script__w--spoken {
+  opacity: 0.4;
+}
+.er-script--contrast .er-script__w--upcoming {
+  opacity: 0.5;
+}
+.er-script--contrast .er-script__w--near-2 {
+  opacity: 0.82;
+}
+.er-script--contrast .er-script__w--near-3 {
+  opacity: 0.74;
+}
+.er-script--contrast .er-script__w--near-4 {
+  opacity: 0.64;
+}
+.er-script--contrast .er-script__w {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 0 6px rgba(0, 0, 0, 0.9);
+}
+.er-script--contrast .er-script__w--active {
+  color: #fff;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 0 14px rgba(140, 110, 255, 0.95),
+    0 0 30px rgba(110, 86, 247, 0.7);
+}
+
+/* Dyslexia-friendly reading — OpenDyslexic with roomier letter/word/line
+   spacing, which research links to easier tracking for dyslexic readers. */
+.er-script--dyslexic {
+  font-family: 'OpenDyslexic', var(--font-prompt);
+  letter-spacing: 0.02em;
+  word-spacing: 0.12em;
+  line-height: 1.7;
+}
+
+/* Reduce motion — drop the per-word colour/opacity easing so the highlight
+   snaps to the active word instead of cross-fading. */
+.er-script--no-motion .er-script__w {
+  transition: none;
 }
 
 /* Click a word to read from there */

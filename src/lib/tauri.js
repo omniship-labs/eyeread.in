@@ -3,8 +3,8 @@
 
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
-// Platform detection. userAgent is reliable here; navigator.platform is
-// deprecated and empty in modern WebKit.
+// Platform detection. Seeded from userAgent (works in the web demo too) then
+// overwritten by initPlatform() via @tauri-apps/plugin-os before React mounts.
 //
 // Screen-share invisibility maps to a real OS capability on:
 //   • macOS   — NSWindowSharingType=none (compositor-level, rock solid)
@@ -15,12 +15,23 @@ export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in
 // (PipeWire + xdg-desktop-portal on Wayland, raw framebuffer on X11) and there
 // is no standard per-window exclusion protocol — so it is best-effort only.
 const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-export const isMacOS = /Mac|iPhone|iPad/.test(ua);
-export const isWindows = /Win/.test(ua);
-export const isLinux = /Linux|X11/.test(ua) && !/Android/.test(ua) && !isWindows;
+export let isMacOS = /Mac|iPhone|iPad/.test(ua);
+export let isWindows = /Win/.test(ua);
+export let isLinux = /Linux|X11/.test(ua) && !/Android/.test(ua) && !isWindows;
 
 // Platforms where the OS enforces capture exclusion reliably.
-export const screenShareProtectionReliable = isMacOS || isWindows;
+export let screenShareProtectionReliable = isMacOS || isWindows;
+
+/** Call once before React mounts to replace userAgent guesses with the real OS. */
+export async function initPlatform() {
+  if (!isTauri) return;
+  const { platform } = await import('@tauri-apps/plugin-os');
+  const p = await platform();
+  isMacOS = p === 'macos';
+  isWindows = p === 'windows';
+  isLinux = p === 'linux';
+  screenShareProtectionReliable = isMacOS || isWindows;
+}
 
 /**
  * Whether the screen-share shield should read as ACTIVE for the given settings.

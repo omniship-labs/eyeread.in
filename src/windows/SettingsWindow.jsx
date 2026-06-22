@@ -8,6 +8,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Timer as TimerIcon, Hourglass, Mic, MicOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Segmented } from '../components/Segmented';
@@ -16,6 +17,7 @@ import { requestMicPermission } from '../lib/mic';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { defaultSettings, fetchSettings } from '../lib/store';
 import { isTauri, listen, emitTo, hideSettingsWindow } from '../lib/tauri';
+import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 
 const sliderFill = (value, min, max) => {
   const pct = ((value - min) / (max - min)) * 100;
@@ -25,9 +27,14 @@ const sliderFill = (value, min, max) => {
 };
 
 export function SettingsWindow() {
+  const { t } = useTranslation();
   const [global, setGlobal] = useState(defaultSettings);
   const [overrides, setOverrides] = useState({});
   const [scriptId, setScriptId] = useState(null);
+
+  // Mirror the global accessibility prefs in this standalone window.
+  useUiScale(global.uiScale);
+  useReducedMotion(global.reduceMotion);
 
   useEffect(() => {
     fetchSettings().then(setGlobal);
@@ -114,20 +121,20 @@ export function SettingsWindow() {
   return (
     <div className="sw-root">
       <div className="sw-titlebar" data-tauri-drag-region>
-        <span className="sw-title">Prompter settings</span>
+        <span className="sw-title">{t('prompter.title')}</span>
       </div>
 
       <div className="sw-body">
         {si(
           'voice',
-          'Tracking',
+          t('reading.tracking'),
           null,
           <>
             <Segmented
               size="md"
               options={[
-                { value: 'voice', label: 'Voice', icon: <Mic size={14} /> },
-                { value: 'scroll', label: 'Scroll', icon: <TimerIcon size={14} /> },
+                { value: 'voice', label: t('reading.voice'), icon: <Mic size={14} /> },
+                { value: 'scroll', label: t('reading.scroll'), icon: <TimerIcon size={14} /> },
               ]}
               value={mode}
               onChange={(m) => {
@@ -141,18 +148,18 @@ export function SettingsWindow() {
                 <span className={'sw-mode-note' + (voiceAvailable ? '' : ' warn')}>
                   {voiceAvailable ? (
                     <>
-                      <Mic size={12} /> Scroll follows your speech
+                      <Mic size={12} /> {t('reading.scrollFollowsSpeech')}
                     </>
                   ) : (
                     <>
-                      <MicOff size={12} /> Mic unavailable — scroll will pause
+                      <MicOff size={12} /> {t('reading.micUnavailable')}
                     </>
                   )}
                 </span>
               ) : (
                 si(
                   'speed',
-                  'Scroll speed',
+                  t('reading.scrollSpeed'),
                   `${val('speed')} wpm`,
                   <input
                     type="range"
@@ -160,7 +167,7 @@ export function SettingsWindow() {
                     min={80}
                     max={220}
                     value={val('speed')}
-                    aria-label="Scroll speed"
+                    aria-label={t('reading.scrollSpeed')}
                     onChange={(e) => set('speed', +e.target.value)}
                     style={sliderFill(val('speed'), 80, 220)}
                   />
@@ -171,7 +178,7 @@ export function SettingsWindow() {
         )}
         {si(
           'size',
-          'Text size',
+          t('reading.textSize'),
           `${val('size')}px`,
           <input
             type="range"
@@ -179,14 +186,14 @@ export function SettingsWindow() {
             min={22}
             max={46}
             value={val('size')}
-            aria-label="Text size"
+            aria-label={t('reading.textSize')}
             onChange={(e) => set('size', +e.target.value)}
             style={sliderFill(val('size'), 22, 46)}
           />
         )}
         {si(
           'opacity',
-          'Overlay opacity',
+          t('reading.overlayOpacity'),
           `${val('opacity')}%`,
           <input
             type="range"
@@ -194,14 +201,14 @@ export function SettingsWindow() {
             min={10}
             max={100}
             value={val('opacity')}
-            aria-label="Overlay opacity"
+            aria-label={t('reading.overlayOpacity')}
             onChange={(e) => set('opacity', +e.target.value)}
             style={sliderFill(val('opacity'), 10, 100)}
           />
         )}
         {si(
           'blur',
-          'Glass blur',
+          t('reading.glassBlur'),
           `${val('blur')}px`,
           <input
             type="range"
@@ -209,40 +216,44 @@ export function SettingsWindow() {
             min={0}
             max={18}
             value={val('blur')}
-            aria-label="Glass blur"
+            aria-label={t('reading.glassBlur')}
             onChange={(e) => set('blur', +e.target.value)}
             style={sliderFill(val('blur'), 0, 18)}
           />
         )}
         {si(
           'mirror',
-          'Mirror text',
+          t('reading.mirrorText'),
           null,
           <Switch
             size="sm"
             checked={!!val('mirror')}
-            label="Mirror text"
+            label={t('reading.mirrorText')}
             onChange={(v) => set('mirror', v)}
           />
         )}
         {si(
           ['timerMode', 'countFrom'],
-          'Timer',
+          t('reading.timer'),
           null,
           <>
             <Segmented
               size="md"
               options={[
-                { value: 'off', label: 'Off' },
-                { value: 'up', label: 'Count up', icon: <TimerIcon size={14} /> },
-                { value: 'down', label: 'Count down', icon: <Hourglass size={14} /> },
+                { value: 'off', label: t('reading.off') },
+                { value: 'up', label: t('reading.countUp'), icon: <TimerIcon size={14} /> },
+                { value: 'down', label: t('reading.countDown'), icon: <Hourglass size={14} /> },
               ]}
               value={val('timerMode')}
               onChange={(v) => set('timerMode', v)}
             />
             {val('timerMode') !== 'off' && (
               <div className="sw-sub-row">
-                <span>{val('timerMode') === 'down' ? 'Count down from' : 'Warn after'}</span>
+                <span>
+                  {val('timerMode') === 'down'
+                    ? t('reading.countDownFrom')
+                    : t('reading.warnAfter')}
+                </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <input
                     className="ep-time-input"
@@ -262,7 +273,7 @@ export function SettingsWindow() {
 
       <div className="sw-foot">
         <Button variant="secondary" block disabled={!hasAny} onClick={resetAll}>
-          Reset all to global
+          {t('prompter.resetAllToGlobal')}
         </Button>
       </div>
     </div>

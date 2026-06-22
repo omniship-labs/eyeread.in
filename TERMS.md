@@ -1,7 +1,7 @@
 # Terms of Use
 
 **eyeread.in** — published by Mrithyunjay Halinge ("MJ"), operating as OmniShip Labs
-_Last updated: June 2026_
+_Last updated: June 20, 2026_
 
 Please read these Terms of Use ("Terms") carefully before downloading or using
 eyeread.in ("the App"). By installing or using the App you agree to these Terms.

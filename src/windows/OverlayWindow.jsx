@@ -12,6 +12,7 @@ import {
   MicOff,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { ScriptViewer } from '../components/ScriptViewer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
@@ -35,9 +36,11 @@ import {
   showSettingsWindow,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
+import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 
 export function OverlayWindow() {
+  const { t } = useTranslation();
   const [script, setScript] = useState(null);
   const [settings, setSettings] = useState(defaultSettings);
   // `active`  = word currently being said (peak of bell curve)
@@ -86,6 +89,10 @@ export function OverlayWindow() {
 
   // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
   const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
+
+  // Reduce-motion is a global accessibility preference (never per-script), so
+  // it tracks the global layer and drives the document-level class.
+  useReducedMotion(settings.reduceMotion);
 
   // Per-script override patch — the overlay's quick controls (A−/A+, ⌘±, ↑/↓)
   // tweak THIS script, not everyone. Persisted via main; mirrored to the open
@@ -240,8 +247,11 @@ export function OverlayWindow() {
     const w = activeWordRef.current;
     if (!win || !w) return;
     const target = w.offsetTop - win.clientHeight / 2 + w.offsetHeight / 2;
-    win.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
-  }, [active, effective.size, script, panelSize]);
+    win.scrollTo({
+      top: Math.max(0, target),
+      behavior: settings.reduceMotion ? 'auto' : 'smooth',
+    });
+  }, [active, effective.size, script, panelSize, settings.reduceMotion]);
 
   // ---- fit native window width to panel (throttled) --------------------------
   const lastFit = useRef(0);
@@ -356,7 +366,8 @@ export function OverlayWindow() {
             ref={gripRef}
             className="grip"
             data-tauri-drag-region
-            title="Drag to move · Esc to hide"
+            title={t('overlay.dragHint')}
+            aria-hidden="true"
           >
             <i />
             <i />
@@ -378,11 +389,11 @@ export function OverlayWindow() {
           {usingVoice && listening && (
             <span className="ov-voice on">
               <Mic size={12} />
-              Voice
+              {t('reading.voice')}
             </span>
           )}
           {effective.voice && playing && !voiceAvailable && (
-            <span className="ov-voice" title="Voice tracking unavailable — timed scroll">
+            <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
               <MicOff size={12} />
             </span>
           )}
@@ -394,7 +405,12 @@ export function OverlayWindow() {
               showLabel
               onChange={setShielded}
             />
-            <button className="ic ic-sm" title="Close prompter (⌘⇧E to reopen)" onClick={close}>
+            <button
+              className="ic ic-sm"
+              title={t('overlay.close')}
+              aria-label={t('overlay.close')}
+              onClick={close}
+            >
               <X />
             </button>
           </span>
@@ -406,6 +422,10 @@ export function OverlayWindow() {
               className="ov-window"
               ref={windowRef}
               style={{ height: panelSize.h }}
+              role="region"
+              aria-label={t('overlay.scriptRegion', {
+                title: script?.title || t('overlay.untitledScript'),
+              })}
               dir={['ar', 'he', 'fa', 'ur'].includes(script?.language) ? 'rtl' : 'ltr'}
             >
               <ScriptViewer
@@ -413,36 +433,57 @@ export function OverlayWindow() {
                 active={active}
                 size={effective.size}
                 mirror={effective.mirror}
+                highContrast={settings.highContrast}
+                dyslexic={settings.dyslexicFont}
+                reduceMotion={settings.reduceMotion}
                 activeWordRef={activeWordRef}
                 onWordClick={onWordClick}
               />
             </div>
           ) : (
-            <div className="ov-empty">No scripts yet. Paste one to start.</div>
+            <div className="ov-empty">{t('library.empty')}</div>
           )}
         </div>
 
-        <div className="ov-foot">
-          <button className="ic" title="Restart" onClick={restart}>
+        <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
+          <button
+            className="ic"
+            title={t('overlay.restart')}
+            aria-label={t('overlay.restart')}
+            onClick={restart}
+          >
             <RotateCcw />
           </button>
-          <button className="ic" title="Back 5 words" onClick={skipBack}>
+          <button
+            className="ic"
+            title={t('overlay.back5')}
+            aria-label={t('overlay.back5')}
+            onClick={skipBack}
+          >
             <ChevronLeft />
           </button>
           <button
             className="ic accent"
-            title={playing ? 'Pause (Space)' : 'Play (Space)'}
+            title={playing ? t('overlay.pause') : t('overlay.play')}
+            aria-label={playing ? t('overlay.pause') : t('overlay.play')}
+            aria-pressed={playing}
             onClick={() => setPlaying((p) => !p)}
           >
             {playing ? <Pause /> : <Play />}
           </button>
-          <button className="ic" title="Skip 5 words ahead" onClick={skip}>
+          <button
+            className="ic"
+            title={t('overlay.skip5')}
+            aria-label={t('overlay.skip5')}
+            onClick={skip}
+          >
             <ChevronsRight />
           </button>
           <span className="sep" />
           <button
             className="ic sizebtn"
-            title="Smaller text"
+            title={t('overlay.smaller')}
+            aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >
@@ -450,7 +491,8 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic sizebtn"
-            title="Larger text"
+            title={t('overlay.larger')}
+            aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >
@@ -459,14 +501,21 @@ export function OverlayWindow() {
           <button
             ref={settingsBtnRef}
             className="ic"
-            title="Prompter settings"
+            title={t('overlay.prompterSettings')}
+            aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
             <SettingsIcon />
           </button>
           <button
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
-            title={interactive ? 'Enable click-through (⌥E)' : 'Disable click-through (⌥E)'}
+            title={
+              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+            }
+            aria-label={
+              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+            }
+            aria-pressed={!interactive}
             onClick={() => setInteractive((i) => !i)}
           >
             {interactive ? '⌥E' : '⌥E·on'}
@@ -476,7 +525,8 @@ export function OverlayWindow() {
         <div
           className={'ov-resize' + (resizing ? ' dragging' : '')}
           onPointerDown={startResize}
-          title="Drag to resize"
+          title={t('overlay.resize')}
+          aria-hidden="true"
         >
           <svg
             viewBox="0 0 12 12"
@@ -495,14 +545,13 @@ export function OverlayWindow() {
 }
 
 function DemoBackdrop() {
+  const { t } = useTranslation();
   return (
     <div className="demo-stage">
       <div className="demo-shared">
-        <div className="demo-eyebrow">Q3 &middot; Company All-Hands</div>
-        <h1 className="demo-title">We shipped invisible. Now we scale it.</h1>
-        <p className="demo-sub">
-          Three numbers that defined the quarter &mdash; and where the next one takes us.
-        </p>
+        <div className="demo-eyebrow">{t('overlay.demoEyebrow')}</div>
+        <h1 className="demo-title">{t('overlay.demoTitle')}</h1>
+        <p className="demo-sub">{t('overlay.demoSub')}</p>
       </div>
     </div>
   );

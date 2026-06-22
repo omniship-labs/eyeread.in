@@ -24,8 +24,10 @@ export const defaultSettings = {
   linuxShareRiskAccepted: false, // Linux only: user acknowledged capture-hiding is best-effort
   voice: true, // voice tracking on/off
   overlaySize: { w: 560, h: 168 }, // user default; per-script overlaySize wins
-  reduceMotion: false, // disable scroll easing animations in overlay
+  reduceMotion: false, // disable scroll easing + UI animations everywhere
   highContrast: false, // boost text contrast in overlay
+  dyslexicFont: false, // OpenDyslexic + roomier spacing for the reading text
+  uiScale: 100, // app UI zoom, % (affects main / settings / about windows)
 };
 
 // Prompter settings a script may override. Anything not listed (position,

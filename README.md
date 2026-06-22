@@ -97,7 +97,7 @@ On Windows and Linux, **⌘ → Ctrl** and **⌥ → Alt** (the shortcuts are re
 
 ## Getting started
 
-**Prerequisites:** Node.js 18+ and, for the native app, Rust — see the
+**Prerequisites:** Node.js 24+ and, for the native app, Rust — see the
 [Tauri v2 setup guide](https://v2.tauri.app/start/prerequisites/).
 
 ```bash
