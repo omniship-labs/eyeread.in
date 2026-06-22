@@ -6,19 +6,19 @@
    build time (scripts/prerender.mjs) as well as from the app.
    index.js layers the live i18next instance on top of this.
    ============================================================ */
-import en from './locales/en/translation.json';
-import fr from './locales/fr/translation.json';
-import de from './locales/de/translation.json';
-import es from './locales/es/translation.json';
-import hi from './locales/hi/translation.json';
-import kn from './locales/kn/translation.json';
-import mr from './locales/mr/translation.json';
-import ml from './locales/ml/translation.json';
-import ta from './locales/ta/translation.json';
-import te from './locales/te/translation.json';
-import zh from './locales/zh/translation.json';
-import ja from './locales/ja/translation.json';
-import ru from './locales/ru/translation.json';
+import en from './locales/en/translation.json' with { type: 'json' };
+import fr from './locales/fr/translation.json' with { type: 'json' };
+import de from './locales/de/translation.json' with { type: 'json' };
+import es from './locales/es/translation.json' with { type: 'json' };
+import hi from './locales/hi/translation.json' with { type: 'json' };
+import kn from './locales/kn/translation.json' with { type: 'json' };
+import mr from './locales/mr/translation.json' with { type: 'json' };
+import ml from './locales/ml/translation.json' with { type: 'json' };
+import ta from './locales/ta/translation.json' with { type: 'json' };
+import te from './locales/te/translation.json' with { type: 'json' };
+import zh from './locales/zh/translation.json' with { type: 'json' };
+import ja from './locales/ja/translation.json' with { type: 'json' };
+import ru from './locales/ru/translation.json' with { type: 'json' };
 
 // NOTE: Bhojpuri and Tulu were dropped pending native-speaker review (their
 // machine translation was low-confidence). To add a language, create its
