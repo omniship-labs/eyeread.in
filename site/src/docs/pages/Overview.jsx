@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from '../../router.jsx';
+import { Link } from 'react-router-dom';
 import { docsPages, docsPath } from '../registry.js';
 import { Icon } from '../../components/Icon.jsx';
 

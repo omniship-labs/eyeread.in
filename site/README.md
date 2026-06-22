@@ -21,8 +21,7 @@ site/
 │   └── prerender.mjs       # per-locale static pages + hreflang + sitemap (post-build)
 └── src/
     ├── main.jsx            # imports design/styles.css (tokens) + i18n + mounts React
-    ├── App.jsx             # routes home ↔ /docs; composes the home sections
-    ├── router.jsx          # minimal path-based client router (no library)
+    ├── App.jsx             # react-router <Routes>: home ↔ /docs
     ├── docs/               # developer docs at /docs (see "Developer docs" below)
     ├── config.js           # non-translatable structure + buildConfig()/useConfig()
     ├── i18n/               # ← EDIT COPY HERE — one bundle per language
@@ -74,9 +73,10 @@ choice from the in-nav switcher is remembered in `localStorage`
 ## Developer docs (`/docs`)
 
 The site doubles as the home for the **developer documentation** at
-`get.eyeread.in/docs`. A tiny path-based router (`src/router.jsx`, no library)
-swaps the marketing home for the docs layout when the URL starts with `/docs`;
-the home page stays multilingual exactly as before.
+`get.eyeread.in/docs`. Routing is **react-router** (`BrowserRouter` in
+`main.jsx`, `<Routes>` in `App.jsx`): `/docs` and `/docs/:slug` render the docs
+layout, everything else renders the marketing home, which stays multilingual
+exactly as before. The sidebar uses `<NavLink>` for its active state.
 
 ```
 src/docs/

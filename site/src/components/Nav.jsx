@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Brand from './Brand.jsx';
 import { Icon } from './Icon.jsx';
-import { Link } from '../router.jsx';
 import { docsPath } from '../docs/registry.js';
 
 export default function Nav({ config }) {

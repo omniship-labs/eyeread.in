@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from '../router.jsx';
+import { NavLink } from 'react-router-dom';
 import { Icon } from '../components/Icon.jsx';
 import { docsPages, docsPath, docsMeta } from './registry.js';
 import Overview from './pages/Overview.jsx';
@@ -42,13 +42,13 @@ export default function DocsLayout({ page }) {
           <ul>
             {docsPages.map((p) => (
               <li key={p.slug || 'index'}>
-                <Link
+                <NavLink
                   to={docsPath(p.slug)}
-                  className={`docs-nav-link${p.key === page.key ? ' is-active' : ''}`}
-                  aria-current={p.key === page.key ? 'page' : undefined}
+                  end={p.slug === ''}
+                  className={({ isActive }) => `docs-nav-link${isActive ? ' is-active' : ''}`}
                 >
                   {t(`${p.key}.nav`)}
-                </Link>
+                </NavLink>
               </li>
             ))}
           </ul>

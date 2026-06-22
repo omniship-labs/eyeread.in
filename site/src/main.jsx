@@ -11,9 +11,9 @@ import './styles/components.css';
 import './styles/docs.css';
 
 // Initialise i18next (language detection + resources) before the app mounts.
+import { BrowserRouter } from 'react-router-dom';
 import './i18n/index.js';
 import App from './App.jsx';
-import { RouterProvider } from './router.jsx';
 import { logoMark } from './assets.js';
 
 // Favicon from the bundled brand mark — no copied favicon file.
@@ -25,8 +25,8 @@ document.head.appendChild(link);
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider>
+    <BrowserRouter>
       <App />
-    </RouterProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

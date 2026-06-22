@@ -34,20 +34,6 @@ export const docsPath = (slug) => (slug ? `${DOCS_BASE}/${slug}/` : `${DOCS_BASE
 // English resources for the `docs` namespace. Add more locales here.
 export const docsResources = { en };
 
-// Resolve a URL path to a docs page (or null if it isn't a docs route).
-// Tolerates an optional leading locale segment and trailing slashes.
-export const matchDocsRoute = (pathname, localeCodes = []) => {
-  const segs = pathname
-    .replace(/^\/+|\/+$/g, '')
-    .split('/')
-    .filter(Boolean);
-  let rest = segs;
-  if (rest[0] && localeCodes.includes(rest[0])) rest = rest.slice(1);
-  if (rest[0] !== 'docs') return null;
-  const slug = rest[1] || '';
-  return docsPages.find((p) => p.slug === slug) || null;
-};
-
 // Head <title>/description for a page key, from the English bundle.
 // The brand name stays constant; only the page label is localized.
 export const docsMeta = (key) => {

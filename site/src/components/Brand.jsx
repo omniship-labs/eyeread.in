@@ -1,5 +1,5 @@
+import { Link } from 'react-router-dom';
 import { logoMark } from '../assets.js';
-import { Link } from '../router.jsx';
 
 export default function Brand({ brand, size = 28, small = false }) {
   // Routes home from anywhere (e.g. the docs pages); on the home page the

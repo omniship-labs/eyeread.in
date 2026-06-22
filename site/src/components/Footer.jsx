@@ -1,6 +1,6 @@
+import { Link } from 'react-router-dom';
 import Brand from './Brand.jsx';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
-import { Link } from '../router.jsx';
 
 export default function Footer({ config }) {
   const { brand, footer, switcher } = config;

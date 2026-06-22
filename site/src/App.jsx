@@ -1,8 +1,8 @@
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useConfig } from './config.js';
 import { useDocumentMeta } from './hooks/useDocumentMeta.js';
-import { useRouter } from './router.jsx';
-import { locales } from './i18n/index.js';
-import { matchDocsRoute } from './docs/registry.js';
+import { docsPages } from './docs/registry.js';
 import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
 import Features from './components/Features.jsx';
@@ -14,7 +14,7 @@ import Credits from './components/Credits.jsx';
 import Footer from './components/Footer.jsx';
 import DocsLayout from './docs/DocsLayout.jsx';
 
-const LOCALE_CODES = locales.map((l) => l.code);
+const DOCS_INDEX = docsPages.find((p) => p.slug === '');
 
 function Home({ config }) {
   useDocumentMeta(config.meta);
@@ -32,15 +32,34 @@ function Home({ config }) {
   );
 }
 
+// /docs/:slug — resolve the slug to a docs page, or bounce to the docs index.
+function DocsRoute() {
+  const { slug = '' } = useParams();
+  const page = docsPages.find((p) => p.slug === slug);
+  return page ? <DocsLayout page={page} /> : <Navigate to="/docs" replace />;
+}
+
+// React Router doesn't restore scroll on navigation — reset to the top on every
+// pathname change (matching a fresh page load).
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   const config = useConfig();
-  const { path } = useRouter();
-  const docsPage = matchDocsRoute(path, LOCALE_CODES);
-
   return (
     <>
+      <ScrollToTop />
       <Nav config={config} />
-      {docsPage ? <DocsLayout page={docsPage} /> : <Home config={config} />}
+      <Routes>
+        <Route path="/docs" element={<DocsLayout page={DOCS_INDEX} />} />
+        <Route path="/docs/:slug" element={<DocsRoute />} />
+        <Route path="*" element={<Home config={config} />} />
+      </Routes>
       <Footer config={config} />
     </>
   );
