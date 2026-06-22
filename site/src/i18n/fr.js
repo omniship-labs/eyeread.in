@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in fait flotter votre script sur n’importe quel écran sous forme de calque en verre. Il suit votre voix — et n’apparaît jamais dans un enregistrement.',
     note: 'Gratuit pour toujours · AGPL-3.0 · Aucun compte requis',
-    primaryCta: 'Télécharger pour macOS',
+    primaryCta: 'Télécharger pour macOS et Windows',
     secondaryCta: 'Voir sur GitHub',
   },
 
@@ -102,14 +102,38 @@ export default {
         body: 'Rien ne quitte votre machine. Vos scripts restent privés.',
       },
       {
-        title: 'macOS uniquement · app native',
-        body: 'Le calque nécessite une superposition de fenêtres au niveau de l’OS. macOS uniquement pour l’instant.',
+        title: 'macOS et Windows · app native',
+        body: 'Invisibilité garantie par l’OS sur macOS et Windows. Linux est expérimental.',
       },
       {
         title: 'Soutenu par les dons',
         body: 'Si eyeread.in vous aide, transmettez — sans pression',
       },
     ],
+  },
+
+  compat: {
+    eyebrow: 'Vérifié par la communauté',
+    heading: 'Quelles versions sont prises en charge — et qui l’a confirmé',
+    subhead:
+      'macOS et Windows offrent une invisibilité garantie par l’OS ; Linux est au mieux-effort et dépend de votre compositeur. Voici ce que les testeurs ont vérifié sur chacun — ajoutez le vôtre.',
+    cols: {
+      version: 'Version de l’OS',
+      environment: 'Environnement',
+      result: 'Partage d’écran',
+      verifiedBy: 'Vérifié par',
+      captureTools: 'Testé avec',
+    },
+    status: {
+      hidden: 'Masqué',
+      partial: 'Partiel',
+      visible: 'Visible',
+      untested: 'Non testé',
+    },
+    guaranteed: 'Garanti par l’OS',
+    bestEffort: 'au mieux-effort',
+    untestedLabel: 'Testeurs recherchés',
+    ctaLabel: 'Vérifier votre config →',
   },
 
   sponsors: {

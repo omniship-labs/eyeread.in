@@ -46,6 +46,13 @@ export const shared = {
   // Guarantee icons, in the same order as each locale's oss.guarantees.
   ossIcons: ['check', 'check', 'info', 'heart'],
 
+  // Compatibility section — the matrix rows live in ./data/compat.js;
+  // only this report link is non-translatable here.
+  compat: {
+    reportHref:
+      'https://github.com/omniship-labs/eyeread.in/issues/new?template=3-compat-report.yml',
+  },
+
   // Backers & sponsors. Data is fetched in the browser at page load from
   // https://opencollective.com/<slug>/members/all.json
   sponsors: {
@@ -97,6 +104,11 @@ export function buildConfig(m) {
       body: m.oss.body,
       repoBadge: shared.ossRepoBadge,
       guarantees: m.oss.guarantees.map((g, i) => ({ ...g, icon: shared.ossIcons[i] })),
+    },
+
+    compat: {
+      ...m.compat,
+      reportHref: shared.compat.reportHref,
     },
 
     sponsors: {

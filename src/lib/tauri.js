@@ -3,10 +3,35 @@
 
 export const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
-// Screen-share invisibility (contentProtected) only works on macOS.
-// userAgent is reliable here; navigator.platform is deprecated and empty in modern WebKit.
-export const isMacOS =
-  typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent);
+// Platform detection. userAgent is reliable here; navigator.platform is
+// deprecated and empty in modern WebKit.
+//
+// Screen-share invisibility maps to a real OS capability on:
+//   • macOS   — NSWindowSharingType=none (compositor-level, rock solid)
+//   • Windows — SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE), Win10 2004+
+//               (DWM-level; excludes the window from DXGI Desktop Duplication,
+//                Windows.Graphics.Capture and BitBlt — i.e. Zoom/Teams/Meet/OBS)
+// On Linux there is no portable equivalent: capture happens in the compositor
+// (PipeWire + xdg-desktop-portal on Wayland, raw framebuffer on X11) and there
+// is no standard per-window exclusion protocol — so it is best-effort only.
+const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+export const isMacOS = /Mac|iPhone|iPad/.test(ua);
+export const isWindows = /Win/.test(ua);
+export const isLinux = /Linux|X11/.test(ua) && !/Android/.test(ua) && !isWindows;
+
+// Platforms where the OS enforces capture exclusion reliably.
+export const screenShareProtectionReliable = isMacOS || isWindows;
+
+/**
+ * Whether the screen-share shield should read as ACTIVE for the given settings.
+ * On macOS/Windows this is just `hideFromShare`. On Linux it additionally
+ * requires the user to have accepted the best-effort risk, so we never present
+ * the overlay as "hidden" on Linux without an explicit acknowledgement.
+ */
+export const shieldActive = (settings) =>
+  isLinux
+    ? !!(settings.hideFromShare && settings.linuxShareRiskAccepted)
+    : !!settings.hideFromShare;
 
 const OVERLAY_W = 660;
 const OVERLAY_H = 420;
@@ -91,6 +116,10 @@ export async function showOverlay(script, settings) {
     await win.setAlwaysOnTop(true).catch(() => {});
     await emitTo('overlay', 'overlay:load', { script, settings });
     await win.show();
+    // Windows quirk (tauri#14189): a content-protected transparent window can
+    // render black in the capture stream after a hide→show cycle. Re-asserting
+    // the display affinity right after show() clears it. No-op elsewhere.
+    if (isWindows && settings.hideFromShare) await setAppProtected(true);
   } else {
     if (!demoTab || demoTab.closed) {
       demoTab = window.open(

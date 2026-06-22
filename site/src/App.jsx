@@ -5,6 +5,7 @@ import Hero from './components/Hero.jsx';
 import Features from './components/Features.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
 import OpenSource from './components/OpenSource.jsx';
+import Compat from './components/Compat.jsx';
 import Sponsors from './components/Sponsors.jsx';
 import Credits from './components/Credits.jsx';
 import Footer from './components/Footer.jsx';
@@ -20,6 +21,7 @@ export default function App() {
         <Features data={config.features} />
         <HowItWorks data={config.how} />
         <OpenSource data={config.oss} links={config.links} />
+        <Compat data={config.compat} />
         <Sponsors data={config.sponsors} />
         {/* Self-hides until credits.js has entries — inject buckets on demand. */}
         <Credits />

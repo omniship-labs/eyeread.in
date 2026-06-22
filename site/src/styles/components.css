@@ -636,3 +636,126 @@
   color: #111;
   background: #fff;
 }
+
+/* ── COMPATIBILITY MATRIX ─────────────────────────────────── */
+.lc-sub {
+  max-width: 60ch;
+  margin: 0 auto 28px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.lc-table-wrap {
+  max-width: 920px;
+  margin: 0 auto 28px;
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-1);
+}
+
+.lc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.lc-table th,
+.lc-table td {
+  text-align: left;
+  padding: 11px 16px;
+}
+
+.lc-table thead th {
+  font-size: 12px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.lc-table tbody + tbody .lc-group th {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.lc-group th {
+  padding-top: 16px;
+  font-size: 13px;
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.lc-guarantee {
+  margin-left: 8px;
+  font-size: 10.5px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.lc-guaranteed {
+  color: var(--success);
+  background: rgba(52, 211, 153, 0.12);
+}
+.lc-bestEffort {
+  color: var(--warning);
+  background: rgba(255, 184, 77, 0.12);
+}
+
+.lc-table tbody tr:not(.lc-group) + tr:not(.lc-group) td {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.lc-ver {
+  color: var(--text-tertiary);
+}
+
+.lc-pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: var(--weight-bold);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.lc-ok {
+  color: var(--success);
+  background: rgba(52, 211, 153, 0.12);
+}
+.lc-warn {
+  color: var(--warning);
+  background: rgba(255, 184, 77, 0.12);
+}
+.lc-bad {
+  color: var(--danger);
+  background: rgba(255, 77, 106, 0.12);
+}
+.lc-muted {
+  color: var(--text-tertiary);
+  background: var(--surface-3);
+}
+
+.lc-verifiers a {
+  color: var(--accent-text);
+}
+.lc-verifiers a:hover {
+  text-decoration: underline;
+}
+.lc-testers-wanted {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+.lc-tools {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.lc-tools-empty {
+  color: var(--text-tertiary);
+}
+
+.compat {
+  text-align: center;
+}

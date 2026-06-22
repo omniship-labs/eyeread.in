@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in muestra tu guion sobre cualquier pantalla como una capa de cristal. Sigue tu voz y nunca aparece en una grabación.',
     note: 'Gratis para siempre · AGPL-3.0 · Sin necesidad de cuenta',
-    primaryCta: 'Descargar para macOS',
+    primaryCta: 'Descargar para macOS y Windows',
     secondaryCta: 'Ver en GitHub',
   },
 
@@ -102,14 +102,38 @@ export default {
         body: 'Nada sale de tu equipo. Tus guiones siguen siendo privados.',
       },
       {
-        title: 'Solo macOS · app nativa',
-        body: 'La capa requiere superposición de ventanas a nivel del SO. Solo macOS por ahora.',
+        title: 'macOS y Windows · app nativa',
+        body: 'Invisibilidad garantizada por el SO en macOS y Windows. Linux es experimental.',
       },
       {
         title: 'Sostenido por donaciones',
         body: 'Si eyeread.in te ayuda, devuélvelo: sin presión',
       },
     ],
+  },
+
+  compat: {
+    eyebrow: 'Verificado por la comunidad',
+    heading: 'Qué versiones son compatibles — y quién lo confirmó',
+    subhead:
+      'macOS y Windows tienen invisibilidad garantizada por el SO; Linux es de mejor esfuerzo y depende de tu compositor. Esto es lo que han verificado los testers en cada uno: añade el tuyo.',
+    cols: {
+      version: 'Versión del SO',
+      environment: 'Entorno',
+      result: 'Pantalla compartida',
+      verifiedBy: 'Verificado por',
+      captureTools: 'Probado con',
+    },
+    status: {
+      hidden: 'Oculto',
+      partial: 'Parcial',
+      visible: 'Visible',
+      untested: 'Sin probar',
+    },
+    guaranteed: 'Garantizado por el SO',
+    bestEffort: 'mejor esfuerzo',
+    untestedLabel: 'Se buscan testers',
+    ctaLabel: 'Verifica tu configuración →',
   },
 
   sponsors: {

@@ -71,7 +71,9 @@ import {
   registerOverlayHotkey,
   registerInteractiveHotkey,
   setAppProtected,
+  shieldActive,
 } from '../lib/tauri';
+import { useShareProtection } from '../hooks/useShareProtection';
 
 export function MainWindow() {
   const logoMark = useSystemLogo();
@@ -95,7 +97,7 @@ export function MainWindow() {
       setSettings(st);
       savedRef.current = new Map(sc.map((s) => [s.id, s]));
       setReady(true);
-      setAppProtected(st.hideFromShare);
+      setAppProtected(shieldActive(st));
     });
   }, []);
 
@@ -126,6 +128,9 @@ export function MainWindow() {
       return next;
     });
   }, []);
+
+  // Screen-share shield toggle (with the Linux risk-acknowledgement gate).
+  const { setShielded, consentModal } = useShareProtection(settings, applySettings);
 
   useEffect(() => {
     let un1, un2, un3, un4;
@@ -230,7 +235,7 @@ export function MainWindow() {
   };
 
   return (
-    <div className={'app-shell' + (settings.hideFromShare ? ' shielded' : ' exposed')}>
+    <div className={'app-shell' + (shieldActive(settings) ? ' shielded' : ' exposed')}>
       {/* Titlebar — only the inner span is the drag region, not the whole bar */}
       <div className="titlebar">
         {!isTauri && (
@@ -246,13 +251,7 @@ export function MainWindow() {
             eyeread<span className="titlebar-wordmark-in">.in</span>
           </span>
         </div>
-        <ShieldToggle
-          shielded={settings.hideFromShare}
-          onChange={(next) => {
-            applySettings({ hideFromShare: next });
-            setAppProtected(next);
-          }}
-        />
+        <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
@@ -329,6 +328,7 @@ export function MainWindow() {
           </>
         )}
       </div>
+      {consentModal}
     </div>
   );
 }

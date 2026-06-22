@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in は、あなたの原稿をガラスのようなオーバーレイとしてどんな画面の上にも浮かべます。あなたの声に追従し、録画には決して映りません。',
     note: 'ずっと無料 · AGPL-3.0 · アカウント不要',
-    primaryCta: 'macOS 版をダウンロード',
+    primaryCta: 'macOS・Windows 版をダウンロード',
     secondaryCta: 'GitHub で見る',
   },
 
@@ -101,14 +101,38 @@ export default {
         body: '何ひとつあなたの端末から外へ出ません。原稿はプライベートのままです。',
       },
       {
-        title: 'macOS のみ · ネイティブアプリ',
-        body: 'オーバーレイには OS レベルのウィンドウ重ね合わせが必要です。今のところ macOS のみ。',
+        title: 'macOS・Windows · ネイティブアプリ',
+        body: 'macOS と Windows では OS レベルで不可視化を保証。Linux は実験的です。',
       },
       {
         title: '寄付で支えられる',
         body: 'eyeread.in が役に立ったら、その恩を次へ——無理は要りません',
       },
     ],
+  },
+
+  compat: {
+    eyebrow: 'コミュニティ検証済み',
+    heading: 'どのバージョンに対応し、誰が確認したか',
+    subhead:
+      'macOS と Windows は OS が不可視化を保証します。Linux はベストエフォートで、コンポジタ次第です。各環境でテスターが検証した結果はこちら。あなたの結果も追加してください。',
+    cols: {
+      version: 'OS バージョン',
+      environment: '環境',
+      result: '画面共有',
+      verifiedBy: '検証者',
+      captureTools: 'テスト済みアプリ',
+    },
+    status: {
+      hidden: '非表示',
+      partial: '一部',
+      visible: '表示',
+      untested: '未検証',
+    },
+    guaranteed: 'OS 保証',
+    bestEffort: 'ベストエフォート',
+    untestedLabel: 'テスター募集',
+    ctaLabel: 'あなたの環境を検証 →',
   },
 
   sponsors: {

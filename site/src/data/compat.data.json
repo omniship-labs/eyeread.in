@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "rows": [
+    {
+      "platform": "macOS",
+      "version": "macOS 15 Sequoia",
+      "env": "Apple Silicon",
+      "result": "hidden",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "macOS",
+      "version": "macOS 14 Sonoma",
+      "env": "Apple Silicon",
+      "result": "hidden",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "macOS",
+      "version": "macOS 13 Ventura",
+      "env": "Intel",
+      "result": "hidden",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Windows",
+      "version": "Windows 11 23H2",
+      "env": "x64",
+      "result": "hidden",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Windows",
+      "version": "Windows 11 22H2",
+      "env": "x64",
+      "result": "hidden",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Windows",
+      "version": "Windows 10 22H2",
+      "env": "x64",
+      "result": "hidden",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Ubuntu 24.04 LTS",
+      "env": "GNOME · Wayland",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Ubuntu 24.04 LTS",
+      "env": "GNOME · X11",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Fedora 40",
+      "env": "GNOME · Wayland",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Fedora 40 KDE",
+      "env": "KDE Plasma 6 · Wayland",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Debian 12",
+      "env": "GNOME · Wayland",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Arch Linux",
+      "env": "KDE Plasma 6 · Wayland",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Arch Linux",
+      "env": "Hyprland · Wayland",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Linux Mint 21",
+      "env": "Cinnamon · X11",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    },
+    {
+      "platform": "Linux",
+      "version": "Pop!_OS 22.04",
+      "env": "GNOME · X11",
+      "result": "untested",
+      "captureTools": [],
+      "date": "",
+      "verifiers": [],
+      "notes": ""
+    }
+  ]
+}

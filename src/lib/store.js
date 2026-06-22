@@ -21,6 +21,7 @@ export const defaultSettings = {
   countFrom: 300, // s, for countdown
   position: 'top', // top | center | bottom
   hideFromShare: true,
+  linuxShareRiskAccepted: false, // Linux only: user acknowledged capture-hiding is best-effort
   voice: true, // voice tracking on/off
   overlaySize: { w: 560, h: 168 }, // user default; per-script overlaySize wins
   reduceMotion: false, // disable scroll easing animations in overlay

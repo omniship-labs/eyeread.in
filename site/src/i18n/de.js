@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in blendet dein Skript als gläsernes Overlay über jeden Bildschirm ein. Es folgt deiner Stimme – und taucht in keiner Aufnahme auf.',
     note: 'Für immer kostenlos · AGPL-3.0 · Kein Konto erforderlich',
-    primaryCta: 'Für macOS herunterladen',
+    primaryCta: 'Für macOS & Windows herunterladen',
     secondaryCta: 'Auf GitHub ansehen',
   },
 
@@ -102,14 +102,38 @@ export default {
         body: 'Nichts verlässt deinen Rechner. Deine Skripte bleiben privat.',
       },
       {
-        title: 'Nur macOS · native App',
-        body: 'Das Overlay erfordert Fenster-Layering auf OS-Ebene. Vorerst nur macOS.',
+        title: 'macOS & Windows · native App',
+        body: 'Vom Betriebssystem erzwungene Unsichtbarkeit auf macOS und Windows. Linux ist experimentell.',
       },
       {
         title: 'Spendenfinanziert',
         body: 'Wenn dir eyeread.in hilft, gib es weiter – ganz ohne Druck',
       },
     ],
+  },
+
+  compat: {
+    eyebrow: 'Von der Community geprüft',
+    heading: 'Welche Versionen unterstützt werden – und wer es bestätigt hat',
+    subhead:
+      'macOS und Windows bieten vom Betriebssystem erzwungene Unsichtbarkeit; Linux ist best-effort und hängt von deinem Compositor ab. Das haben Tester jeweils bestätigt – füge deins hinzu.',
+    cols: {
+      version: 'OS-Version',
+      environment: 'Umgebung',
+      result: 'Bildschirmübertragung',
+      verifiedBy: 'Geprüft von',
+      captureTools: 'Getestet mit',
+    },
+    status: {
+      hidden: 'Verborgen',
+      partial: 'Teilweise',
+      visible: 'Sichtbar',
+      untested: 'Ungetestet',
+    },
+    guaranteed: 'OS-garantiert',
+    bestEffort: 'best-effort',
+    untestedLabel: 'Tester gesucht',
+    ctaLabel: 'Deine Konfiguration prüfen →',
   },
 
   sponsors: {

@@ -81,8 +81,13 @@ jobs:
         include:
           - target: aarch64-apple-darwin
             runner: macos-latest
+            bundles: dmg,updater
           - target: x86_64-apple-darwin
             runner: macos-13
+            bundles: dmg,updater
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            bundles: nsis,updater
 
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
@@ -109,24 +114,31 @@ jobs:
         run: npx tauri icon src-tauri/icons/icon.png
 
       - name: Stamp version
+        shell: bash
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
+          # Cross-platform stamp (runs on macOS and Windows runners) — Node
+          # rewrites both manifests, avoiding the BSD/GNU `sed -i` split.
           node -e "
             const fs = require('fs');
+            const v = process.env.VERSION;
             const p = JSON.parse(fs.readFileSync('package.json'));
-            p.version = process.env.VERSION;
+            p.version = v;
             fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+            const c = fs.readFileSync('src-tauri/Cargo.toml', 'utf8');
+            fs.writeFileSync('src-tauri/Cargo.toml', c.replace(/^version = \".*\"/m, 'version = \"' + v + '\"'));
           "
-          sed -i '' "s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/Cargo.toml
 
       - name: Import Apple signing certificate
+        if: runner.os == 'macOS'
         uses: ./.github/actions/import-apple-cert
         with:
           certificate: ${{ secrets.APPLE_CERTIFICATE }}
           certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Build, sign & notarize
+        shell: bash
         env:
           RELEASE_CHANNEL: stable
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -138,15 +150,18 @@ jobs:
         run: |
           npm run tauri build -- \
             --target ${{ matrix.target }} \
-            --bundles dmg,updater
+            --bundles ${{ matrix.bundles }}
 
       - uses: actions/upload-artifact@v4
         with:
           name: stable-${{ matrix.target }}
+          if-no-files-found: ignore
           path: |
             src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
             src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz
             src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz.sig
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe.sig
 
   publish:
     needs: [prepare, build]
@@ -170,6 +185,12 @@ jobs:
           ARM_SIG=$(cat artifacts/stable-aarch64-apple-darwin/*.app.tar.gz.sig)
           X86_SIG=$(cat artifacts/stable-x86_64-apple-darwin/*.app.tar.gz.sig)
 
+          # Windows NSIS updater artifact — discover the exact installer name
+          # (the arch token in `*_x64-setup.exe` is set by the bundler).
+          WIN_DIR=artifacts/stable-x86_64-pc-windows-msvc
+          WIN_EXE=$(basename "$(ls "$WIN_DIR"/*-setup.exe)")
+          WIN_SIG=$(cat "$WIN_DIR"/*-setup.exe.sig)
+
           cat > latest.json <<EOF
           {
             "version": "$VERSION",
@@ -183,6 +204,10 @@ jobs:
               "darwin-x86_64": {
                 "url": "$REPO/eyeread.in_${VERSION}_x86_64.app.tar.gz",
                 "signature": "$X86_SIG"
+              },
+              "windows-x86_64": {
+                "url": "$REPO/${WIN_EXE}",
+                "signature": "$WIN_SIG"
               }
             }
           }
@@ -200,4 +225,6 @@ jobs:
             artifacts/**/*.dmg
             artifacts/**/*.app.tar.gz
             artifacts/**/*.app.tar.gz.sig
+            artifacts/**/*-setup.exe
+            artifacts/**/*-setup.exe.sig
             latest.json

@@ -19,7 +19,7 @@ export default {
     subhead:
       'eyeread.in 将你的讲稿以玻璃般的浮层悬浮在任意屏幕之上。它跟随你的声音——并且永远不会出现在录制画面里。',
     note: '永久免费 · AGPL-3.0 · 无需账号',
-    primaryCta: '下载 macOS 版',
+    primaryCta: '下载 macOS 和 Windows 版',
     secondaryCta: '在 GitHub 上查看',
   },
 
@@ -100,14 +100,38 @@ export default {
         body: '任何数据都不会离开你的设备。你的讲稿始终私密。',
       },
       {
-        title: '仅限 macOS · 原生应用',
-        body: '浮层需要操作系统级的窗口分层。目前仅支持 macOS。',
+        title: 'macOS 和 Windows · 原生应用',
+        body: '在 macOS 和 Windows 上由操作系统保障隐身。Linux 为实验性。',
       },
       {
         title: '由捐助支持',
         body: '如果 eyeread.in 帮到了你，请把善意传递下去——绝无压力',
       },
     ],
+  },
+
+  compat: {
+    eyebrow: '社区验证',
+    heading: '支持哪些版本——以及由谁确认',
+    subhead:
+      'macOS 和 Windows 拥有操作系统保障的隐身；Linux 为尽力而为，取决于你的合成器。以下是测试者在各平台上验证的结果——欢迎补充。',
+    cols: {
+      version: '系统版本',
+      environment: '环境',
+      result: '屏幕共享',
+      verifiedBy: '验证者',
+      captureTools: '测试软件',
+    },
+    status: {
+      hidden: '已隐藏',
+      partial: '部分',
+      visible: '可见',
+      untested: '未测试',
+    },
+    guaranteed: '系统保障',
+    bestEffort: '尽力而为',
+    untestedLabel: '招募测试者',
+    ctaLabel: '验证你的环境 →',
   },
 
   sponsors: {

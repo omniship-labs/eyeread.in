@@ -34,7 +34,7 @@ export default {
     subhead:
       'eyeread.in floats your script over any screen as a glass overlay. It follows your voice — and never shows up in a recording.',
     note: 'Free forever · AGPL-3.0 · No account required',
-    primaryCta: 'Download for macOS',
+    primaryCta: 'Download for macOS & Windows',
     secondaryCta: 'View on GitHub',
   },
 
@@ -116,14 +116,38 @@ export default {
         body: 'Nothing leaves your machine. Your scripts stay private.',
       },
       {
-        title: 'macOS only · native app',
-        body: 'The overlay requires OS-level window layering. macOS only for now.',
+        title: 'macOS & Windows · native app',
+        body: 'OS-enforced invisibility on macOS and Windows. Linux is experimental.',
       },
       {
         title: 'Donation-supported',
         body: 'If eyeread.in helps you, pay it forward — no pressure',
       },
     ],
+  },
+
+  compat: {
+    eyebrow: 'Verified by the community',
+    heading: 'Which versions are supported — and who confirmed it',
+    subhead:
+      'macOS and Windows get OS-enforced invisibility; Linux is best-effort and depends on your compositor. Here’s what testers have verified on each — add yours.',
+    cols: {
+      version: 'OS version',
+      environment: 'Environment',
+      result: 'Screen-share',
+      verifiedBy: 'Verified by',
+      captureTools: 'Tested with',
+    },
+    status: {
+      hidden: 'Hidden',
+      partial: 'Partial',
+      visible: 'Visible',
+      untested: 'Untested',
+    },
+    guaranteed: 'OS-guaranteed',
+    bestEffort: 'best-effort',
+    untestedLabel: 'Testers wanted',
+    ctaLabel: 'Verify your setup →',
   },
 
   sponsors: {
