@@ -14,7 +14,10 @@
     "empty": "Aucun script pour l’instant. Collez-en un pour commencer.",
     "pin": "Épingler",
     "unpin": "Désépingler",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "searchLabel": "Rechercher des scripts",
+    "filterScripts": "Filtrer les scripts",
+    "cardLabel": "{{title}}, {{words}} mots, environ {{mins}} min"
   },
   "editor": {
     "textareaPlaceholder": "Collez ou tapez votre script ici…",
@@ -87,7 +90,15 @@
     "languageHint": "Langue de l’interface",
     "about": "À propos",
     "aboutHint": "Version, crédits et mentions légales",
-    "open": "Ouvrir ↗"
+    "open": "Ouvrir ↗",
+    "dyslexicFont": "Lecture adaptée à la dyslexie",
+    "dyslexicFontHint": "Police OpenDyslexic avec un espacement plus large dans le prompteur",
+    "appTextSize": "Taille du texte de l'app",
+    "appTextSizeHint": "Met à l'échelle toute l'interface de l'app",
+    "scaleSmall": "Petit",
+    "scaleDefault": "Par défaut",
+    "scaleLarge": "Grand",
+    "scaleLarger": "Plus grand"
   },
   "overlay": {
     "dragHint": "Glisser pour déplacer · Échap pour masquer",
@@ -108,7 +119,10 @@
     "resize": "Glisser pour redimensionner",
     "demoEyebrow": "T3 · Réunion plénière",
     "demoTitle": "Nous avons livré l’invisible. Maintenant, passons à l’échelle.",
-    "demoSub": "Trois chiffres qui ont marqué le trimestre — et là où nous mène le prochain."
+    "demoSub": "Trois chiffres qui ont marqué le trimestre — et là où nous mène le prochain.",
+    "controls": "Commandes du prompteur",
+    "scriptRegion": "Script : {{title}}",
+    "untitledScript": "Sans titre"
   },
   "prompter": {
     "title": "Réglages du prompteur",

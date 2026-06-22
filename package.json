@@ -29,6 +29,7 @@
   "dependencies": {
     "@fontsource/hanken-grotesk": "^5.2.5",
     "@fontsource/jetbrains-mono": "^5.2.5",
+    "@fontsource/opendyslexic": "^5.2.5",
     "@fontsource/space-grotesk": "^5.2.5",
     "@iconify-icons/mdi": "^1.2.48",
     "@iconify/react": "^6.0.2",

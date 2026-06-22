@@ -14,7 +14,10 @@
     "empty": "No scripts yet. Paste one to start.",
     "pin": "Pin",
     "unpin": "Unpin",
-    "delete": "Delete"
+    "delete": "Delete",
+    "searchLabel": "Search scripts",
+    "filterScripts": "Filter scripts",
+    "cardLabel": "{{title}}, {{words}} words, about {{mins}} min"
   },
   "editor": {
     "textareaPlaceholder": "Paste or type your script here…",
@@ -87,7 +90,15 @@
     "languageHint": "Interface language",
     "about": "About",
     "aboutHint": "Version, credits, and legal",
-    "open": "Open ↗"
+    "open": "Open ↗",
+    "dyslexicFont": "Dyslexia-friendly reading",
+    "dyslexicFontHint": "OpenDyslexic font with roomier spacing in the prompter",
+    "appTextSize": "App text size",
+    "appTextSizeHint": "Scales the whole app interface",
+    "scaleSmall": "Small",
+    "scaleDefault": "Default",
+    "scaleLarge": "Large",
+    "scaleLarger": "Larger"
   },
   "overlay": {
     "dragHint": "Drag to move · Esc to hide",
@@ -108,7 +119,10 @@
     "resize": "Drag to resize",
     "demoEyebrow": "Q3 · Company All-Hands",
     "demoTitle": "We shipped invisible. Now we scale it.",
-    "demoSub": "Three numbers that defined the quarter — and where the next one takes us."
+    "demoSub": "Three numbers that defined the quarter — and where the next one takes us.",
+    "controls": "Prompter controls",
+    "scriptRegion": "Script: {{title}}",
+    "untitledScript": "Untitled"
   },
   "prompter": {
     "title": "Prompter settings",

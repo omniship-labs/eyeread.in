@@ -83,6 +83,10 @@
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 12px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline;
 }
 .aw-link:hover {
   color: var(--paper-100);
@@ -178,6 +182,13 @@
   gap: 6px;
   font-size: 13px;
   color: var(--text-secondary);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  padding: 0;
+}
+button.aw-supporter {
+  cursor: pointer;
 }
 .aw-supporter:hover {
   color: var(--text-primary);

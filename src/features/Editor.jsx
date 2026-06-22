@@ -72,6 +72,7 @@ export function Editor({
         <div className="ed-topbar">
           <input
             className="ed-title"
+            aria-label="Script title"
             value={script.title}
             onChange={(e) => onChange({ title: e.target.value })}
           />
@@ -85,6 +86,7 @@ export function Editor({
         <div className="ed-body">
           <textarea
             className="ed-textarea"
+            aria-label="Script text"
             value={script.text}
             onChange={(e) => onChange({ text: e.target.value })}
             placeholder={t('editor.textareaPlaceholder')}
@@ -261,6 +263,7 @@ export function Editor({
               <div className="ep-label">{t('editor.language')}</div>
               <select
                 className="ep-select"
+                aria-label="Script language"
                 value={script.language ?? 'en'}
                 onChange={(e) => onChange({ language: e.target.value })}
               >

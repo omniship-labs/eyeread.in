@@ -76,6 +76,7 @@ import {
   shieldActive,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
+import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 
 export function MainWindow() {
   const { t } = useTranslation();
@@ -91,6 +92,10 @@ export function MainWindow() {
   const savedRef = useRef(new Map());
   settingsRef.current = settings;
   scriptsRef.current = scripts;
+
+  // ---- accessibility: UI scale + reduced motion ---------------------------
+  useUiScale(settings.uiScale);
+  useReducedMotion(settings.reduceMotion);
 
   // ---- initial load -------------------------------------------------------
   useEffect(() => {
@@ -259,8 +264,10 @@ export function MainWindow() {
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
           title={t('app.settings')}
+          aria-label={t('app.settings')}
+          aria-pressed={pane === 'settings'}
         >
-          <SettingsIcon size={15} />
+          <SettingsIcon size={15} aria-hidden="true" />
         </button>
       </div>
 
@@ -284,7 +291,13 @@ export function MainWindow() {
             />
 
             {/* Resize handle */}
-            <div className="pane-divider" onMouseDown={handleMouseDown} />
+            <div
+              className="pane-divider"
+              onMouseDown={handleMouseDown}
+              role="separator"
+              aria-orientation="vertical"
+              aria-hidden="true"
+            />
 
             {/* Right: editor — or empty state */}
             <div className="editor-pane">

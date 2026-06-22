@@ -15,6 +15,9 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/600.css';
 import '@fontsource/jetbrains-mono/700.css';
+// Optional dyslexia-friendly reading face (off by default; toggled in Settings)
+import '@fontsource/opendyslexic/400.css';
+import '@fontsource/opendyslexic/700.css';
 
 // Design-system tokens (single source of truth), minus its CDN fonts.css —
 // src/styles/fonts.css declares the same variables for the local faces.

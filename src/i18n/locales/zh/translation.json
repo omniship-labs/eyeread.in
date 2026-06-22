@@ -14,7 +14,10 @@
     "empty": "还没有脚本。粘贴一个即可开始。",
     "pin": "置顶",
     "unpin": "取消置顶",
-    "delete": "删除"
+    "delete": "删除",
+    "searchLabel": "搜索脚本",
+    "filterScripts": "筛选脚本",
+    "cardLabel": "{{title}}，{{words}} 个词，约 {{mins}} 分钟"
   },
   "editor": {
     "textareaPlaceholder": "在此粘贴或输入你的脚本…",
@@ -87,7 +90,15 @@
     "languageHint": "界面语言",
     "about": "关于",
     "aboutHint": "版本、致谢与法律信息",
-    "open": "打开 ↗"
+    "open": "打开 ↗",
+    "dyslexicFont": "诵读困难友好阅读",
+    "dyslexicFontHint": "在提词器中使用 OpenDyslexic 字体并加大间距",
+    "appTextSize": "应用文字大小",
+    "appTextSizeHint": "缩放整个应用界面",
+    "scaleSmall": "小",
+    "scaleDefault": "默认",
+    "scaleLarge": "大",
+    "scaleLarger": "更大"
   },
   "overlay": {
     "dragHint": "拖动以移动 · Esc 隐藏",
@@ -108,7 +119,10 @@
     "resize": "拖动以调整大小",
     "demoEyebrow": "第三季度 · 公司全员大会",
     "demoTitle": "我们交付了隐形。现在让它规模化。",
-    "demoSub": "定义了本季度的三个数字 — 以及下一个数字将带我们去往何方。"
+    "demoSub": "定义了本季度的三个数字 — 以及下一个数字将带我们去往何方。",
+    "controls": "提词器控制",
+    "scriptRegion": "脚本：{{title}}",
+    "untitledScript": "无标题"
   },
   "prompter": {
     "title": "提词器设置",

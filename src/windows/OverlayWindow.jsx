@@ -36,6 +36,7 @@ import {
   showSettingsWindow,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
+import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 
 export function OverlayWindow() {
@@ -88,6 +89,10 @@ export function OverlayWindow() {
 
   // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
   const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
+
+  // Reduce-motion is a global accessibility preference (never per-script), so
+  // it tracks the global layer and drives the document-level class.
+  useReducedMotion(settings.reduceMotion);
 
   // Per-script override patch — the overlay's quick controls (A−/A+, ⌘±, ↑/↓)
   // tweak THIS script, not everyone. Persisted via main; mirrored to the open
@@ -242,8 +247,11 @@ export function OverlayWindow() {
     const w = activeWordRef.current;
     if (!win || !w) return;
     const target = w.offsetTop - win.clientHeight / 2 + w.offsetHeight / 2;
-    win.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
-  }, [active, effective.size, script, panelSize]);
+    win.scrollTo({
+      top: Math.max(0, target),
+      behavior: settings.reduceMotion ? 'auto' : 'smooth',
+    });
+  }, [active, effective.size, script, panelSize, settings.reduceMotion]);
 
   // ---- fit native window width to panel (throttled) --------------------------
   const lastFit = useRef(0);
@@ -359,6 +367,7 @@ export function OverlayWindow() {
             className="grip"
             data-tauri-drag-region
             title={t('overlay.dragHint')}
+            aria-hidden="true"
           >
             <i />
             <i />
@@ -396,7 +405,12 @@ export function OverlayWindow() {
               showLabel
               onChange={setShielded}
             />
-            <button className="ic ic-sm" title={t('overlay.close')} onClick={close}>
+            <button
+              className="ic ic-sm"
+              title={t('overlay.close')}
+              aria-label={t('overlay.close')}
+              onClick={close}
+            >
               <X />
             </button>
           </span>
@@ -408,6 +422,10 @@ export function OverlayWindow() {
               className="ov-window"
               ref={windowRef}
               style={{ height: panelSize.h }}
+              role="region"
+              aria-label={t('overlay.scriptRegion', {
+                title: script?.title || t('overlay.untitledScript'),
+              })}
               dir={['ar', 'he', 'fa', 'ur'].includes(script?.language) ? 'rtl' : 'ltr'}
             >
               <ScriptViewer
@@ -415,6 +433,9 @@ export function OverlayWindow() {
                 active={active}
                 size={effective.size}
                 mirror={effective.mirror}
+                highContrast={settings.highContrast}
+                dyslexic={settings.dyslexicFont}
+                reduceMotion={settings.reduceMotion}
                 activeWordRef={activeWordRef}
                 onWordClick={onWordClick}
               />
@@ -424,27 +445,45 @@ export function OverlayWindow() {
           )}
         </div>
 
-        <div className="ov-foot">
-          <button className="ic" title={t('overlay.restart')} onClick={restart}>
+        <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
+          <button
+            className="ic"
+            title={t('overlay.restart')}
+            aria-label={t('overlay.restart')}
+            onClick={restart}
+          >
             <RotateCcw />
           </button>
-          <button className="ic" title={t('overlay.back5')} onClick={skipBack}>
+          <button
+            className="ic"
+            title={t('overlay.back5')}
+            aria-label={t('overlay.back5')}
+            onClick={skipBack}
+          >
             <ChevronLeft />
           </button>
           <button
             className="ic accent"
             title={playing ? t('overlay.pause') : t('overlay.play')}
+            aria-label={playing ? t('overlay.pause') : t('overlay.play')}
+            aria-pressed={playing}
             onClick={() => setPlaying((p) => !p)}
           >
             {playing ? <Pause /> : <Play />}
           </button>
-          <button className="ic" title={t('overlay.skip5')} onClick={skip}>
+          <button
+            className="ic"
+            title={t('overlay.skip5')}
+            aria-label={t('overlay.skip5')}
+            onClick={skip}
+          >
             <ChevronsRight />
           </button>
           <span className="sep" />
           <button
             className="ic sizebtn"
             title={t('overlay.smaller')}
+            aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >
@@ -453,6 +492,7 @@ export function OverlayWindow() {
           <button
             className="ic sizebtn"
             title={t('overlay.larger')}
+            aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >
@@ -462,6 +502,7 @@ export function OverlayWindow() {
             ref={settingsBtnRef}
             className="ic"
             title={t('overlay.prompterSettings')}
+            aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
             <SettingsIcon />
@@ -471,6 +512,10 @@ export function OverlayWindow() {
             title={
               interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
             }
+            aria-label={
+              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+            }
+            aria-pressed={!interactive}
             onClick={() => setInteractive((i) => !i)}
           >
             {interactive ? '⌥E' : '⌥E·on'}
@@ -481,6 +526,7 @@ export function OverlayWindow() {
           className={'ov-resize' + (resizing ? ' dragging' : '')}
           onPointerDown={startResize}
           title={t('overlay.resize')}
+          aria-hidden="true"
         >
           <svg
             viewBox="0 0 12 12"
