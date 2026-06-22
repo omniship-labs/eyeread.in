@@ -21,7 +21,8 @@ site/
 │   └── prerender.mjs       # per-locale static pages + hreflang + sitemap (post-build)
 └── src/
     ├── main.jsx            # imports design/styles.css (tokens) + i18n + mounts React
-    ├── App.jsx             # composes the sections (reads useConfig())
+    ├── App.jsx             # react-router <Routes>: home ↔ /docs
+    ├── docs/               # developer docs at /docs (see "Developer docs" below)
     ├── config.js           # non-translatable structure + buildConfig()/useConfig()
     ├── i18n/               # ← EDIT COPY HERE — one bundle per language
     │   ├── registry.js     # pure locale data (bundles, regions, URLs) — Node-safe
@@ -68,6 +69,37 @@ by [i18next](https://www.i18next.com/) + react-i18next.
 The visitor's language is auto-detected from the browser on first visit and their
 choice from the in-nav switcher is remembered in `localStorage`
 (`eyeread.locale`); `<html lang>` follows the active language.
+
+## Developer docs (`/docs`)
+
+The site doubles as the home for the **developer documentation** at
+`get.eyeread.in/docs`. Routing is **react-router** (`BrowserRouter` in
+`main.jsx`, `<Routes>` in `App.jsx`): `/docs` and `/docs/:slug` render the docs
+layout, everything else renders the marketing home, which stays multilingual
+exactly as before. The sidebar uses `<NavLink>` for its active state.
+
+```
+src/docs/
+├── registry.js        # page order, slugs, URL helpers, head meta (Node-safe)
+├── content.en.js       # the `docs` i18next namespace — English copy
+├── DocsLayout.jsx      # sidebar + active page + <head> sync
+├── CodeBlock.jsx       # <CodeBlock> / <Code> primitives
+└── pages/              # Overview, BuildFromSource, Architecture,
+                        # Contributing, TauriApi
+```
+
+- **i18n is wired, English-only for now.** Docs copy lives in its own `docs`
+  namespace (separate from the marketing `translation` namespace, so it never
+  affects the locale shape test). Only `content.en.js` exists; every other
+  locale falls back to English via i18next `fallbackLng`. To translate, add
+  `src/docs/content.<code>.js` mirroring `content.en.js`, then register it in
+  `src/i18n/index.js`. Technical literals (commands, file paths, API
+  signatures, code blocks) stay in the page components — only prose translates.
+- **Crawlable, static-host friendly.** `scripts/prerender.mjs` writes a static
+  `dist/docs/<slug>/index.html` per route (with its own `<title>`/description/
+  canonical and root-absolute asset paths) and adds them to `sitemap.xml`, so
+  deep links resolve before the client router runs. A `dist/404.html` SPA
+  fallback covers any unmatched path.
 
 ## Design tokens & assets
 
