@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { openExternal, listen } from '../lib/tauri';
 import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
@@ -27,6 +28,7 @@ function getVersion() {
 }
 
 export function AboutWindow() {
+  const { t } = useTranslation();
   const [shielded, setShielded] = useState(true);
   const testers = getTesters();
 
@@ -54,7 +56,7 @@ export function AboutWindow() {
       </div>
 
       <div className="aw-credit">
-        Created with ❤️ by{' '}
+        {t('about.createdBy')}{' '}
         <span className="aw-link" onClick={() => openExternal(MJ_URL)}>
           MJ
         </span>
@@ -63,29 +65,29 @@ export function AboutWindow() {
       <div className="aw-divider" />
 
       <div className="aw-section">
-        <div className="aw-section-label">Source &amp; License</div>
+        <div className="aw-section-label">{t('about.sourceLicense')}</div>
         <div className="aw-row">
-          <span>Open source · AGPL-3.0</span>
+          <span>{t('about.openSource')}</span>
           <span className="aw-link" onClick={() => openExternal(REPO_URL)}>
-            GitHub ↗
+            {t('about.github')}
           </span>
         </div>
       </div>
 
       <div className="aw-section">
-        <div className="aw-section-label">Legal</div>
+        <div className="aw-section-label">{t('about.legal')}</div>
         <div className="aw-row">
           <span className="aw-link" onClick={() => openExternal(TERMS_URL)}>
-            Terms of use ↗
+            {t('about.terms')}
           </span>
           <span className="aw-link" onClick={() => openExternal(PRIVACY_URL)}>
-            Privacy policy ↗
+            {t('about.privacy')}
           </span>
         </div>
       </div>
 
       <div className="aw-section">
-        <div className="aw-section-label">Tested by</div>
+        <div className="aw-section-label">{t('about.testedBy')}</div>
         {testers.length > 0 ? (
           <div className="aw-testers">
             {testers.map((t, i) => (
@@ -103,9 +105,9 @@ export function AboutWindow() {
           </div>
         ) : (
           <div className="aw-supporters-empty">
-            Help verify screen-share invisibility —{' '}
+            {t('about.helpVerify')}{' '}
             <span className="aw-link" onClick={() => openExternal(COMPAT_REPORT_URL)}>
-              test your setup ↗
+              {t('about.testYourSetup')}
             </span>
           </div>
         )}
@@ -114,32 +116,32 @@ export function AboutWindow() {
       <div className="aw-divider" />
 
       <div className="aw-section aw-section-supporters">
-        <div className="aw-section-label">Supporters</div>
+        <div className="aw-section-label">{t('about.supporters')}</div>
         {sponsors.length > 0 ? (
           <>
             <div className="aw-supporters-scroll">
               <SupporterGroup
-                title="Sponsors"
+                title={t('about.sponsors')}
                 tier="sponsor"
                 people={sponsors.filter((s) => s.tier === 'sponsor')}
                 onOpen={openExternal}
               />
               <SupporterGroup
-                title="Backers"
+                title={t('about.backers')}
                 tier="backer"
                 people={sponsors.filter((s) => s.tier !== 'sponsor')}
                 onOpen={openExternal}
               />
             </div>
             <span className="aw-link aw-supporters-all" onClick={() => openExternal(OC_URL)}>
-              View all on Open Collective ↗
+              {t('about.viewAllOC')}
             </span>
           </>
         ) : (
           <div className="aw-supporters-empty">
-            Be the first to{' '}
+            {t('about.beFirst')}{' '}
             <span className="aw-link" onClick={() => openExternal(OC_URL)}>
-              support eyeread.in ↗
+              {t('about.supportEyeread')}
             </span>
           </div>
         )}

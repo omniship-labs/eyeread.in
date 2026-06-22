@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { Search, Plus, FileText, Type, Clock, Pin, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { wordCount, readingMins } from '../lib/utils';
 
 const TABS = ['all', 'recent', 'pinned'];
+const TAB_LABELS = {
+  all: 'library.tabAll',
+  recent: 'library.tabRecent',
+  pinned: 'library.tabPinned',
+};
 
 export function Library({
   scripts,
@@ -14,6 +20,7 @@ export function Library({
   onDelete,
   width,
 }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState('all');
   const [query, setQuery] = useState('');
 
@@ -33,37 +40,35 @@ export function Library({
       style={width ? { width, minWidth: width, maxWidth: width } : undefined}
     >
       <div className="lib-top">
-        <div className="lib-title">Scripts</div>
+        <div className="lib-title">{t('library.title')}</div>
         <div className="lib-search-row">
           <div className="lib-search">
             <Search size={16} />
             <input
-              placeholder="Search scripts…"
+              placeholder={t('library.searchPlaceholder')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <button className="lib-btn" onClick={onCreate} title="New script">
+          <button className="lib-btn" onClick={onCreate} title={t('library.newScript')}>
             <Plus size={16} />
-            <span className="lib-btn-label">New script</span>
+            <span className="lib-btn-label">{t('library.newScript')}</span>
           </button>
         </div>
         <div className="lib-tabs">
-          {TABS.map((t) => (
+          {TABS.map((tabKey) => (
             <div
-              key={t}
-              className={'lib-tab' + (tab === t ? ' active' : '')}
-              onClick={() => setTab(t)}
+              key={tabKey}
+              className={'lib-tab' + (tab === tabKey ? ' active' : '')}
+              onClick={() => setTab(tabKey)}
             >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              {t(TAB_LABELS[tabKey])}
             </div>
           ))}
         </div>
       </div>
       <div className="lib-list">
-        {list.length === 0 && (
-          <div className="lib-empty">No scripts yet. Paste one to start.</div>
-        )}
+        {list.length === 0 && <div className="lib-empty">{t('library.empty')}</div>}
         {list.map((s) => (
           <div
             key={s.id}
@@ -89,7 +94,7 @@ export function Library({
                 <div className="sc-actions">
                   <button
                     className={'sc-act' + (s.pinned ? ' sc-act-active' : '')}
-                    title={s.pinned ? 'Unpin' : 'Pin'}
+                    title={s.pinned ? t('library.unpin') : t('library.pin')}
                     onClick={(e) => {
                       e.stopPropagation();
                       onTogglePin(s.id, !s.pinned);
@@ -99,7 +104,7 @@ export function Library({
                   </button>
                   <button
                     className="sc-act"
-                    title="Delete"
+                    title={t('library.delete')}
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(s.id);

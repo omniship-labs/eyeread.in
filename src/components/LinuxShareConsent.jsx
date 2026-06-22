@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import './linux-consent.css';
 
 /**
@@ -16,6 +17,7 @@ import './linux-consent.css';
  *   onCancel — () => void  user backs out; protection stays off
  */
 export function LinuxShareConsent({ onAccept, onCancel }) {
+  const { t } = useTranslation();
   // Esc cancels, like every other dismissible surface in the app.
   useEffect(() => {
     const onKey = (e) => {
@@ -39,40 +41,32 @@ export function LinuxShareConsent({ onAccept, onCancel }) {
             <AlertTriangle size={18} />
           </span>
           <span className="lsc-title" id="lsc-title">
-            Screen-share hiding is experimental on Linux
+            {t('consent.title')}
           </span>
         </div>
 
         <div className="lsc-body">
           <p>
-            On macOS and Windows the operating system guarantees this window is excluded from
-            screen capture. <b>Linux has no such guarantee.</b>
+            {t('consent.introA')} <b>{t('consent.introB')}</b>
           </p>
           <ul className="lsc-list">
             <li>
-              Whether the overlay is hidden depends entirely on your compositor (KWin, Mutter,
-              wlroots, X11…). On most setups it will <b>not</b> be hidden.
+              {t('consent.li0a')} <b>{t('consent.li0b')}</b>
             </li>
+            <li>{t('consent.li1')}</li>
             <li>
-              Your script may be fully visible to anyone you are sharing with, or appear in
-              recordings.
-            </li>
-            <li>
-              <b>Always verify with a test recording</b> before relying on it in a real call.
+              <b>{t('consent.li2')}</b>
             </li>
           </ul>
-          <p>
-            Do you understand the risk and want to enable it anyway? You won&apos;t be asked
-            again.
-          </p>
+          <p>{t('consent.question')}</p>
         </div>
 
         <div className="lsc-actions">
           <button type="button" className="lsc-btn lsc-btn-cancel" onClick={onCancel}>
-            Cancel
+            {t('consent.cancel')}
           </button>
           <button type="button" className="lsc-btn lsc-btn-accept" onClick={onAccept} autoFocus>
-            I understand — enable anyway
+            {t('consent.accept')}
           </button>
         </div>
       </div>
