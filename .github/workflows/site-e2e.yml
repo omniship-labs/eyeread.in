@@ -94,13 +94,9 @@ jobs:
           message: |
             ### 📸 Site responsiveness screenshots — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
 
-            Playwright captured full-page screenshots at **desktop / tablet / mobile** viewports.
-
-            | Viewport | Direct download |
-            |----------|----------------|
-            | Desktop (1280×800) | [⬇️ home-desktop.png](${{ steps.artifact_desktop.outputs.artifact-url }}) |
-            | Tablet (768×1024) | [⬇️ home-tablet.png](${{ steps.artifact_tablet.outputs.artifact-url }}) |
-            | Mobile (390×844) | [⬇️ home-mobile.png](${{ steps.artifact_mobile.outputs.artifact-url }}) |
+            | Desktop (1280×800) | Tablet (768×1024) | Mobile (390×844) |
+            |---|---|---|
+            | ![desktop](${{ steps.artifact_desktop.outputs.artifact-url }}) | ![tablet](${{ steps.artifact_tablet.outputs.artifact-url }}) | ![mobile](${{ steps.artifact_mobile.outputs.artifact-url }}) |
 
             **[⬇️ Download all screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (zip)
 
