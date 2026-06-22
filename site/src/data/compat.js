@@ -22,6 +22,12 @@
      { name: 'octocat', profile: 'https://github.com/octocat' }
    ============================================================ */
 
+import pkg from '../../../package.json';
+
+// Current app version — verifications confirmed against an OLDER version are
+// flagged "re-verify" so each release gets re-checked (see isStaleVersion).
+export const CURRENT_VERSION = pkg.version;
+
 export const compat = [
   // ── macOS — OS-guaranteed (NSWindow.sharingType = .none) ──
   { platform: 'macOS', version: 'macOS 15 Sequoia', env: 'Apple Silicon', result: 'hidden', appVersion: '', date: '', verifiers: [], notes: '' },
@@ -48,5 +54,24 @@ export const compat = [
 // Fixed display order + per-platform guarantee level.
 export const PLATFORM_ORDER = ['macOS', 'Windows', 'Linux'];
 export const PLATFORM_GUARANTEE = { macOS: 'guaranteed', Windows: 'guaranteed', Linux: 'bestEffort' };
+
+// Numeric x.y.z tuple, ignoring any pre-release suffix (e.g. "-nightly.…").
+const triple = (v) =>
+  String(v || '')
+    .split('-')[0]
+    .split('.')
+    .map((n) => parseInt(n, 10) || 0);
+
+const rank = ([a = 0, b = 0, c = 0]) => a * 1e6 + b * 1e3 + c;
+
+/**
+ * Was a verification (done on `appVersion`) confirmed against an app version
+ * older than the one we currently ship? If so it should be re-verified.
+ * Returns false for empty versions (nothing claimed yet).
+ */
+export function isStaleVersion(appVersion) {
+  if (!appVersion) return false;
+  return rank(triple(appVersion)) < rank(triple(CURRENT_VERSION));
+}
 
 export default compat;

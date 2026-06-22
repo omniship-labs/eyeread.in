@@ -147,6 +147,7 @@ export default {
     guaranteed: 'OS-guaranteed',
     bestEffort: 'best-effort',
     untestedLabel: 'Testers wanted',
+    staleLabel: 'Re-verify',
     ctaLabel: 'Verify your setup →',
   },
 

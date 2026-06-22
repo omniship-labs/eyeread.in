@@ -133,6 +133,7 @@ export default {
     guaranteed: 'Garantizado por el SO',
     bestEffort: 'mejor esfuerzo',
     untestedLabel: 'Se buscan testers',
+    staleLabel: 'Reverificar',
     ctaLabel: 'Verifica tu configuración →',
   },
 

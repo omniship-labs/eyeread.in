@@ -133,6 +133,7 @@ export default {
     guaranteed: 'OS-garantiert',
     bestEffort: 'best-effort',
     untestedLabel: 'Tester gesucht',
+    staleLabel: 'Neu prüfen',
     ctaLabel: 'Deine Konfiguration prüfen →',
   },
 

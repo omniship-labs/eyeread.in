@@ -133,6 +133,7 @@ export default {
     guaranteed: 'OS உறுதி',
     bestEffort: 'சிறந்த-முயற்சி',
     untestedLabel: 'சோதனையாளர்கள் தேவை',
+    staleLabel: 'மீண்டும் சரிபார்க்கவும்',
     ctaLabel: 'உங்கள் அமைப்பைச் சரிபார்க்கவும் →',
   },
 

@@ -133,6 +133,7 @@ export default {
     guaranteed: 'OS-सुनिश्चित',
     bestEffort: 'सर्वोत्तम-प्रयत्न',
     untestedLabel: 'टेस्टर हवे आहेत',
+    staleLabel: 'पुन्हा तपासा',
     ctaLabel: 'तुमचा सेटअप सत्यापित करा →',
   },
 

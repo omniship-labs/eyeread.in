@@ -132,6 +132,7 @@ export default {
     guaranteed: 'OS-ಖಾತರಿ',
     bestEffort: 'ಅತ್ಯುತ್ತಮ-ಪ್ರಯತ್ನ',
     untestedLabel: 'ಟೆಸ್ಟರ್‌ಗಳು ಬೇಕಾಗಿದ್ದಾರೆ',
+    staleLabel: 'ಮರು-ಪರಿಶೀಲಿಸಿ',
     ctaLabel: 'ನಿಮ್ಮ ಸೆಟಪ್ ಪರಿಶೀಲಿಸಿ →',
   },
 

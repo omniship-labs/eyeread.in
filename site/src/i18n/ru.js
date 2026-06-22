@@ -133,6 +133,7 @@ export default {
     guaranteed: 'Гарантия ОС',
     bestEffort: 'по мере возможности',
     untestedLabel: 'Нужны тестировщики',
+    staleLabel: 'Перепроверить',
     ctaLabel: 'Проверить вашу конфигурацию →',
   },
 

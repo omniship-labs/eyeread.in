@@ -131,6 +131,7 @@ export default {
     guaranteed: '系统保障',
     bestEffort: '尽力而为',
     untestedLabel: '招募测试者',
+    staleLabel: '需重新验证',
     ctaLabel: '验证你的环境 →',
   },
 

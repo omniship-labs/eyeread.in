@@ -1,5 +1,5 @@
 import { Icon } from './Icon.jsx';
-import { compat, PLATFORM_ORDER, PLATFORM_GUARANTEE } from '../data/compat.js';
+import { compat, PLATFORM_ORDER, PLATFORM_GUARANTEE, isStaleVersion } from '../data/compat.js';
 
 // Map a result to its pill modifier class.
 const STATUS_CLASS = {
@@ -32,8 +32,19 @@ function Verifiers({ people, untestedLabel }) {
 }
 
 export default function Compat({ data }) {
-  const { eyebrow, heading, subhead, cols, status, guaranteed, bestEffort, untestedLabel, ctaLabel, reportHref } =
-    data;
+  const {
+    eyebrow,
+    heading,
+    subhead,
+    cols,
+    status,
+    guaranteed,
+    bestEffort,
+    untestedLabel,
+    staleLabel,
+    ctaLabel,
+    reportHref,
+  } = data;
   const guaranteeLabel = { guaranteed, bestEffort };
 
   return (
@@ -79,7 +90,14 @@ export default function Compat({ data }) {
                     <td>
                       <Verifiers people={row.verifiers} untestedLabel={untestedLabel} />
                     </td>
-                    <td className="lc-app">{row.appVersion || '—'}</td>
+                    <td className="lc-app">
+                      {row.appVersion || '—'}
+                      {row.result !== 'untested' && isStaleVersion(row.appVersion) && (
+                        <span className="lc-stale" title={staleLabel}>
+                          ⟳ {staleLabel}
+                        </span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

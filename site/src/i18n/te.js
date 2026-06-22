@@ -132,6 +132,7 @@ export default {
     guaranteed: 'OS హామీ',
     bestEffort: 'ఉత్తమ-ప్రయత్నం',
     untestedLabel: 'టెస్టర్లు కావాలి',
+    staleLabel: 'మళ్లీ ధృవీకరించండి',
     ctaLabel: 'మీ సెటప్‌ను ధృవీకరించండి →',
   },
 

@@ -133,6 +133,7 @@ export default {
     guaranteed: 'Garanti par l’OS',
     bestEffort: 'au mieux-effort',
     untestedLabel: 'Testeurs recherchés',
+    staleLabel: 'À revérifier',
     ctaLabel: 'Vérifier votre config →',
   },
 

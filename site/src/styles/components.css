@@ -754,6 +754,20 @@
   font-size: 13px;
 }
 
+.lc-stale {
+  display: inline-block;
+  margin-left: 6px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--warning);
+  background: rgba(255, 184, 77, 0.12);
+}
+
 .compat {
   text-align: center;
 }

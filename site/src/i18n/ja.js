@@ -132,6 +132,7 @@ export default {
     guaranteed: 'OS 保証',
     bestEffort: 'ベストエフォート',
     untestedLabel: 'テスター募集',
+    staleLabel: '要再検証',
     ctaLabel: 'あなたの環境を検証 →',
   },
 

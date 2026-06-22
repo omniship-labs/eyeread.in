@@ -134,6 +134,7 @@ export default {
     guaranteed: 'OS-ഉറപ്പ്',
     bestEffort: 'മികച്ച-ശ്രമം',
     untestedLabel: 'ടെസ്റ്റർമാരെ ആവശ്യമുണ്ട്',
+    staleLabel: 'വീണ്ടും പരിശോധിക്കൂ',
     ctaLabel: 'നിങ്ങളുടെ സജ്ജീകരണം പരിശോധിക്കൂ →',
   },
 
