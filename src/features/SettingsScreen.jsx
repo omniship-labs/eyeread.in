@@ -16,6 +16,8 @@ export function SettingsScreen({ settings, onSettings }) {
     hideFromShare,
     reduceMotion,
     highContrast,
+    dyslexicFont,
+    uiScale = 100,
     voice,
     speed,
     size,
@@ -201,6 +203,9 @@ export function SettingsScreen({ settings, onSettings }) {
                 type="number"
                 min={1}
                 max={120}
+                aria-label={
+                  timerMode === 'down' ? 'Count down from (minutes)' : 'Warn after (minutes)'
+                }
                 value={countFromMins}
                 onChange={(e) => onSettings({ countFrom: Math.max(1, +e.target.value) * 60 })}
               />
@@ -244,6 +249,35 @@ export function SettingsScreen({ settings, onSettings }) {
             checked={!!highContrast}
             label="High contrast"
             onChange={(v) => onSettings({ highContrast: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>Dyslexia-friendly reading</b>
+            <span>OpenDyslexic font with roomier spacing in the prompter</span>
+          </div>
+          <Switch
+            size="sm"
+            checked={!!dyslexicFont}
+            label="Dyslexia-friendly reading"
+            onChange={(v) => onSettings({ dyslexicFont: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>App text size</b>
+            <span>Scales the whole app interface</span>
+          </div>
+          <Segmented
+            size="sm"
+            options={[
+              { value: 90, label: 'Small' },
+              { value: 100, label: 'Default' },
+              { value: 115, label: 'Large' },
+              { value: 130, label: 'Larger' },
+            ]}
+            value={uiScale}
+            onChange={(v) => onSettings({ uiScale: v })}
           />
         </div>
       </div>
@@ -306,9 +340,9 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>eyeread.in</b>
             <span>Version, credits, and legal</span>
           </div>
-          <span className="set-link" onClick={showAboutWindow}>
+          <button type="button" className="set-link" onClick={showAboutWindow}>
             Open ↗
-          </span>
+          </button>
         </div>
       </div>
       {consentModal}
