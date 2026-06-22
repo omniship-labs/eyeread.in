@@ -12,6 +12,7 @@ import {
   MicOff,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { ScriptViewer } from '../components/ScriptViewer';
 import { useVoiceTracking, voiceAvailable } from '../hooks/useVoiceTracking';
@@ -38,6 +39,7 @@ import { useShareProtection } from '../hooks/useShareProtection';
 import { fmtTime } from '../lib/utils';
 
 export function OverlayWindow() {
+  const { t } = useTranslation();
   const [script, setScript] = useState(null);
   const [settings, setSettings] = useState(defaultSettings);
   // `active`  = word currently being said (peak of bell curve)
@@ -356,7 +358,7 @@ export function OverlayWindow() {
             ref={gripRef}
             className="grip"
             data-tauri-drag-region
-            title="Drag to move · Esc to hide"
+            title={t('overlay.dragHint')}
           >
             <i />
             <i />
@@ -378,11 +380,11 @@ export function OverlayWindow() {
           {usingVoice && listening && (
             <span className="ov-voice on">
               <Mic size={12} />
-              Voice
+              {t('reading.voice')}
             </span>
           )}
           {effective.voice && playing && !voiceAvailable && (
-            <span className="ov-voice" title="Voice tracking unavailable — timed scroll">
+            <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
               <MicOff size={12} />
             </span>
           )}
@@ -394,7 +396,7 @@ export function OverlayWindow() {
               showLabel
               onChange={setShielded}
             />
-            <button className="ic ic-sm" title="Close prompter (⌘⇧E to reopen)" onClick={close}>
+            <button className="ic ic-sm" title={t('overlay.close')} onClick={close}>
               <X />
             </button>
           </span>
@@ -418,31 +420,31 @@ export function OverlayWindow() {
               />
             </div>
           ) : (
-            <div className="ov-empty">No scripts yet. Paste one to start.</div>
+            <div className="ov-empty">{t('library.empty')}</div>
           )}
         </div>
 
         <div className="ov-foot">
-          <button className="ic" title="Restart" onClick={restart}>
+          <button className="ic" title={t('overlay.restart')} onClick={restart}>
             <RotateCcw />
           </button>
-          <button className="ic" title="Back 5 words" onClick={skipBack}>
+          <button className="ic" title={t('overlay.back5')} onClick={skipBack}>
             <ChevronLeft />
           </button>
           <button
             className="ic accent"
-            title={playing ? 'Pause (Space)' : 'Play (Space)'}
+            title={playing ? t('overlay.pause') : t('overlay.play')}
             onClick={() => setPlaying((p) => !p)}
           >
             {playing ? <Pause /> : <Play />}
           </button>
-          <button className="ic" title="Skip 5 words ahead" onClick={skip}>
+          <button className="ic" title={t('overlay.skip5')} onClick={skip}>
             <ChevronsRight />
           </button>
           <span className="sep" />
           <button
             className="ic sizebtn"
-            title="Smaller text"
+            title={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >
@@ -450,7 +452,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic sizebtn"
-            title="Larger text"
+            title={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >
@@ -459,14 +461,16 @@ export function OverlayWindow() {
           <button
             ref={settingsBtnRef}
             className="ic"
-            title="Prompter settings"
+            title={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
             <SettingsIcon />
           </button>
           <button
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
-            title={interactive ? 'Enable click-through (⌥E)' : 'Disable click-through (⌥E)'}
+            title={
+              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+            }
             onClick={() => setInteractive((i) => !i)}
           >
             {interactive ? '⌥E' : '⌥E·on'}
@@ -476,7 +480,7 @@ export function OverlayWindow() {
         <div
           className={'ov-resize' + (resizing ? ' dragging' : '')}
           onPointerDown={startResize}
-          title="Drag to resize"
+          title={t('overlay.resize')}
         >
           <svg
             viewBox="0 0 12 12"
@@ -495,14 +499,13 @@ export function OverlayWindow() {
 }
 
 function DemoBackdrop() {
+  const { t } = useTranslation();
   return (
     <div className="demo-stage">
       <div className="demo-shared">
-        <div className="demo-eyebrow">Q3 &middot; Company All-Hands</div>
-        <h1 className="demo-title">We shipped invisible. Now we scale it.</h1>
-        <p className="demo-sub">
-          Three numbers that defined the quarter &mdash; and where the next one takes us.
-        </p>
+        <div className="demo-eyebrow">{t('overlay.demoEyebrow')}</div>
+        <h1 className="demo-title">{t('overlay.demoTitle')}</h1>
+        <p className="demo-sub">{t('overlay.demoSub')}</p>
       </div>
     </div>
   );

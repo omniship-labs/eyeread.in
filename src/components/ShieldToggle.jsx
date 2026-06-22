@@ -1,4 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * ShieldToggle — eye icon button signalling screen-share protection state.
@@ -18,18 +19,19 @@ export function ShieldToggle({
   size = 14,
   showLabel = false,
 }) {
+  const { t } = useTranslation();
   return (
     <button
       className={`${className}${shielded ? ' shielded' : ' exposed'}`}
       onClick={() => onChange(!shielded)}
-      title={
-        shielded
-          ? 'Hidden from screen share — click to expose'
-          : 'Visible in screen share — click to hide'
-      }
+      title={shielded ? t('shield.hiddenTitle') : t('shield.visibleTitle')}
     >
       {shielded ? <EyeOff size={size} /> : <Eye size={size} />}
-      {showLabel && <span className="ov-shield-label">{shielded ? 'HIDDEN' : 'VISIBLE'}</span>}
+      {showLabel && (
+        <span className="ov-shield-label">
+          {shielded ? t('overlay.hidden') : t('overlay.visible')}
+        </span>
+      )}
     </button>
   );
 }

@@ -1,4 +1,5 @@
 import { Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
@@ -6,11 +7,13 @@ import { Segmented } from '../components/Segmented';
 import { showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { ShieldToggle } from '../components/ShieldToggle';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
 
 export function SettingsScreen({ settings, onSettings }) {
+  const { t } = useTranslation();
   const {
     position,
     hideFromShare,
@@ -37,10 +40,10 @@ export function SettingsScreen({ settings, onSettings }) {
 
   // Describe the screen-share state, flagging Linux as best-effort.
   const shareHint = isLinux
-    ? 'Experimental on Linux — depends on your compositor'
+    ? t('settings.shareLinux')
     : hideFromShare
-      ? 'Hidden from screen-share'
-      : 'Visible to screen-share';
+      ? t('settings.shareHidden')
+      : t('settings.shareVisible');
 
   const restoreDefaults = () => {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
@@ -48,22 +51,22 @@ export function SettingsScreen({ settings, onSettings }) {
 
   return (
     <div className="settings-main">
-      <div className="settings-title">Settings</div>
+      <div className="settings-title">{t('settings.title')}</div>
 
       {/* ── Overlay behavior ── */}
       <div className="set-group">
-        <div className="set-group-label">Overlay</div>
+        <div className="set-group-label">{t('settings.overlay')}</div>
         <div className="set-row">
           <div className="set-info">
-            <b>Default position</b>
-            <span>Where the overlay anchors on screen</span>
+            <b>{t('settings.defaultPosition')}</b>
+            <span>{t('settings.defaultPositionHint')}</span>
           </div>
           <Segmented
             size="sm"
             options={[
-              { value: 'top', label: 'Top' },
-              { value: 'center', label: 'Center' },
-              { value: 'bottom', label: 'Bottom' },
+              { value: 'top', label: t('settings.positionTop') },
+              { value: 'center', label: t('settings.positionCenter') },
+              { value: 'bottom', label: t('settings.positionBottom') },
             ]}
             value={position}
             onChange={(v) => onSettings({ position: v })}
@@ -71,7 +74,7 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Hide from screen-share</b>
+            <b>{t('settings.hideFromShare')}</b>
             <span>{shareHint}</span>
           </div>
           <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
@@ -80,17 +83,17 @@ export function SettingsScreen({ settings, onSettings }) {
 
       {/* ── Reading defaults ── */}
       <div className="set-group">
-        <div className="set-group-label">Reading defaults</div>
+        <div className="set-group-label">{t('settings.readingDefaults')}</div>
         <div className="set-row">
           <div className="set-info">
-            <b>Tracking mode</b>
-            <span>How the prompter follows your pace</span>
+            <b>{t('settings.trackingMode')}</b>
+            <span>{t('settings.trackingModeHint')}</span>
           </div>
           <Segmented
             size="sm"
             options={[
-              { value: 'voice', label: 'Voice', icon: <Mic size={13} /> },
-              { value: 'scroll', label: 'Scroll', icon: <TimerIcon size={13} /> },
+              { value: 'voice', label: t('reading.voice'), icon: <Mic size={13} /> },
+              { value: 'scroll', label: t('reading.scroll'), icon: <TimerIcon size={13} /> },
             ]}
             value={mode}
             onChange={(m) => {
@@ -103,14 +106,14 @@ export function SettingsScreen({ settings, onSettings }) {
         {!voice && (
           <div className="set-row">
             <div className="set-info">
-              <b>Scroll speed</b>
-              <span>Default words-per-minute when not voice-tracking</span>
+              <b>{t('reading.scrollSpeed')}</b>
+              <span>{t('settings.scrollSpeedHint')}</span>
             </div>
             <Slider
               min={80}
               max={220}
               value={speed}
-              ariaLabel="Scroll speed"
+              ariaLabel={t('reading.scrollSpeed')}
               onChange={(v) => onSettings({ speed: v })}
               style={{ width: 140 }}
             />
@@ -119,14 +122,14 @@ export function SettingsScreen({ settings, onSettings }) {
         )}
         <div className="set-row">
           <div className="set-info">
-            <b>Text size</b>
-            <span>Default font size in the overlay</span>
+            <b>{t('reading.textSize')}</b>
+            <span>{t('settings.textSizeHint')}</span>
           </div>
           <Slider
             min={22}
             max={52}
             value={size}
-            ariaLabel="Text size"
+            ariaLabel={t('reading.textSize')}
             onChange={(v) => onSettings({ size: v })}
             style={{ width: 140 }}
           />
@@ -134,14 +137,14 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Overlay opacity</b>
-            <span>Transparency when first launched</span>
+            <b>{t('reading.overlayOpacity')}</b>
+            <span>{t('settings.overlayOpacityHint')}</span>
           </div>
           <Slider
             min={10}
             max={100}
             value={opacity}
-            ariaLabel="Overlay opacity"
+            ariaLabel={t('reading.overlayOpacity')}
             onChange={(v) => onSettings({ opacity: v })}
             style={{ width: 140 }}
           />
@@ -149,14 +152,14 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Glass blur</b>
-            <span>Backdrop blur intensity behind the panel</span>
+            <b>{t('reading.glassBlur')}</b>
+            <span>{t('settings.glassBlurHint')}</span>
           </div>
           <Slider
             min={0}
             max={18}
             value={blur}
-            ariaLabel="Glass blur"
+            ariaLabel={t('reading.glassBlur')}
             onChange={(v) => onSettings({ blur: v })}
             style={{ width: 140 }}
           />
@@ -164,27 +167,27 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Mirror text</b>
-            <span>Flip horizontally for beam-splitter rigs</span>
+            <b>{t('reading.mirrorText')}</b>
+            <span>{t('settings.mirrorTextHint')}</span>
           </div>
           <Switch
             size="sm"
             checked={!!mirror}
-            label="Mirror text"
+            label={t('reading.mirrorText')}
             onChange={(v) => onSettings({ mirror: v })}
           />
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Timer</b>
-            <span>Timer mode shown in the overlay</span>
+            <b>{t('reading.timer')}</b>
+            <span>{t('settings.timerHint')}</span>
           </div>
           <Segmented
             size="sm"
             options={[
-              { value: 'off', label: 'Off' },
-              { value: 'up', label: 'Count up', icon: <TimerIcon size={13} /> },
-              { value: 'down', label: 'Count down', icon: <Hourglass size={13} /> },
+              { value: 'off', label: t('reading.off') },
+              { value: 'up', label: t('reading.countUp'), icon: <TimerIcon size={13} /> },
+              { value: 'down', label: t('reading.countDown'), icon: <Hourglass size={13} /> },
             ]}
             value={timerMode}
             onChange={(v) => onSettings({ timerMode: v })}
@@ -193,7 +196,9 @@ export function SettingsScreen({ settings, onSettings }) {
         {timerMode !== 'off' && (
           <div className="set-row">
             <div className="set-info">
-              <b>{timerMode === 'down' ? 'Count down from' : 'Warn after'}</b>
+              <b>
+                {timerMode === 'down' ? t('reading.countDownFrom') : t('reading.warnAfter')}
+              </b>
             </div>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <input
@@ -210,39 +215,51 @@ export function SettingsScreen({ settings, onSettings }) {
         )}
         <div className="set-row">
           <div className="set-info">
-            <b>Restore defaults</b>
-            <span>Reset all reading defaults to built-in values</span>
+            <b>{t('settings.restoreDefaults')}</b>
+            <span>{t('settings.restoreDefaultsHint')}</span>
           </div>
           <Button variant="link" onClick={restoreDefaults}>
-            Reset ↺
+            {t('settings.reset')}
           </Button>
+        </div>
+      </div>
+
+      {/* ── Language ── */}
+      <div className="set-group">
+        <div className="set-group-label">{t('settings.languageGroup')}</div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('switcher.label')}</b>
+            <span>{t('settings.languageHint')}</span>
+          </div>
+          <LanguageSwitcher />
         </div>
       </div>
 
       {/* ── Accessibility ── */}
       <div className="set-group">
-        <div className="set-group-label">Accessibility</div>
+        <div className="set-group-label">{t('settings.accessibility')}</div>
         <div className="set-row">
           <div className="set-info">
-            <b>Reduce motion</b>
-            <span>Disables easing and smooth-scroll animations in the overlay</span>
+            <b>{t('settings.reduceMotion')}</b>
+            <span>{t('settings.reduceMotionHint')}</span>
           </div>
           <Switch
             size="sm"
             checked={!!reduceMotion}
-            label="Reduce motion"
+            label={t('settings.reduceMotion')}
             onChange={(v) => onSettings({ reduceMotion: v })}
           />
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>High contrast</b>
-            <span>Stronger text shadow for legibility over complex backgrounds</span>
+            <b>{t('settings.highContrast')}</b>
+            <span>{t('settings.highContrastHint')}</span>
           </div>
           <Switch
             size="sm"
             checked={!!highContrast}
-            label="High contrast"
+            label={t('settings.highContrast')}
             onChange={(v) => onSettings({ highContrast: v })}
           />
         </div>
@@ -250,31 +267,31 @@ export function SettingsScreen({ settings, onSettings }) {
 
       {/* ── Hotkeys ── */}
       <div className="set-group">
-        <div className="set-group-label">Hotkeys</div>
+        <div className="set-group-label">{t('settings.hotkeys')}</div>
         <div className="set-row">
           <div className="set-info">
-            <b>Show / hide overlay</b>
-            <span>Toggle the prompter — works system-wide</span>
+            <b>{t('settings.hkToggle')}</b>
+            <span>{t('settings.hkToggleHint')}</span>
           </div>
           <span className="hotkey">{modKey} + Shift + E</span>
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Interact / click-through</b>
-            <span>Lets clicks pass through the glass — works system-wide</span>
+            <b>{t('settings.hkInteract')}</b>
+            <span>{t('settings.hkInteractHint')}</span>
           </div>
           <span className="hotkey">{altKey} + E</span>
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Play / pause scroll</b>
-            <span>While the overlay is focused</span>
+            <b>{t('settings.hkPlayPause')}</b>
+            <span>{t('settings.hkFocusedHint')}</span>
           </div>
           <span className="hotkey">Space</span>
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Increase / decrease text size</b>
+            <b>{t('settings.hkTextSize')}</b>
           </div>
           <span style={{ display: 'flex', gap: 8 }}>
             <span className="hotkey">{modKey} + +</span>
@@ -283,7 +300,7 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Scroll speed up / down</b>
+            <b>{t('settings.hkScrollSpeed')}</b>
           </div>
           <span style={{ display: 'flex', gap: 8 }}>
             <span className="hotkey">↑</span>
@@ -292,22 +309,22 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>Hide overlay</b>
-            <span>While the overlay is focused</span>
+            <b>{t('settings.hkHide')}</b>
+            <span>{t('settings.hkFocusedHint')}</span>
           </div>
           <span className="hotkey">Esc</span>
         </div>
       </div>
 
       <div className="set-group">
-        <div className="set-group-label">About</div>
+        <div className="set-group-label">{t('settings.about')}</div>
         <div className="set-row">
           <div className="set-info">
             <b>eyeread.in</b>
-            <span>Version, credits, and legal</span>
+            <span>{t('settings.aboutHint')}</span>
           </div>
           <span className="set-link" onClick={showAboutWindow}>
-            Open ↗
+            {t('settings.open')}
           </span>
         </div>
       </div>
