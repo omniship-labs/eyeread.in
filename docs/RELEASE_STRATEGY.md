@@ -13,21 +13,21 @@ best-effort.
 
 ## Channels
 
-| Channel     | Trigger                     | Bundle ID                | Updater endpoint              |
-| ----------- | --------------------------- | ------------------------ | ----------------------------- |
-| **Stable**  | `v*` tag (or workflow dispatch) | `in.eyeread.app`     | `releases/latest/.../latest.json` |
-| **Nightly** | Push to `dev` or daily cron | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
+| Channel     | Trigger                         | Bundle ID                | Updater endpoint                        |
+| ----------- | ------------------------------- | ------------------------ | --------------------------------------- |
+| **Stable**  | `v*` tag (or workflow dispatch) | `in.eyeread.app`         | `releases/latest/.../latest.json`       |
+| **Nightly** | Push to `dev` or daily cron     | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
 
 Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
 and matches the running OS/arch to a `platforms` key.
 
 ## Build matrix
 
-| OS          | Targets (Rust triple)                                  | Bundles            | Updater key(s)                       |
-| ----------- | ------------------------------------------------------ | ------------------ | ------------------------------------ |
-| **macOS**   | `aarch64-apple-darwin`, `x86_64-apple-darwin`          | `dmg` + `updater`  | `darwin-aarch64`, `darwin-x86_64`    |
-| **Windows** | `x86_64-pc-windows-msvc`, `aarch64-pc-windows-msvc`    | `nsis` + `updater` | `windows-x86_64`, `windows-aarch64`  |
-| **Linux**   | `x86_64-unknown-linux-gnu`                             | `appimage`, `deb`  | `linux-x86_64` (AppImage)            |
+| OS          | Targets (Rust triple)                               | Bundles            | Updater key(s)                      |
+| ----------- | --------------------------------------------------- | ------------------ | ----------------------------------- |
+| **macOS**   | `aarch64-apple-darwin`, `x86_64-apple-darwin`       | `dmg` + `updater`  | `darwin-aarch64`, `darwin-x86_64`   |
+| **Windows** | `x86_64-pc-windows-msvc`, `aarch64-pc-windows-msvc` | `nsis` + `updater` | `windows-x86_64`, `windows-aarch64` |
+| **Linux**   | `x86_64-unknown-linux-gnu`                          | `appimage`, `deb`  | `linux-x86_64` (AppImage)           |
 
 Separate per-arch downloads (not a macOS Universal binary): smaller files, and
 the updater already keys on arch.
@@ -41,13 +41,13 @@ the updater already keys on arch.
   Gatekeeper blocks unsigned/unnotarized apps.
 - **Invisibility:** capture exclusion uses `NSWindow.sharingType = .none` —
   this is **public** AppKit API, mapped from Tauri's `contentProtected`, and is
-  *not* itself an App Store blocker.
+  _not_ itself an App Store blocker.
 - **Mac App Store: blocked by the transparent overlay, not by invisibility.**
   The glass overlay window needs `app.macOSPrivateApi: true` (in
   `tauri.conf.json`) plus the Rust `macos-private-api` feature. Tauri documents
   that enabling this **"will prevent your application from being accepted into
   the App Store."** The sandbox MAS also requires would separately strain
-  global-shortcut and always-on-top-across-Spaces behaviour. So the *current*
+  global-shortcut and always-on-top-across-Spaces behaviour. So the _current_
   build is MAS-ineligible — direct Developer ID distribution only.
 
   **Could MAS ever happen?** Only as a separate, sandboxed build variant that
@@ -66,10 +66,10 @@ the updater already keys on arch.
   #### Spike: can we drop `macOSPrivateApi`? — No (without a native overlay)
 
   The overlay is rendered by a **transparent WKWebView** (`transparent: true`).
-  For an HTML overlay to show the desktop through it, the *webview itself* must
+  For an HTML overlay to show the desktop through it, the _webview itself_ must
   not paint its background. The only known way to do that on macOS is the
   **private** Key-Value-Coding call `webView.setValue(false, forKey:
-  "drawsBackground")` — which is exactly what Tauri's `macos-private-api`
+"drawsBackground")` — which is exactly what Tauri's `macos-private-api`
   feature does under the hood. Findings:
 
   - **No public API exists** to make a macOS WKWebView background transparent.
@@ -79,11 +79,11 @@ the updater already keys on arch.
     `drawsBackground` is false.
   - **Tauri won't solve it for us.** The request to achieve transparency via
     public APIs / Metal (tauri-apps/tauri #13680) was **closed as not planned**.
-  - `NSWindow` transparency itself *is* public (`setOpaque:NO`, clear
+  - `NSWindow` transparency itself _is_ public (`setOpaque:NO`, clear
     `backgroundColor`); the private dependency is **solely** the webview content
     layer.
 
-  **Conclusion:** you cannot keep the React/HTML overlay *and* turn off
+  **Conclusion:** you cannot keep the React/HTML overlay _and_ turn off
   `macOSPrivateApi`. The only MAS-eligible route is to **re-render the overlay
   natively** (a transparent `NSWindow` drawing the script with AppKit / Core
   Text / `NSVisualEffectView` instead of a webview) — a real feature rewrite
@@ -91,6 +91,7 @@ the updater already keys on arch.
   native build (MAS only), doubling that surface. Given the direct Developer ID
   build already reaches 100% of Macs, **the spike's recommendation is to not
   pursue MAS** until there's concrete demand that only the App Store can serve.
+
 - **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `10.15` (Catalina). This
   also sets the build's deployment target.
 
@@ -115,6 +116,7 @@ the updater already keys on arch.
   and fork builds keep working. Azure Trusted Signing (~$10/mo, cloud-based) is
   preferred over an EV cert on a hardware token, which can't run unattended in
   CI.
+
 - **arm64:** cross-compiled from the x64 `windows-latest` runner. WebView2 is
   arch-independent at runtime.
 - **Minimum OS:** Windows 10 version 2004 (build 19041) — the floor for
@@ -138,22 +140,22 @@ the updater already keys on arch.
 
 ## Minimum OS versions
 
-| OS      | Minimum                                   | Enforced by                                  |
-| ------- | ----------------------------------------- | -------------------------------------------- |
-| macOS   | 10.15 Catalina                            | `bundle.macOS.minimumSystemVersion`          |
-| Windows | 10 v2004 (build 19041)                    | runtime check (feature) + WebView2 floor     |
-| Linux   | Ubuntu 22.04 / Debian 12 / glibc 2.35 era | build host (`ubuntu-22.04`)                   |
+| OS      | Minimum                                   | Enforced by                              |
+| ------- | ----------------------------------------- | ---------------------------------------- |
+| macOS   | 10.15 Catalina                            | `bundle.macOS.minimumSystemVersion`      |
+| Windows | 10 v2004 (build 19041)                    | runtime check (feature) + WebView2 floor |
+| Linux   | Ubuntu 22.04 / Debian 12 / glibc 2.35 era | build host (`ubuntu-22.04`)              |
 
 ## Accounts, secrets & cost (the cheap path)
 
 Total recurring cost for full trust on all three OSes: **≈ $99/yr (Apple) +
 ≈ $120/yr (Azure Trusted Signing) = ~$219/yr.** Linux is free.
 
-| OS      | Account to create                              | Cost            | Why it's the cheap option                                            |
-| ------- | ---------------------------------------------- | --------------- | -------------------------------------------------------------------- |
-| macOS   | [Apple Developer Program](https://developer.apple.com/programs/) | **$99/yr**      | Only way to notarize. No cheaper legit path; skipping = Gatekeeper warnings. |
-| Windows | [Azure](https://portal.azure.com) → Trusted Signing | **~$9.99/mo**   | Cheapest real Authenticode (EV certs are $200–600/yr). No hardware token. |
-| Linux   | None (GitHub) / Flathub via GitHub PR          | **Free**        | AppImage/deb on GitHub Releases; Flathub is a free PR.               |
+| OS      | Account to create                                                | Cost          | Why it's the cheap option                                                    |
+| ------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------- |
+| macOS   | [Apple Developer Program](https://developer.apple.com/programs/) | **$99/yr**    | Only way to notarize. No cheaper legit path; skipping = Gatekeeper warnings. |
+| Windows | [Azure](https://portal.azure.com) → Trusted Signing              | **~$9.99/mo** | Cheapest real Authenticode (EV certs are $200–600/yr). No hardware token.    |
+| Linux   | None (GitHub) / Flathub via GitHub PR                            | **Free**      | AppImage/deb on GitHub Releases; Flathub is a free PR.                       |
 
 ### macOS — one-time setup
 
@@ -177,11 +179,11 @@ Secrets to add (repo → Settings → Secrets and variables → Actions):
 
 1. Create a free **Azure account**; add a pay-as-you-go subscription.
 2. Create a **Trusted Signing account** (~$9.99/mo) and a **certificate
-   profile**. *Eligibility:* a registered org verified ≥ 3 years, **or**
+   profile**. _Eligibility:_ a registered org verified ≥ 3 years, **or**
    individual identity validation — budget a few days for Microsoft's identity
    check.
 3. In **Entra ID**, register an **app (service principal)** and give it the
-   *Trusted Signing Certificate Profile Signer* role; create a client secret.
+   _Trusted Signing Certificate Profile Signer_ role; create a client secret.
 
 Secrets to add:
 
@@ -218,7 +220,7 @@ the signing keys can sign software as you. Treat them accordingly.
 
 - **Scope secrets to environments, not the repo.** Put every signing secret in
   the `release` and `nightly` **environments** (repo → Settings → Environments),
-  *not* in repo-wide Actions secrets. Environment secrets are only readable by
+  _not_ in repo-wide Actions secrets. Environment secrets are only readable by
   jobs that declare that `environment:` — which the build jobs now do — so PR/CI
   jobs can never see them. (The Tauri **public** key is not a secret; it lives in
   `tauri.conf.json`.)
@@ -252,7 +254,7 @@ key.** It mostly already holds — here's how to keep it that way.
   (lint/test/build only) and never touches signing. GitHub does not pass
   secrets to fork-PR runs, and the environment scoping above is the backstop.
 - **Guard the privileged trigger.** `welcome.yml` uses `pull_request_target`
-  (which *does* run with repo context) but only posts a greeting and never
+  (which _does_ run with repo context) but only posts a greeting and never
   checks out PR code — keep it that way. Never add `pull_request_target` +
   checkout of the PR head; that's the classic secret-exfiltration hole.
 - **CODEOWNERS gates the dangerous files.** `.github/CODEOWNERS` requires
@@ -270,13 +272,13 @@ key.** It mostly already holds — here's how to keep it that way.
 
 ## Should you gate releases? Yes — here's the layering
 
-Gate by *consequence*, cheaply:
+Gate by _consequence_, cheaply:
 
 1. **Stable already ships as a draft** (`draft: true`) — the human "publish"
    click is your final gate. Keep it; don't auto-publish stable.
 2. **Tag protection.** Restrict who can push `v*` tags (Settings → Tags) so only
    maintainers can trigger a stable build.
-3. **Environment rules** (above) gate *secret access* to the right ref —
+3. **Environment rules** (above) gate _secret access_ to the right ref —
    the most important control, and free.
 4. **Optional required reviewers on `release`.** Add yourself as a required
    reviewer so even a correctly-tagged build pauses for one approval before
@@ -322,7 +324,7 @@ testing also needs Beta App Review). The invisibility core relies on the private
 rejects — the same blocker as the Mac App Store. So there is **no TestFlight path
 for the desktop app**. (TestFlight is iOS-first anyway; eyeread.in is
 desktop-only. If a mobile companion without the capture-exclusion feature is ever
-built, TestFlight would apply to *that*, not to this binary.)
+built, TestFlight would apply to _that_, not to this binary.)
 
 The good news: for a directly-distributed, notarized app you don't need it — the
 **`nightly` channel already is our TestFlight equivalent**, and avoiding review
