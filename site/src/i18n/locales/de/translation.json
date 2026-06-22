@@ -19,14 +19,21 @@
     "subhead": "eyeread.in blendet dein Skript als gläsernes Overlay über jeden Bildschirm ein. Es folgt deiner Stimme – und taucht in keiner Aufnahme auf.",
     "note": "Für immer kostenlos · AGPL-3.0 · Kein Konto erforderlich",
     "primaryCta": "Für macOS & Windows herunterladen",
-    "secondaryCta": "Auf GitHub ansehen"
+    "secondaryCta": "Auf GitHub ansehen",
+    "primaryCtaMac": "Für macOS herunterladen",
+    "primaryCtaWindows": "Für Windows herunterladen",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "Kamera · eyeread.in für Aufnahme verborgen",
     "invisibleBadge": "Vor jeder Bildschirmübertragungs-Software verborgen",
     "slide": {
       "eyebrow": "Q3-Vollversammlung · Acme Corp",
-      "heading": ["Bauen für die", "nächsten zehn Jahre"]
+      "heading": [
+        "Bauen für die",
+        "nächsten zehn Jahre"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "Unterstützer"
   },
   "footer": {
-    "links": ["GitHub", "Doku", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "Doku",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "Für immer kostenlos"
   },
   "switcher": {

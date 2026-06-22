@@ -19,14 +19,21 @@
     "subhead": "eyeread.in तुमची स्क्रिप्ट कोणत्याही स्क्रीनवर काचेच्या ओव्हरलेप्रमाणे दाखवते. ते तुमच्या आवाजाचे अनुसरण करते — आणि कोणत्याही रेकॉर्डिंगमध्ये कधीही दिसत नाही.",
     "note": "कायम मोफत · AGPL-3.0 · खाते आवश्यक नाही",
     "primaryCta": "macOS आणि Windows साठी डाउनलोड करा",
-    "secondaryCta": "GitHub वर पाहा"
+    "secondaryCta": "GitHub वर पाहा",
+    "primaryCtaMac": "macOS आणि Windows साठी डाउनलोड करा",
+    "primaryCtaWindows": "macOS आणि Windows साठी डाउनलोड करा",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "कॅमेरा · रेकॉर्डिंगपासून लपलेले eyeread.in",
     "invisibleBadge": "सर्व स्क्रीन-शेअर सॉफ्टवेअरपासून लपलेले",
     "slide": {
       "eyebrow": "Q3 ऑल-हँड्स · Acme Corp",
-      "heading": ["पुढील दहा वर्षांसाठी", "उभारणी"]
+      "heading": [
+        "पुढील दहा वर्षांसाठी",
+        "उभारणी"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "समर्थक"
   },
   "footer": {
-    "links": ["GitHub", "दस्तऐवज", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "दस्तऐवज",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "कायम मोफत"
   },
   "switcher": {

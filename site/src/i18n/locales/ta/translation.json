@@ -19,14 +19,21 @@
     "subhead": "eyeread.in உங்கள் ஸ்கிரிப்ட்டை எந்தத் திரையின் மீதும் கண்ணாடி அடுக்காகக் காட்டுகிறது. அது உங்கள் குரலைப் பின்தொடர்கிறது — எந்தப் பதிவிலும் ஒருபோதும் தோன்றாது.",
     "note": "என்றும் இலவசம் · AGPL-3.0 · கணக்கு தேவையில்லை",
     "primaryCta": "macOS மற்றும் Windows-க்காகப் பதிவிறக்கவும்",
-    "secondaryCta": "GitHub-ல் பார்க்கவும்"
+    "secondaryCta": "GitHub-ல் பார்க்கவும்",
+    "primaryCtaMac": "macOS மற்றும் Windows-க்காகப் பதிவிறக்கவும்",
+    "primaryCtaWindows": "macOS மற்றும் Windows-க்காகப் பதிவிறக்கவும்",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "கேமரா · பதிவில் இருந்து மறைந்த eyeread.in",
     "invisibleBadge": "அனைத்து திரை-பகிர்வு மென்பொருளிலிருந்தும் மறைந்தது",
     "slide": {
       "eyebrow": "Q3 ஆல்-ஹேண்ட்ஸ் · Acme Corp",
-      "heading": ["அடுத்த பத்து ஆண்டுகளுக்கு", "கட்டமைத்தல்"]
+      "heading": [
+        "அடுத்த பத்து ஆண்டுகளுக்கு",
+        "கட்டமைத்தல்"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "ஆதரவாளர்கள்"
   },
   "footer": {
-    "links": ["GitHub", "ஆவணங்கள்", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "ஆவணங்கள்",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "என்றும் இலவசம்"
   },
   "switcher": {

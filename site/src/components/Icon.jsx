@@ -25,6 +25,7 @@ import {
 import { Icon as IconifyIcon } from '@iconify/react';
 import githubIcon from '@iconify-icons/mdi/github';
 import appleIcon from '@iconify-icons/mdi/apple';
+import windowsIcon from '@iconify-icons/mdi/microsoft-windows';
 
 const LUCIDE = {
   'eye-off': EyeOff,
@@ -47,6 +48,7 @@ const LUCIDE = {
 const BRAND = {
   github: githubIcon,
   apple: appleIcon,
+  windows: windowsIcon,
 };
 
 export function Icon({ name, size = 24 }) {

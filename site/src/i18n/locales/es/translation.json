@@ -19,14 +19,21 @@
     "subhead": "eyeread.in muestra tu guion sobre cualquier pantalla como una capa de cristal. Sigue tu voz y nunca aparece en una grabación.",
     "note": "Gratis para siempre · AGPL-3.0 · Sin necesidad de cuenta",
     "primaryCta": "Descargar para macOS y Windows",
-    "secondaryCta": "Ver en GitHub"
+    "secondaryCta": "Ver en GitHub",
+    "primaryCtaMac": "Descargar para macOS y Windows",
+    "primaryCtaWindows": "Descargar para macOS y Windows",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "Cámara · eyeread.in oculto en la grabación",
     "invisibleBadge": "Oculto de todo software de pantalla compartida",
     "slide": {
       "eyebrow": "Reunión general T3 · Acme Corp",
-      "heading": ["Construyendo para los", "próximos diez años"]
+      "heading": [
+        "Construyendo para los",
+        "próximos diez años"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "Patrocinadores"
   },
   "footer": {
-    "links": ["GitHub", "Docs", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "Docs",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "Gratis para siempre"
   },
   "switcher": {

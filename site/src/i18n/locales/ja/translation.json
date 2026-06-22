@@ -19,14 +19,21 @@
     "subhead": "eyeread.in は、あなたの原稿をガラスのようなオーバーレイとしてどんな画面の上にも浮かべます。あなたの声に追従し、録画には決して映りません。",
     "note": "ずっと無料 · AGPL-3.0 · アカウント不要",
     "primaryCta": "macOS・Windows 版をダウンロード",
-    "secondaryCta": "GitHub で見る"
+    "secondaryCta": "GitHub で見る",
+    "primaryCtaMac": "macOS・Windows 版をダウンロード",
+    "primaryCtaWindows": "macOS・Windows 版をダウンロード",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "カメラ · eyeread.in は録画から隠れています",
     "invisibleBadge": "すべての画面共有ソフトから隠れる",
     "slide": {
       "eyebrow": "Q3 全社ミーティング · Acme Corp",
-      "heading": ["これからの10年を", "築くために"]
+      "heading": [
+        "これからの10年を",
+        "築くために"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "バッカー"
   },
   "footer": {
-    "links": ["GitHub", "ドキュメント", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "ドキュメント",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "ずっと無料"
   },
   "switcher": {

@@ -19,14 +19,21 @@
     "subhead": "eyeread.in 将你的讲稿以玻璃般的浮层悬浮在任意屏幕之上。它跟随你的声音——并且永远不会出现在录制画面里。",
     "note": "永久免费 · AGPL-3.0 · 无需账号",
     "primaryCta": "下载 macOS 和 Windows 版",
-    "secondaryCta": "在 GitHub 上查看"
+    "secondaryCta": "在 GitHub 上查看",
+    "primaryCtaMac": "下载 macOS 和 Windows 版",
+    "primaryCtaWindows": "下载 macOS 和 Windows 版",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "摄像头 · eyeread.in 已从录制中隐藏",
     "invisibleBadge": "对所有屏幕共享软件隐藏",
     "slide": {
       "eyebrow": "Q3 全员大会 · Acme Corp",
-      "heading": ["为未来十年", "而构建"]
+      "heading": [
+        "为未来十年",
+        "而构建"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "支持者"
   },
   "footer": {
-    "links": ["GitHub", "文档", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "文档",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "永久免费"
   },
   "switcher": {

@@ -19,14 +19,21 @@
     "subhead": "eyeread.in మీ స్క్రిప్ట్‌ను ఏ స్క్రీన్ పైనైనా గాజు ఓవర్‌లేగా చూపిస్తుంది. ఇది మీ స్వరాన్ని అనుసరిస్తుంది — మరియు ఏ రికార్డింగ్‌లోనూ ఎప్పుడూ కనిపించదు.",
     "note": "ఎప్పటికీ ఉచితం · AGPL-3.0 · ఖాతా అవసరం లేదు",
     "primaryCta": "macOS మరియు Windows కోసం డౌన్‌లోడ్ చేయండి",
-    "secondaryCta": "GitHub లో చూడండి"
+    "secondaryCta": "GitHub లో చూడండి",
+    "primaryCtaMac": "macOS మరియు Windows కోసం డౌన్‌లోడ్ చేయండి",
+    "primaryCtaWindows": "macOS మరియు Windows కోసం డౌన్‌లోడ్ చేయండి",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "కెమెరా · రికార్డింగ్ నుండి దాగిన eyeread.in",
     "invisibleBadge": "అన్ని స్క్రీన్-షేర్ సాఫ్ట్‌వేర్ నుండి దాగినది",
     "slide": {
       "eyebrow": "Q3 ఆల్-హ్యాండ్స్ · Acme Corp",
-      "heading": ["రాబోయే పదేళ్ల కోసం", "నిర్మాణం"]
+      "heading": [
+        "రాబోయే పదేళ్ల కోసం",
+        "నిర్మాణం"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "మద్దతుదారులు"
   },
   "footer": {
-    "links": ["GitHub", "డాక్స్", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "డాక్స్",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "ఎప్పటికీ ఉచితం"
   },
   "switcher": {

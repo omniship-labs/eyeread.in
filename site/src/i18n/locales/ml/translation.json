@@ -19,14 +19,21 @@
     "subhead": "eyeread.in നിങ്ങളുടെ സ്ക്രിപ്റ്റിനെ ഏത് സ്ക്രീനിനു മുകളിലും ഒരു ഗ്ലാസ് ഓവർലേയായി കാണിക്കുന്നു. അത് നിങ്ങളുടെ ശബ്ദത്തെ പിന്തുടരുന്നു — ഒരു റെക്കോർഡിംഗിലും ഒരിക്കലും കാണില്ല.",
     "note": "എന്നും സൗജന്യം · AGPL-3.0 · അക്കൗണ്ട് ആവശ്യമില്ല",
     "primaryCta": "macOS, Windows എന്നിവയ്ക്കായി ഡൗൺലോഡ് ചെയ്യൂ",
-    "secondaryCta": "GitHub-ൽ കാണുക"
+    "secondaryCta": "GitHub-ൽ കാണുക",
+    "primaryCtaMac": "macOS, Windows എന്നിവയ്ക്കായി ഡൗൺലോഡ് ചെയ്യൂ",
+    "primaryCtaWindows": "macOS, Windows എന്നിവയ്ക്കായി ഡൗൺലോഡ് ചെയ്യൂ",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "ക്യാമറ · റെക്കോർഡിംഗിൽ നിന്ന് മറഞ്ഞ eyeread.in",
     "invisibleBadge": "എല്ലാ സ്ക്രീൻ-ഷെയർ സോഫ്റ്റ്‌വെയറിൽ നിന്നും മറഞ്ഞത്",
     "slide": {
       "eyebrow": "Q3 ഓൾ-ഹാൻഡ്സ് · Acme Corp",
-      "heading": ["അടുത്ത പത്ത് വർഷത്തേക്ക്", "കെട്ടിപ്പടുക്കുന്നു"]
+      "heading": [
+        "അടുത്ത പത്ത് വർഷത്തേക്ക്",
+        "കെട്ടിപ്പടുക്കുന്നു"
+      ]
     },
     "overlay": {
       "timer": "01:24",
@@ -138,7 +145,12 @@
     "backersLabel": "പിന്തുണക്കാർ"
   },
   "footer": {
-    "links": ["GitHub", "ഡോക്സ്", "Discord", "AGPL-3.0"],
+    "links": [
+      "GitHub",
+      "ഡോക്സ്",
+      "Discord",
+      "AGPL-3.0"
+    ],
     "copy": "എന്നും സൗജന്യം"
   },
   "switcher": {
