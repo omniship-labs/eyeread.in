@@ -1,5 +1,5 @@
 import { Icon } from './Icon.jsx';
-import { compat, PLATFORM_ORDER, PLATFORM_GUARANTEE, isStaleVersion } from '../data/compat.js';
+import { compat, PLATFORM_ORDER, PLATFORM_GUARANTEE } from '../data/compat.js';
 
 // Map a result to its pill modifier class.
 const STATUS_CLASS = {
@@ -31,6 +31,11 @@ function Verifiers({ people, untestedLabel }) {
   );
 }
 
+function CaptureTools({ tools }) {
+  if (!tools || tools.length === 0) return <span className="lc-tools-empty">—</span>;
+  return <span className="lc-tools">{tools.join(', ')}</span>;
+}
+
 export default function Compat({ data }) {
   const {
     eyebrow,
@@ -41,7 +46,6 @@ export default function Compat({ data }) {
     guaranteed,
     bestEffort,
     untestedLabel,
-    staleLabel,
     ctaLabel,
     reportHref,
   } = data;
@@ -61,7 +65,7 @@ export default function Compat({ data }) {
               <th>{cols.environment}</th>
               <th>{cols.result}</th>
               <th>{cols.verifiedBy}</th>
-              <th>{cols.appVersion}</th>
+              <th>{cols.captureTools}</th>
             </tr>
           </thead>
           {PLATFORM_ORDER.map((platform) => {
@@ -90,13 +94,8 @@ export default function Compat({ data }) {
                     <td>
                       <Verifiers people={row.verifiers} untestedLabel={untestedLabel} />
                     </td>
-                    <td className="lc-app">
-                      {row.appVersion || '—'}
-                      {row.result !== 'untested' && isStaleVersion(row.appVersion) && (
-                        <span className="lc-stale" title={staleLabel}>
-                          ⟳ {staleLabel}
-                        </span>
-                      )}
+                    <td>
+                      <CaptureTools tools={row.captureTools} />
                     </td>
                   </tr>
                 ))}

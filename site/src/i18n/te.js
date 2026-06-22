@@ -121,7 +121,7 @@ export default {
       environment: 'ఎన్విరాన్‌మెంట్',
       result: 'స్క్రీన్-షేర్',
       verifiedBy: 'ధృవీకరించినవారు',
-      appVersion: 'యాప్',
+      captureTools: 'పరీక్షించిన సాధనాలు',
     },
     status: {
       hidden: 'దాగింది',
@@ -132,7 +132,6 @@ export default {
     guaranteed: 'OS హామీ',
     bestEffort: 'ఉత్తమ-ప్రయత్నం',
     untestedLabel: 'టెస్టర్లు కావాలి',
-    staleLabel: 'మళ్లీ ధృవీకరించండి',
     ctaLabel: 'మీ సెటప్‌ను ధృవీకరించండి →',
   },
 

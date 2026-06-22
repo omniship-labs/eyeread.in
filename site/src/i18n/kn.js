@@ -121,7 +121,7 @@ export default {
       environment: 'ಪರಿಸರ',
       result: 'ಸ್ಕ್ರೀನ್-ಶೇರ್',
       verifiedBy: 'ಪರಿಶೀಲಿಸಿದವರು',
-      appVersion: 'ಆ್ಯಪ್',
+      captureTools: 'ಪರೀಕ್ಷಿಸಿದ ಸಾಧನಗಳು',
     },
     status: {
       hidden: 'ಮರೆಯಾಗಿದೆ',
@@ -132,7 +132,6 @@ export default {
     guaranteed: 'OS-ಖಾತರಿ',
     bestEffort: 'ಅತ್ಯುತ್ತಮ-ಪ್ರಯತ್ನ',
     untestedLabel: 'ಟೆಸ್ಟರ್‌ಗಳು ಬೇಕಾಗಿದ್ದಾರೆ',
-    staleLabel: 'ಮರು-ಪರಿಶೀಲಿಸಿ',
     ctaLabel: 'ನಿಮ್ಮ ಸೆಟಪ್ ಪರಿಶೀಲಿಸಿ →',
   },
 

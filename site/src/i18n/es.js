@@ -122,7 +122,7 @@ export default {
       environment: 'Entorno',
       result: 'Pantalla compartida',
       verifiedBy: 'Verificado por',
-      appVersion: 'App',
+      captureTools: 'Probado con',
     },
     status: {
       hidden: 'Oculto',
@@ -133,7 +133,6 @@ export default {
     guaranteed: 'Garantizado por el SO',
     bestEffort: 'mejor esfuerzo',
     untestedLabel: 'Se buscan testers',
-    staleLabel: 'Reverificar',
     ctaLabel: 'Verifica tu configuración →',
   },
 

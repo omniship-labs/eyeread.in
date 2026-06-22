@@ -120,7 +120,7 @@ export default {
       environment: '环境',
       result: '屏幕共享',
       verifiedBy: '验证者',
-      appVersion: '版本',
+      captureTools: '测试软件',
     },
     status: {
       hidden: '已隐藏',
@@ -131,7 +131,6 @@ export default {
     guaranteed: '系统保障',
     bestEffort: '尽力而为',
     untestedLabel: '招募测试者',
-    staleLabel: '需重新验证',
     ctaLabel: '验证你的环境 →',
   },
 

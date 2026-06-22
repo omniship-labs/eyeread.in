@@ -136,7 +136,7 @@ export default {
       environment: 'Environment',
       result: 'Screen-share',
       verifiedBy: 'Verified by',
-      appVersion: 'App',
+      captureTools: 'Tested with',
     },
     status: {
       hidden: 'Hidden',
@@ -147,7 +147,6 @@ export default {
     guaranteed: 'OS-guaranteed',
     bestEffort: 'best-effort',
     untestedLabel: 'Testers wanted',
-    staleLabel: 'Re-verify',
     ctaLabel: 'Verify your setup →',
   },
 

@@ -122,7 +122,7 @@ export default {
       environment: 'Umgebung',
       result: 'Bildschirmübertragung',
       verifiedBy: 'Geprüft von',
-      appVersion: 'App',
+      captureTools: 'Getestet mit',
     },
     status: {
       hidden: 'Verborgen',
@@ -133,7 +133,6 @@ export default {
     guaranteed: 'OS-garantiert',
     bestEffort: 'best-effort',
     untestedLabel: 'Tester gesucht',
-    staleLabel: 'Neu prüfen',
     ctaLabel: 'Deine Konfiguration prüfen →',
   },
 

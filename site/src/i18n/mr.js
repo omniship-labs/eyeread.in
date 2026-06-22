@@ -122,7 +122,7 @@ export default {
       environment: 'एनव्हायर्नमेंट',
       result: 'स्क्रीन-शेअर',
       verifiedBy: 'कोणी सत्यापित केले',
-      appVersion: 'अ‍ॅप',
+      captureTools: 'चाचणी केली',
     },
     status: {
       hidden: 'लपलेले',
@@ -133,7 +133,6 @@ export default {
     guaranteed: 'OS-सुनिश्चित',
     bestEffort: 'सर्वोत्तम-प्रयत्न',
     untestedLabel: 'टेस्टर हवे आहेत',
-    staleLabel: 'पुन्हा तपासा',
     ctaLabel: 'तुमचा सेटअप सत्यापित करा →',
   },
 

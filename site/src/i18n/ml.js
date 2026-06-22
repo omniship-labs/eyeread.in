@@ -123,7 +123,7 @@ export default {
       environment: 'പരിസരം',
       result: 'സ്ക്രീൻ-ഷെയർ',
       verifiedBy: 'പരിശോധിച്ചത്',
-      appVersion: 'ആപ്പ്',
+      captureTools: 'പരീക്ഷിച്ചത്',
     },
     status: {
       hidden: 'മറഞ്ഞു',
@@ -134,7 +134,6 @@ export default {
     guaranteed: 'OS-ഉറപ്പ്',
     bestEffort: 'മികച്ച-ശ്രമം',
     untestedLabel: 'ടെസ്റ്റർമാരെ ആവശ്യമുണ്ട്',
-    staleLabel: 'വീണ്ടും പരിശോധിക്കൂ',
     ctaLabel: 'നിങ്ങളുടെ സജ്ജീകരണം പരിശോധിക്കൂ →',
   },
 

@@ -121,7 +121,7 @@ export default {
       environment: '環境',
       result: '画面共有',
       verifiedBy: '検証者',
-      appVersion: 'アプリ',
+      captureTools: 'テスト済みアプリ',
     },
     status: {
       hidden: '非表示',
@@ -132,7 +132,6 @@ export default {
     guaranteed: 'OS 保証',
     bestEffort: 'ベストエフォート',
     untestedLabel: 'テスター募集',
-    staleLabel: '要再検証',
     ctaLabel: 'あなたの環境を検証 →',
   },
 

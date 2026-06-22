@@ -122,7 +122,7 @@ export default {
       environment: 'Окружение',
       result: 'Демонстрация экрана',
       verifiedBy: 'Кто проверил',
-      appVersion: 'Прил.',
+      captureTools: 'Тестировалось в',
     },
     status: {
       hidden: 'Скрыто',
@@ -133,7 +133,6 @@ export default {
     guaranteed: 'Гарантия ОС',
     bestEffort: 'по мере возможности',
     untestedLabel: 'Нужны тестировщики',
-    staleLabel: 'Перепроверить',
     ctaLabel: 'Проверить вашу конфигурацию →',
   },
 
