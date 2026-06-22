@@ -263,6 +263,48 @@ draft.
 - **Snap, Chocolatey** — only if the community asks.
 - **Mac App Store** — blocked by private-API usage (see above).
 
+## Beta / QA distribution (the TestFlight question)
+
+**TestFlight does not fit this app.** TestFlight ships builds through App Store
+Connect, which means an App Store / Mac App Store distribution provisioning
+profile, the App Store sandbox, and an upload-time private-API scan (external
+testing also needs Beta App Review). The invisibility core relies on the private
+`NSWindow.sharingType` API (`macOSPrivateApi`), which is exactly what that scan
+rejects — the same blocker as the Mac App Store. So there is **no TestFlight path
+for the desktop app**. (TestFlight is iOS-first anyway; eyeread.in is
+desktop-only. If a mobile companion without the capture-exclusion feature is ever
+built, TestFlight would apply to *that*, not to this binary.)
+
+The good news: for a directly-distributed, notarized app you don't need it — the
+**`nightly` channel already is our TestFlight equivalent**, and avoiding review
+is a feature, not a gap. Map of what TestFlight gives vs. how we cover it:
+
+| TestFlight capability      | Our equivalent (no store)                                              |
+| -------------------------- | ---------------------------------------------------------------------- |
+| Beta build distribution    | `nightly` GitHub pre-release (Developer ID-signed + notarized)         |
+| Auto-update for testers    | Tauri updater on the nightly endpoint (works once `pubkey` is set)     |
+| Tester management / groups | GitHub (watchers), a Discord/mailing list, or a private `beta` channel |
+| Crash reports & feedback   | Add `tauri-plugin-sentry` (or similar) + the compat-report issue form  |
+| Staged rollout             | Promote nightly → optional `beta` (RC) → stable                        |
+| 90-day build expiry        | N/A — direct builds don't expire                                       |
+
+### Optional: a third `beta` (release-candidate) channel
+
+Two channels (nightly, stable) are enough today. If you want a calmer pre-release
+ring than nightly without touching stable, add a `beta` channel that mirrors the
+release workflow but triggers on `v*-beta.*` tags, publishes a **pre-release**
+(not draft), and serves its own `latest.json` under a `beta` tag with bundle id
+`in.eyeread.app.beta`. Opt-in users point the updater at the beta endpoint.
+Worth it only once there's a tester base asking for RCs.
+
+### Crash/feedback telemetry (the real TestFlight value)
+
+The one thing the store gives that we don't yet: structured crash + feedback.
+Cheapest privacy-respecting path is **self-hosted Sentry (GlitchTip) or the
+free Sentry tier** wired via `tauri-plugin-sentry`, opt-in, with the policy
+noted in `PRIVACY.md`. This is the highest-value beta addition — prioritise it
+over a separate beta channel.
+
 ## Suggested execution order
 
 1. **Azure Trusted Signing** for Windows — set the secrets; unblocks winget and
@@ -272,3 +314,5 @@ draft.
 3. **Homebrew Cask + winget** submissions (both consume signed GitHub assets).
 4. **Flathub** for Linux.
 5. **`get.eyeread.in` download page** with OS/arch auto-detect.
+6. **Opt-in crash/feedback telemetry** (`tauri-plugin-sentry`) — the genuine
+   TestFlight value; do before a dedicated `beta` channel.
