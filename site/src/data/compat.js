@@ -1,52 +1,45 @@
 /* ============================================================
    Screen-share compatibility matrix — SINGLE SOURCE OF TRUTH.
    ------------------------------------------------------------
+   The actual rows live in `compat.data.json` (next to this file).
+   This module just imports that JSON and re-exports it with the
+   display metadata. WHY THE SPLIT:
+
+     • The compat data is fed by community reports through an
+       automated pipeline (.github/workflows/compat-report.yml →
+       scripts/apply-compat-report.mjs). That bot writes the rows
+       as JSON via JSON.stringify of *validated, allowlisted*
+       values — JSON can't carry executable code, so an untrusted
+       tester report can never inject anything that runs at build
+       time or ships in the bundle. Keeping the data out of this
+       .js file is the whole point.
+
    Rendered on the marketing site (components/Compat.jsx) at
-   /#compatibility. The README links to that live matrix rather than
-   duplicating it. Add a row — or fill in the verifiers — whenever a
-   tester confirms a setup.
+   /#compatibility and in the in-app About window (src/lib/credits.js).
+   The README links to the live matrix rather than duplicating it.
 
    On macOS and Windows invisibility is OS-guaranteed; rows there
-   record which OS versions have been confirmed by a real human. On
-   Linux there is no guarantee, so the result column is the whole
-   point — it says whether the overlay actually stayed hidden.
+   record which OS versions a real human has confirmed. On Linux
+   there is no guarantee, so the result column is the whole point —
+   it says whether the overlay actually stayed hidden.
 
-   platform: 'macOS' | 'Windows' | 'Linux'   (grouping + guarantee)
-   result:
-     'hidden'   → overlay confirmed EXCLUDED from capture (works)
-     'partial'  → hidden in some capture tools but not all
-     'visible'  → overlay shows up in the capture (does NOT work)
-     'untested' → no verified report yet — testers wanted!
-
-   captureTools: which screen-sharing apps were tested, e.g.
-     ['Zoom', 'Google Meet', 'OBS Studio', 'Discord']
-
-   verifiers: GitHub users who confirmed it, e.g.
-     { name: 'octocat', profile: 'https://github.com/octocat' }
+   Row shape (see compat.data.json):
+     platform     'macOS' | 'Windows' | 'Linux'  (grouping + guarantee)
+     version      OS version string
+     env          chip/arch (macOS/Windows) or desktop·session (Linux)
+     result       'hidden'   → confirmed EXCLUDED from capture (works)
+                  'partial'  → hidden in some capture tools but not all
+                  'visible'  → shows up in the capture (does NOT work)
+                  'untested' → no verified report yet — testers wanted!
+     captureTools which screen-sharing apps were tested, e.g.
+                  ['Zoom', 'Google Meet', 'OBS Studio']
+     verifiers    GitHub users who confirmed it, e.g.
+                  { name: 'octocat', profile: 'https://github.com/octocat' }
    ============================================================ */
 
-export const compat = [
-  // ── macOS — OS-guaranteed (NSWindow.sharingType = .none) ──
-  { platform: 'macOS', version: 'macOS 15 Sequoia', env: 'Apple Silicon', result: 'hidden', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'macOS', version: 'macOS 14 Sonoma', env: 'Apple Silicon', result: 'hidden', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'macOS', version: 'macOS 13 Ventura', env: 'Intel', result: 'hidden', captureTools: [], date: '', verifiers: [], notes: '' },
+import data from './compat.data.json';
 
-  // ── Windows — OS-guaranteed (WDA_EXCLUDEFROMCAPTURE, Win10 2004+) ──
-  { platform: 'Windows', version: 'Windows 11 23H2', env: 'x64', result: 'hidden', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Windows', version: 'Windows 11 22H2', env: 'x64', result: 'hidden', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Windows', version: 'Windows 10 22H2', env: 'x64', result: 'hidden', captureTools: [], date: '', verifiers: [], notes: '' },
-
-  // ── Linux — best-effort (depends entirely on the compositor) ──
-  { platform: 'Linux', version: 'Ubuntu 24.04 LTS', env: 'GNOME · Wayland', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Ubuntu 24.04 LTS', env: 'GNOME · X11', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Fedora 40', env: 'GNOME · Wayland', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Fedora 40 KDE', env: 'KDE Plasma 6 · Wayland', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Debian 12', env: 'GNOME · Wayland', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Arch Linux', env: 'KDE Plasma 6 · Wayland', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Arch Linux', env: 'Hyprland · Wayland', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Linux Mint 21', env: 'Cinnamon · X11', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-  { platform: 'Linux', version: 'Pop!_OS 22.04', env: 'GNOME · X11', result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' },
-];
+export const compat = data.rows;
 
 // Fixed display order + per-platform guarantee level.
 export const PLATFORM_ORDER = ['macOS', 'Windows', 'Linux'];

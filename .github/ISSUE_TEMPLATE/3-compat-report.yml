@@ -6,14 +6,17 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping verify eyeread.in! Confirmed reports get added to the
-        compatibility matrix on the site and in the README — with credit to you.
+        Thanks for helping verify eyeread.in! Once a maintainer accepts your
+        report it's added to the [compatibility matrix](https://eyeread.in/#compatibility)
+        on the site and the About window — **credited to your GitHub account**
+        (the one filing this issue), so there's no need to type a handle.
 
         **How to test (please actually do this):**
         1. Open the overlay and make sure **Hide from screen-share** is ON.
         2. Start a real screen share or recording — **Zoom, Google Meet, Teams,
-           OBS, or QuickTime** — sharing your **whole screen**.
-        3. Look at the captured/recorded output: is the overlay there or not?
+           OBS, or QuickTime** — and look at the **captured/recorded output**,
+           not your own screen.
+        3. Note whether the overlay is there or not.
 
   - type: dropdown
     id: platform
@@ -45,11 +48,17 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: app_version
+  - type: dropdown
+    id: scope
     attributes:
-      label: eyeread.in version
-      placeholder: 'e.g. 0.1.0'
+      label: What did you share?
+      description: >
+        This matters — exclude-from-capture can behave differently for a whole
+        display vs. a single window. Test whole-screen if you can.
+      options:
+        - Whole screen / entire display
+        - A single window or app
+        - Both
     validations:
       required: true
 
@@ -81,25 +90,28 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: app_version
+    attributes:
+      label: eyeread.in version (optional)
+      description: Helps us triage if something regressed. Find it in the About window.
+      placeholder: 'e.g. 0.1.0'
+
   - type: textarea
     id: notes
     attributes:
       label: Evidence / notes
       description: >
         Anything useful — which tools differed, a screenshot of the captured
-        output, compositor quirks, etc. (Don't paste anything you wouldn't want public.)
-
-  - type: input
-    id: credit
-    attributes:
-      label: GitHub handle for credit (optional)
-      description: How you'd like to be listed in the compatibility matrix.
-      placeholder: '@yourname'
+        output, compositor quirks, or the name of an "Other" tool you picked
+        above. (Don't paste anything you wouldn't want public.)
 
   - type: checkboxes
     id: confirm
     attributes:
       label: Confirmation
       options:
-        - label: I actually started a real screen share / recording and checked the captured output (not just the local screen).
+        - label: I started a real screen share / recording and checked the captured output (not just my local screen).
+          required: true
+        - label: This is my own first-hand test, not copied from someone else's report.
           required: true
