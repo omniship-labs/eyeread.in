@@ -71,7 +71,6 @@ the updater already keys on arch.
   **private** Key-Value-Coding call `webView.setValue(false, forKey:
 "drawsBackground")` — which is exactly what Tauri's `macos-private-api`
   feature does under the hood. Findings:
-
   - **No public API exists** to make a macOS WKWebView background transparent.
     Apple's feedback request for one (FB7539179 / feedback-assistant #81) has
     sat open since 2020 with no public API added; CSS `background: transparent`
