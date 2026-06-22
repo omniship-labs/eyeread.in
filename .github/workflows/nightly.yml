@@ -60,6 +60,11 @@ jobs:
 
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
+    # Signing secrets live in the `nightly` environment. Configure it in repo
+    # settings with a deployment-branch rule limited to `dev` so the secrets can
+    # never be reached from any other ref. Leave reviewers empty — nightly is
+    # automated.
+    environment: nightly
 
     steps:
       - uses: actions/checkout@v4

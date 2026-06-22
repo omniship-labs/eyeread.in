@@ -163,6 +163,82 @@ The updater won't verify downloads until a public key is set. Run
 - **Windows unsigned:** Tauri-signed only; SmartScreen warns and winget won't
   accept it. The Azure ~$10/mo is the smallest spend that removes both problems.
 
+## Handling secrets
+
+The threat to manage: this is a **public, AGPL** repo that accepts fork PRs, and
+the signing keys can sign software as you. Treat them accordingly.
+
+- **Scope secrets to environments, not the repo.** Put every signing secret in
+  the `release` and `nightly` **environments** (repo → Settings → Environments),
+  *not* in repo-wide Actions secrets. Environment secrets are only readable by
+  jobs that declare that `environment:` — which the build jobs now do — so PR/CI
+  jobs can never see them. (The Tauri **public** key is not a secret; it lives in
+  `tauri.conf.json`.)
+- **Restrict where secrets can be used.** On the `release` environment add a
+  **deployment tag rule** (`v*`); on `nightly`, a **deployment branch rule**
+  (`dev` only). Now the secrets are unreachable from any fork, branch, or tag
+  outside those rules.
+- **Prefer OIDC over a stored Azure secret (free hardening).** Instead of
+  `AZURE_CLIENT_SECRET`, configure a **federated credential** in Entra ID for
+  this repo's environment and add `permissions: id-token: write` +
+  `azure/login@v2`. `trusted-signing-cli` then authenticates with a short-lived
+  token and there's no long-lived secret to leak or rotate. Recommended once the
+  basic path works.
+- **Rotation & expiry.** Azure client secrets and the federated trust expire —
+  calendar a renewal. Apple certs expire yearly; the app-specific password can
+  be revoked from appleid.apple.com.
+- **Back up the irreplaceable keys offline.** Store the **Tauri updater private
+  key** + passphrase and the Apple `.p12` in a password manager / offline vault.
+  Losing the Tauri key means you can never push an update to already-installed
+  apps — there is no recovery.
+- **Never log them.** Jobs pass secrets via `env:` only; don't `echo` them. The
+  Azure endpoint/account/profile written into `signCommand` args are identifiers,
+  not credentials — fine to appear in logs.
+
+## Contributor onboarding & fork safety
+
+The model: **anyone can contribute code; no contributor can reach a signing
+key.** It mostly already holds — here's how to keep it that way.
+
+- **CI for PRs is secret-free by design.** `ci.yml` runs on `pull_request`
+  (lint/test/build only) and never touches signing. GitHub does not pass
+  secrets to fork-PR runs, and the environment scoping above is the backstop.
+- **Guard the privileged trigger.** `welcome.yml` uses `pull_request_target`
+  (which *does* run with repo context) but only posts a greeting and never
+  checks out PR code — keep it that way. Never add `pull_request_target` +
+  checkout of the PR head; that's the classic secret-exfiltration hole.
+- **CODEOWNERS gates the dangerous files.** `.github/CODEOWNERS` requires
+  maintainer review for `.github/`, the Tauri/signing config, and licensing —
+  so a PR can't quietly rewrite the release workflow to print secrets. Pair it
+  with a branch rule that **requires review from Code Owners**.
+- **Require approval to run workflows from first-time contributors** (repo →
+  Settings → Actions → "Require approval for all outside collaborators"). Stops
+  a drive-by PR from running CI at all until a maintainer eyeballs it.
+- **CLA is already enforced** (cla-assistant) — keep it; it's your legal basis
+  for the dual AGPL/commercial license.
+- **Branch protection on `main` and `dev`:** require CI to pass + at least one
+  review + Code Owner review; disallow force-push. `dev` feeds nightly and
+  `main` feeds tags, so protecting them protects the signed channels.
+
+## Should you gate releases? Yes — here's the layering
+
+Gate by *consequence*, cheaply:
+
+1. **Stable already ships as a draft** (`draft: true`) — the human "publish"
+   click is your final gate. Keep it; don't auto-publish stable.
+2. **Tag protection.** Restrict who can push `v*` tags (Settings → Tags) so only
+   maintainers can trigger a stable build.
+3. **Environment rules** (above) gate *secret access* to the right ref —
+   the most important control, and free.
+4. **Optional required reviewers on `release`.** Add yourself as a required
+   reviewer so even a correctly-tagged build pauses for one approval before
+   signing runs. Worth it for a solo maintainer who wants a deliberate "go".
+   Leave `nightly` reviewer-free so automation isn't blocked.
+
+Net: nightly is automatic but ref-locked to `dev`; stable needs a protected tag,
+runs in a gated environment, and still won't go public until you publish the
+draft.
+
 ## Where we distribute
 
 ### Canonical (own it now)

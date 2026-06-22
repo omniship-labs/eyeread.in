@@ -97,6 +97,10 @@ jobs:
 
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
+    # Signing secrets live in the `release` environment. Configure it in repo
+    # settings with a deployment-tag rule (v*) and, optionally, required
+    # reviewers so a human approves before any signing job can run.
+    environment: release
 
     steps:
       - uses: actions/checkout@v4
