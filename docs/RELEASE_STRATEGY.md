@@ -39,10 +39,30 @@ the updater already keys on arch.
 - **Signing:** Apple Developer ID + notarization + stapling (see the
   `import-apple-cert` action and the `APPLE_*` secrets). This is mandatory —
   Gatekeeper blocks unsigned/unnotarized apps.
-- **Invisibility:** `NSWindow.sharingType = .none` via `macOSPrivateApi` +
-  `contentProtected`.
-- **Mac App Store: not pursued.** Private API + the App Store sandbox are
-  mutually exclusive; MAS would reject the build. Direct distribution only.
+- **Invisibility:** capture exclusion uses `NSWindow.sharingType = .none` —
+  this is **public** AppKit API, mapped from Tauri's `contentProtected`, and is
+  *not* itself an App Store blocker.
+- **Mac App Store: blocked by the transparent overlay, not by invisibility.**
+  The glass overlay window needs `app.macOSPrivateApi: true` (in
+  `tauri.conf.json`) plus the Rust `macos-private-api` feature. Tauri documents
+  that enabling this **"will prevent your application from being accepted into
+  the App Store."** The sandbox MAS also requires would separately strain
+  global-shortcut and always-on-top-across-Spaces behaviour. So the *current*
+  build is MAS-ineligible — direct Developer ID distribution only.
+
+  **Could MAS ever happen?** Only as a separate, sandboxed build variant that
+  earns its way past the private-API flag:
+  1. Re-implement window transparency with **public APIs only** (custom
+     `NSWindow`/`NSVisualEffectView` via a small native plugin) so
+     `macOSPrivateApi` can be turned off. This is the hard, load-bearing part.
+  2. Adopt the **App Sandbox** with entitlements and re-verify global shortcuts,
+     always-on-top across Spaces, SQLite in the container, and capture exclusion
+     all still work sandboxed.
+  3. Ship it as a **parallel MAS target** (App Store provisioning, no
+     self-updater — MAS handles updates), kept alongside the Developer ID build.
+
+  Treat MAS as a future discoverability play, not a near-term channel — and
+  never as a replacement for the direct build.
 - **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `10.15` (Catalina). This
   also sets the build's deployment target.
 
@@ -261,7 +281,8 @@ draft.
 - **Microsoft Store (MSIX)** — possible, but the capture-exclusion API may draw
   review questions; revisit later.
 - **Snap, Chocolatey** — only if the community asks.
-- **Mac App Store** — blocked by private-API usage (see above).
+- **Mac App Store** — blocked by the `macOSPrivateApi` transparent-window flag;
+  only viable as a separate sandboxed variant that drops it (see macOS above).
 
 ## Beta / QA distribution (the TestFlight question)
 
