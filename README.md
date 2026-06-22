@@ -28,6 +28,8 @@ capture pipeline before any capture software sees it.
 | **Windows** | ✅ Fully supported | `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` — Windows 10 2004+.                           |
 | **Linux**   | ⚠️ Experimental    | No portable exclusion exists — outcome depends entirely on the compositor.                       |
 
+**Minimum OS versions:** macOS 10.15 Catalina · Windows 10 v2004 (build 19041, required for capture exclusion) · Linux from the Ubuntu 22.04 / Debian 12 / glibc 2.35 era.
+
 **Windows.** `WDA_EXCLUDEFROMCAPTURE` is enforced by the Desktop Window Manager _before_ any
 capture API runs, so the window is excluded from **DXGI Desktop Duplication, Windows.Graphics.Capture,
 and BitBlt** alike — i.e. Zoom, Teams, Google Meet, Discord, and OBS all see nothing, while the

@@ -43,8 +43,8 @@ the updater already keys on arch.
   `contentProtected`.
 - **Mac App Store: not pursued.** Private API + the App Store sandbox are
   mutually exclusive; MAS would reject the build. Direct distribution only.
-- **TODO:** set `minimumSystemVersion` in `tauri.conf.json` so old Macs are
-  rejected at install/update time rather than crashing.
+- **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `10.15` (Catalina). This
+  also sets the build's deployment target.
 
 ### Windows — fully supported
 
@@ -69,6 +69,11 @@ the updater already keys on arch.
   CI.
 - **arm64:** cross-compiled from the x64 `windows-latest` runner. WebView2 is
   arch-independent at runtime.
+- **Minimum OS:** Windows 10 version 2004 (build 19041) — the floor for
+  `WDA_EXCLUDEFROMCAPTURE`. There's no Tauri config to hard-gate the OS version,
+  so the app checks at runtime and the invisibility feature degrades gracefully
+  on older builds. The installer pins a minimum WebView2 runtime
+  (`minimumWebview2Version`).
 
 ### Linux — experimental
 
@@ -79,8 +84,84 @@ the updater already keys on arch.
 - **Formats:** **AppImage** (portable, distro-agnostic — the recommended format
   for testers and the updater's Linux artifact) plus **.deb** for
   Debian/Ubuntu.
-- **glibc floor:** built on `ubuntu-22.04` (not `-latest`) so the AppImage runs
-  on a wider range of distros.
+- **glibc floor / minimum OS:** built on `ubuntu-22.04` (glibc 2.35). The
+  AppImage runs on distros of that vintage or newer — roughly Ubuntu 22.04+,
+  Debian 12+, Fedora 36+. Older distros are out of scope.
+
+## Minimum OS versions
+
+| OS      | Minimum                                   | Enforced by                                  |
+| ------- | ----------------------------------------- | -------------------------------------------- |
+| macOS   | 10.15 Catalina                            | `bundle.macOS.minimumSystemVersion`          |
+| Windows | 10 v2004 (build 19041)                    | runtime check (feature) + WebView2 floor     |
+| Linux   | Ubuntu 22.04 / Debian 12 / glibc 2.35 era | build host (`ubuntu-22.04`)                   |
+
+## Accounts, secrets & cost (the cheap path)
+
+Total recurring cost for full trust on all three OSes: **≈ $99/yr (Apple) +
+≈ $120/yr (Azure Trusted Signing) = ~$219/yr.** Linux is free.
+
+| OS      | Account to create                              | Cost            | Why it's the cheap option                                            |
+| ------- | ---------------------------------------------- | --------------- | -------------------------------------------------------------------- |
+| macOS   | [Apple Developer Program](https://developer.apple.com/programs/) | **$99/yr**      | Only way to notarize. No cheaper legit path; skipping = Gatekeeper warnings. |
+| Windows | [Azure](https://portal.azure.com) → Trusted Signing | **~$9.99/mo**   | Cheapest real Authenticode (EV certs are $200–600/yr). No hardware token. |
+| Linux   | None (GitHub) / Flathub via GitHub PR          | **Free**        | AppImage/deb on GitHub Releases; Flathub is a free PR.               |
+
+### macOS — one-time setup
+
+1. Join the **Apple Developer Program** ($99/yr).
+2. In the dev portal, create a **Developer ID Application** certificate; export
+   it as a password-protected `.p12`.
+3. Create an **app-specific password** at <https://appleid.apple.com> (for
+   notarization).
+4. Note your 10-char **Team ID** (Membership page).
+
+Secrets to add (repo → Settings → Secrets and variables → Actions):
+
+- `APPLE_CERTIFICATE` — `base64 -i cert.p12` output
+- `APPLE_CERTIFICATE_PASSWORD` — the `.p12` password
+- `APPLE_SIGNING_IDENTITY` — e.g. `Developer ID Application: Your Name (TEAMID)`
+- `APPLE_ID` — your Apple ID email
+- `APPLE_ID_PASSWORD` — the app-specific password
+- `APPLE_TEAM_ID` — the 10-char team ID
+
+### Windows — one-time setup (Azure Trusted Signing)
+
+1. Create a free **Azure account**; add a pay-as-you-go subscription.
+2. Create a **Trusted Signing account** (~$9.99/mo) and a **certificate
+   profile**. *Eligibility:* a registered org verified ≥ 3 years, **or**
+   individual identity validation — budget a few days for Microsoft's identity
+   check.
+3. In **Entra ID**, register an **app (service principal)** and give it the
+   *Trusted Signing Certificate Profile Signer* role; create a client secret.
+
+Secrets to add:
+
+- `AZURE_TRUSTED_SIGNING_ENDPOINT` — e.g. `https://eus.codesigning.azure.net/`
+- `AZURE_TRUSTED_SIGNING_ACCOUNT` — Trusted Signing account name
+- `AZURE_TRUSTED_SIGNING_PROFILE` — certificate profile name
+- `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` — the service principal
+
+Until these are set, Windows builds are Tauri-signed only (updater works,
+SmartScreen warns) — nothing breaks.
+
+### Shared — Tauri updater key (free, do this first)
+
+The updater won't verify downloads until a public key is set. Run
+`npm run tauri signer generate` once, then:
+
+- Paste the **public key** into `plugins.updater.pubkey` in `tauri.conf.json`
+  (currently empty — must be filled before the updater is trusted).
+- Add the **private key** + passphrase as secrets:
+  - `TAURI_SIGNING_PRIVATE_KEY`
+  - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
+
+### Free-but-worse fallbacks (if you can't pay yet)
+
+- **macOS unsigned:** ship the `.dmg` without notarization — users must
+  right-click → Open or run `xattr -dr com.apple.quarantine`. Bad first-run UX.
+- **Windows unsigned:** Tauri-signed only; SmartScreen warns and winget won't
+  accept it. The Azure ~$10/mo is the smallest spend that removes both problems.
 
 ## Where we distribute
 
