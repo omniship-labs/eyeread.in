@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useConfig } from './config.js';
 import { useDocumentMeta } from './hooks/useDocumentMeta.js';
-import { docsPages } from './docs/registry.js';
+import { docsPages, DOCS_ROUTE, DOCS_SLUG_ROUTE } from './docs/registry.js';
 import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
 import Features from './components/Features.jsx';
@@ -56,8 +56,8 @@ export default function App() {
       <ScrollToTop />
       <Nav config={config} />
       <Routes>
-        <Route path="/docs" element={<DocsLayout page={DOCS_INDEX} />} />
-        <Route path="/docs/:slug" element={<DocsRoute />} />
+        <Route path={DOCS_ROUTE} element={<DocsLayout page={DOCS_INDEX} />} />
+        <Route path={DOCS_SLUG_ROUTE} element={<DocsRoute />} />
         <Route path="*" element={<Home config={config} />} />
       </Routes>
       <Footer config={config} />

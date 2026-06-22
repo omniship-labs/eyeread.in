@@ -18,6 +18,11 @@ export const DOCS_NS = 'docs';
 // Path prefix the docs are served at.
 export const DOCS_BASE = '/docs';
 
+// React-router patterns for the docs routes — the single source of truth shared
+// by App.jsx's <Routes> and the routing test.
+export const DOCS_ROUTE = DOCS_BASE; // '/docs' → index
+export const DOCS_SLUG_ROUTE = `${DOCS_BASE}/:slug`; // '/docs/:slug' → a page
+
 // Sidebar order. `slug` is the URL segment ('' = the docs index);
 // `key` indexes into the docs content bundle (content.en.js).
 export const docsPages = [
