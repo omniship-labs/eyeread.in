@@ -45,27 +45,25 @@ export function LinuxShareConsent({ onAccept, onCancel }) {
 
         <div className="lsc-body">
           <p>
-            On macOS and Windows the operating system guarantees this window is
-            excluded from screen capture. <b>Linux has no such guarantee.</b>
+            On macOS and Windows the operating system guarantees this window is excluded from
+            screen capture. <b>Linux has no such guarantee.</b>
           </p>
           <ul className="lsc-list">
             <li>
-              Whether the overlay is hidden depends entirely on your compositor
-              (KWin, Mutter, wlroots, X11…). On most setups it will <b>not</b> be
-              hidden.
+              Whether the overlay is hidden depends entirely on your compositor (KWin, Mutter,
+              wlroots, X11…). On most setups it will <b>not</b> be hidden.
             </li>
             <li>
-              Your script may be fully visible to anyone you are sharing with, or
-              appear in recordings.
+              Your script may be fully visible to anyone you are sharing with, or appear in
+              recordings.
             </li>
             <li>
-              <b>Always verify with a test recording</b> before relying on it in
-              a real call.
+              <b>Always verify with a test recording</b> before relying on it in a real call.
             </li>
           </ul>
           <p>
-            Do you understand the risk and want to enable it anyway? You won&apos;t
-            be asked again.
+            Do you understand the risk and want to enable it anyway? You won&apos;t be asked
+            again.
           </p>
         </div>
 

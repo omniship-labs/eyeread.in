@@ -43,6 +43,10 @@ export const compat = data.rows;
 
 // Fixed display order + per-platform guarantee level.
 export const PLATFORM_ORDER = ['macOS', 'Windows', 'Linux'];
-export const PLATFORM_GUARANTEE = { macOS: 'guaranteed', Windows: 'guaranteed', Linux: 'bestEffort' };
+export const PLATFORM_GUARANTEE = {
+  macOS: 'guaranteed',
+  Windows: 'guaranteed',
+  Linux: 'bestEffort',
+};
 
 export default compat;

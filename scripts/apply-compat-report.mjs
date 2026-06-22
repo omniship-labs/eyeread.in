@@ -132,11 +132,20 @@ async function main() {
   const rows = db.rows;
 
   let row = rows.find(
-    (r) => r.platform === platform && eq(r.version, version) && eq(r.env, env),
+    (r) => r.platform === platform && eq(r.version, version) && eq(r.env, env)
   );
   const isNew = !row;
   if (isNew) {
-    row = { platform, version, env, result: 'untested', captureTools: [], date: '', verifiers: [], notes: '' };
+    row = {
+      platform,
+      version,
+      env,
+      result: 'untested',
+      captureTools: [],
+      date: '',
+      verifiers: [],
+      notes: '',
+    };
     rows.push(row);
   }
 
@@ -196,7 +205,7 @@ async function main() {
         `pr_title=compat: ${platform} ${version} (${env}) — report from #${num}`,
         `pr_branch=compat-report/issue-${num}`,
         '',
-      ].join('\n'),
+      ].join('\n')
     );
   }
 
