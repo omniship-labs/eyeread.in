@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "vite",
     "sponsors": "node scripts/fetch-sponsors.mjs",
-    "gen:compat": "node scripts/gen-compat.mjs",
     "prebuild": "node scripts/fetch-sponsors.mjs",
     "build": "vite build",
     "preview": "vite preview",
