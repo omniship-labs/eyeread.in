@@ -26,10 +26,7 @@
     "invisibleBadge": "すべての画面共有ソフトから隠れる",
     "slide": {
       "eyebrow": "Q3 全社ミーティング · Acme Corp",
-      "heading": [
-        "これからの10年を",
-        "築くために"
-      ]
+      "heading": ["これからの10年を", "築くために"]
     },
     "overlay": {
       "timer": "01:24",
@@ -141,12 +138,7 @@
     "backersLabel": "バッカー"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "ドキュメント",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "ドキュメント", "Discord", "AGPL-3.0"],
     "copy": "ずっと無料"
   },
   "switcher": {

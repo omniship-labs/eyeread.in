@@ -26,10 +26,7 @@
     "invisibleBadge": "सर्व स्क्रीन-शेअर सॉफ्टवेअरपासून लपलेले",
     "slide": {
       "eyebrow": "Q3 ऑल-हँड्स · Acme Corp",
-      "heading": [
-        "पुढील दहा वर्षांसाठी",
-        "उभारणी"
-      ]
+      "heading": ["पुढील दहा वर्षांसाठी", "उभारणी"]
     },
     "overlay": {
       "timer": "01:24",
@@ -141,12 +138,7 @@
     "backersLabel": "समर्थक"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "दस्तऐवज",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "दस्तऐवज", "Discord", "AGPL-3.0"],
     "copy": "कायम मोफत"
   },
   "switcher": {

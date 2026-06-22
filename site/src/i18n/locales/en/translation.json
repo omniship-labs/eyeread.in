@@ -26,10 +26,7 @@
     "invisibleBadge": "Hidden from all screen-share software",
     "slide": {
       "eyebrow": "Q3 All-Hands · Acme Corp",
-      "heading": [
-        "Building for the",
-        "next ten years"
-      ]
+      "heading": ["Building for the", "next ten years"]
     },
     "overlay": {
       "timer": "01:24",
@@ -141,12 +138,7 @@
     "backersLabel": "Backers"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "Docs",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "Docs", "Discord", "AGPL-3.0"],
     "copy": "Free forever"
   },
   "switcher": {

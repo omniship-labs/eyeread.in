@@ -26,10 +26,7 @@
     "invisibleBadge": "对所有屏幕共享软件隐藏",
     "slide": {
       "eyebrow": "Q3 全员大会 · Acme Corp",
-      "heading": [
-        "为未来十年",
-        "而构建"
-      ]
+      "heading": ["为未来十年", "而构建"]
     },
     "overlay": {
       "timer": "01:24",
@@ -141,12 +138,7 @@
     "backersLabel": "支持者"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "文档",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "文档", "Discord", "AGPL-3.0"],
     "copy": "永久免费"
   },
   "switcher": {

@@ -26,10 +26,7 @@
     "invisibleBadge": "అన్ని స్క్రీన్-షేర్ సాఫ్ట్‌వేర్ నుండి దాగినది",
     "slide": {
       "eyebrow": "Q3 ఆల్-హ్యాండ్స్ · Acme Corp",
-      "heading": [
-        "రాబోయే పదేళ్ల కోసం",
-        "నిర్మాణం"
-      ]
+      "heading": ["రాబోయే పదేళ్ల కోసం", "నిర్మాణం"]
     },
     "overlay": {
       "timer": "01:24",
@@ -141,12 +138,7 @@
     "backersLabel": "మద్దతుదారులు"
   },
   "footer": {
-    "links": [
-      "GitHub",
-      "డాక్స్",
-      "Discord",
-      "AGPL-3.0"
-    ],
+    "links": ["GitHub", "డాక్స్", "Discord", "AGPL-3.0"],
     "copy": "ఎప్పటికీ ఉచితం"
   },
   "switcher": {
