@@ -19,6 +19,10 @@
     "subhead": "eyeread.in floats your script over any screen as a glass overlay. It follows your voice — and never shows up in a recording.",
     "note": "Free forever · AGPL-3.0 · No account required",
     "primaryCta": "Download for macOS & Windows",
+    "primaryCtaMac": "Download for macOS",
+    "primaryCtaWindows": "Download for Windows",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
     "secondaryCta": "View on GitHub"
   },
   "demo": {

@@ -19,7 +19,11 @@
     "subhead": "eyeread.in blendet dein Skript als gläsernes Overlay über jeden Bildschirm ein. Es folgt deiner Stimme – und taucht in keiner Aufnahme auf.",
     "note": "Für immer kostenlos · AGPL-3.0 · Kein Konto erforderlich",
     "primaryCta": "Für macOS & Windows herunterladen",
-    "secondaryCta": "Auf GitHub ansehen"
+    "secondaryCta": "Auf GitHub ansehen",
+    "primaryCtaMac": "Für macOS herunterladen",
+    "primaryCtaWindows": "Für Windows herunterladen",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "Kamera · eyeread.in für Aufnahme verborgen",

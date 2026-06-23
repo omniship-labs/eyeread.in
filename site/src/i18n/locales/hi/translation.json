@@ -19,7 +19,11 @@
     "subhead": "eyeread.in आपकी स्क्रिप्ट को किसी भी स्क्रीन पर एक ग्लास ओवरले के रूप में दिखाता है। यह आपकी आवाज़ का अनुसरण करता है — और किसी रिकॉर्डिंग में कभी नहीं दिखता।",
     "note": "हमेशा के लिए मुफ़्त · AGPL-3.0 · किसी खाते की ज़रूरत नहीं",
     "primaryCta": "macOS और Windows के लिए डाउनलोड करें",
-    "secondaryCta": "GitHub पर देखें"
+    "secondaryCta": "GitHub पर देखें",
+    "primaryCtaMac": "macOS और Windows के लिए डाउनलोड करें",
+    "primaryCtaWindows": "macOS और Windows के लिए डाउनलोड करें",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "कैमरा · रिकॉर्डिंग से छिपा eyeread.in",

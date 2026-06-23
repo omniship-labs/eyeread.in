@@ -19,7 +19,11 @@
     "subhead": "eyeread.in നിങ്ങളുടെ സ്ക്രിപ്റ്റിനെ ഏത് സ്ക്രീനിനു മുകളിലും ഒരു ഗ്ലാസ് ഓവർലേയായി കാണിക്കുന്നു. അത് നിങ്ങളുടെ ശബ്ദത്തെ പിന്തുടരുന്നു — ഒരു റെക്കോർഡിംഗിലും ഒരിക്കലും കാണില്ല.",
     "note": "എന്നും സൗജന്യം · AGPL-3.0 · അക്കൗണ്ട് ആവശ്യമില്ല",
     "primaryCta": "macOS, Windows എന്നിവയ്ക്കായി ഡൗൺലോഡ് ചെയ്യൂ",
-    "secondaryCta": "GitHub-ൽ കാണുക"
+    "secondaryCta": "GitHub-ൽ കാണുക",
+    "primaryCtaMac": "macOS, Windows എന്നിവയ്ക്കായി ഡൗൺലോഡ് ചെയ്യൂ",
+    "primaryCtaWindows": "macOS, Windows എന്നിവയ്ക്കായി ഡൗൺലോഡ് ചെയ്യൂ",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "ക്യാമറ · റെക്കോർഡിംഗിൽ നിന്ന് മറഞ്ഞ eyeread.in",

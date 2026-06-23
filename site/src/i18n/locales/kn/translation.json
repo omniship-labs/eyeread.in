@@ -19,7 +19,11 @@
     "subhead": "eyeread.in ನಿಮ್ಮ ಸ್ಕ್ರಿಪ್ಟ್ ಅನ್ನು ಯಾವುದೇ ಪರದೆಯ ಮೇಲೆ ಗಾಜಿನ ಓವರ್‌ಲೇ ಆಗಿ ತೋರಿಸುತ್ತದೆ. ಇದು ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಅನುಸರಿಸುತ್ತದೆ — ಮತ್ತು ಯಾವುದೇ ರೆಕಾರ್ಡಿಂಗ್‌ನಲ್ಲಿ ಎಂದಿಗೂ ಕಾಣಿಸುವುದಿಲ್ಲ.",
     "note": "ಎಂದೆಂದಿಗೂ ಉಚಿತ · AGPL-3.0 · ಖಾತೆ ಅಗತ್ಯವಿಲ್ಲ",
     "primaryCta": "macOS ಮತ್ತು Windows ಗಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
-    "secondaryCta": "GitHub ನಲ್ಲಿ ನೋಡಿ"
+    "secondaryCta": "GitHub ನಲ್ಲಿ ನೋಡಿ",
+    "primaryCtaMac": "macOS ಮತ್ತು Windows ಗಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "primaryCtaWindows": "macOS ಮತ್ತು Windows ಗಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "ಕ್ಯಾಮೆರಾ · ರೆಕಾರ್ಡಿಂಗ್‌ನಿಂದ ಮರೆಯಾದ eyeread.in",

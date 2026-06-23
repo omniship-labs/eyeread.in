@@ -19,7 +19,11 @@
     "subhead": "eyeread.in показывает ваш сценарий поверх любого экрана как стеклянный слой. Он следует за вашим голосом — и никогда не появляется в записи.",
     "note": "Бесплатно навсегда · AGPL-3.0 · Без аккаунта",
     "primaryCta": "Скачать для macOS и Windows",
-    "secondaryCta": "Открыть на GitHub"
+    "secondaryCta": "Открыть на GitHub",
+    "primaryCtaMac": "Скачать для macOS и Windows",
+    "primaryCtaWindows": "Скачать для macOS и Windows",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "Камера · eyeread.in скрыт от записи",

@@ -19,7 +19,11 @@
     "subhead": "eyeread.in fait flotter votre script sur n’importe quel écran sous forme de calque en verre. Il suit votre voix — et n’apparaît jamais dans un enregistrement.",
     "note": "Gratuit pour toujours · AGPL-3.0 · Aucun compte requis",
     "primaryCta": "Télécharger pour macOS et Windows",
-    "secondaryCta": "Voir sur GitHub"
+    "secondaryCta": "Voir sur GitHub",
+    "primaryCtaMac": "Télécharger pour macOS",
+    "primaryCtaWindows": "Télécharger pour Windows",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "Caméra · eyeread.in masqué de l’enregistrement",

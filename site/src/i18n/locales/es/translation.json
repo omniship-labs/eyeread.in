@@ -19,7 +19,11 @@
     "subhead": "eyeread.in muestra tu guion sobre cualquier pantalla como una capa de cristal. Sigue tu voz y nunca aparece en una grabación.",
     "note": "Gratis para siempre · AGPL-3.0 · Sin necesidad de cuenta",
     "primaryCta": "Descargar para macOS y Windows",
-    "secondaryCta": "Ver en GitHub"
+    "secondaryCta": "Ver en GitHub",
+    "primaryCtaMac": "Descargar para macOS y Windows",
+    "primaryCtaWindows": "Descargar para macOS y Windows",
+    "primaryCtaLinux": "Not yet available on Linux",
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
   },
   "demo": {
     "cameraBadge": "Cámara · eyeread.in oculto en la grabación",
