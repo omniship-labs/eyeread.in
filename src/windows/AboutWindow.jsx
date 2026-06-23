@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { openExternal, listen } from '../lib/tauri';
 import i18n from '../i18n/index.js';
@@ -16,6 +16,8 @@ const COMPAT_REPORT_URL =
 const MJ_URL = 'https://m.halinge.in';
 const TERMS_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS.md';
 const PRIVACY_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/PRIVACY.md';
+
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 function getVersion() {
   const ver = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
@@ -36,8 +38,54 @@ export function AboutWindow() {
   const [reduceMotion, setReduceMotion] = useState(false);
   const testers = getTesters();
 
+  // ✨ Easter egg on the app icon. Drag to bend the glass, click to toggle the
+  // shield. Effects use the same theme as the overlay (violet glass tint +
+  // glass blur) and stay LOCAL to this About window for the session — nothing
+  // is persisted or pushed to the other windows.
+  //   • drag up / down    → transparency (--aw-alpha)
+  //   • drag left / right → blur (--aw-blur)
+  //   • click (no drag)   → toggle screen-share shield (violet ⇄ red tint)
+  //   • double-click      → reset transparency + blur
+  const [alpha, setAlpha] = useState(0); // 0 = solid window, 1 = fully sheer
+  const [blur, setBlur] = useState(0); // px of glass blur
+  const [eggShielded, setEggShielded] = useState(null); // null → follow settings
+  const dragRef = useRef(null);
+
   useUiScale(uiScale);
   useReducedMotion(reduceMotion);
+
+  // The session-local shield wins once the user has flipped it via the egg.
+  const shieldOn = eggShielded ?? shielded;
+
+  const onIconPointerDown = (e) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dragRef.current = { x: e.clientX, y: e.clientY, alpha, blur, moved: false };
+  };
+
+  const onIconPointerMove = (e) => {
+    const start = dragRef.current;
+    if (!start) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) start.moved = true;
+    // drag down sheers the glass, drag up makes it solid; right blurs, left sharpens.
+    setAlpha(clamp(start.alpha + dy / 320, 0, 0.85));
+    setBlur(clamp(start.blur + dx / 36, 0, 16));
+  };
+
+  const onIconPointerUp = (e) => {
+    const start = dragRef.current;
+    dragRef.current = null;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+    // A click (no meaningful drag) toggles the shield for this window only.
+    if (start && !start.moved) setEggShielded((v) => !(v ?? shielded));
+  };
+
+  const resetEgg = () => {
+    setAlpha(0);
+    setBlur(0);
+  };
 
   useEffect(() => {
     fetchSettings().then((s) => {
@@ -60,12 +108,24 @@ export function AboutWindow() {
   }, []);
 
   return (
-    <div className={'aw-root' + (shielded ? ' shielded' : ' exposed')}>
+    <div
+      className={'aw-root' + (shieldOn ? ' shielded' : ' exposed')}
+      style={{ '--aw-alpha': alpha, '--aw-blur': `${blur}px` }}
+    >
       {/* drag region — clear strip at top, avoids traffic lights */}
       <div className="aw-titlebar" data-tauri-drag-region />
 
       <div className="aw-hero">
-        <img className="aw-icon" src="/app-icon.png" alt="eyeread.in" draggable={false} />
+        <img
+          className="aw-icon"
+          src="/app-icon.png"
+          alt="eyeread.in"
+          draggable={false}
+          onPointerDown={onIconPointerDown}
+          onPointerMove={onIconPointerMove}
+          onPointerUp={onIconPointerUp}
+          onDoubleClick={resetEgg}
+        />
         <div className="aw-name">eyeread.in</div>
         <div className="aw-version">{getVersion()}</div>
         <div className="aw-org">© 2026 OmniShip Labs</div>
