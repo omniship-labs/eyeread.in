@@ -20,6 +20,12 @@
   --shadow-lg: 0 14px 40px rgba(0,0,0,0.5);
   --shadow-xl: 0 24px 70px rgba(0,0,0,0.6);
 
+  /* ---- Window chrome (floating panels + About + Settings) */
+  --window-border:         1px solid var(--accent-subtle-border);
+  --window-shadow:         0 0 0 1px rgba(110,86,247,0.35), 0 8px 32px rgba(0,0,0,0.45);
+  --window-shadow-shielded: 0 0 0 1px rgba(110,86,247,0.45), 0 8px 32px rgba(0,0,0,0.45), 0 0 28px rgba(110,86,247,0.18);
+  --window-shadow-exposed:  0 0 0 1px rgba(239,68,68,0.45),  0 8px 32px rgba(0,0,0,0.45), 0 0 28px rgba(239,68,68,0.18);
+
   /* ---- Glow (the signature accent treatment) ------------ */
   --glow-accent-sm: 0 0 12px rgba(110,86,247,0.45);
   --glow-accent:    0 0 0 1px rgba(110,86,247,0.10), 0 18px 50px rgba(110,86,247,0.20);

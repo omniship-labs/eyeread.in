@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "ప్రాంప్టర్ సెట్టింగ్‌లు",
-    "resetAllToGlobal": "అన్నింటినీ గ్లోబల్‌కు రీసెట్ చేయి"
+    "resetAllToGlobal": "అన్నింటినీ గ్లోబల్‌కు రీసెట్ చేయి",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "స్క్రీన్ షేర్ నుండి దాచబడింది — చూపడానికి క్లిక్ చేయండి",

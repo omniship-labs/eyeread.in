@@ -16,7 +16,7 @@ import { SettingItem } from '../components/SettingItem';
 import { requestMicPermission } from '../lib/mic';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { defaultSettings, fetchSettings } from '../lib/store';
-import { isTauri, listen, emitTo, hideSettingsWindow } from '../lib/tauri';
+import { isTauri, listen, emitTo, hideSettingsWindow, resetOverlayLayout } from '../lib/tauri';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 
 const sliderFill = (value, min, max) => {
@@ -95,6 +95,17 @@ export function SettingsWindow() {
   const resetAll = () => {
     setOverrides({});
     broadcast({});
+  };
+
+  const resetLayout = () => {
+    if (scriptId) {
+      emitTo('main', 'script:patch', {
+        id: scriptId,
+        patch: { overlayPos: null, overlaySize: null },
+      });
+    }
+    emitTo('overlay', 'overlay:reset-layout', {});
+    resetOverlayLayout(global);
   };
 
   // ---- helpers ---------------------------------------------------------------
@@ -274,6 +285,9 @@ export function SettingsWindow() {
       <div className="sw-foot">
         <Button variant="secondary" block disabled={!hasAny} onClick={resetAll}>
           {t('prompter.resetAllToGlobal')}
+        </Button>
+        <Button variant="ghost" block onClick={resetLayout}>
+          {t('prompter.resetLayout')}
         </Button>
       </div>
     </div>

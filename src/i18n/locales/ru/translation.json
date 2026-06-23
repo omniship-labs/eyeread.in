@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "Настройки суфлёра",
-    "resetAllToGlobal": "Сбросить всё к глобальным"
+    "resetAllToGlobal": "Сбросить всё к глобальным",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "Скрыт от демонстрации экрана — нажмите, чтобы показать",

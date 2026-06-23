@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "Ajustes del teleprónter",
-    "resetAllToGlobal": "Restablecer todo a global"
+    "resetAllToGlobal": "Restablecer todo a global",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "Oculto de la pantalla compartida — clic para mostrar",

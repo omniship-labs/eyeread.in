@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "Teleprompter-Einstellungen",
-    "resetAllToGlobal": "Alle auf global zurücksetzen"
+    "resetAllToGlobal": "Alle auf global zurücksetzen",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "Vor Bildschirmfreigabe verborgen — zum Anzeigen klicken",

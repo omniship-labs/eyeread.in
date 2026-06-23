@@ -33,6 +33,7 @@ import {
   hideOverlay,
   focusMain,
   fitOverlayToPanel,
+  getOverlayPos,
   shieldActive,
   showSettingsWindow,
 } from '../lib/tauri';
@@ -179,7 +180,7 @@ export function OverlayWindow() {
 
   // ---- cross-window events ---------------------------------------------------
   useEffect(() => {
-    let un1, un2, un3, un4;
+    let un1, un2, un3, un4, un5;
     (async () => {
       un1 = await listen('overlay:load', (p) => {
         loadedRef.current = true;
@@ -211,12 +212,18 @@ export function OverlayWindow() {
           prev && prev.id === p?.id ? { ...prev, settingsOverrides: p.overrides ?? {} } : prev
         );
       });
+      // Reset position + size to defaults (triggered from settings window).
+      un5 = await listen('overlay:reset-layout', () => {
+        setPanelSize(clampSize(defaultSettings.overlaySize));
+        setScript((prev) => (prev ? { ...prev, overlayPos: null, overlaySize: null } : prev));
+      });
     })();
     return () => {
       un1?.();
       un2?.();
       un3?.();
       un4?.();
+      un5?.();
     };
   }, [setPanelSize, sendSettingsContext]);
 
@@ -373,7 +380,18 @@ export function OverlayWindow() {
           WebkitBackdropFilter: `blur(${effective.blur}px) saturate(1.15)`,
         }}
       >
-        <div className="ov-head" data-tauri-drag-region>
+        <div
+          className="ov-head"
+          data-tauri-drag-region
+          onPointerUp={() => {
+            if (!isTauri || !scriptRef.current) return;
+            getOverlayPos().then((pos) => {
+              if (!pos) return;
+              const s = scriptRef.current;
+              emitTo('main', 'script:patch', { id: s.id, patch: { overlayPos: pos } });
+            });
+          }}
+        >
           <span
             ref={gripRef}
             className="grip"

@@ -10,6 +10,7 @@ export function App() {
   useEffect(() => {
     document.body.classList.toggle('overlay-window', windowKind === 'overlay');
     document.body.classList.toggle('settings-window', windowKind === 'settings');
+    document.body.classList.toggle('about-window', windowKind === 'about');
   }, []);
 
   if (windowKind === 'overlay') return <OverlayWindow />;

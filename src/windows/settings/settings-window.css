@@ -10,7 +10,8 @@
   color: var(--text-primary);
   font-family: var(--font-sans);
   overflow: hidden;
-  border: 1px solid var(--border-default);
+  border: var(--window-border);
+  box-shadow: var(--window-shadow);
   box-sizing: border-box;
 }
 
@@ -36,6 +37,9 @@
   flex-shrink: 0;
   padding: 10px 16px 14px;
   border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .sw-body {

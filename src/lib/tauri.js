@@ -81,7 +81,7 @@ async function overlayWindow() {
 }
 
 /** Anchor the overlay window on the current monitor. */
-export async function positionOverlay(position = 'top') {
+export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
   if (!isTauri) return;
   const { currentMonitor, LogicalPosition } = await import('@tauri-apps/api/window');
   const win = await overlayWindow();
@@ -92,7 +92,7 @@ export async function positionOverlay(position = 'top') {
   const mh = monitor.size.height / scale;
   const mx = monitor.position.x / scale;
   const my = monitor.position.y / scale;
-  const x = mx + (mw - OVERLAY_W) / 2;
+  const x = mx + (mw - windowW) / 2;
   // Shift center/bottom positions up so the panel appears at the intended
   // visual location (the CSS has a small top pad for the drag region).
   const SHADOW_PAD = 22;
@@ -116,11 +116,19 @@ export async function showOverlay(script, settings) {
     // dragged it somewhere and we should leave it there.
     const alreadyVisible = await win.isVisible().catch(() => false);
     if (!alreadyVisible) {
-      await positionOverlay(settings.position);
-      // Set a tall fixed height with room for the settings popover above the
-      // panel. We never change height again — only width tracks the panel.
-      const { LogicalSize } = await import('@tauri-apps/api/window');
-      await win.setSize(new LogicalSize(OVERLAY_W, OVERLAY_H + 420)).catch(() => {});
+      const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window');
+      const savedW = settings.overlaySize?.w;
+      const targetW = savedW ? Math.round(savedW + 96) : OVERLAY_W;
+      await win.setSize(new LogicalSize(targetW, OVERLAY_H + 420)).catch(() => {});
+      // Restore last position for this script, or default to centered.
+      const savedPos = script?.overlayPos;
+      if (savedPos) {
+        await win
+          .setPosition(new LogicalPosition(Math.round(savedPos.x), Math.round(savedPos.y)))
+          .catch(() => {});
+      } else {
+        await positionOverlay(settings.position, targetW);
+      }
     }
     // follow the user across desktops / Spaces, stay above everything
     await win.setVisibleOnAllWorkspaces(true).catch(() => {});
@@ -188,6 +196,20 @@ export async function showAboutWindow() {
   await invoke('show_about_window');
 }
 
+export async function hideAboutWindow() {
+  if (!isTauri) return;
+  const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+  const win = await WebviewWindow.getByLabel('about');
+  await win?.hide();
+}
+
+export async function setAboutProtected(protected_) {
+  if (!isTauri) return;
+  const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+  const win = await WebviewWindow.getByLabel('about');
+  await win?.setContentProtected(protected_);
+}
+
 export async function hideOverlay() {
   if (isTauri) {
     const win = await overlayWindow();
@@ -202,6 +224,31 @@ export async function hideOverlay() {
  * settings popover) when the overlay is shown and never touched again, so
  * nothing on screen shifts when the popover opens or closes.
  */
+export async function getOverlayPos() {
+  if (!isTauri) return null;
+  const win = await overlayWindow();
+  if (!win) return null;
+  try {
+    const scale = await win.scaleFactor();
+    const pos = await win.outerPosition();
+    return { x: pos.x / scale, y: pos.y / scale };
+  } catch {
+    return null;
+  }
+}
+
+/** Reset the overlay to its default size and centered position. */
+export async function resetOverlayLayout(settings) {
+  if (!isTauri) return;
+  const { LogicalSize } = await import('@tauri-apps/api/window');
+  const win = await overlayWindow();
+  if (!win) return;
+  const defaultW = settings?.overlaySize?.w ?? 560;
+  const targetW = Math.round(defaultW + 96);
+  await win.setSize(new LogicalSize(targetW, OVERLAY_H + 420)).catch(() => {});
+  await positionOverlay(settings?.position ?? 'top', targetW);
+}
+
 export async function fitOverlayToPanel(panel) {
   if (!isTauri) return;
   const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window');

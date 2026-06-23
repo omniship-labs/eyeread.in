@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "प्रॉम्प्टर सेटिंग्ज",
-    "resetAllToGlobal": "सर्व ग्लोबलवर रीसेट करा"
+    "resetAllToGlobal": "सर्व ग्लोबलवर रीसेट करा",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "स्क्रीन शेअरपासून लपलेले — दाखवण्यासाठी क्लिक करा",
