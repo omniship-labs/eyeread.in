@@ -21,7 +21,11 @@
   border-radius: var(--radius-xl);
   border: var(--window-border);
   box-shadow: var(--window-shadow);
-  background: color-mix(in srgb, var(--bg-base) calc(var(--ov-alpha, 0.62) * 100%), transparent);
+  background: color-mix(
+    in srgb,
+    var(--bg-base) calc(var(--ov-alpha, 0.62) * 100%),
+    transparent
+  );
   backdrop-filter: var(--blur-glass);
   -webkit-backdrop-filter: var(--blur-glass);
   transition:
@@ -363,11 +367,17 @@
   inset: 0;
   background:
     radial-gradient(1200px 600px at 80% -10%, var(--demo-glow-blue), transparent 60%),
-    radial-gradient(900px 500px at 10% 110%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
-    linear-gradient(135deg,
+    radial-gradient(
+      900px 500px at 10% 110%,
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      135deg,
       color-mix(in srgb, var(--bg-base) 85%, var(--demo-glow-blue)) 0%,
       var(--bg-base) 60%,
-      color-mix(in srgb, var(--bg-base) 95%, var(--accent)) 100%);
+      color-mix(in srgb, var(--bg-base) 95%, var(--accent)) 100%
+    );
   padding: 64px 84px;
   box-sizing: border-box;
   color: var(--demo-text);

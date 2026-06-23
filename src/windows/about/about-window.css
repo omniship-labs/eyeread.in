@@ -25,9 +25,14 @@
   margin: 32px;
   height: calc(100vh - 64px);
   border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--bg-base) calc((1 - var(--aw-alpha, 0)) * 100%), transparent);
+  background: color-mix(
+    in srgb,
+    var(--bg-base) calc((1 - var(--aw-alpha, 0)) * 100%),
+    transparent
+  );
   backdrop-filter: blur(var(--aw-blur, 0px)) saturate(calc(1 + var(--aw-alpha, 0) * 0.25));
-  -webkit-backdrop-filter: blur(var(--aw-blur, 0px)) saturate(calc(1 + var(--aw-alpha, 0) * 0.25));
+  -webkit-backdrop-filter: blur(var(--aw-blur, 0px))
+    saturate(calc(1 + var(--aw-alpha, 0) * 0.25));
   color: var(--text-primary);
   font-family: var(--font-sans);
   padding: 0 28px 24px;

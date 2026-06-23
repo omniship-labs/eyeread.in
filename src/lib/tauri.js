@@ -123,7 +123,9 @@ export async function showOverlay(script, settings) {
       // Restore last position for this script, or default to centered.
       const savedPos = script?.overlayPos;
       if (savedPos) {
-        await win.setPosition(new LogicalPosition(Math.round(savedPos.x), Math.round(savedPos.y))).catch(() => {});
+        await win
+          .setPosition(new LogicalPosition(Math.round(savedPos.x), Math.round(savedPos.y)))
+          .catch(() => {});
       } else {
         await positionOverlay(settings.position, targetW);
       }

@@ -99,7 +99,10 @@ export function SettingsWindow() {
 
   const resetLayout = () => {
     if (scriptId) {
-      emitTo('main', 'script:patch', { id: scriptId, patch: { overlayPos: null, overlaySize: null } });
+      emitTo('main', 'script:patch', {
+        id: scriptId,
+        patch: { overlayPos: null, overlaySize: null },
+      });
     }
     emitTo('overlay', 'overlay:reset-layout', {});
     resetOverlayLayout(global);

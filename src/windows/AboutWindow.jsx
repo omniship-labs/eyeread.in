@@ -83,7 +83,10 @@ export function AboutWindow() {
       iconPressedRef.current = false;
       dragRef.current = null;
       setIconNudge({ x: 0, y: 0 });
-      if (start?.moved) { setAlpha_(0); setBlur_(0); }
+      if (start?.moved) {
+        setAlpha_(0);
+        setBlur_(0);
+      }
       document.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerup', onUp);
       document.removeEventListener('pointercancel', onUp);
@@ -133,7 +136,12 @@ export function AboutWindow() {
       style={{ '--aw-alpha': alpha, '--aw-blur': `${blur}px` }}
     >
       <div className="aw-titlebar" data-tauri-drag-region>
-        <button type="button" className="ic ic-sm aw-close" aria-label="Close" onClick={hideAboutWindow}>
+        <button
+          type="button"
+          className="ic ic-sm aw-close"
+          aria-label="Close"
+          onClick={hideAboutWindow}
+        >
           <X />
         </button>
       </div>
@@ -146,9 +154,10 @@ export function AboutWindow() {
           draggable={false}
           style={{
             transform: `translate(${iconNudge.x}px, ${iconNudge.y}px)`,
-            transition: iconNudge.x === 0 && iconNudge.y === 0
-              ? `transform 600ms var(--ease-spring)`
-              : 'none',
+            transition:
+              iconNudge.x === 0 && iconNudge.y === 0
+                ? `transform 600ms var(--ease-spring)`
+                : 'none',
           }}
           onPointerDown={onIconPointerDown}
           onDoubleClick={resetEgg}
