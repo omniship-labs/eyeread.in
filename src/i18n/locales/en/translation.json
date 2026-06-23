@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "Prompter settings",
-    "resetAllToGlobal": "Reset all to global"
+    "resetAllToGlobal": "Reset all to global",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "Hidden from screen share — click to expose",

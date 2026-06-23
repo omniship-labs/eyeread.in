@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "ப்ராம்ப்டர் அமைப்புகள்",
-    "resetAllToGlobal": "அனைத்தையும் குளோபலுக்கு மீட்டமை"
+    "resetAllToGlobal": "அனைத்தையும் குளோபலுக்கு மீட்டமை",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "திரை பகிர்விலிருந்து மறைக்கப்பட்டது — காட்ட கிளிக் செய்",

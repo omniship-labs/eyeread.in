@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "プロンプター設定",
-    "resetAllToGlobal": "すべてグローバルにリセット"
+    "resetAllToGlobal": "すべてグローバルにリセット",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "画面共有から隠れています — クリックで表示",

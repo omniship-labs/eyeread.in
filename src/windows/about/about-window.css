@@ -2,8 +2,9 @@
    Violet when hidden (shielded), red when exposed to screen-share. */
 .aw-root::after {
   content: '';
-  position: fixed;
+  position: absolute;
   inset: 0;
+  border-radius: inherit;
   pointer-events: none;
   z-index: 9999;
   transition: background var(--dur-slow) var(--ease-out);
@@ -19,37 +20,37 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  background: var(--surface-1);
+  /* 32px margin on all sides gives the shadow room to bleed into the
+     transparent window area — mirrors how the overlay panel floats. */
+  margin: 32px;
+  height: calc(100vh - 64px);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--bg-base) calc((1 - var(--aw-alpha, 0)) * 100%), transparent);
+  backdrop-filter: blur(var(--aw-blur, 0px)) saturate(calc(1 + var(--aw-alpha, 0) * 0.25));
+  -webkit-backdrop-filter: blur(var(--aw-blur, 0px)) saturate(calc(1 + var(--aw-alpha, 0) * 0.25));
   color: var(--text-primary);
   font-family: var(--font-sans);
   padding: 0 28px 24px;
   box-sizing: border-box;
   overflow: hidden;
   user-select: none;
-  border: 1px solid var(--border-default);
+  border: var(--window-border);
+  box-shadow: var(--window-shadow);
   -webkit-app-region: drag;
-
-  /* ✨ Easter egg — driven by --aw-alpha (0→1) and --aw-blur from the icon
-     drag. Transparency fades the panel toward the window backdrop; blur is
-     the overlay's glass blur. Fast transition keeps the drag responsive
-     while still animating the click/double-click reset. */
-  filter: blur(var(--aw-blur, 0px)) saturate(calc(1 + var(--aw-alpha, 0) * 0.25));
+  position: relative;
   transition:
-    filter var(--dur-fast) var(--ease-out),
-    border-color var(--dur-slow) var(--ease-out);
+    background 600ms var(--ease-spring),
+    backdrop-filter 600ms var(--ease-spring),
+    border-color var(--dur-slow) var(--ease-out),
+    box-shadow var(--dur-slow) var(--ease-out);
 }
-/* Fade everything but the shield tint + drag strip as the glass goes sheer. */
-.aw-root > :not(.aw-titlebar) {
-  opacity: calc(1 - var(--aw-alpha, 0));
-  transition: opacity var(--dur-fast) var(--ease-out);
-}
-/* Echo the overlay's violet/red border glow on the panel edge. */
 .aw-root.shielded {
   border-color: rgba(110, 86, 247, 0.45);
+  box-shadow: var(--window-shadow-shielded);
 }
 .aw-root.exposed {
   border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: var(--window-shadow-exposed);
 }
 
 /* disable drag on everything interactive inside */
@@ -57,12 +58,40 @@
   -webkit-app-region: no-drag;
 }
 
-/* clear drag strip — sits above hero, gives macOS traffic lights room */
+/* drag strip */
 .aw-titlebar {
   width: 100%;
   height: 40px;
   flex-shrink: 0;
   -webkit-app-region: drag;
+}
+
+.aw-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--dur-fast) var(--ease-out);
+  -webkit-app-region: no-drag;
+  z-index: 1;
+}
+.aw-close:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.aw-close svg {
+  width: 14px;
+  height: 14px;
 }
 
 .aw-hero {

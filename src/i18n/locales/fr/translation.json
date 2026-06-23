@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "Réglages du prompteur",
-    "resetAllToGlobal": "Tout réinitialiser au global"
+    "resetAllToGlobal": "Tout réinitialiser au global",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "Masqué du partage d’écran — cliquez pour exposer",

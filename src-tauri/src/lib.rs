@@ -117,26 +117,35 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let migrations = vec![Migration {
-        version: 1,
-        description: "create scripts and settings tables",
-        sql: "CREATE TABLE IF NOT EXISTS scripts (
-                id TEXT PRIMARY KEY,
-                title TEXT NOT NULL DEFAULT 'Untitled script',
-                text TEXT NOT NULL DEFAULT '',
-                tag TEXT NOT NULL DEFAULT 'draft',
-                pinned INTEGER NOT NULL DEFAULT 0,
-                overlay_w INTEGER,
-                overlay_h INTEGER,
-                settings TEXT,
-                updated_at INTEGER NOT NULL
-              );
-              CREATE TABLE IF NOT EXISTS settings (
-                key TEXT PRIMARY KEY,
-                value TEXT NOT NULL
-              );",
-        kind: MigrationKind::Up,
-    }];
+    let migrations = vec![
+        Migration {
+            version: 1,
+            description: "create scripts and settings tables",
+            sql: "CREATE TABLE IF NOT EXISTS scripts (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL DEFAULT 'Untitled script',
+                    text TEXT NOT NULL DEFAULT '',
+                    tag TEXT NOT NULL DEFAULT 'draft',
+                    pinned INTEGER NOT NULL DEFAULT 0,
+                    overlay_w INTEGER,
+                    overlay_h INTEGER,
+                    settings TEXT,
+                    updated_at INTEGER NOT NULL
+                  );
+                  CREATE TABLE IF NOT EXISTS settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                  );",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "add overlay position per script",
+            sql: "ALTER TABLE scripts ADD COLUMN overlay_x REAL;
+                  ALTER TABLE scripts ADD COLUMN overlay_y REAL;",
+            kind: MigrationKind::Up,
+        },
+    ];
 
     tauri::Builder::default()
         .menu(build_app_menu)

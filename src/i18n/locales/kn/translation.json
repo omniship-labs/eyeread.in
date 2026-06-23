@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "ಪ್ರಾಂಪ್ಟರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
-    "resetAllToGlobal": "ಎಲ್ಲವನ್ನೂ ಗ್ಲೋಬಲ್‌ಗೆ ಮರುಹೊಂದಿಸಿ"
+    "resetAllToGlobal": "ಎಲ್ಲವನ್ನೂ ಗ್ಲೋಬಲ್‌ಗೆ ಮರುಹೊಂದಿಸಿ",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "ಸ್ಕ್ರೀನ್ ಶೇರ್‌ನಿಂದ ಮರೆಯಾಗಿದೆ — ತೋರಿಸಲು ಕ್ಲಿಕ್ ಮಾಡಿ",

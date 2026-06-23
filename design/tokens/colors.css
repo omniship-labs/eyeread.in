@@ -54,9 +54,16 @@
   --surface-hover:  rgba(255,255,255,0.04);
   --surface-active: rgba(255,255,255,0.07);
 
+  /* Demo backdrop (web preview only) */
+  --demo-glow-blue:   rgba(76, 108, 200, 0.18); /* cool blue radial highlight */
+  --demo-text:        #cdd5e6;  /* body copy on demo stage — blue-tinted paper */
+  --demo-text-title:  #eef2fb;  /* hero headline on demo stage */
+  --demo-text-sub:    #93a0c0;  /* sub-copy on demo stage */
+  --demo-text-eyebrow: #6f7ba0; /* label / eyebrow on demo stage */
+
   /* Glass (the overlay's signature material) */
-  --glass-bg:       rgba(12,12,20,0.66);
-  --glass-bg-heavy: rgba(8,8,14,0.78);
+  --glass-bg:       color-mix(in srgb, var(--bg-base) 66%, transparent);
+  --glass-bg-heavy: color-mix(in srgb, var(--bg-base) 78%, transparent);
   --glass-border:   rgba(255,255,255,0.10);
 
   /* Text */

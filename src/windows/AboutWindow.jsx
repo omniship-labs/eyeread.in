@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { openExternal, listen } from '../lib/tauri';
+import { X } from 'lucide-react';
+import { openExternal, listen, hideAboutWindow, setAboutProtected } from '../lib/tauri';
 import i18n from '../i18n/index.js';
 import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
@@ -46,10 +47,12 @@ export function AboutWindow() {
   //   • drag left / right → blur (--aw-blur)
   //   • click (no drag)   → toggle screen-share shield (violet ⇄ red tint)
   //   • double-click      → reset transparency + blur
-  const [alpha, setAlpha] = useState(0); // 0 = solid window, 1 = fully sheer
-  const [blur, setBlur] = useState(0); // px of glass blur
+  const [alpha, setAlpha_] = useState(0);
+  const [blur, setBlur_] = useState(0);
+  const [iconNudge, setIconNudge] = useState({ x: 0, y: 0 });
   const [eggShielded, setEggShielded] = useState(null); // null → follow settings
   const dragRef = useRef(null);
+  const iconPressedRef = useRef(false);
 
   useUiScale(uiScale);
   useReducedMotion(reduceMotion);
@@ -59,32 +62,49 @@ export function AboutWindow() {
 
   const onIconPointerDown = (e) => {
     e.preventDefault();
-    e.currentTarget.setPointerCapture?.(e.pointerId);
+    iconPressedRef.current = true;
     dragRef.current = { x: e.clientX, y: e.clientY, alpha, blur, moved: false };
-  };
 
-  const onIconPointerMove = (e) => {
-    const start = dragRef.current;
-    if (!start) return;
-    const dx = e.clientX - start.x;
-    const dy = e.clientY - start.y;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) start.moved = true;
-    // drag down sheers the glass, drag up makes it solid; right blurs, left sharpens.
-    setAlpha(clamp(start.alpha + dy / 320, 0, 0.85));
-    setBlur(clamp(start.blur + dx / 36, 0, 16));
-  };
+    const onMove = (ev) => {
+      if (!iconPressedRef.current) return;
+      const start = dragRef.current;
+      if (!start) return;
+      const dx = ev.clientX - start.x;
+      const dy = ev.clientY - start.y;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) start.moved = true;
+      // horizontal distance → blur, vertical distance → transparency
+      setAlpha_(clamp(Math.abs(dy) / 120, 0, 0.85));
+      setBlur_(clamp(Math.abs(dx) / 8, 0, 16));
+      setIconNudge({ x: dx / 18, y: dy / 18 });
+    };
 
-  const onIconPointerUp = (e) => {
-    const start = dragRef.current;
-    dragRef.current = null;
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
-    // A click (no meaningful drag) toggles the shield for this window only.
-    if (start && !start.moved) setEggShielded((v) => !(v ?? shielded));
+    const onUp = () => {
+      const start = dragRef.current;
+      iconPressedRef.current = false;
+      dragRef.current = null;
+      setIconNudge({ x: 0, y: 0 });
+      if (start?.moved) { setAlpha_(0); setBlur_(0); }
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onUp);
+      if (start && !start.moved) {
+        setEggShielded((v) => {
+          const next = !(v ?? shielded);
+          setAboutProtected(next);
+          return next;
+        });
+      }
+    };
+
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('pointercancel', onUp);
   };
 
   const resetEgg = () => {
-    setAlpha(0);
-    setBlur(0);
+    setAlpha_(0);
+    setBlur_(0);
+    setIconNudge({ x: 0, y: 0 });
   };
 
   useEffect(() => {
@@ -112,8 +132,11 @@ export function AboutWindow() {
       className={'aw-root' + (shieldOn ? ' shielded' : ' exposed')}
       style={{ '--aw-alpha': alpha, '--aw-blur': `${blur}px` }}
     >
-      {/* drag region — clear strip at top, avoids traffic lights */}
-      <div className="aw-titlebar" data-tauri-drag-region />
+      <div className="aw-titlebar" data-tauri-drag-region>
+        <button type="button" className="ic ic-sm aw-close" aria-label="Close" onClick={hideAboutWindow}>
+          <X />
+        </button>
+      </div>
 
       <div className="aw-hero">
         <img
@@ -121,9 +144,13 @@ export function AboutWindow() {
           src="/app-icon.png"
           alt="eyeread.in"
           draggable={false}
+          style={{
+            transform: `translate(${iconNudge.x}px, ${iconNudge.y}px)`,
+            transition: iconNudge.x === 0 && iconNudge.y === 0
+              ? `transform 600ms var(--ease-spring)`
+              : 'none',
+          }}
           onPointerDown={onIconPointerDown}
-          onPointerMove={onIconPointerMove}
-          onPointerUp={onIconPointerUp}
           onDoubleClick={resetEgg}
         />
         <div className="aw-name">eyeread.in</div>

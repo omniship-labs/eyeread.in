@@ -74,6 +74,7 @@ import {
   registerInteractiveHotkey,
   setAppProtected,
   shieldActive,
+  resetOverlayLayout,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
@@ -331,6 +332,11 @@ export function MainWindow() {
                       overrides: {},
                       from: 'main',
                     });
+                  }}
+                  onResetLayout={() => {
+                    updateScript(sel.id, { overlayPos: null, overlaySize: null });
+                    emitTo('overlay', 'overlay:reset-layout', {});
+                    resetOverlayLayout(settings);
                   }}
                   onBack={null}
                   onStart={() => startReading(sel)}

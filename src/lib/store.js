@@ -164,6 +164,7 @@ const rowToScript = (r) => ({
   pinned: !!r.pinned,
   updatedAt: r.updated_at,
   ...(r.overlay_w != null ? { overlaySize: { w: r.overlay_w, h: r.overlay_h } } : {}),
+  ...(r.overlay_x != null ? { overlayPos: { x: r.overlay_x, y: r.overlay_y } } : {}),
   ...(r.settings ? { settingsOverrides: safeParse(r.settings) } : {}),
 });
 
@@ -212,11 +213,12 @@ export async function upsertScript(s) {
   }
   const d = await db();
   await d.execute(
-    `INSERT INTO scripts (id, title, text, tag, pinned, overlay_w, overlay_h, settings, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `INSERT INTO scripts (id, title, text, tag, pinned, overlay_w, overlay_h, overlay_x, overlay_y, settings, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      ON CONFLICT(id) DO UPDATE SET
        title = $2, text = $3, tag = $4, pinned = $5,
-       overlay_w = $6, overlay_h = $7, settings = $8, updated_at = $9`,
+       overlay_w = $6, overlay_h = $7, overlay_x = $8, overlay_y = $9,
+       settings = $10, updated_at = $11`,
     [
       s.id,
       s.title,
@@ -225,6 +227,8 @@ export async function upsertScript(s) {
       s.pinned ? 1 : 0,
       s.overlaySize?.w ?? null,
       s.overlaySize?.h ?? null,
+      s.overlayPos?.x ?? null,
+      s.overlayPos?.y ?? null,
       s.settingsOverrides && Object.keys(s.settingsOverrides).length
         ? JSON.stringify(s.settingsOverrides)
         : null,

@@ -126,7 +126,8 @@
   },
   "prompter": {
     "title": "提词器设置",
-    "resetAllToGlobal": "全部重置为全局"
+    "resetAllToGlobal": "全部重置为全局",
+    "resetLayout": "Reset position & size"
   },
   "shield": {
     "hiddenTitle": "已对屏幕共享隐藏 — 点击以显示",

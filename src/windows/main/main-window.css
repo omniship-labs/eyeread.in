@@ -720,7 +720,7 @@
   border-color: var(--accent);
 }
 .ov-mini {
-  background: rgba(10, 10, 18, 0.66);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--accent-subtle-border);

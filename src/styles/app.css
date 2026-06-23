@@ -20,8 +20,9 @@ body {
   flex-direction: column;
 }
 
-/* The overlay window draws on a fully transparent surface */
-body.overlay-window {
+/* The overlay and about windows draw on a fully transparent surface */
+body.overlay-window,
+body.about-window {
   background: transparent;
 }
 

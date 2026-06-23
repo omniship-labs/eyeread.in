@@ -36,6 +36,7 @@ export function Editor({
   onChange,
   onScriptSettings,
   onResetScript,
+  onResetLayout,
   onStart,
 }) {
   const { t } = useTranslation();
@@ -274,6 +275,12 @@ export function Editor({
                 ))}
               </select>
             </div>
+
+            {onResetLayout && (script.overlayPos || script.overlaySize) && (
+              <Button variant="ghost" block onClick={onResetLayout}>
+                {t('prompter.resetLayout')}
+              </Button>
+            )}
           </div>
         </div>
       </div>
