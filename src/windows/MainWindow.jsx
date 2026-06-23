@@ -122,7 +122,9 @@ export function MainWindow() {
       }
     };
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // ---- persistence (debounced) --------------------------------------------
