@@ -24,7 +24,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@fontsource/hanken-grotesk": "^5.2.5",

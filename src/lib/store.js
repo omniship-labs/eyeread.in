@@ -151,7 +151,12 @@ export async function persistSettings(settings) {
 let dbPromise = null;
 function db() {
   if (!dbPromise) {
-    dbPromise = import('@tauri-apps/plugin-sql').then((m) => m.default.load(DB_PATH));
+    dbPromise = import('@tauri-apps/plugin-sql')
+      .then((m) => m.default.load(DB_PATH))
+      .catch((e) => {
+        dbPromise = null; // allow retry on next call
+        throw e;
+      });
   }
   return dbPromise;
 }

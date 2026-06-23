@@ -100,14 +100,31 @@ export function MainWindow() {
 
   // ---- initial load -------------------------------------------------------
   useEffect(() => {
-    Promise.all([fetchScripts(), fetchSettings()]).then(([sc, st]) => {
-      setScripts(sc);
-      setSelId(sc[0]?.id ?? null);
-      setSettings(st);
-      savedRef.current = new Map(sc.map((s) => [s.id, s]));
-      setReady(true);
-      setAppProtected(shieldActive(st));
-    });
+    let cancelled = false;
+    const load = async (attempt = 1) => {
+      try {
+        const [sc, st] = await Promise.all([fetchScripts(), fetchSettings()]);
+        if (cancelled) return;
+        setScripts(sc);
+        setSelId(sc[0]?.id ?? null);
+        setSettings(st);
+        savedRef.current = new Map(sc.map((s) => [s.id, s]));
+        setReady(true);
+        setAppProtected(shieldActive(st));
+      } catch {
+        if (cancelled) return;
+        if (attempt < 5) {
+          setTimeout(() => load(attempt + 1), 300 * attempt);
+        } else {
+          // give up — show UI with empty state rather than hanging forever
+          setReady(true);
+        }
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // ---- persistence (debounced) --------------------------------------------
