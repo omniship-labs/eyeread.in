@@ -1,0 +1,9 @@
+#!/bin/sh
+cd "$(git rev-parse --show-toplevel)" && npm run lint
+
+# Format staged JS/JSX files with prettier and re-stage them
+STAGED=$(git diff --cached --name-only | grep -E '\.(js|jsx)$')
+if [ -n "$STAGED" ]; then
+  echo "$STAGED" | xargs npx prettier --write
+  echo "$STAGED" | xargs git add
+fi
