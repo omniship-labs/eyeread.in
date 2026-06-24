@@ -138,10 +138,15 @@ export function OverlayWindow() {
       return () => window.removeEventListener('keydown', onKey);
     }
     let unsub;
-    (async () => {
-      unsub = await listen('overlay:toggle-interactive', () => setInteractive((i) => !i));
-    })();
-    return () => unsub?.();
+    let cancelled = false;
+    listen('overlay:toggle-interactive', () => setInteractive((i) => !i)).then((fn) => {
+      if (cancelled) fn();
+      else unsub = fn;
+    });
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   // ---- boot ------------------------------------------------------------------
