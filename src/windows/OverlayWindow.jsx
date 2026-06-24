@@ -58,6 +58,7 @@ export function OverlayWindow() {
   const activeWordRef = useRef(null);
   const panelRef = useRef(null);
   const gripRef = useRef(null);
+  const passthruBtnRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const scriptRef = useRef(script);
   scriptRef.current = script;
@@ -123,12 +124,12 @@ export function OverlayWindow() {
   );
 
   // ---- interaction modes -----------------------------------------------------
-  useClickThrough(interactive ? [panelRef] : [gripRef]);
+  useClickThrough(interactive ? [panelRef] : [gripRef, passthruBtnRef]);
 
   useEffect(() => {
     if (!isTauri) {
       const onKey = (e) => {
-        if (e.altKey && e.code === 'KeyE') {
+        if (e.altKey && e.shiftKey && e.code === 'KeyE') {
           e.preventDefault();
           setInteractive((i) => !i);
         }
@@ -137,10 +138,15 @@ export function OverlayWindow() {
       return () => window.removeEventListener('keydown', onKey);
     }
     let unsub;
-    (async () => {
-      unsub = await listen('overlay:toggle-interactive', () => setInteractive((i) => !i));
-    })();
-    return () => unsub?.();
+    let cancelled = false;
+    listen('overlay:toggle-interactive', () => setInteractive((i) => !i)).then((fn) => {
+      if (cancelled) fn();
+      else unsub = fn;
+    });
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   // ---- boot ------------------------------------------------------------------
@@ -538,6 +544,7 @@ export function OverlayWindow() {
             <SettingsIcon />
           </button>
           <button
+            ref={passthruBtnRef}
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
             title={
               interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
@@ -548,7 +555,7 @@ export function OverlayWindow() {
             aria-pressed={!interactive}
             onClick={() => setInteractive((i) => !i)}
           >
-            {interactive ? '⌥E' : '⌥E·on'}
+            {interactive ? '⌥⇧E' : '⌥⇧E·on'}
           </button>
         </div>
 
