@@ -58,6 +58,7 @@ export function OverlayWindow() {
   const activeWordRef = useRef(null);
   const panelRef = useRef(null);
   const gripRef = useRef(null);
+  const passthruBtnRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const scriptRef = useRef(script);
   scriptRef.current = script;
@@ -123,7 +124,7 @@ export function OverlayWindow() {
   );
 
   // ---- interaction modes -----------------------------------------------------
-  useClickThrough(interactive ? [panelRef] : [gripRef]);
+  useClickThrough(interactive ? [panelRef] : [gripRef, passthruBtnRef]);
 
   useEffect(() => {
     if (!isTauri) {
@@ -538,6 +539,7 @@ export function OverlayWindow() {
             <SettingsIcon />
           </button>
           <button
+            ref={passthruBtnRef}
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
             title={
               interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
