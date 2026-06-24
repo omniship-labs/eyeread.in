@@ -326,13 +326,13 @@ export function registerOverlayHotkey(toggle) {
 }
 
 /**
- * Register the global click-through toggle hotkey (⌥E). Main window only —
+ * Register the global click-through toggle hotkey (⌥⇧E). Main window only —
  * the overlay can't own global shortcuts when it's fully click-through.
  * On press, we emit an event that the overlay listens for.
  */
 export function registerInteractiveHotkey() {
   if (!isTauri) return Promise.resolve(() => {});
-  const combo = 'Alt+E';
+  const combo = 'Alt+Shift+E';
   return withHotkeyLock(combo, async () => {
     const { register, unregister } = await import('@tauri-apps/plugin-global-shortcut');
     await unregister(combo).catch(() => {});

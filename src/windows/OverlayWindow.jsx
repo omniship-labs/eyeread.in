@@ -128,7 +128,7 @@ export function OverlayWindow() {
   useEffect(() => {
     if (!isTauri) {
       const onKey = (e) => {
-        if (e.altKey && e.code === 'KeyE') {
+        if (e.altKey && e.shiftKey && e.code === 'KeyE') {
           e.preventDefault();
           setInteractive((i) => !i);
         }
@@ -548,7 +548,7 @@ export function OverlayWindow() {
             aria-pressed={!interactive}
             onClick={() => setInteractive((i) => !i)}
           >
-            {interactive ? '⌥E' : '⌥E·on'}
+            {interactive ? '⌥⇧E' : '⌥⇧E·on'}
           </button>
         </div>
 
