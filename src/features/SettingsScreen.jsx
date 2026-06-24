@@ -314,7 +314,7 @@ export function SettingsScreen({ settings, onSettings }) {
             <b>{t('settings.hkInteract')}</b>
             <span>{t('settings.hkInteractHint')}</span>
           </div>
-          <span className="hotkey">{altKey} + E</span>
+          <span className="hotkey">{altKey} + Shift + E</span>
         </div>
         <div className="set-row">
           <div className="set-info">
