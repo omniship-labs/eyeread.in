@@ -73,7 +73,7 @@
   box-shadow: var(--window-shadow-exposed);
 }
 
-/* Pass-through mode (⌥E): same glass — only the chrome recedes, and the
+/* Pass-through mode (⌥⇧E): same glass — only the chrome recedes, and the
    drag grip stays prominent since it remains grabbable. */
 .overlay-panel.ghost {
   border-color: rgba(110, 86, 247, 0.16);
