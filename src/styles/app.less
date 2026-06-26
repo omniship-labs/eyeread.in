@@ -1,0 +1,322 @@
+/* ============================================================
+   eyeread — app globals + shared component styles.
+   Tokens come from ../design/styles.less (single source).
+   ============================================================ */
+
+@import (reference) "../../design/tokens/mixins.less";
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  overflow: hidden;
+  .user-select(none);
+  cursor: default;
+
+  &.overlay-window,
+  &.about-window {
+    background: transparent;
+  }
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+input, textarea { .user-select(text); }
+
+/* ---- Accessibility: keyboard focus ------------------------- */
+:where(
+  button,
+  [role='button'],
+  [role='tab'],
+  a[href],
+  input,
+  textarea,
+  select,
+  [tabindex]
+):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Screen-reader-only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Accessibility: reduce motion -------------------------- */
+.reduce-motion-rules() {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) { .reduce-motion-rules(); }
+.reduce-motion { .reduce-motion-rules(); }
+
+/* ---- Switch (.sw-wrap pattern) ----------------------------- */
+.er-switch {
+  position: relative;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  flex: none;
+  padding: 0;
+  transition: all var(--dur-base) var(--ease-out);
+
+  .th {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--dur-base) var(--ease-spring);
+    display: block;
+  }
+
+  &--md {
+    width: 42px;
+    height: 24px;
+    .th { width: 18px; height: 18px; }
+    &.on .th { transform: translateX(18px); }
+  }
+
+  &--sm {
+    width: 36px;
+    height: 20px;
+    .th { width: 14px; height: 14px; }
+    &.on .th { transform: translateX(16px); }
+  }
+
+  &.on {
+    background: var(--accent);
+    border-color: transparent;
+    box-shadow: var(--glow-accent-sm);
+  }
+}
+
+/* ---- Slider (.ep-slider pattern) ---------------------------- */
+.er-slider {
+  .appearance(none);
+  width: 100%;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  outline: none;
+  border: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--accent);
+    box-shadow: var(--glow-accent-sm);
+  }
+}
+
+/* ---- Segmented (.ep-seg / .seg pattern) ---------------------- */
+.er-seg {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 3px;
+
+  button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    padding: 0 8px;
+    transition: all var(--dur-fast) var(--ease-out);
+
+    svg { width: 14px; height: 14px; }
+
+    &[aria-pressed='true'] {
+      background: var(--accent-subtle-bg);
+      color: var(--accent-text);
+      box-shadow: inset 0 0 0 1px var(--accent-subtle-border);
+    }
+  }
+
+  &--sm {
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    button { height: 26px; font-size: 11px; border-radius: 4px; }
+  }
+
+  &--md button { height: 30px; font-size: 12px; }
+}
+
+/* ---- ScriptViewer (prompter reading states) ------------------ */
+.er-script {
+  font-family: var(--font-prompt);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+
+  &--center { text-align: center; }
+  &--mirror { transform: scaleX(-1); }
+  &--sm  { font-size: var(--prompt-sm); }
+  &--md  { font-size: var(--prompt-md); }
+  &--lg  { font-size: var(--prompt-lg); }
+  &--xl  { font-size: var(--prompt-xl); }
+
+  &__w {
+    transition:
+      color 0.3s var(--ease-out),
+      opacity 0.3s var(--ease-out);
+
+    &--spoken   { color: var(--prompt-upcoming); opacity: 0.18; }
+    &--upcoming { color: var(--prompt-spoken);   opacity: 0.28; }
+
+    &--active {
+      color: var(--prompt-active);
+      opacity: 1;
+      font-weight: 700;
+      text-shadow:
+        0 0 12px rgba(255, 255, 255, 0.9),
+        0 0 28px rgba(140, 110, 255, 0.85),
+        0 0 56px rgba(110, 86, 247, 0.55);
+    }
+
+    /* Bell curve highlight — peak at active+1, symmetric taper */
+    &--near-1 { color: var(--prompt-active); opacity: 0.85; font-weight: 500; }
+    &--near-2 { color: var(--prompt-active); opacity: 0.68; }
+    &--near-3 { color: var(--prompt-active); opacity: 0.52; }
+    &--near-4 { color: var(--prompt-active); opacity: 0.38; }
+  }
+
+  /* High contrast — lift dim states, add dark halo */
+  &--contrast {
+    .er-script__w {
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.95),
+        0 0 6px rgba(0, 0, 0, 0.9);
+
+      &--spoken   { opacity: 0.4; }
+      &--upcoming { opacity: 0.5; }
+      &--near-2   { opacity: 0.82; }
+      &--near-3   { opacity: 0.74; }
+      &--near-4   { opacity: 0.64; }
+
+      &--active {
+        color: #fff;
+        text-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.95),
+          0 0 14px rgba(140, 110, 255, 0.95),
+          0 0 30px rgba(110, 86, 247, 0.7);
+      }
+    }
+  }
+
+  &--dyslexic {
+    font-family: 'OpenDyslexic', var(--font-prompt);
+    letter-spacing: 0.02em;
+    word-spacing: 0.12em;
+    line-height: 1.7;
+  }
+
+  &--no-motion .er-script__w { transition: none; }
+
+  &--clickable .er-script__w {
+    cursor: pointer;
+    border-radius: 4px;
+    &:hover {
+      color: var(--accent-text);
+      opacity: 1;
+      background: var(--accent-subtle-bg);
+    }
+  }
+}
+
+/* ── SettingItem — shared cascade row used in Editor and SettingsWindow ── */
+.si-root {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  &:last-child { border-bottom: none; }
+}
+
+.si-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.si-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+.si-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.si-val {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent-text);
+}
+
+/* origin badge — fixed height in both states so toggling never shifts content */
+.si-origin {
+  height: 18px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  &.inherited {
+    color: var(--text-tertiary);
+    opacity: 0.5;
+  }
+
+  &.overridden {
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    color: var(--accent-text);
+    background: var(--accent-subtle-bg);
+    border: 1px solid var(--accent-subtle-border);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+
+    &:hover { background: var(--surface-hover); }
+    svg { width: 10px; height: 10px; }
+  }
+}

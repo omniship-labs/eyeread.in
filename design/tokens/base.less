@@ -35,8 +35,8 @@ a {
   color: var(--accent-text);
   text-decoration: none;
   transition: color var(--dur-fast) var(--ease-out);
+  &:hover { color: var(--paper-100); }
 }
-a:hover { color: var(--paper-100); }
 
 button { font-family: inherit; }
 
@@ -64,12 +64,14 @@ button { font-family: inherit; }
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--ink-500) transparent;
+
+  &::-webkit-scrollbar { width: 10px; height: 10px; }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--ink-500);
+    border-radius: var(--radius-pill);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    &:hover { background: var(--ink-400); }
+  }
 }
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-thumb {
-  background: var(--ink-500);
-  border-radius: var(--radius-pill);
-  border: 3px solid transparent;
-  background-clip: padding-box;
-}
-*::-webkit-scrollbar-thumb:hover { background: var(--ink-400); }

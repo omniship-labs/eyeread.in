@@ -3,6 +3,8 @@
    Structural rules: nav, hero, section rhythm, grids, footer.
    ============================================================ */
 
+@import (reference) "../../../design/tokens/mixins.less";
+
 /* ── NAV ─────────────────────────────────────────────────── */
 .nav {
   position: fixed;
@@ -13,10 +15,10 @@
   align-items: center;
   padding: 0 var(--space-12);
   background: rgba(10, 10, 15, 0.7);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  .backdrop-filter(blur(24px));
   border-bottom: 1px solid var(--border-subtle);
 }
+
 .nav-inner {
   display: flex;
   align-items: center;
@@ -24,6 +26,7 @@
   max-width: var(--container-lg);
   margin: 0 auto;
 }
+
 .nav-right {
   margin-left: auto;
   display: flex;
@@ -35,25 +38,20 @@
   display: flex;
   align-items: center;
   gap: 9px;
+
+  img { width: 28px; height: 28px; }
 }
-.brand img {
-  width: 28px;
-  height: 28px;
-}
+
 .brand-word {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   font-size: var(--text-lg);
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
+  span { color: var(--accent); }
 }
-.brand-word span {
-  color: var(--accent);
-}
-.brand-word-sm {
-  font-size: var(--text-base);
-  color: var(--text-secondary);
-}
+
+.brand-word-sm { font-size: var(--text-base); color: var(--text-secondary); }
 
 /* ── SECTION RHYTHM ──────────────────────────────────────── */
 .section {
@@ -61,6 +59,7 @@
   margin: 0 auto;
   padding: 120px var(--space-12);
 }
+
 .sec-ey {
   font-family: var(--font-mono);
   font-size: var(--text-2xs);
@@ -70,6 +69,7 @@
   margin-bottom: var(--space-4);
   text-align: center;
 }
+
 .sec-h {
   font-size: clamp(28px, 3vw, 44px);
   font-weight: var(--weight-bold);
@@ -78,10 +78,8 @@
   text-align: center;
   margin-bottom: var(--space-16);
 }
-.sec-ey-l,
-.sec-h-l {
-  text-align: left;
-}
+
+.sec-ey-l, .sec-h-l { text-align: left; }
 
 /* ── HERO ────────────────────────────────────────────────── */
 .hero {
@@ -94,13 +92,25 @@
   padding: 96px var(--space-12) 80px;
   text-align: center;
   overflow: hidden;
+
+  h1 {
+    font-size: clamp(44px, 5.5vw, 80px);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tighter);
+    line-height: var(--leading-none);
+    color: #fff;
+    max-width: 860px;
+    em { font-style: normal; color: var(--accent); }
+  }
 }
+
 .glow {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
 }
+
 .glow-top {
   top: -120px;
   width: 800px;
@@ -108,6 +118,7 @@
   background: radial-gradient(ellipse, rgba(110, 86, 247, 0.24) 0%, transparent 68%);
   filter: blur(60px);
 }
+
 .glow-btm {
   bottom: -200px;
   width: 600px;
@@ -115,6 +126,7 @@
   background: radial-gradient(ellipse, rgba(76, 60, 200, 0.12) 0%, transparent 70%);
   filter: blur(80px);
 }
+
 .hero-badges {
   display: flex;
   align-items: center;
@@ -123,18 +135,7 @@
   flex-wrap: wrap;
   justify-content: center;
 }
-.hero h1 {
-  font-size: clamp(44px, 5.5vw, 80px);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tighter);
-  line-height: var(--leading-none);
-  color: #fff;
-  max-width: 860px;
-}
-.hero h1 em {
-  font-style: normal;
-  color: var(--accent);
-}
+
 .hero-sub {
   margin-top: var(--space-5);
   font-size: clamp(15px, 1.5vw, 20px);
@@ -142,6 +143,7 @@
   line-height: var(--leading-loose);
   max-width: 520px;
 }
+
 .cta-row {
   margin-top: var(--space-10);
   display: flex;
@@ -150,6 +152,7 @@
   justify-content: center;
   flex-wrap: wrap;
 }
+
 .linux-warning {
   margin-top: var(--space-10);
   display: flex;
@@ -165,6 +168,7 @@
   max-width: 480px;
   margin-inline: auto;
 }
+
 .hero-note {
   margin-top: var(--space-4);
   font-family: var(--font-mono);
@@ -177,9 +181,8 @@
 }
 
 /* ── FEATURES ────────────────────────────────────────────── */
-.features {
-  padding-top: 140px;
-}
+.features { padding-top: 140px; }
+
 .feat-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -196,6 +199,7 @@
   gap: 100px;
   align-items: center;
 }
+
 .steps {
   display: flex;
   flex-direction: column;
@@ -203,6 +207,7 @@
   list-style: none;
   margin-top: var(--space-10);
 }
+
 .step {
   display: flex;
   gap: var(--space-5);
@@ -220,16 +225,12 @@
   gap: 80px;
   align-items: center;
 }
-.oss-right {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
+
+.oss-right { display: flex; flex-direction: column; gap: var(--space-4); }
 
 /* ── SPONSORS ────────────────────────────────────────────── */
-.sponsors {
-  text-align: center;
-}
+.sponsors { text-align: center; }
+
 .sponsors-sub {
   max-width: 540px;
   margin: -40px auto 48px;
@@ -246,6 +247,7 @@
   max-width: var(--container-lg);
   margin: 0 auto;
 }
+
 .footer-right {
   margin-left: auto;
   display: flex;
@@ -255,53 +257,19 @@
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 880px) {
-  .nav {
-    padding: 0 var(--space-5);
-  }
-  .section {
-    padding: 80px var(--space-5);
-  }
-  .feat-grid {
-    grid-template-columns: 1fr;
-  }
-  .how-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-12);
-  }
-  .oss {
-    grid-template-columns: 1fr;
-    gap: var(--space-10);
-    padding: 40px var(--space-7);
-  }
-  .footer {
-    flex-direction: column;
-    gap: var(--space-5);
-    padding: var(--space-8) var(--space-5);
-  }
-  .footer-right {
-    margin-left: 0;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-4);
-  }
+  .nav { padding: 0 var(--space-5); }
+  .section { padding: 80px var(--space-5); }
+  .feat-grid { grid-template-columns: 1fr; }
+  .how-grid { grid-template-columns: 1fr; gap: var(--space-12); }
+  .oss { grid-template-columns: 1fr; gap: var(--space-10); padding: 40px var(--space-7); }
+  .footer { flex-direction: column; gap: var(--space-5); padding: var(--space-8) var(--space-5); }
+  .footer-right { margin-left: 0; flex-wrap: wrap; justify-content: center; gap: var(--space-4); }
 }
 
-/* Phones — collapse the GitHub button to an icon so the download CTA
-   never overflows off-screen. */
+/* Phones — collapse the GitHub button to an icon only */
 @media (max-width: 560px) {
-  .nav {
-    padding: 0 var(--space-4);
-  }
-  .nav-right {
-    gap: var(--space-2);
-  }
-  /* GitHub button → icon only */
-  .nav-right .btn-ghost .btn-label {
-    display: none;
-  }
-  .nav-right .btn-ghost.btn-sm {
-    padding: 0;
-    width: var(--control-h-sm);
-    justify-content: center;
-  }
+  .nav { padding: 0 var(--space-4); }
+  .nav-right { gap: var(--space-2); }
+  .nav-right .btn-ghost .btn-label { display: none; }
+  .nav-right .btn-ghost.btn-sm { padding: 0; width: var(--control-h-sm); justify-content: center; }
 }

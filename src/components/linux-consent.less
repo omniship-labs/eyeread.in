@@ -1,6 +1,8 @@
 /* Linux screen-share consent modal — shown before the user enables
    capture-hiding on Linux, where the OS gives no reliable guarantee. */
 
+@import (reference) "../../design/tokens/mixins.less";
+
 .lsc-backdrop {
   position: fixed;
   inset: 0;
@@ -10,8 +12,7 @@
   justify-content: center;
   padding: 24px;
   background: rgba(6, 6, 9, 0.62);
-  backdrop-filter: blur(6px) saturate(1.1);
-  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+  .backdrop-filter(blur(6px) saturate(1.1));
 }
 
 .lsc-card {
@@ -45,28 +46,20 @@
   border: 1px solid rgba(255, 184, 77, 0.28);
 }
 
-.lsc-title {
-  font-size: 15px;
-  font-weight: 650;
-}
+.lsc-title { font-size: 15px; font-weight: 650; }
 
 .lsc-body {
   font-size: 13px;
   line-height: 1.5;
   color: var(--text-secondary, #a8a8ba);
-}
 
-.lsc-body p {
-  margin: 0 0 10px;
+  p { margin: 0 0 10px; }
 }
 
 .lsc-list {
   margin: 0 0 12px;
   padding-left: 18px;
-}
-
-.lsc-list li {
-  margin: 4px 0;
+  li { margin: 4px 0; }
 }
 
 .lsc-actions {
@@ -90,18 +83,11 @@
   background: transparent;
   color: var(--text-secondary, #a8a8ba);
   border-color: var(--border-default, rgba(255, 255, 255, 0.1));
-}
-
-.lsc-btn-cancel:hover {
-  background: var(--surface-hover, rgba(255, 255, 255, 0.04));
-  color: var(--text-primary, #f2f2f7);
+  &:hover { background: var(--surface-hover, rgba(255, 255, 255, 0.04)); color: var(--text-primary, #f2f2f7); }
 }
 
 .lsc-btn-accept {
   background: var(--warning, #ffb84d);
   color: #1a1305;
-}
-
-.lsc-btn-accept:hover {
-  filter: brightness(1.06);
+  &:hover { filter: brightness(1.06); }
 }

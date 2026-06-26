@@ -21,17 +21,17 @@ import '@fontsource/opendyslexic/700.css';
 
 // Design-system tokens (single source of truth), minus its CDN fonts.css —
 // src/styles/fonts.css declares the same variables for the local faces.
-import './styles/fonts.css';
-import '../design/tokens/colors.css';
-import '../design/tokens/typography.css';
-import '../design/tokens/spacing.css';
-import '../design/tokens/effects.css';
-import '../design/tokens/base.css';
+import './styles/fonts.less';
+import '../design/tokens/colors.less';
+import '../design/tokens/typography.less';
+import '../design/tokens/spacing.less';
+import '../design/tokens/effects.less';
+import '../design/tokens/base.less';
 
-import './styles/app.css';
-import './windows/main/main-window.css';
-import './windows/overlay/overlay.css';
-import './windows/settings/settings-window.css';
+import './styles/app.less';
+import './windows/main/main-window.less';
+import './windows/overlay/overlay.less';
+import './windows/settings/settings-window.less';
 
 // Initialise i18next (language detection + resources) before the app mounts.
 import './i18n/index.js';

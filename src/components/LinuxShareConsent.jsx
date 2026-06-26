@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import './linux-consent.css';
+import './linux-consent.less';
 
 /**
  * LinuxShareConsent — risk-acknowledgement modal shown before enabling

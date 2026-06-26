@@ -7,7 +7,7 @@ import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 import sponsors from '../data/sponsors.json';
-import './about/about-window.css';
+import './about/about-window.less';
 
 const OC_URL = 'https://opencollective.com/eyereadin';
 

@@ -48,13 +48,14 @@
   padding: 4px 16px 16px;
   display: flex;
   flex-direction: column;
+
+  /* full-width segmented controls */
+  .er-seg { width: 100%; }
+  .er-seg button { flex: 1; }
 }
 
 /* section — mirrors aw-section from AboutWindow */
-.sw-section {
-  width: 100%;
-  margin-bottom: 14px;
-}
+.sw-section { width: 100%; margin-bottom: 14px; }
 
 .sw-section-label {
   font-family: var(--font-mono);
@@ -65,39 +66,20 @@
   margin-bottom: 8px;
 }
 
-.sw-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--border-subtle);
-  margin: 2px 0 14px;
-}
-
-/* full-width segmented controls */
-.sw-body .er-seg {
-  width: 100%;
-}
-.sw-body .er-seg button {
-  flex: 1;
-}
+.sw-divider { width: 100%; height: 1px; background: var(--border-subtle); margin: 2px 0 14px; }
 
 /* mode detail under the Tracking tab — fixed height so swapping never shifts rows */
-.sw-mode-detail {
-  min-height: 52px;
-  padding-top: 10px;
-}
+.sw-mode-detail { min-height: 52px; padding-top: 10px; }
+
 .sw-mode-note {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
   color: var(--text-tertiary);
-}
-.sw-mode-note.warn {
-  color: var(--warning, #f5a524);
-}
-.sw-mode-note svg {
-  width: 12px;
-  height: 12px;
+
+  &.warn { color: var(--warning, #f5a524); }
+  svg { width: 12px; height: 12px; }
 }
 
 /* sub-row inside a section (e.g. Warn after / Count down from) */
