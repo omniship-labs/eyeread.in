@@ -2,7 +2,7 @@
    eyeread — the floating glass prompter window.
    ============================================================ */
 
-@import (reference) "../../../design/tokens/mixins.less";
+@import (reference) '../../../design/tokens/mixins.less';
 
 .overlay-root {
   flex: 1;
@@ -13,12 +13,17 @@
   position: relative;
   overflow: visible;
 
-  &.pos-top { padding-top: 0; }
+  &.pos-top {
+    padding-top: 0;
+  }
 
   &.demo {
     justify-content: flex-start;
     padding-top: 64px;
-    .overlay-panel { position: relative; z-index: 20; }
+    .overlay-panel {
+      position: relative;
+      z-index: 20;
+    }
   }
 }
 
@@ -58,13 +63,17 @@
   &.shielded {
     border-color: rgba(110, 86, 247, 0.45);
     box-shadow: var(--window-shadow-shielded);
-    &::before { background: rgba(110, 86, 247, 0.1); }
+    &::before {
+      background: rgba(110, 86, 247, 0.1);
+    }
   }
 
   &.exposed {
     border-color: rgba(239, 68, 68, 0.45);
     box-shadow: var(--window-shadow-exposed);
-    &::before { background: rgba(239, 68, 68, 0.13); }
+    &::before {
+      background: rgba(239, 68, 68, 0.13);
+    }
   }
 
   /* Pass-through mode (⌥⇧E) */
@@ -78,7 +87,9 @@
       opacity: 0.45;
       transition: opacity var(--dur-slow) var(--ease-out);
     }
-    .ov-foot { border-top-color: transparent; }
+    .ov-foot {
+      border-top-color: transparent;
+    }
     .grip {
       opacity: 1;
       background: var(--accent-subtle-bg);
@@ -88,7 +99,10 @@
   }
 
   /* Make sure panel children sit above the tint layer */
-  > * { position: relative; z-index: 1; }
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .ov-head {
@@ -98,8 +112,12 @@
   padding: 12px 12px 0;
   overflow: hidden;
 
-  .ov-time  { flex-shrink: 0; }
-  .ov-voice { flex-shrink: 0; }
+  .ov-time {
+    flex-shrink: 0;
+  }
+  .ov-voice {
+    flex-shrink: 0;
+  }
 }
 
 .grip {
@@ -127,7 +145,10 @@
   align-items: center;
   gap: 6px;
   font-variant-numeric: tabular-nums;
-  svg { width: 13px; height: 13px; }
+  svg {
+    width: 13px;
+    height: 13px;
+  }
 }
 
 .ov-voice {
@@ -139,8 +160,13 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  svg { width: 12px; height: 12px; }
-  &.on { color: var(--accent-text); }
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+  &.on {
+    color: var(--accent-text);
+  }
 }
 
 .ov-invisible {
@@ -158,19 +184,33 @@
   padding: 4px 9px;
   border-radius: var(--radius-pill);
   white-space: nowrap;
-  svg { width: 13px; height: 13px; }
+  svg {
+    width: 13px;
+    height: 13px;
+  }
 }
 
-.ov-body { padding: 8px 22px 4px; position: relative; }
+.ov-body {
+  padding: 8px 22px 4px;
+  position: relative;
+}
 
 .ov-window {
   height: 168px; /* overridden inline — resizable */
   overflow: hidden;
   position: relative;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    #000 22%,
+    #000 72%,
+    transparent 100%
+  );
   mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
 
-  .er-script { padding: 56px 0; }
+  .er-script {
+    padding: 56px 0;
+  }
 }
 
 .ov-empty {
@@ -206,14 +246,22 @@
   transition: all var(--dur-fast) var(--ease-out);
   padding: 0;
 
-  &:hover { background: var(--surface-hover); color: var(--text-primary); }
-  svg { width: 19px; height: 19px; }
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+  svg {
+    width: 19px;
+    height: 19px;
+  }
 
   &.accent {
     background: var(--accent);
     color: #fff;
     box-shadow: var(--glow-accent-sm);
-    &:hover { background: var(--accent-hover); }
+    &:hover {
+      background: var(--accent-hover);
+    }
   }
 
   &.on {
@@ -227,7 +275,10 @@
     height: 26px;
     border-radius: var(--radius-sm);
     flex: none;
-    svg { width: 14px; height: 14px; }
+    svg {
+      width: 14px;
+      height: 14px;
+    }
   }
 
   /* screen-share shield button — shows HIDDEN / VISIBLE label */
@@ -243,8 +294,14 @@
     color: var(--text-tertiary);
     white-space: nowrap;
 
-    svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .ov-shield-label { display: inline; }
+    svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+    .ov-shield-label {
+      display: inline;
+    }
 
     &.on {
       color: var(--accent-text);
@@ -272,13 +329,28 @@
     padding: 0 8px;
     height: 26px;
 
-    &:hover { color: var(--text-primary); background: var(--surface-hover); }
-    &.on { color: var(--accent-text); background: var(--accent-subtle-bg); border-color: var(--accent-subtle-border); }
+    &:hover {
+      color: var(--text-primary);
+      background: var(--surface-hover);
+    }
+    &.on {
+      color: var(--accent-text);
+      background: var(--accent-subtle-bg);
+      border-color: var(--accent-subtle-border);
+    }
   }
 }
 
-.sep { width: 1px; height: 22px; background: var(--border-default); margin: 0 3px; }
-.sizebtn { font-family: var(--font-display); font-weight: 700; }
+.sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border-default);
+  margin: 0 3px;
+}
+.sizebtn {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
 
 /* corner resize handle */
 .ov-resize {
@@ -299,12 +371,22 @@
   touch-action: none;
 
   &:hover,
-  &.dragging { opacity: 1; color: var(--accent-text); }
-  svg { width: 12px; height: 12px; pointer-events: none; }
+  &.dragging {
+    opacity: 1;
+    color: var(--accent-text);
+  }
+  svg {
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+  }
 }
 
 /* ===== Browser demo backdrop (web preview only) ===== */
-.demo-stage { position: fixed; inset: 0; }
+.demo-stage {
+  position: fixed;
+  inset: 0;
+}
 
 .demo-shared {
   position: absolute;

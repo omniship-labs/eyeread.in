@@ -3,7 +3,7 @@
    Structural rules: nav, hero, section rhythm, grids, footer.
    ============================================================ */
 
-@import (reference) "../../../design/tokens/mixins.less";
+@import (reference) '../../../design/tokens/mixins.less';
 
 /* ── NAV ─────────────────────────────────────────────────── */
 .nav {
@@ -39,7 +39,10 @@
   align-items: center;
   gap: 9px;
 
-  img { width: 28px; height: 28px; }
+  img {
+    width: 28px;
+    height: 28px;
+  }
 }
 
 .brand-word {
@@ -48,10 +51,15 @@
   font-size: var(--text-lg);
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
-  span { color: var(--accent); }
+  span {
+    color: var(--accent);
+  }
 }
 
-.brand-word-sm { font-size: var(--text-base); color: var(--text-secondary); }
+.brand-word-sm {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
 
 /* ── SECTION RHYTHM ──────────────────────────────────────── */
 .section {
@@ -79,7 +87,10 @@
   margin-bottom: var(--space-16);
 }
 
-.sec-ey-l, .sec-h-l { text-align: left; }
+.sec-ey-l,
+.sec-h-l {
+  text-align: left;
+}
 
 /* ── HERO ────────────────────────────────────────────────── */
 .hero {
@@ -100,7 +111,10 @@
     line-height: var(--leading-none);
     color: #fff;
     max-width: 860px;
-    em { font-style: normal; color: var(--accent); }
+    em {
+      font-style: normal;
+      color: var(--accent);
+    }
   }
 }
 
@@ -181,7 +195,9 @@
 }
 
 /* ── FEATURES ────────────────────────────────────────────── */
-.features { padding-top: 140px; }
+.features {
+  padding-top: 140px;
+}
 
 .feat-grid {
   display: grid;
@@ -226,10 +242,16 @@
   align-items: center;
 }
 
-.oss-right { display: flex; flex-direction: column; gap: var(--space-4); }
+.oss-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
 
 /* ── SPONSORS ────────────────────────────────────────────── */
-.sponsors { text-align: center; }
+.sponsors {
+  text-align: center;
+}
 
 .sponsors-sub {
   max-width: 540px;
@@ -257,19 +279,51 @@
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
 @media (max-width: 880px) {
-  .nav { padding: 0 var(--space-5); }
-  .section { padding: 80px var(--space-5); }
-  .feat-grid { grid-template-columns: 1fr; }
-  .how-grid { grid-template-columns: 1fr; gap: var(--space-12); }
-  .oss { grid-template-columns: 1fr; gap: var(--space-10); padding: 40px var(--space-7); }
-  .footer { flex-direction: column; gap: var(--space-5); padding: var(--space-8) var(--space-5); }
-  .footer-right { margin-left: 0; flex-wrap: wrap; justify-content: center; gap: var(--space-4); }
+  .nav {
+    padding: 0 var(--space-5);
+  }
+  .section {
+    padding: 80px var(--space-5);
+  }
+  .feat-grid {
+    grid-template-columns: 1fr;
+  }
+  .how-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+  }
+  .oss {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    padding: 40px var(--space-7);
+  }
+  .footer {
+    flex-direction: column;
+    gap: var(--space-5);
+    padding: var(--space-8) var(--space-5);
+  }
+  .footer-right {
+    margin-left: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+  }
 }
 
 /* Phones — collapse the GitHub button to an icon only */
 @media (max-width: 560px) {
-  .nav { padding: 0 var(--space-4); }
-  .nav-right { gap: var(--space-2); }
-  .nav-right .btn-ghost .btn-label { display: none; }
-  .nav-right .btn-ghost.btn-sm { padding: 0; width: var(--control-h-sm); justify-content: center; }
+  .nav {
+    padding: 0 var(--space-4);
+  }
+  .nav-right {
+    gap: var(--space-2);
+  }
+  .nav-right .btn-ghost .btn-label {
+    display: none;
+  }
+  .nav-right .btn-ghost.btn-sm {
+    padding: 0;
+    width: var(--control-h-sm);
+    justify-content: center;
+  }
 }

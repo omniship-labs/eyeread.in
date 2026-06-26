@@ -3,9 +3,13 @@
    Tokens come from ../design/styles.less (single source).
    ============================================================ */
 
-@import (reference) "../../design/tokens/mixins.less";
+@import (reference) '../../design/tokens/mixins.less';
 
-html, body, #root { height: 100%; }
+html,
+body,
+#root {
+  height: 100%;
+}
 
 body {
   margin: 0;
@@ -24,7 +28,10 @@ body {
   flex-direction: column;
 }
 
-input, textarea { .user-select(text); }
+input,
+textarea {
+  .user-select(text);
+}
 
 /* ---- Accessibility: keyboard focus ------------------------- */
 :where(
@@ -57,7 +64,9 @@ input, textarea { .user-select(text); }
 
 /* ---- Accessibility: reduce motion -------------------------- */
 .reduce-motion-rules() {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
@@ -65,8 +74,12 @@ input, textarea { .user-select(text); }
   }
 }
 
-@media (prefers-reduced-motion: reduce) { .reduce-motion-rules(); }
-.reduce-motion { .reduce-motion-rules(); }
+@media (prefers-reduced-motion: reduce) {
+  .reduce-motion-rules();
+}
+.reduce-motion {
+  .reduce-motion-rules();
+}
 
 /* ---- Switch (.sw-wrap pattern) ----------------------------- */
 .er-switch {
@@ -93,15 +106,25 @@ input, textarea { .user-select(text); }
   &--md {
     width: 42px;
     height: 24px;
-    .th { width: 18px; height: 18px; }
-    &.on .th { transform: translateX(18px); }
+    .th {
+      width: 18px;
+      height: 18px;
+    }
+    &.on .th {
+      transform: translateX(18px);
+    }
   }
 
   &--sm {
     width: 36px;
     height: 20px;
-    .th { width: 14px; height: 14px; }
-    &.on .th { transform: translateX(16px); }
+    .th {
+      width: 14px;
+      height: 14px;
+    }
+    &.on .th {
+      transform: translateX(16px);
+    }
   }
 
   &.on {
@@ -158,7 +181,10 @@ input, textarea { .user-select(text); }
     padding: 0 8px;
     transition: all var(--dur-fast) var(--ease-out);
 
-    svg { width: 14px; height: 14px; }
+    svg {
+      width: 14px;
+      height: 14px;
+    }
 
     &[aria-pressed='true'] {
       background: var(--accent-subtle-bg);
@@ -170,10 +196,17 @@ input, textarea { .user-select(text); }
   &--sm {
     border-radius: var(--radius-sm);
     padding: 2px;
-    button { height: 26px; font-size: 11px; border-radius: 4px; }
+    button {
+      height: 26px;
+      font-size: 11px;
+      border-radius: 4px;
+    }
   }
 
-  &--md button { height: 30px; font-size: 12px; }
+  &--md button {
+    height: 30px;
+    font-size: 12px;
+  }
 }
 
 /* ---- ScriptViewer (prompter reading states) ------------------ */
@@ -184,20 +217,38 @@ input, textarea { .user-select(text); }
   letter-spacing: -0.01em;
   color: var(--text-primary);
 
-  &--center { text-align: center; }
-  &--mirror { transform: scaleX(-1); }
-  &--sm  { font-size: var(--prompt-sm); }
-  &--md  { font-size: var(--prompt-md); }
-  &--lg  { font-size: var(--prompt-lg); }
-  &--xl  { font-size: var(--prompt-xl); }
+  &--center {
+    text-align: center;
+  }
+  &--mirror {
+    transform: scaleX(-1);
+  }
+  &--sm {
+    font-size: var(--prompt-sm);
+  }
+  &--md {
+    font-size: var(--prompt-md);
+  }
+  &--lg {
+    font-size: var(--prompt-lg);
+  }
+  &--xl {
+    font-size: var(--prompt-xl);
+  }
 
   &__w {
     transition:
       color 0.3s var(--ease-out),
       opacity 0.3s var(--ease-out);
 
-    &--spoken   { color: var(--prompt-upcoming); opacity: 0.18; }
-    &--upcoming { color: var(--prompt-spoken);   opacity: 0.28; }
+    &--spoken {
+      color: var(--prompt-upcoming);
+      opacity: 0.18;
+    }
+    &--upcoming {
+      color: var(--prompt-spoken);
+      opacity: 0.28;
+    }
 
     &--active {
       color: var(--prompt-active);
@@ -210,10 +261,23 @@ input, textarea { .user-select(text); }
     }
 
     /* Bell curve highlight — peak at active+1, symmetric taper */
-    &--near-1 { color: var(--prompt-active); opacity: 0.85; font-weight: 500; }
-    &--near-2 { color: var(--prompt-active); opacity: 0.68; }
-    &--near-3 { color: var(--prompt-active); opacity: 0.52; }
-    &--near-4 { color: var(--prompt-active); opacity: 0.38; }
+    &--near-1 {
+      color: var(--prompt-active);
+      opacity: 0.85;
+      font-weight: 500;
+    }
+    &--near-2 {
+      color: var(--prompt-active);
+      opacity: 0.68;
+    }
+    &--near-3 {
+      color: var(--prompt-active);
+      opacity: 0.52;
+    }
+    &--near-4 {
+      color: var(--prompt-active);
+      opacity: 0.38;
+    }
   }
 
   /* High contrast — lift dim states, add dark halo */
@@ -223,11 +287,21 @@ input, textarea { .user-select(text); }
         0 1px 2px rgba(0, 0, 0, 0.95),
         0 0 6px rgba(0, 0, 0, 0.9);
 
-      &--spoken   { opacity: 0.4; }
-      &--upcoming { opacity: 0.5; }
-      &--near-2   { opacity: 0.82; }
-      &--near-3   { opacity: 0.74; }
-      &--near-4   { opacity: 0.64; }
+      &--spoken {
+        opacity: 0.4;
+      }
+      &--upcoming {
+        opacity: 0.5;
+      }
+      &--near-2 {
+        opacity: 0.82;
+      }
+      &--near-3 {
+        opacity: 0.74;
+      }
+      &--near-4 {
+        opacity: 0.64;
+      }
 
       &--active {
         color: #fff;
@@ -246,7 +320,9 @@ input, textarea { .user-select(text); }
     line-height: 1.7;
   }
 
-  &--no-motion .er-script__w { transition: none; }
+  &--no-motion .er-script__w {
+    transition: none;
+  }
 
   &--clickable .er-script__w {
     cursor: pointer;
@@ -263,7 +339,9 @@ input, textarea { .user-select(text); }
 .si-root {
   padding: 10px 0;
   border-bottom: 1px solid var(--border-subtle);
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .si-label-row {
@@ -316,7 +394,12 @@ input, textarea { .user-select(text); }
     cursor: pointer;
     transition: background var(--dur-fast) var(--ease-out);
 
-    &:hover { background: var(--surface-hover); }
-    svg { width: 10px; height: 10px; }
+    &:hover {
+      background: var(--surface-hover);
+    }
+    svg {
+      width: 10px;
+      height: 10px;
+    }
   }
 }
