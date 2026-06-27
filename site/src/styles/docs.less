@@ -9,7 +9,6 @@
 .docs-shell {
   max-width: var(--container-lg);
   margin: 0 auto;
-  /* clear the fixed 60px nav */
   padding: calc(60px + var(--space-12)) var(--space-12) var(--space-16);
   display: grid;
   grid-template-columns: 220px 1fr;
@@ -22,6 +21,7 @@
   position: sticky;
   top: calc(60px + var(--space-6));
 }
+
 .docs-nav-heading {
   display: block;
   font-family: var(--font-mono);
@@ -31,12 +31,16 @@
   color: var(--text-tertiary);
   margin-bottom: var(--space-4);
 }
-.docs-nav ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+
+.docs-nav {
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 }
+
 .docs-nav-link {
   display: block;
   padding: 7px 12px;
@@ -47,78 +51,90 @@
   transition:
     color var(--dur-fast) var(--ease-out),
     background var(--dur-fast) var(--ease-out);
-}
-.docs-nav-link:hover {
-  color: var(--text-primary);
-  background: var(--surface-1);
-}
-.docs-nav-link.is-active {
-  color: var(--accent-text);
-  background: var(--accent-subtle-bg);
-  border-left-color: var(--accent);
-  font-weight: var(--weight-semibold);
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--surface-1);
+  }
+
+  &.is-active {
+    color: var(--accent-text);
+    background: var(--accent-subtle-bg);
+    border-left-color: var(--accent);
+    font-weight: var(--weight-semibold);
+  }
 }
 
 /* ── PROSE ───────────────────────────────────────────────── */
 .docs-content {
-  min-width: 0; /* let code blocks/tables shrink instead of overflowing */
+  min-width: 0;
 }
 .doc-prose {
   max-width: 760px;
 }
-.doc-prose h1 {
-  font-size: clamp(28px, 3.4vw, 40px);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tighter);
-  color: #fff;
-  line-height: 1.1;
+
+.doc-prose {
+  h1 {
+    font-size: clamp(28px, 3.4vw, 40px);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tighter);
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+    color: #fff;
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  p {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: var(--leading-loose);
+    margin-bottom: var(--space-4);
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+
+    li {
+      position: relative;
+      padding-left: var(--space-5);
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      line-height: var(--leading-loose);
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 11px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+    }
+  }
 }
-.doc-prose h2 {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
-  color: #fff;
-  margin-top: var(--space-12);
-  margin-bottom: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--border-subtle);
-}
-.doc-prose p {
-  font-size: var(--text-base);
-  color: var(--text-secondary);
-  line-height: var(--leading-loose);
-  margin-bottom: var(--space-4);
-}
+
 .doc-lead {
   font-size: var(--text-lg) !important;
   color: var(--text-primary) !important;
   margin-top: var(--space-4);
   margin-bottom: var(--space-6) !important;
 }
-.doc-prose ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
-.doc-prose ul li {
-  position: relative;
-  padding-left: var(--space-5);
-  font-size: var(--text-base);
-  color: var(--text-secondary);
-  line-height: var(--leading-loose);
-}
-.doc-prose ul li::before {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 11px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-}
+
 .doc-checklist li::before {
   border-radius: 3px;
   background: var(--text-tertiary);
@@ -135,6 +151,7 @@
   padding: 1px 5px;
   white-space: nowrap;
 }
+
 .doc-code {
   margin: var(--space-4) 0 var(--space-6);
   border: 1px solid var(--border-subtle);
@@ -142,6 +159,7 @@
   background: var(--surface-1);
   overflow: hidden;
 }
+
 .doc-code-label {
   display: block;
   padding: 7px 16px;
@@ -152,17 +170,19 @@
   background: var(--surface-2);
   border-bottom: 1px solid var(--border-subtle);
 }
+
 .doc-pre {
   margin: 0;
   padding: var(--space-4) var(--space-5);
   overflow-x: auto;
-}
-.doc-pre code {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: var(--leading-loose);
-  color: var(--text-primary);
-  white-space: pre;
+
+  code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-loose);
+    color: var(--text-primary);
+    white-space: pre;
+  }
 }
 
 /* ── TABLES ──────────────────────────────────────────────── */
@@ -174,34 +194,40 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   overflow: hidden;
-}
-.doc-table th,
-.doc-table td {
-  text-align: left;
-  padding: 10px 14px;
-  vertical-align: top;
-  border-bottom: 1px solid var(--border-subtle);
-}
-.doc-table tr:last-child th,
-.doc-table tr:last-child td {
-  border-bottom: none;
-}
-.doc-table thead th {
-  font-size: var(--text-2xs);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-tertiary);
-  background: var(--surface-1);
-  font-weight: var(--weight-bold);
-}
-.doc-table tbody th {
-  color: var(--text-primary);
-  font-weight: var(--weight-semibold);
-  white-space: nowrap;
-}
-.doc-table td {
-  color: var(--text-secondary);
-  line-height: var(--leading-reading);
+
+  th,
+  td {
+    text-align: left;
+    padding: 10px 14px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  tr:last-child {
+    th,
+    td {
+      border-bottom: none;
+    }
+  }
+
+  thead th {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+    background: var(--surface-1);
+    font-weight: var(--weight-bold);
+  }
+
+  tbody th {
+    color: var(--text-primary);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+  }
+  tbody td {
+    color: var(--text-secondary);
+    line-height: var(--leading-reading);
+  }
 }
 
 /* ── NOTE / CALLOUT ──────────────────────────────────────── */
@@ -222,6 +248,7 @@
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
+
 .doc-card {
   display: flex;
   flex-direction: column;
@@ -233,11 +260,13 @@
   transition:
     border-color var(--dur-fast) var(--ease-out),
     background var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+  }
 }
-.doc-card:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-2);
-}
+
 .doc-card-icon {
   display: inline-flex;
   align-items: center;
@@ -250,6 +279,7 @@
   color: var(--accent);
   margin-bottom: var(--space-2);
 }
+
 .doc-card-title {
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
@@ -266,16 +296,17 @@
   margin-top: var(--space-12);
   padding-top: var(--space-6);
   border-top: 1px solid var(--border-subtle);
-}
-.docs-edit a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: var(--text-sm);
-  color: var(--text-tertiary);
-}
-.docs-edit a:hover {
-  color: var(--text-primary);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
@@ -306,8 +337,6 @@
   }
 }
 
-/* Phones — keep the nav from overflowing: drop the Docs link (it's still in
-   the footer and the brand routes home). */
 @media (max-width: 560px) {
   .nav-docs {
     display: none;

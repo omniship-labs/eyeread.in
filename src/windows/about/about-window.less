@@ -1,27 +1,13 @@
-/* Shield tint — full-window colour wash, themed like the overlay glass.
-   Violet when hidden (shielded), red when exposed to screen-share. */
-.aw-root::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 9999;
-  transition: background var(--dur-slow) var(--ease-out);
-}
-.aw-root.shielded::after {
-  background: rgba(110, 86, 247, 0.1);
-}
-.aw-root.exposed::after {
-  background: rgba(239, 68, 68, 0.13);
-}
+/* ============================================================
+   eyeread — About window
+   ============================================================ */
+
+@import (reference) '../../../design/tokens/mixins.less';
 
 .aw-root {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* 32px margin on all sides gives the shadow room to bleed into the
-     transparent window area — mirrors how the overlay panel floats. */
   margin: 32px;
   height: calc(100vh - 64px);
   border-radius: var(--radius-xl);
@@ -38,29 +24,48 @@
   padding: 0 28px 24px;
   box-sizing: border-box;
   overflow: hidden;
-  user-select: none;
+  .user-select(none);
   border: var(--window-border);
   box-shadow: var(--window-shadow);
-  -webkit-app-region: drag;
+  .app-region(drag);
   position: relative;
   transition:
     background 600ms var(--ease-spring),
     backdrop-filter 600ms var(--ease-spring),
     border-color var(--dur-slow) var(--ease-out),
     box-shadow var(--dur-slow) var(--ease-out);
-}
-.aw-root.shielded {
-  border-color: rgba(110, 86, 247, 0.45);
-  box-shadow: var(--window-shadow-shielded);
-}
-.aw-root.exposed {
-  border-color: rgba(239, 68, 68, 0.45);
-  box-shadow: var(--window-shadow-exposed);
-}
 
-/* disable drag on everything interactive inside */
-.aw-root * {
-  -webkit-app-region: no-drag;
+  &.shielded {
+    border-color: rgba(110, 86, 247, 0.45);
+    box-shadow: var(--window-shadow-shielded);
+    &::after {
+      background: rgba(110, 86, 247, 0.1);
+    }
+  }
+
+  &.exposed {
+    border-color: rgba(239, 68, 68, 0.45);
+    box-shadow: var(--window-shadow-exposed);
+    &::after {
+      background: rgba(239, 68, 68, 0.13);
+    }
+  }
+
+  /* Shield tint overlay — violet when shielded, red when exposed */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 9999;
+    transition: background var(--dur-slow) var(--ease-out);
+  }
+
+  /* disable drag on everything interactive inside */
+  * {
+    .app-region(no-drag);
+  }
 }
 
 /* drag strip */
@@ -89,14 +94,15 @@
   transition: all var(--dur-fast) var(--ease-out);
   -webkit-app-region: no-drag;
   z-index: 1;
-}
-.aw-close:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-.aw-close svg {
-  width: 14px;
-  height: 14px;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .aw-hero {
@@ -112,13 +118,12 @@
   height: 72px;
   border-radius: 16px;
   margin-bottom: 6px;
-  /* grabbable for the easter egg — drag to bend the glass, click to shield */
   cursor: grab;
   touch-action: none;
   -webkit-user-drag: none;
-}
-.aw-icon:active {
-  cursor: grabbing;
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .aw-name {
@@ -134,12 +139,10 @@
   font-size: 11px;
   color: var(--text-tertiary);
 }
-
 .aw-org {
   font-size: 12px;
   color: var(--text-tertiary);
 }
-
 .aw-credit {
   font-size: 13px;
   color: var(--text-secondary);
@@ -155,9 +158,9 @@
   background: transparent;
   padding: 0;
   display: inline;
-}
-.aw-link:hover {
-  color: var(--paper-100);
+  &:hover {
+    color: var(--paper-100);
+  }
 }
 
 .aw-divider {
@@ -217,15 +220,15 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* room for the scrollbar so content doesn't sit under it */
   padding-right: 4px;
-}
-.aw-supporters-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-.aw-supporters-scroll::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: 3px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-default);
+    border-radius: 3px;
+  }
 }
 
 .aw-tier-label {
@@ -254,12 +257,13 @@
   background: transparent;
   font-family: inherit;
   padding: 0;
+  &:hover {
+    color: var(--text-primary);
+  }
 }
+
 button.aw-supporter {
   cursor: pointer;
-}
-.aw-supporter:hover {
-  color: var(--text-primary);
 }
 
 .aw-supporter-avatar {
@@ -271,14 +275,16 @@ button.aw-supporter {
 }
 
 /* Featured sponsors get larger avatars and stronger text */
-.aw-tier-sponsor .aw-supporter {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-.aw-tier-sponsor .aw-supporter-avatar {
-  width: 24px;
-  height: 24px;
+.aw-tier-sponsor {
+  .aw-supporter {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .aw-supporter-avatar {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .aw-supporters-all {
