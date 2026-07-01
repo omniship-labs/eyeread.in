@@ -76,7 +76,13 @@
         "closable": false,
         "visible": false,
         "visibleOnAllWorkspaces": true,
-        "focus": false
+        "focus": false,
+        "windowEffects": {
+          "effects": ["hudWindow", "acrylic"],
+          "state": "active",
+          "radius": 20.0,
+          "color": [10, 10, 15, 190]
+        }
       }
     ],
     "security": {
