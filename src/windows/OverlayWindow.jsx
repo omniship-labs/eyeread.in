@@ -36,6 +36,7 @@ import {
   focusMain,
   fitOverlayToPanel,
   getOverlayPos,
+  setOverlayGlass,
   shieldActive,
   showSettingsWindow,
 } from '../lib/tauri';
@@ -387,6 +388,15 @@ export function OverlayWindow() {
   // src-tauri/src/lib.rs). Linux has no portable compositor-level blur, so
   // it keeps the CSS fallback.
   const nativeGlass = isTauri && (isMacOS || isWindows);
+  // AppKit/DWM materials aren't a continuously tunable blur radius, so the
+  // "Glass blur" slider can't scale native blur strength — but it can at
+  // least turn native blur fully on/off, same as blur=0 means "no blur" for
+  // the CSS path on other platforms.
+  const wantNativeGlass = nativeGlass && effective.blur > 0;
+
+  useEffect(() => {
+    if (nativeGlass) setOverlayGlass(wantNativeGlass);
+  }, [nativeGlass, wantNativeGlass]);
 
   return (
     <div
@@ -408,12 +418,14 @@ export function OverlayWindow() {
         style={{
           '--ov-alpha': effective.opacity / 100,
           width: panelSize.w,
-          // On macOS/Windows the window sits over a native blur layer, so
-          // the glass is composited by the window server, not this CSS
-          // filter. Layering a CSS backdrop-filter on top too is what
-          // caused the lag, since the webview recomputes it every frame
-          // the desktop behind the window changes.
-          ...(nativeGlass
+          // When native glass is active the window sits over a native blur
+          // layer, so the glass is composited by the window server, not
+          // this CSS filter — layering a CSS backdrop-filter on top too is
+          // what caused the lag, since the webview recomputes it every
+          // frame the desktop behind the window changes. When blur is 0,
+          // native glass is off too (see setOverlayGlass above), so the CSS
+          // path is just a harmless no-op `blur(0px)` there.
+          ...(wantNativeGlass
             ? { backdropFilter: 'none', WebkitBackdropFilter: 'none' }
             : {
                 backdropFilter: `blur(${effective.blur}px) saturate(1.15)`,

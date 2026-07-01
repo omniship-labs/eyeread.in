@@ -322,6 +322,20 @@ export async function setAppProtected(on) {
   await invoke('set_app_protected', { protected: on });
 }
 
+/**
+ * Turn the overlay's native glass (macOS vibrancy/Liquid Glass, Windows
+ * Acrylic) on or off, so the "Glass blur" setting actually does something
+ * on those platforms — AppKit/DWM materials aren't a continuously tunable
+ * blur radius like CSS was, so every nonzero blur value uses the same fixed
+ * material, but this at least makes blur === 0 genuinely disable it instead
+ * of always showing native blur regardless of the setting.
+ */
+export async function setOverlayGlass(enabled) {
+  if (!isTauri) return;
+  const { invoke } = await import('@tauri-apps/api/core');
+  await invoke('set_overlay_glass', { enabled }).catch(() => {});
+}
+
 // Serialize hotkey registration so StrictMode double-invocation can't race.
 const hotkeyQueue = {};
 function withHotkeyLock(combo, fn) {
