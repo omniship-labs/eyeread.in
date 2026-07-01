@@ -76,7 +76,12 @@
         "closable": false,
         "visible": false,
         "visibleOnAllWorkspaces": true,
-        "focus": false
+        "focus": false,
+        "windowEffects": {
+          "effects": ["hudWindow"],
+          "state": "active",
+          "radius": 20.0
+        }
       }
     ],
     "security": {
