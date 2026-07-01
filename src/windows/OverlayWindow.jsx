@@ -29,6 +29,7 @@ import {
 import {
   isTauri,
   isMacOS,
+  isWindows,
   listen,
   emitTo,
   hideOverlay,
@@ -363,10 +364,13 @@ export function OverlayWindow() {
         ? fmtTime(effective.countFrom - elapsed)
         : null;
 
-  // macOS Tauri gets its glass blur from a native NSVisualEffectView instead
-  // of CSS backdrop-filter (see "overlay" window's windowEffects in
-  // src-tauri/tauri.conf.json).
-  const nativeGlass = isTauri && isMacOS;
+  // macOS/Windows Tauri get their glass blur from a native compositor layer
+  // instead of CSS backdrop-filter — NSVisualEffectView/Liquid Glass on
+  // macOS, Acrylic on Windows (see "overlay" window's windowEffects in
+  // src-tauri/tauri.conf.json, plus the macOS 26+ upgrade in
+  // src-tauri/src/lib.rs). Linux has no portable compositor-level blur, so
+  // it keeps the CSS fallback.
+  const nativeGlass = isTauri && (isMacOS || isWindows);
 
   return (
     <div
@@ -388,11 +392,11 @@ export function OverlayWindow() {
         style={{
           '--ov-alpha': effective.opacity / 100,
           width: panelSize.w,
-          // On macOS the window sits over a native NSVisualEffectView (see
-          // tauri.conf.json) — the glass blur is composited by the window
-          // server, not this CSS filter. Layering a CSS backdrop-filter on
-          // top too is what caused the lag, since WKWebView recomputes it
-          // every frame the desktop behind the window changes.
+          // On macOS/Windows the window sits over a native blur layer, so
+          // the glass is composited by the window server, not this CSS
+          // filter. Layering a CSS backdrop-filter on top too is what
+          // caused the lag, since the webview recomputes it every frame
+          // the desktop behind the window changes.
           ...(nativeGlass
             ? { backdropFilter: 'none', WebkitBackdropFilter: 'none' }
             : {

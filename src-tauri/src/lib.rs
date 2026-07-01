@@ -5,6 +5,23 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
 
+/// Upgrade the overlay's glass material to real Liquid Glass (NSGlassEffectView)
+/// on macOS 26+, replacing the NSVisualEffectView vibrancy that tauri.conf.json's
+/// `windowEffects` applies to every window on launch. `apply_liquid_glass` checks
+/// the AppKit version itself and errors out on older macOS, so on <26 this is a
+/// no-op and the window keeps its baseline vibrancy — no manual OS-version
+/// parsing needed here, and newer macOS releases pick up new materials for free.
+#[cfg(target_os = "macos")]
+fn upgrade_overlay_to_liquid_glass(app: &AppHandle) {
+    use window_vibrancy::{apply_liquid_glass, clear_vibrancy, NSGlassEffectViewStyle};
+
+    if let Some(win) = app.get_webview_window("overlay") {
+        if apply_liquid_glass(&win, NSGlassEffectViewStyle::Regular, None, Some(20.0)).is_ok() {
+            let _ = clear_vibrancy(&win);
+        }
+    }
+}
+
 /// Toggle screen-capture invisibility on every app window at once.
 ///
 /// Maps to the OS-level capture-exclusion primitive per platform:
@@ -155,7 +172,11 @@ pub fn run() {
             show_about_window,
             set_app_protected,
         ])
-        .setup(|_app| Ok(()))
+        .setup(|_app| {
+            #[cfg(target_os = "macos")]
+            upgrade_overlay_to_liquid_glass(_app.handle());
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running eyeread.in");
 }

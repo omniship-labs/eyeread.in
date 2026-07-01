@@ -78,9 +78,10 @@
         "visibleOnAllWorkspaces": true,
         "focus": false,
         "windowEffects": {
-          "effects": ["hudWindow"],
+          "effects": ["hudWindow", "acrylic"],
           "state": "active",
-          "radius": 20.0
+          "radius": 20.0,
+          "color": [10, 10, 15, 190]
         }
       }
     ],
