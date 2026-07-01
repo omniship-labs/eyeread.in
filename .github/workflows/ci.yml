@@ -52,3 +52,30 @@ jobs:
       - name: Clippy
         run: cargo clippy -- -D warnings
         working-directory: src-tauri
+
+  # macOS/Windows have platform-only code (window-vibrancy, Liquid Glass,
+  # Acrylic, etc.) that only type-checks with a real Apple/MSVC toolchain —
+  # cross-compiling those from the Linux `rust` job above can't catch it.
+  # `cargo check` also fully validates tauri.conf.json, since
+  # tauri::generate_context!() deserializes it into a strongly-typed Config
+  # struct at compile time and fails the build on any invalid field.
+  rust-native-targets:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-latest
+            name: macOS
+          - runner: windows-latest
+            name: Windows
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        with:
+          workspaces: src-tauri
+      - name: Check (${{ matrix.name }} toolchain)
+        run: cargo check
+        working-directory: src-tauri
