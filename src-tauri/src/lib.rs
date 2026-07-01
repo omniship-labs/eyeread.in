@@ -1,9 +1,23 @@
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},
+    window::{Color, Effect, EffectState, EffectsBuilder},
     AppHandle, Manager, WindowEvent,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
+
+/// The overlay's baseline native glass — must match the "overlay" window's
+/// `windowEffects` in tauri.conf.json (applied once at launch); duplicated
+/// here so `set_overlay_glass` can re-apply/clear it at runtime, which the
+/// declarative config can't do.
+fn overlay_glass_effects() -> tauri::utils::config::WindowEffectsConfig {
+    EffectsBuilder::new()
+        .effects([Effect::HudWindow, Effect::Acrylic])
+        .state(EffectState::Active)
+        .radius(20.0)
+        .color(Color(10, 10, 15, 190))
+        .build()
+}
 
 /// Upgrade the overlay's glass material to real Liquid Glass (NSGlassEffectView)
 /// on macOS 26+, replacing the NSVisualEffectView vibrancy that tauri.conf.json's
@@ -19,6 +33,34 @@ fn upgrade_overlay_to_liquid_glass(app: &AppHandle) {
         if apply_liquid_glass(&win, NSGlassEffectViewStyle::Regular, None, Some(20.0)).is_ok() {
             let _ = clear_vibrancy(&win);
         }
+    }
+}
+
+/// Turn the overlay's native glass on/off at runtime so the "Glass blur"
+/// setting is actually honored. AppKit/DWM materials aren't a continuously
+/// tunable blur radius like the old CSS `backdrop-filter` was — every
+/// nonzero blur value ends up using the same fixed material — but blur == 0
+/// now genuinely turns native blur off instead of always applying it
+/// regardless of the setting.
+#[tauri::command]
+fn set_overlay_glass(app: AppHandle, enabled: bool) {
+    let Some(win) = app.get_webview_window("overlay") else {
+        return;
+    };
+    if enabled {
+        let _ = win.set_effects(Some(overlay_glass_effects()));
+        #[cfg(target_os = "macos")]
+        upgrade_overlay_to_liquid_glass(&app);
+    } else {
+        // Tauri's own set_effects(None) only clears Windows effects — macOS
+        // vibrancy/Liquid Glass has to be cleared directly via window-vibrancy.
+        #[cfg(target_os = "macos")]
+        {
+            use window_vibrancy::{clear_liquid_glass, clear_vibrancy};
+            let _ = clear_liquid_glass(&win);
+            let _ = clear_vibrancy(&win);
+        }
+        let _ = win.set_effects(None);
     }
 }
 
@@ -171,6 +213,7 @@ pub fn run() {
             install_update,
             show_about_window,
             set_app_protected,
+            set_overlay_glass,
         ])
         .setup(|_app| {
             #[cfg(target_os = "macos")]
