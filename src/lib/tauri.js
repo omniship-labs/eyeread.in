@@ -249,6 +249,21 @@ export async function resetOverlayLayout(settings) {
   await positionOverlay(settings?.position ?? 'top', targetW);
 }
 
+/**
+ * Fit the native overlay window to the panel's actual rendered box (`panel`
+ * = { w, h } from panelRef.getBoundingClientRect()).
+ *
+ * This used to only chase width, leaving height pinned to a big fixed
+ * constant as permanent headroom for the panel's resize handle — harmless
+ * while the glass blur was CSS `backdrop-filter` scoped to the panel
+ * element, since the extra window space was simply invisible. macOS/Windows
+ * now get their blur from a native compositor layer that fills the *whole*
+ * OS window (see tauri.conf.json's `windowEffects`), which isn't clipped to
+ * any DOM element — so a window sized well past its content showed up as a
+ * big translucent/tinted rectangle around a much smaller panel. Fitting
+ * height the same way width already was removes that dead space instead of
+ * merely hiding it.
+ */
 export async function fitOverlayToPanel(panel) {
   if (!isTauri) return;
   const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window');
@@ -259,14 +274,19 @@ export async function fitOverlayToPanel(panel) {
     const pos = await win.outerPosition();
     const size = await win.outerSize();
     const oldW = size.width / scale;
-    const newW = Math.round(panel.w + 96); // 32px padding each side
-    if (Math.abs(newW - oldW) < 2) return; // width unchanged — do nothing
-    await win.setSize(new LogicalSize(newW, size.height / scale));
-    // compensate horizontally so the panel stays centred
+    const oldH = size.height / scale;
+    // Room for the root's own CSS padding (overlay.less .overlay-root:
+    // 22px top / 32px right+bottom+left) plus headroom for the panel's
+    // box-shadow blur, so neither gets clipped by the OS window edge.
+    const newW = Math.round(panel.w + 96); // 32px padding each side + shadow bleed
+    const newH = Math.round(panel.h + 86); // 22/32px top/bottom padding + shadow bleed
+    if (Math.abs(newW - oldW) < 2 && Math.abs(newH - oldH) < 2) return;
+    await win.setSize(new LogicalSize(newW, newH));
+    // compensate so the panel stays visually centred as it grows/shrinks
     await win.setPosition(
       new LogicalPosition(
         Math.round(pos.x / scale + (oldW - newW) / 2),
-        Math.round(pos.y / scale)
+        Math.round(pos.y / scale + (oldH - newH) / 2)
       )
     );
   } catch {

@@ -274,22 +274,38 @@ export function OverlayWindow() {
     });
   }, [active, effective.size, script, panelSize, settings.reduceMotion]);
 
-  // ---- fit native window width to panel (throttled) --------------------------
+  // ---- fit native window to the panel's real rendered box (throttled) --------
+  // Measures panelRef directly (rather than trusting panelSize, which is only
+  // ever the resizable body height) so the OS window always matches the
+  // panel's true footprint — see fitOverlayToPanel's doc comment for why that
+  // now matters for both width and height.
   const lastFit = useRef(0);
+  const pendingFit = useRef(null);
   useEffect(() => {
     if (!isTauri) return undefined;
-    const now = Date.now();
-    if (now - lastFit.current > 120) {
-      lastFit.current = now;
-      fitOverlayToPanel(panelSize);
-      return undefined;
-    }
-    const t = setTimeout(() => {
-      lastFit.current = Date.now();
-      fitOverlayToPanel(panelSize);
-    }, 130);
-    return () => clearTimeout(t);
-  }, [panelSize]);
+    const el = panelRef.current;
+    if (!el) return undefined;
+    const fit = () => {
+      const { width, height } = el.getBoundingClientRect();
+      clearTimeout(pendingFit.current);
+      const now = Date.now();
+      if (now - lastFit.current > 120) {
+        lastFit.current = now;
+        fitOverlayToPanel({ w: width, h: height });
+      } else {
+        pendingFit.current = setTimeout(() => {
+          lastFit.current = Date.now();
+          fitOverlayToPanel({ w: width, h: height });
+        }, 130);
+      }
+    };
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      clearTimeout(pendingFit.current);
+    };
+  }, []);
 
   // ---- transport controls ----------------------------------------------------
   const restart = useCallback(() => {
