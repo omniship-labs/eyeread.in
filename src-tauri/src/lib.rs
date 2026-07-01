@@ -1,18 +1,22 @@
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},
-    window::{Color, Effect, EffectState, EffectsBuilder},
     AppHandle, Manager, WindowEvent,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
 
-/// The overlay's baseline native glass — must match the "overlay" window's
-/// `windowEffects` in tauri.conf.json (applied once at launch); duplicated
-/// here so `set_overlay_glass` can re-apply/clear it at runtime, which the
-/// declarative config can't do.
+/// The overlay's baseline native glass on Windows — must match the "overlay"
+/// window's `windowEffects` in tauri.conf.json (applied once at launch);
+/// duplicated here so `set_overlay_glass` can re-apply/clear it at runtime,
+/// which the declarative config can't do. macOS has its own runtime path in
+/// `set_overlay_glass` since it needs an explicit main-thread hop that
+/// `set_effects` already handles internally.
+#[cfg(windows)]
 fn overlay_glass_effects() -> tauri::utils::config::WindowEffectsConfig {
+    use tauri::window::{Color, Effect, EffectState, EffectsBuilder};
+
     EffectsBuilder::new()
-        .effects([Effect::HudWindow, Effect::Acrylic])
+        .effects([Effect::Acrylic])
         .state(EffectState::Active)
         .radius(20.0)
         .color(Color(10, 10, 15, 190))
@@ -47,21 +51,51 @@ fn set_overlay_glass(app: AppHandle, enabled: bool) {
     let Some(win) = app.get_webview_window("overlay") else {
         return;
     };
-    if enabled {
-        let _ = win.set_effects(Some(overlay_glass_effects()));
-        #[cfg(target_os = "macos")]
-        upgrade_overlay_to_liquid_glass(&app);
-    } else {
-        // Tauri's own set_effects(None) only clears Windows effects — macOS
-        // vibrancy/Liquid Glass has to be cleared directly via window-vibrancy.
-        #[cfg(target_os = "macos")]
-        {
-            use window_vibrancy::{clear_liquid_glass, clear_vibrancy};
-            let _ = clear_liquid_glass(&win);
-            let _ = clear_vibrancy(&win);
-        }
-        let _ = win.set_effects(None);
+
+    // `window_vibrancy::apply_vibrancy`/`apply_liquid_glass`/`clear_*` all
+    // assert they're running on the real AppKit main thread and silently
+    // return `Err(NotMainThread)` otherwise. `#[tauri::command]` handlers
+    // run on a worker thread by default — unlike `WebviewWindow::set_effects`,
+    // which dispatches to the main thread internally — so calling them
+    // directly here was a no-op: toggling "Glass blur" to 0 never actually
+    // cleared native blur, and the fix above didn't fix anything.
+    #[cfg(target_os = "macos")]
+    {
+        let win_mt = win.clone();
+        let _ = win.run_on_main_thread(move || {
+            use window_vibrancy::{
+                apply_vibrancy, clear_liquid_glass, clear_vibrancy, NSVisualEffectMaterial,
+                NSVisualEffectState,
+            };
+            if enabled {
+                let _ = apply_vibrancy(
+                    &win_mt,
+                    NSVisualEffectMaterial::HudWindow,
+                    Some(NSVisualEffectState::Active),
+                    Some(20.0),
+                );
+                upgrade_overlay_to_liquid_glass(&app);
+            } else {
+                let _ = clear_liquid_glass(&win_mt);
+                let _ = clear_vibrancy(&win_mt);
+            }
+        });
     }
+
+    // Tauri's Windows vibrancy path already dispatches to the main thread
+    // internally (see `WebviewWindow::set_effects`), so no explicit hop
+    // is needed here.
+    #[cfg(windows)]
+    {
+        let _ = win.set_effects(if enabled {
+            Some(overlay_glass_effects())
+        } else {
+            None
+        });
+    }
+
+    #[cfg(not(any(target_os = "macos", windows)))]
+    let _ = (win, enabled);
 }
 
 /// Toggle screen-capture invisibility on every app window at once.
