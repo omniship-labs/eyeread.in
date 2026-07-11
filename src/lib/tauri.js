@@ -80,13 +80,8 @@ async function overlayWindow() {
   return WebviewWindow.getByLabel('overlay');
 }
 
-/** Anchor the overlay window on the current monitor. */
-export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
-  if (!isTauri) return;
-  const { currentMonitor, LogicalPosition } = await import('@tauri-apps/api/window');
-  const win = await overlayWindow();
-  const monitor = await currentMonitor();
-  if (!win || !monitor) return;
+/** Compute the anchored (x, y) for the overlay window on a given monitor. */
+function computeOverlayPosition(monitor, position, windowW) {
   const scale = monitor.scaleFactor || 1;
   const mw = monitor.size.width / scale;
   const mh = monitor.size.height / scale;
@@ -102,7 +97,18 @@ export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
       : position === 'bottom'
         ? my + mh - OVERLAY_H - 24 - SHADOW_PAD
         : my; // top — padding-top:0 in CSS, so panel starts at the window top; no offset needed
-  await win.setPosition(new LogicalPosition(Math.round(x), Math.round(y)));
+  return { x: Math.round(x), y: Math.round(y) };
+}
+
+/** Anchor the overlay window on the current monitor. */
+export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
+  if (!isTauri) return;
+  const { currentMonitor, LogicalPosition } = await import('@tauri-apps/api/window');
+  const win = await overlayWindow();
+  const monitor = await currentMonitor();
+  if (!win || !monitor) return;
+  const { x, y } = computeOverlayPosition(monitor, position, windowW);
+  await win.setPosition(new LogicalPosition(x, y));
 }
 
 let demoTab = null;
@@ -240,13 +246,23 @@ export async function getOverlayPos() {
 /** Reset the overlay to its default size and centered position. */
 export async function resetOverlayLayout(settings) {
   if (!isTauri) return;
-  const { LogicalSize } = await import('@tauri-apps/api/window');
+  const { LogicalSize, LogicalPosition, currentMonitor } =
+    await import('@tauri-apps/api/window');
   const win = await overlayWindow();
   if (!win) return;
   const defaultW = settings?.overlaySize?.w ?? 560;
   const targetW = Math.round(defaultW + 96);
-  await win.setSize(new LogicalSize(targetW, OVERLAY_H + 420)).catch(() => {});
-  await positionOverlay(settings?.position ?? 'top', targetW);
+  const monitor = await currentMonitor();
+  // Apply size and position together (rather than one after the other) so
+  // the window doesn't visibly resize at its old spot before jumping to the
+  // new one — that two-step sequence is what caused the reset-button flicker.
+  const resize = win.setSize(new LogicalSize(targetW, OVERLAY_H + 420)).catch(() => {});
+  let reposition = Promise.resolve();
+  if (monitor) {
+    const { x, y } = computeOverlayPosition(monitor, settings?.position ?? 'top', targetW);
+    reposition = win.setPosition(new LogicalPosition(x, y)).catch(() => {});
+  }
+  await Promise.all([resize, reposition]);
 }
 
 export async function fitOverlayToPanel(panel) {
