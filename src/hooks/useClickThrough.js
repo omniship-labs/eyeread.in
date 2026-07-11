@@ -44,10 +44,11 @@ export function useClickThrough(refs, enabled = true, mode) {
     let win = null;
     let ignoring = null; // unknown at start — first check always syncs
     let pointerDown = false;
-    // Cached rather than fetched every tick — it only changes if the window
-    // moves to a monitor with a different DPI, which an always-on-top
-    // overlay essentially never does. Re-fetch here (not per-tick) if that
-    // assumption ever turns out wrong for someone's setup.
+    // Cached rather than fetched every tick, and refreshed each time we
+    // *enter* pass-through (not on every 80ms tick) — the window can only
+    // move while it's interactive (dragging requires catching the mouse),
+    // so re-checking right as we go back to ignoring cursor events catches
+    // a mid-session monitor change without paying for it on every tick.
     let scale = 1;
 
     // never flip to click-through mid-interaction (slider drags, etc.)
@@ -72,7 +73,7 @@ export function useClickThrough(refs, enabled = true, mode) {
       if (shouldIgnore === ignoring) return;
       ignoring = shouldIgnore;
       await win.setIgnoreCursorEvents(shouldIgnore);
-      syncMode();
+      await syncMode();
     };
 
     // Interactive mode: cheap, IPC-free — plain DOM mousemove.
@@ -100,11 +101,18 @@ export function useClickThrough(refs, enabled = true, mode) {
     };
 
     // Switch listener/poller to match the current mode.
-    function syncMode() {
+    async function syncMode() {
       if (cancelled) return;
       if (ignoring) {
         window.removeEventListener('mousemove', onMouseMove);
-        if (!timer) timer = setInterval(tick, 80);
+        if (!timer) {
+          // Window movement only happens while interactive (dragging needs
+          // the mouse caught), so re-check the DPI right as we go back to
+          // ignoring — catches a mid-session monitor change for free.
+          scale = await win.scaleFactor().catch(() => scale);
+          if (cancelled || !ignoring) return; // state may have flipped back already
+          if (!timer) timer = setInterval(tick, 80);
+        }
       } else {
         if (timer) {
           clearInterval(timer);
@@ -123,7 +131,7 @@ export function useClickThrough(refs, enabled = true, mode) {
       // First check always needs a poll — we don't know the cursor's
       // position relative to the window until we've asked via IPC once.
       await tick();
-      syncMode();
+      await syncMode();
     })();
 
     return () => {
