@@ -265,6 +265,11 @@ export async function resetOverlayLayout(settings) {
   await Promise.all([resize, reposition]);
 }
 
+// Vertical room the overlay-root wrapper reserves around the panel (22px top
+// pad + 32px bottom pad, using the larger "not pos-top" case so we never
+// undersize) plus a little slack for the box-shadow's blur bleed.
+const VERTICAL_CHROME = 22 + 32 + 24;
+
 export async function fitOverlayToPanel(panel) {
   if (!isTauri) return;
   const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window');
@@ -275,10 +280,20 @@ export async function fitOverlayToPanel(panel) {
     const pos = await win.outerPosition();
     const size = await win.outerSize();
     const oldW = size.width / scale;
+    const oldH = size.height / scale;
     const newW = Math.round(panel.w + 96); // 32px padding each side
-    if (Math.abs(newW - oldW) < 2) return; // width unchanged — do nothing
-    await win.setSize(new LogicalSize(newW, size.height / scale));
-    // compensate horizontally so the panel stays centred
+    // `panel.h`, when passed, is the panel's actual measured rendered height
+    // (header + body + footer + borders) — the window must be at least that
+    // tall or the bottom of the panel (including the resize handle) gets
+    // clipped by the OS window's own edge. Only grow, never shrink: the
+    // window is deliberately oversized to leave room for the settings
+    // popover, and shrinking would fight that.
+    const neededH = panel.h ? Math.round(panel.h + VERTICAL_CHROME) : oldH;
+    const newH = Math.max(oldH, neededH);
+    if (Math.abs(newW - oldW) < 2 && newH <= oldH) return; // nothing to do
+    await win.setSize(new LogicalSize(newW, newH));
+    // compensate horizontally so the panel stays centred; height only ever
+    // grows downward, so no vertical position compensation is needed.
     await win.setPosition(
       new LogicalPosition(
         Math.round(pos.x / scale + (oldW - newW) / 2),

@@ -17,10 +17,21 @@ import { isTauri } from '../lib/tauri';
  * rest of the time. That keeps the constant `scale_factor`/`cursorPosition`
  * IPC traffic confined to the one mode that actually needs it.
  *
+ * `mode` should change (e.g. pass the "interactive" boolean/label) whenever
+ * the set of interactive regions changes shape. Region *contents* update via
+ * `refsRef` on every render for free, but a mode change needs the effect to
+ * actually restart: it tears down the stale timer/listener from the old mode
+ * and re-checks the cursor immediately, instead of waiting on a mousemove
+ * that may never come (e.g. toggling modes without moving the mouse leaves
+ * `ignoring` stale — the window keeps swallowing/passing clicks based on
+ * regions that no longer apply, and in the pass-through case the old
+ * polling timer is never killed).
+ *
  * @param {Array<React.RefObject<HTMLElement>>} refs interactive regions
  * @param {boolean} enabled
+ * @param {*} [mode] identity of the current region set; change forces resync
  */
-export function useClickThrough(refs, enabled = true) {
+export function useClickThrough(refs, enabled = true, mode) {
   const refsRef = useRef(refs);
   refsRef.current = refs;
 
@@ -117,5 +128,5 @@ export function useClickThrough(refs, enabled = true) {
       window.removeEventListener('pointerdown', onDown, true);
       window.removeEventListener('pointerup', onUp, true);
     };
-  }, [enabled]);
+  }, [enabled, mode]);
 }

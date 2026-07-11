@@ -124,7 +124,7 @@ export function OverlayWindow() {
   );
 
   // ---- interaction modes -----------------------------------------------------
-  useClickThrough(interactive ? [panelRef] : [gripRef, passthruBtnRef]);
+  useClickThrough(interactive ? [panelRef] : [gripRef, passthruBtnRef], true, interactive);
 
   useEffect(() => {
     if (!isTauri) {
@@ -272,19 +272,26 @@ export function OverlayWindow() {
     });
   }, [active, effective.size, script, panelSize, settings.reduceMotion]);
 
-  // ---- fit native window width to panel (throttled) --------------------------
+  // ---- fit native window to panel (throttled) ---------------------------------
+  // Pass the panel's actual rendered height (not just the resizable content
+  // area) so the OS window grows enough to avoid clipping the panel's own
+  // bottom edge (and the resize handle on it) when the user drags it taller.
   const lastFit = useRef(0);
   useEffect(() => {
     if (!isTauri) return undefined;
+    const measure = () => ({
+      w: panelSize.w,
+      h: panelRef.current?.getBoundingClientRect().height,
+    });
     const now = Date.now();
     if (now - lastFit.current > 120) {
       lastFit.current = now;
-      fitOverlayToPanel(panelSize);
+      fitOverlayToPanel(measure());
       return undefined;
     }
     const t = setTimeout(() => {
       lastFit.current = Date.now();
-      fitOverlayToPanel(panelSize);
+      fitOverlayToPanel(measure());
     }, 130);
     return () => clearTimeout(t);
   }, [panelSize]);
