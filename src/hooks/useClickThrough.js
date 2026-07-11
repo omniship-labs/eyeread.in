@@ -14,8 +14,9 @@ import { isTauri } from '../lib/tauri';
  * position via IPC instead. But while the window IS catching events
  * (interactive mode), we get real DOM mousemove for free — so we only poll
  * when pass-through is active, and rely on a plain mousemove listener the
- * rest of the time. That keeps the constant `scale_factor`/`cursorPosition`
- * IPC traffic confined to the one mode that actually needs it.
+ * rest of the time. That keeps the constant `cursorPosition`/`outerPosition`
+ * IPC traffic confined to the one mode that actually needs it. `scaleFactor`
+ * is fetched once per mode-sync and cached rather than polled every tick.
  *
  * `mode` should change (e.g. pass the "interactive" boolean/label) whenever
  * the set of interactive regions changes shape. Region *contents* update via
@@ -43,6 +44,11 @@ export function useClickThrough(refs, enabled = true, mode) {
     let win = null;
     let ignoring = null; // unknown at start — first check always syncs
     let pointerDown = false;
+    // Cached rather than fetched every tick — it only changes if the window
+    // moves to a monitor with a different DPI, which an always-on-top
+    // overlay essentially never does. Re-fetch here (not per-tick) if that
+    // assumption ever turns out wrong for someone's setup.
+    let scale = 1;
 
     // never flip to click-through mid-interaction (slider drags, etc.)
     const onDown = () => (pointerDown = true);
@@ -76,15 +82,14 @@ export function useClickThrough(refs, enabled = true, mode) {
     };
 
     // Pass-through mode: no DOM events reach us, so poll the global cursor
-    // via IPC (cursorPosition/outerPosition/scaleFactor) until it re-enters.
+    // via IPC (cursorPosition/outerPosition) until it re-enters.
     const tick = async () => {
       if (cancelled || pointerDown) return;
       try {
         const { cursorPosition } = await import('@tauri-apps/api/window');
-        const [cur, wpos, scale] = await Promise.all([
+        const [cur, wpos] = await Promise.all([
           cursorPosition(), // physical, global
           win.outerPosition(), // physical
-          win.scaleFactor(),
         ]);
         const x = (cur.x - wpos.x) / scale; // logical, window-relative
         const y = (cur.y - wpos.y) / scale;
@@ -113,6 +118,8 @@ export function useClickThrough(refs, enabled = true, mode) {
       const { getCurrentWindow } = await import('@tauri-apps/api/window');
       if (cancelled) return;
       win = getCurrentWindow();
+      scale = await win.scaleFactor().catch(() => 1);
+      if (cancelled) return;
       // First check always needs a poll — we don't know the cursor's
       // position relative to the window until we've asked via IPC once.
       await tick();
