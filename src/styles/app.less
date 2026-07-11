@@ -255,28 +255,20 @@ textarea {
       opacity: 1;
       font-weight: 700;
       text-shadow:
-        0 0 12px rgba(255, 255, 255, 0.9),
-        0 0 28px rgba(140, 110, 255, 0.85),
-        0 0 56px rgba(110, 86, 247, 0.55);
+        0 0 6px rgba(255, 255, 255, 1),
+        0 0 18px rgba(255, 255, 255, 0.95),
+        0 0 40px rgba(140, 110, 255, 1),
+        0 0 80px rgba(110, 86, 247, 0.75);
     }
 
-    /* Bell curve highlight — peak at active+1, symmetric taper */
-    &--near-1 {
+    /* Bell highlight — gradual taper ahead of the peak. The per-word
+       opacity is computed by ScriptViewer (configurable width), kept
+       visibly below the glowing peak so it still pops. */
+    &--near {
       color: var(--prompt-active);
-      opacity: 0.85;
+    }
+    &--near-lead {
       font-weight: 500;
-    }
-    &--near-2 {
-      color: var(--prompt-active);
-      opacity: 0.68;
-    }
-    &--near-3 {
-      color: var(--prompt-active);
-      opacity: 0.52;
-    }
-    &--near-4 {
-      color: var(--prompt-active);
-      opacity: 0.38;
     }
   }
 
@@ -293,22 +285,15 @@ textarea {
       &--upcoming {
         opacity: 0.5;
       }
-      &--near-2 {
-        opacity: 0.82;
-      }
-      &--near-3 {
-        opacity: 0.74;
-      }
-      &--near-4 {
-        opacity: 0.64;
-      }
+      /* bell taper opacities are lifted in ScriptViewer (CONTRAST_LIFT) */
 
       &--active {
         color: #fff;
         text-shadow:
           0 1px 2px rgba(0, 0, 0, 0.95),
-          0 0 14px rgba(140, 110, 255, 0.95),
-          0 0 30px rgba(110, 86, 247, 0.7);
+          0 0 8px rgba(255, 255, 255, 0.9),
+          0 0 18px rgba(140, 110, 255, 1),
+          0 0 38px rgba(110, 86, 247, 0.8);
       }
     }
   }

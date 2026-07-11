@@ -5,12 +5,24 @@ import React from 'react';
  *
  * `active` = index of the word currently being read (the peak of the bell).
  * Words before active → spoken (dim). Words after → upcoming (dim).
- * Bell radiates out symmetrically ahead, tapering over 4 steps.
- * Behind the peak only 1 step of near-1 is shown, then spoken.
+ * The bell tapers gradually over `bellAhead` words (default 9), all kept
+ * readable, then drops off to upcoming. Behind the peak only 1 step is
+ * shown, then spoken.
  */
+const BELL_START = 0.92; // opacity of the word right after the peak
+const BELL_END = 0.5; // opacity of the last word inside the bell
+const CONTRAST_LIFT = 0.12; // high-contrast mode raises the whole taper
+
+function bellOpacity(delta, bellAhead, highContrast) {
+  const span = Math.max(1, bellAhead - 1);
+  const o = BELL_START - ((BELL_START - BELL_END) * (delta - 1)) / span;
+  return Math.min(1, highContrast ? o + CONTRAST_LIFT : o);
+}
+
 export function ScriptViewer({
   text = '',
   active = 0,
+  bellAhead = 9,
   size = 'md',
   mirror = false,
   align = 'left',
@@ -51,24 +63,30 @@ export function ScriptViewer({
         const delta = wc - active; // negative = behind, 0 = peak, positive = ahead
 
         let state;
-        if (delta === 0)
+        let wordStyle;
+        if (delta === 0) {
           state = 'active'; // peak
-        else if (delta === -1)
-          state = 'near-1'; // one behind — still glowing
-        else if (delta < -1)
+        } else if (delta === -1) {
+          state = 'near near-lead'; // one behind — still glowing
+          wordStyle = { opacity: bellOpacity(1, bellAhead, highContrast) };
+        } else if (delta < -1) {
           state = 'spoken'; // further behind — dim
-        else if (delta === 1)
-          state = 'near-1'; // one ahead
-        else if (delta === 2) state = 'near-2';
-        else if (delta === 3) state = 'near-3';
-        else if (delta === 4) state = 'near-4';
-        else state = 'upcoming'; // far ahead — dim
+        } else if (delta <= bellAhead) {
+          state = delta === 1 ? 'near near-lead' : 'near'; // ahead — readable taper
+          wordStyle = { opacity: bellOpacity(delta, bellAhead, highContrast) };
+        } else {
+          state = 'upcoming'; // far ahead — dim
+        }
 
         return (
           <span
             key={i}
             ref={wc === active ? activeWordRef : null}
-            className={`er-script__w er-script__w--${state}`}
+            className={[
+              'er-script__w',
+              ...state.split(' ').map((s) => `er-script__w--${s}`),
+            ].join(' ')}
+            style={wordStyle}
             onClick={onWordClick ? () => onWordClick(wc) : undefined}
             title={onWordClick ? 'Read from here' : undefined}
           >

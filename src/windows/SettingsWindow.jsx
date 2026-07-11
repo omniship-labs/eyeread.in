@@ -203,6 +203,21 @@ export function SettingsWindow() {
           />
         )}
         {si(
+          'bellWords',
+          t('reading.highlightAhead'),
+          `${val('bellWords')}`,
+          <input
+            type="range"
+            className="er-slider"
+            min={3}
+            max={15}
+            value={val('bellWords')}
+            aria-label={t('reading.highlightAhead')}
+            onChange={(e) => set('bellWords', +e.target.value)}
+            style={sliderFill(val('bellWords'), 3, 15)}
+          />
+        )}
+        {si(
           'opacity',
           t('reading.overlayOpacity'),
           `${val('opacity')}%`,

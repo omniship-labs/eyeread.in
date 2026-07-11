@@ -14,6 +14,7 @@ const DB_PATH = 'sqlite:eyeread.db';
 export const defaultSettings = {
   size: 30, // px
   speed: 135, // wpm (auto-scroll fallback)
+  bellWords: 9, // upcoming words kept clearly lit ahead of the peak
   opacity: 40, // % tint — low default: you're always reading over live content
   blur: 3, // px backdrop blur ("glassyness") — 0 = crystal clear
   mirror: false,
@@ -23,6 +24,9 @@ export const defaultSettings = {
   hideFromShare: true,
   linuxShareRiskAccepted: false, // Linux only: user acknowledged capture-hiding is best-effort
   voice: true, // voice tracking on/off
+  // Keep the mic session alive while paused (global-only, privacy-relevant):
+  // avoids the OS "listening" chime WebKit plays on every fresh mic start.
+  keepMicOpen: false,
   overlaySize: { w: 560, h: 168 }, // user default; per-script overlaySize wins
   reduceMotion: false, // disable scroll easing + UI animations everywhere
   highContrast: false, // boost text contrast in overlay
@@ -35,6 +39,7 @@ export const defaultSettings = {
 export const OVERRIDABLE_KEYS = [
   'voice',
   'speed',
+  'bellWords',
   'size',
   'opacity',
   'blur',
