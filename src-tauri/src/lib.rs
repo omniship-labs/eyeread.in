@@ -5,99 +5,6 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
 
-/// The overlay's baseline native glass on Windows — must match the "overlay"
-/// window's `windowEffects` in tauri.conf.json (applied once at launch);
-/// duplicated here so `set_overlay_glass` can re-apply/clear it at runtime,
-/// which the declarative config can't do. macOS has its own runtime path in
-/// `set_overlay_glass` since it needs an explicit main-thread hop that
-/// `set_effects` already handles internally.
-#[cfg(windows)]
-fn overlay_glass_effects() -> tauri::utils::config::WindowEffectsConfig {
-    use tauri::window::{Color, Effect, EffectState, EffectsBuilder};
-
-    EffectsBuilder::new()
-        .effects([Effect::Acrylic])
-        .state(EffectState::Active)
-        .radius(20.0)
-        .color(Color(10, 10, 15, 190))
-        .build()
-}
-
-/// Upgrade the overlay's glass material to real Liquid Glass (NSGlassEffectView)
-/// on macOS 26+, replacing the NSVisualEffectView vibrancy that tauri.conf.json's
-/// `windowEffects` applies to every window on launch. `apply_liquid_glass` checks
-/// the AppKit version itself and errors out on older macOS, so on <26 this is a
-/// no-op and the window keeps its baseline vibrancy — no manual OS-version
-/// parsing needed here, and newer macOS releases pick up new materials for free.
-#[cfg(target_os = "macos")]
-fn upgrade_overlay_to_liquid_glass(app: &AppHandle) {
-    use window_vibrancy::{apply_liquid_glass, clear_vibrancy, NSGlassEffectViewStyle};
-
-    if let Some(win) = app.get_webview_window("overlay") {
-        if apply_liquid_glass(&win, NSGlassEffectViewStyle::Regular, None, Some(20.0)).is_ok() {
-            let _ = clear_vibrancy(&win);
-        }
-    }
-}
-
-/// Turn the overlay's native glass on/off at runtime so the "Glass blur"
-/// setting is actually honored. AppKit/DWM materials aren't a continuously
-/// tunable blur radius like the old CSS `backdrop-filter` was — every
-/// nonzero blur value ends up using the same fixed material — but blur == 0
-/// now genuinely turns native blur off instead of always applying it
-/// regardless of the setting.
-#[tauri::command]
-fn set_overlay_glass(app: AppHandle, enabled: bool) {
-    let Some(win) = app.get_webview_window("overlay") else {
-        return;
-    };
-
-    // `window_vibrancy::apply_vibrancy`/`apply_liquid_glass`/`clear_*` all
-    // assert they're running on the real AppKit main thread and silently
-    // return `Err(NotMainThread)` otherwise. `#[tauri::command]` handlers
-    // run on a worker thread by default — unlike `WebviewWindow::set_effects`,
-    // which dispatches to the main thread internally — so calling them
-    // directly here was a no-op: toggling "Glass blur" to 0 never actually
-    // cleared native blur, and the fix above didn't fix anything.
-    #[cfg(target_os = "macos")]
-    {
-        let win_mt = win.clone();
-        let _ = win.run_on_main_thread(move || {
-            use window_vibrancy::{
-                apply_vibrancy, clear_liquid_glass, clear_vibrancy, NSVisualEffectMaterial,
-                NSVisualEffectState,
-            };
-            if enabled {
-                let _ = apply_vibrancy(
-                    &win_mt,
-                    NSVisualEffectMaterial::HudWindow,
-                    Some(NSVisualEffectState::Active),
-                    Some(20.0),
-                );
-                upgrade_overlay_to_liquid_glass(&app);
-            } else {
-                let _ = clear_liquid_glass(&win_mt);
-                let _ = clear_vibrancy(&win_mt);
-            }
-        });
-    }
-
-    // Tauri's Windows vibrancy path already dispatches to the main thread
-    // internally (see `WebviewWindow::set_effects`), so no explicit hop
-    // is needed here.
-    #[cfg(windows)]
-    {
-        let _ = win.set_effects(if enabled {
-            Some(overlay_glass_effects())
-        } else {
-            None
-        });
-    }
-
-    #[cfg(not(any(target_os = "macos", windows)))]
-    let _ = (win, enabled);
-}
-
 /// Toggle screen-capture invisibility on every app window at once.
 ///
 /// Maps to the OS-level capture-exclusion primitive per platform:
@@ -247,13 +154,8 @@ pub fn run() {
             install_update,
             show_about_window,
             set_app_protected,
-            set_overlay_glass,
         ])
-        .setup(|_app| {
-            #[cfg(target_os = "macos")]
-            upgrade_overlay_to_liquid_glass(_app.handle());
-            Ok(())
-        })
+        .setup(|_app| Ok(()))
         .run(tauri::generate_context!())
         .expect("error while running eyeread.in");
 }

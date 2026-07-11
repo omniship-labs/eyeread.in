@@ -80,13 +80,8 @@ async function overlayWindow() {
   return WebviewWindow.getByLabel('overlay');
 }
 
-/** Anchor the overlay window on the current monitor. */
-export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
-  if (!isTauri) return;
-  const { currentMonitor, LogicalPosition } = await import('@tauri-apps/api/window');
-  const win = await overlayWindow();
-  const monitor = await currentMonitor();
-  if (!win || !monitor) return;
+/** Compute the anchored (x, y) for the overlay window on a given monitor. */
+function computeOverlayPosition(monitor, position, windowW) {
   const scale = monitor.scaleFactor || 1;
   const mw = monitor.size.width / scale;
   const mh = monitor.size.height / scale;
@@ -102,7 +97,18 @@ export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
       : position === 'bottom'
         ? my + mh - OVERLAY_H - 24 - SHADOW_PAD
         : my; // top — padding-top:0 in CSS, so panel starts at the window top; no offset needed
-  await win.setPosition(new LogicalPosition(Math.round(x), Math.round(y)));
+  return { x: Math.round(x), y: Math.round(y) };
+}
+
+/** Anchor the overlay window on the current monitor. */
+export async function positionOverlay(position = 'top', windowW = OVERLAY_W) {
+  if (!isTauri) return;
+  const { currentMonitor, LogicalPosition } = await import('@tauri-apps/api/window');
+  const win = await overlayWindow();
+  const monitor = await currentMonitor();
+  if (!win || !monitor) return;
+  const { x, y } = computeOverlayPosition(monitor, position, windowW);
+  await win.setPosition(new LogicalPosition(x, y));
 }
 
 let demoTab = null;
@@ -240,30 +246,30 @@ export async function getOverlayPos() {
 /** Reset the overlay to its default size and centered position. */
 export async function resetOverlayLayout(settings) {
   if (!isTauri) return;
-  const { LogicalSize } = await import('@tauri-apps/api/window');
+  const { LogicalSize, LogicalPosition, currentMonitor } =
+    await import('@tauri-apps/api/window');
   const win = await overlayWindow();
   if (!win) return;
   const defaultW = settings?.overlaySize?.w ?? 560;
   const targetW = Math.round(defaultW + 96);
-  await win.setSize(new LogicalSize(targetW, OVERLAY_H + 420)).catch(() => {});
-  await positionOverlay(settings?.position ?? 'top', targetW);
+  const monitor = await currentMonitor();
+  // Apply size and position together (rather than one after the other) so
+  // the window doesn't visibly resize at its old spot before jumping to the
+  // new one — that two-step sequence is what caused the reset-button flicker.
+  const resize = win.setSize(new LogicalSize(targetW, OVERLAY_H + 420)).catch(() => {});
+  let reposition = Promise.resolve();
+  if (monitor) {
+    const { x, y } = computeOverlayPosition(monitor, settings?.position ?? 'top', targetW);
+    reposition = win.setPosition(new LogicalPosition(x, y)).catch(() => {});
+  }
+  await Promise.all([resize, reposition]);
 }
 
-/**
- * Fit the native overlay window to the panel's actual rendered box (`panel`
- * = { w, h } from panelRef.getBoundingClientRect()).
- *
- * This used to only chase width, leaving height pinned to a big fixed
- * constant as permanent headroom for the panel's resize handle — harmless
- * while the glass blur was CSS `backdrop-filter` scoped to the panel
- * element, since the extra window space was simply invisible. macOS/Windows
- * now get their blur from a native compositor layer that fills the *whole*
- * OS window (see tauri.conf.json's `windowEffects`), which isn't clipped to
- * any DOM element — so a window sized well past its content showed up as a
- * big translucent/tinted rectangle around a much smaller panel. Fitting
- * height the same way width already was removes that dead space instead of
- * merely hiding it.
- */
+// Vertical room the overlay-root wrapper reserves around the panel (22px top
+// pad + 32px bottom pad, using the larger "not pos-top" case so we never
+// undersize) plus a little slack for the box-shadow's blur bleed.
+const VERTICAL_CHROME = 22 + 32 + 24;
+
 export async function fitOverlayToPanel(panel) {
   if (!isTauri) return;
   const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window');
@@ -275,18 +281,23 @@ export async function fitOverlayToPanel(panel) {
     const size = await win.outerSize();
     const oldW = size.width / scale;
     const oldH = size.height / scale;
-    // Room for the root's own CSS padding (overlay.less .overlay-root:
-    // 22px top / 32px right+bottom+left) plus headroom for the panel's
-    // box-shadow blur, so neither gets clipped by the OS window edge.
-    const newW = Math.round(panel.w + 96); // 32px padding each side + shadow bleed
-    const newH = Math.round(panel.h + 86); // 22/32px top/bottom padding + shadow bleed
-    if (Math.abs(newW - oldW) < 2 && Math.abs(newH - oldH) < 2) return;
+    const newW = Math.round(panel.w + 96); // 32px padding each side
+    // `panel.h`, when passed, is the panel's actual measured rendered height
+    // (header + body + footer + borders) — the window must be at least that
+    // tall or the bottom of the panel (including the resize handle) gets
+    // clipped by the OS window's own edge. Only grow, never shrink: the
+    // window is deliberately oversized to leave room for the settings
+    // popover, and shrinking would fight that.
+    const neededH = panel.h ? Math.round(panel.h + VERTICAL_CHROME) : oldH;
+    const newH = Math.max(oldH, neededH);
+    if (Math.abs(newW - oldW) < 2 && newH <= oldH) return; // nothing to do
     await win.setSize(new LogicalSize(newW, newH));
-    // compensate so the panel stays visually centred as it grows/shrinks
+    // compensate horizontally so the panel stays centred; height only ever
+    // grows downward, so no vertical position compensation is needed.
     await win.setPosition(
       new LogicalPosition(
         Math.round(pos.x / scale + (oldW - newW) / 2),
-        Math.round(pos.y / scale + (oldH - newH) / 2)
+        Math.round(pos.y / scale)
       )
     );
   } catch {
@@ -320,20 +331,6 @@ export async function setAppProtected(on) {
   if (!isTauri) return;
   const { invoke } = await import('@tauri-apps/api/core');
   await invoke('set_app_protected', { protected: on });
-}
-
-/**
- * Turn the overlay's native glass (macOS vibrancy/Liquid Glass, Windows
- * Acrylic) on or off, so the "Glass blur" setting actually does something
- * on those platforms — AppKit/DWM materials aren't a continuously tunable
- * blur radius like CSS was, so every nonzero blur value uses the same fixed
- * material, but this at least makes blur === 0 genuinely disable it instead
- * of always showing native blur regardless of the setting.
- */
-export async function setOverlayGlass(enabled) {
-  if (!isTauri) return;
-  const { invoke } = await import('@tauri-apps/api/core');
-  await invoke('set_overlay_glass', { enabled }).catch(() => {});
 }
 
 // Serialize hotkey registration so StrictMode double-invocation can't race.
