@@ -104,6 +104,35 @@ pub fn run() {
                   ALTER TABLE scripts ADD COLUMN overlay_y REAL;",
             kind: MigrationKind::Up,
         },
+        // v2 reused a version number that pre-squash dev databases had already
+        // recorded (an old "add settings column" migration), so those DBs
+        // skipped it and lack overlay_x/overlay_y. Rebuild to the canonical
+        // schema — safe from every historical state. NEVER renumber or edit an
+        // applied migration again; always append a new version.
+        Migration {
+            version: 3,
+            description: "repair: rebuild scripts to canonical schema",
+            sql: "CREATE TABLE scripts_v3 (
+                    id TEXT PRIMARY KEY,
+                    title TEXT NOT NULL DEFAULT 'Untitled script',
+                    text TEXT NOT NULL DEFAULT '',
+                    tag TEXT NOT NULL DEFAULT 'draft',
+                    pinned INTEGER NOT NULL DEFAULT 0,
+                    overlay_w INTEGER,
+                    overlay_h INTEGER,
+                    overlay_x REAL,
+                    overlay_y REAL,
+                    settings TEXT,
+                    updated_at INTEGER NOT NULL
+                  );
+                  INSERT INTO scripts_v3
+                    (id, title, text, tag, pinned, overlay_w, overlay_h, settings, updated_at)
+                    SELECT id, title, text, tag, pinned, overlay_w, overlay_h, settings, updated_at
+                    FROM scripts;
+                  DROP TABLE scripts;
+                  ALTER TABLE scripts_v3 RENAME TO scripts;",
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()

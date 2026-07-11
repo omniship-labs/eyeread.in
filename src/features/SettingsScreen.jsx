@@ -22,6 +22,7 @@ export function SettingsScreen({ settings, onSettings }) {
     dyslexicFont,
     uiScale = 100,
     voice,
+    keepMicOpen,
     speed,
     size,
     opacity,
@@ -105,6 +106,20 @@ export function SettingsScreen({ settings, onSettings }) {
             }}
           />
         </div>
+        {voice && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.keepMicOpen')}</b>
+              <span>{t('settings.keepMicOpenHint')}</span>
+            </div>
+            <Switch
+              size="sm"
+              checked={!!keepMicOpen}
+              label={t('settings.keepMicOpen')}
+              onChange={(v) => onSettings({ keepMicOpen: v })}
+            />
+          </div>
+        )}
         {!voice && (
           <div className="set-row">
             <div className="set-info">

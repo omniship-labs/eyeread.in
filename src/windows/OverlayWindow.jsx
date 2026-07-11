@@ -45,13 +45,17 @@ export function OverlayWindow() {
   const { t } = useTranslation();
   const [script, setScript] = useState(null);
   const [settings, setSettings] = useState(defaultSettings);
-  // `active`  = word currently being said (peak of bell curve)
+  // `active`  = next word to be spoken (peak of bell curve leads the voice)
   // `pointer` = lookahead search position for voice matching
   const [active, setActive] = useState(0);
   const [pointer, setPointer] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [interactive, setInteractive] = useState(true);
+  // True while the overlay is in an active reading session (shown via
+  // overlay:load, until closed). Gates the keep-mic-open behavior so a
+  // hidden overlay never holds the mic. Demo mode is always "open".
+  const [sessionActive, setSessionActive] = useState(!isTauri);
   const loadedRef = useRef(false);
 
   const windowRef = useRef(null);
@@ -197,6 +201,7 @@ export function OverlayWindow() {
         jumpToRef.current(0); // resets active + pointer + cancels any slide
         setElapsed(0);
         setPlaying(true);
+        setSessionActive(true);
         setInteractive(true);
         // Refresh an open settings window with the new script's context.
         setTimeout(sendSettingsContext, 0);
@@ -238,7 +243,7 @@ export function OverlayWindow() {
     setActive(idx);
     setPointer(idx);
   }); // fallback before hook mounts
-  const { usingVoice, listening, jumpTo } = useVoiceTracking({
+  const { usingVoice, listening, voiceError, retryVoice, jumpTo } = useVoiceTracking({
     words,
     playing,
     voiceEnabled: effective.voice,
@@ -247,6 +252,8 @@ export function OverlayWindow() {
     setPointer,
     setActive,
     language: script?.language,
+    keepMicOpen: settings.keepMicOpen,
+    sessionActive,
   });
   // Keep ref current so overlay:load listener (registered once) always calls latest jumpTo
   useEffect(() => {
@@ -323,6 +330,7 @@ export function OverlayWindow() {
 
   const close = useCallback(() => {
     setPlaying(false);
+    setSessionActive(false); // release the mic even with keep-open enabled
     hideOverlay();
     focusMain();
   }, []);
@@ -435,6 +443,17 @@ export function OverlayWindow() {
               {t('reading.voice')}
             </span>
           )}
+          {effective.voice && voiceAvailable && voiceError && (
+            <button
+              className="ov-voice ov-voice--retry"
+              title={t('overlay.enableMicHint')}
+              aria-label={t('overlay.enableMicHint')}
+              onClick={retryVoice}
+            >
+              <MicOff size={12} />
+              {t('overlay.enableMic')}
+            </button>
+          )}
           {effective.voice && playing && !voiceAvailable && (
             <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
               <MicOff size={12} />
@@ -474,6 +493,7 @@ export function OverlayWindow() {
               <ScriptViewer
                 text={script.text}
                 active={active}
+                bellAhead={effective.bellWords}
                 size={effective.size}
                 mirror={effective.mirror}
                 highContrast={settings.highContrast}

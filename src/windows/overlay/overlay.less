@@ -167,6 +167,33 @@
   &.on {
     color: var(--accent-text);
   }
+
+  /* Mic blocked — WebKit needs a gesture inside this window to start SR.
+     Any pointerdown on the overlay auto-retries; this button is the
+     explicit fallback (a real button so the click carries activation). */
+  &--retry {
+    cursor: pointer;
+    background: rgba(255, 176, 32, 0.12);
+    border: 1px solid rgba(255, 176, 32, 0.35);
+    border-radius: var(--radius-pill);
+    padding: 3px 8px;
+    color: #ffb020;
+    animation: ov-voice-pulse 2.4s ease-in-out infinite;
+
+    &:hover {
+      background: rgba(255, 176, 32, 0.22);
+    }
+  }
+}
+
+@keyframes ov-voice-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
 }
 
 .ov-invisible {
