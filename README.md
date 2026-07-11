@@ -64,12 +64,14 @@ Wayland _and_ X11). Confirmed reports are added to the matrix with credit.
 
 ## Architecture
 
-The app is a single React codebase that runs in two Tauri windows, selected by `?window=` query param at startup.
+The app is a single React codebase that runs in four Tauri windows, selected by `?window=` query param at startup.
 
-| Window    | Purpose                          | Notable config                                                                             |
-| --------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
-| `main`    | Script library, editor, settings | Standard window with macOS overlay title bar                                               |
-| `overlay` | The floating glass prompter      | Transparent, frameless, always-on-top, `contentProtected: true`, visible across all Spaces |
+| Window     | Purpose                          | Notable config                                                                             |
+| ---------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
+| `main`     | Script library, editor, settings | Standard window with macOS overlay title bar                                               |
+| `overlay`  | The floating glass prompter      | Transparent, frameless, always-on-top, `contentProtected: true`, visible across all Spaces |
+| `settings` | Prompter settings (per-script)   | Independent window so it can never clip or resize the overlay; hides on blur               |
+| `about`    | About / credits                  | Frameless; closing hides instead of destroying so it can reopen                            |
 
 **Storage.** Scripts are stored in SQLite (`eyeread.db` via `tauri-plugin-sql`), settings in
 `settings.json` (`tauri-plugin-store`), both in the user's app data directory. The two windows
@@ -77,16 +79,21 @@ stay in sync over Tauri events. In a plain browser the same code falls back to `
 `BroadcastChannel`, so `npm run dev` works without the native shell. Legacy localStorage data
 migrates automatically on first native launch.
 
-**Voice tracking.** Uses the Web Speech API where available. Recognized words are aligned
-against the script near the current read position. Falls back to timed scrolling at the
-configured wpm where speech recognition is unavailable (e.g. WKWebView).
+**Voice tracking.** Uses the Web Speech API (works in the native builds — WKWebView on
+macOS, WebView2 on Windows — and in Chromium browsers). Recognized words are aligned
+against the script near the current read position; on repeated misses the matcher
+re-locks on the last two heard words (forward or backward, so restarted sentences are
+followed), and the highlight moves at your measured speaking rate. Falls back to timed
+scrolling at the configured wpm where speech recognition is unavailable (e.g. Linux
+WebKitGTK). On macOS, WebKit requires a click inside the overlay before the mic can
+start — the app retries automatically on your first interaction.
 
 **Hotkeys.**
 
 | Shortcut  | Action                             |
 | --------- | ---------------------------------- |
 | ⌘ Shift E | Show / hide overlay (system-wide)  |
-| ⌥ E       | Toggle click-through (system-wide) |
+| ⌥ Shift E | Toggle click-through (system-wide) |
 | Space     | Play / pause scroll                |
 | ↑ / ↓     | Scroll speed up / down             |
 | ⌘ + / ⌘ − | Text size up / down                |
@@ -125,24 +132,30 @@ npm run tauri build
 
 ```
 design/               Design tokens, component specs, and UI kits — source of truth for styling
+docs/                 Release strategy and other project docs
+site/                 Marketing site (get.eyeread.in) — own Vite config and tests
 src/
-  windows/
-    main/             MainWindow.jsx + main-window.css
-    overlay/          OverlayWindow.jsx · SettingsDrawer · VoiceDebugger + overlay.css
-    settings/         settings-window.css
+  windows/            MainWindow · OverlayWindow · SettingsWindow · AboutWindow (.jsx)
+    main/             main-window.less
+    overlay/          overlay.less
+    settings/         settings-window.less
+    about/            about-window.less
   features/           Library · Editor · SettingsScreen
-  components/         ScriptViewer, Switch, Slider, Segmented (shared across windows)
-  hooks/              useVoiceTracking · useClickThrough · usePanelResize
-  lib/                Tauri platform abstraction · store · voiceMatch · utils
-  styles/             app.css · fonts.css (global; window CSS is colocated in windows/)
-src-tauri/            Tauri 2 shell — window config, capabilities, Info.plist
+  components/         ScriptViewer, Switch, Slider, Segmented… (shared across windows)
+  hooks/              useVoiceTracking · useSpeechRecognition · useClickThrough ·
+                      usePanelResize · useShareProtection · useA11y
+  lib/                tauri (platform abstraction) · store · voiceMatch · mic · utils
+  i18n/               i18next setup + locales/ (13 languages)
+  styles/             app.less · fonts.less (global; window styles colocated in windows/)
+src-tauri/            Tauri 2 shell — window config, migrations, capabilities, Info.plist
 ```
 
 ## Known limitations
 
 - Screen-share invisibility requires the native build (macOS or Windows). The web demo overlay is visible to screen capture, and Linux is best-effort only (see [Platform support](#platform-support)).
-- The overlay window captures mouse clicks within its bounds by default. Use ⌥E to enable full click-through.
+- The overlay window captures mouse clicks within its bounds by default. Use ⌥⇧E to enable full click-through.
 - Voice tracking quality depends on the platform speech engine. Timed scroll is the automatic fallback.
+- On macOS, starting the mic needs one interaction inside the overlay (a WebKit user-activation rule) — the app recovers on your first click or drag, and the "keep mic open while paused" setting avoids repeated mic starts (and the system listening chime) within a session.
 
 ## Releases
 
@@ -165,6 +178,47 @@ release.
 See **[docs/RELEASE_STRATEGY.md](docs/RELEASE_STRATEGY.md)** for the full
 per-OS strategy (signing, store eligibility, distribution channels), and
 `.github/workflows/` for CI configuration and required secrets.
+
+## Disclaimers
+
+We are **not** responsible for any issues arising from use of this software, including but not limited to data loss, privacy incidents, or unexpected screen-share behavior. By using eyeread.in you accept responsibility for verifying that the overlay is invisible on your specific setup before using it in sensitive contexts.
+
+- Screen-share invisibility is **OS-enforced on macOS and Windows** but is not guaranteed to defeat every capture method (hardware capture cards, phone cameras, or future OS changes are out of scope).
+- **Linux invisibility is experimental and comes with no guarantees** — the app makes you acknowledge the risk before enabling it, and we strongly recommend a test recording first (see [Platform support](#platform-support)).
+- **This app never sends audio or transcripts anywhere** — recognition is delegated to the platform speech engine via the Web Speech API. Note that the platform engine itself may use its vendor's speech service depending on OS, browser, and language (e.g. Chrome's implementation is Google-backed; modern macOS/Windows generally process on-device). Check your OS/browser privacy settings if this matters for your use.
+- This software is provided as-is under AGPL-3.0, **without warranty of any kind** — see [LICENSE](LICENSE) for the full disclaimer.
+
+## Troubleshooting
+
+If something isn't working, please check these first:
+
+- **Overlay is visible in screen share (macOS/Windows):** Make sure you're running the native build, not the web demo (`npm run dev`). The web demo overlay is always visible to capture by design.
+- **Overlay is visible in screen share (Linux):** This is expected — Linux invisibility is experimental and compositor-dependent. See [Platform support](#platform-support).
+- **Voice tracking isn't following along:** Check the mic permission first (System Settings → Privacy & Security → Microphone on macOS). On macOS the mic can't start until you've interacted with the overlay once — click or drag anywhere on it, or use the amber "Enable mic" chip in the header. Where the Web Speech API is genuinely unavailable (e.g. some Linux builds) the app falls back to timed scroll automatically.
+- **Mic chime on every resume (macOS):** That's the system's speech-recognition listening sound — the OS plays it whenever a mic session starts. Enable **Keep mic open while paused** in Settings → Reading defaults to hold one session for the whole reading, so it chimes once instead of on every resume.
+- **Hotkeys not responding:** Another app may have registered the same shortcut. Check System Settings → Keyboard Shortcuts (macOS) or your compositor's keybind config (Linux) for conflicts.
+- **App won't launch / blank script list:** This can happen if the SQLite database fails to load on first run. Quit and relaunch — the app retries automatically.
+
+When filing a bug, please include:
+
+- OS and version (e.g. macOS 15.3, Windows 11 24H2)
+- App version (stable or nightly + date stamp)
+- Whether you're using the native build or web demo
+- Steps to reproduce and what you expected vs. what happened
+
+→ [Open an issue](https://github.com/omniship-labs/eyeread.in/issues/new/choose)
+
+## Credits
+
+eyeread.in is built on the shoulders of:
+
+- **[Tauri](https://tauri.app/)** — the Rust + WebView shell that makes native invisibility possible
+- **[React](https://react.dev/)** — UI framework
+- **[Vite](https://vitejs.dev/)** — build tooling
+- **[Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API)** — on-device voice recognition
+- **[tauri-plugin-sql](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/sql)** and **[tauri-plugin-store](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store)** — storage
+
+Contributors are listed in the [GitHub contributor graph](https://github.com/omniship-labs/eyeread.in/graphs/contributors). If you've helped test, translate, or triage and aren't listed, please open an issue or PR so we can add you.
 
 ---
 
