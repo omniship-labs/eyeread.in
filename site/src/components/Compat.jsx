@@ -105,7 +105,12 @@ export default function Compat({ data }) {
         </table>
       </div>
 
-      <a className="btn btn-ghost" href={reportHref} target="_blank" rel="noopener noreferrer">
+      <a
+        className="btn btn-ghost btn-lg"
+        href={reportHref}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <Icon name="check" size={16} /> {ctaLabel}
       </a>
     </section>

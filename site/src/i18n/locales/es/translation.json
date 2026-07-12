@@ -141,6 +141,11 @@
     "sponsorsLabel": "Mecenas",
     "backersLabel": "Patrocinadores"
   },
+  "collective": {
+    "kicker": "Parte del colectivo",
+    "blurb": "Código abierto para problemas cotidianos: herramientas libres AGPL-3.0, creadas en abierto.",
+    "cta": "Explora OmniShip"
+  },
   "footer": {
     "links": ["GitHub", "Docs", "Discord", "AGPL-3.0"],
     "copy": "Gratis para siempre"

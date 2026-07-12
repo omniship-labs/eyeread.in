@@ -292,3 +292,50 @@ button.aw-supporter {
   margin-top: 10px;
   flex-shrink: 0;
 }
+
+/* ── OmniShip Labs byline ─────────────────────────────────── */
+/* The org signature — Beacon coral mark, quiet type. Clicking it
+   opens omniship.dev. Used once per surface, per the brand system. */
+.aw-omniship {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 2px;
+  padding: 6px 0 2px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  img {
+    border-radius: 7px;
+    pointer-events: none;
+  }
+
+  &:hover .aw-omniship-byline {
+    color: var(--text-primary);
+  }
+}
+
+.aw-omniship-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.aw-omniship-byline {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  transition: color var(--dur-fast, 120ms) ease;
+}
+
+.aw-omniship-tagline {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f24e1e;
+  opacity: 0.85;
+}

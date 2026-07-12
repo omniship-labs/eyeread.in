@@ -141,6 +141,11 @@
     "sponsorsLabel": "प्रायोजक",
     "backersLabel": "समर्थक"
   },
+  "collective": {
+    "kicker": "कलेक्टिव का हिस्सा",
+    "blurb": "रोज़मर्रा की समस्याओं के लिए ओपन सोर्स — मुफ़्त AGPL-3.0 टूल, खुले में बनाए गए।",
+    "cta": "OmniShip देखें"
+  },
   "footer": {
     "links": ["GitHub", "दस्तावेज़", "Discord", "AGPL-3.0"],
     "copy": "हमेशा के लिए मुफ़्त"

@@ -91,6 +91,10 @@
     "hkHide": "隐藏悬浮层",
     "languageGroup": "语言",
     "languageHint": "界面语言",
+    "support": "支持",
+    "donateTitle": "eyeread.in 依 AGPL-3.0 自由使用",
+    "donateHint": "如果它对你有帮助，请帮忙维持它 — 靠人支持，而非付费墙。",
+    "donateCta": "成为支持者",
     "about": "关于",
     "aboutHint": "版本、致谢与法律信息",
     "open": "打开 ↗",
@@ -144,6 +148,7 @@
   },
   "about": {
     "createdBy": "由 ❤️ 制作，作者",
+    "orgByline": "OmniShip Labs 出品项目",
     "sourceLicense": "源码与许可",
     "openSource": "开源 · AGPL-3.0",
     "github": "GitHub ↗",

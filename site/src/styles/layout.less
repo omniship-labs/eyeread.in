@@ -261,8 +261,147 @@
 }
 
 /* ── FOOTER ──────────────────────────────────────────────── */
-.footer {
+.footer-outer {
   border-top: 1px solid var(--border-subtle);
+}
+
+/* The OmniShip Labs collective card — Beacon coral (#F24E1E, the org's
+   accent) deliberately warm against the site's cool indigo. */
+@beacon: #f24e1e;
+
+.collective-wrap {
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-12) 0;
+}
+
+.collective {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  overflow: hidden;
+  border: 1px solid fade(@beacon, 26%);
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(120deg, var(--surface-1) 0%, fade(@beacon, 7%) 100%);
+  padding: 28px 32px;
+  box-shadow: 0 0 0 1px fade(@beacon, 6%);
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    border-color: fade(@beacon, 45%);
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px fade(@beacon, 22%),
+      0 26px 70px fade(@beacon, 16%);
+  }
+}
+
+.collective-glow {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 320px;
+  height: 220px;
+  background: radial-gradient(ellipse, fade(@beacon, 20%) 0%, transparent 70%);
+  filter: blur(36px);
+  pointer-events: none;
+  opacity: 0.65;
+  transition: opacity var(--dur-fast) var(--ease-out);
+
+  .collective:hover & {
+    opacity: 1;
+  }
+}
+
+.collective-pane {
+  position: relative;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: fade(@beacon, 12%);
+  border: 1px solid fade(@beacon, 32%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    border-radius: 8px;
+  }
+}
+
+.collective-body {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.collective-kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: @beacon;
+  margin-bottom: 7px;
+}
+
+.collective-name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+
+  span {
+    color: @beacon;
+  }
+}
+
+.collective-blurb {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+  max-width: 52ch;
+}
+
+.collective-cta {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  background: @beacon;
+  color: #fff;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  transition: box-shadow var(--dur-fast) var(--ease-out);
+
+  svg {
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .collective:hover & {
+    box-shadow: 0 0 28px fade(@beacon, 45%);
+
+    svg {
+      transform: translateX(3px);
+    }
+  }
+}
+
+.footer {
   padding: var(--space-10) var(--space-12);
   display: flex;
   align-items: center;
@@ -296,6 +435,14 @@
     grid-template-columns: 1fr;
     gap: var(--space-10);
     padding: 40px var(--space-7);
+  }
+  .collective-wrap {
+    padding: var(--space-8) var(--space-5) 0;
+  }
+  .collective {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
   }
   .footer {
     flex-direction: column;

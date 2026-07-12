@@ -7,9 +7,11 @@ import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 import sponsors from '../data/sponsors.json';
+import omnishipMark from '../assets/logos/omniship-mark-beacon.svg';
 import './about/about-window.less';
 
 const OC_URL = 'https://opencollective.com/eyereadin';
+const OMNISHIP_URL = 'https://omniship.dev';
 
 const REPO_URL = 'https://github.com/omniship-labs/eyeread.in';
 const COMPAT_REPORT_URL =
@@ -270,6 +272,21 @@ export function AboutWindow() {
           </div>
         )}
       </div>
+
+      <div className="aw-divider" />
+
+      <button
+        type="button"
+        className="aw-omniship"
+        title="omniship.dev"
+        onClick={() => openExternal(OMNISHIP_URL)}
+      >
+        <img src={omnishipMark} alt="" width={26} height={26} draggable={false} />
+        <span className="aw-omniship-text">
+          <span className="aw-omniship-byline">{t('about.orgByline')}</span>
+          <span className="aw-omniship-tagline">Open Meets New Ideas</span>
+        </span>
+      </button>
     </div>
   );
 }
