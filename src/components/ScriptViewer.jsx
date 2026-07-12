@@ -5,7 +5,7 @@ import React from 'react';
  *
  * `active` = index of the word currently being read (the peak of the bell).
  * Words before active → spoken (dim). Words after → upcoming (dim).
- * The bell tapers gradually over `bellAhead` words (default 9), all kept
+ * The bell tapers gradually over `bellAhead` words (default 15), all kept
  * readable, then drops off to upcoming. Behind the peak only 1 step is
  * shown, then spoken.
  */
@@ -22,7 +22,7 @@ function bellOpacity(delta, bellAhead, highContrast) {
 export function ScriptViewer({
   text = '',
   active = 0,
-  bellAhead = 9,
+  bellAhead = 15,
   size = 'md',
   mirror = false,
   align = 'left',

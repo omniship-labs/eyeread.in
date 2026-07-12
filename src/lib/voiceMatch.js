@@ -11,6 +11,8 @@
  *   flubbed sentences), nearest occurrence wins. A lone miss never jumps.
  */
 
+import { expandNumberToken } from './numberWords';
+
 export const LOOKAHEAD = 3;
 export const RESYNC_BEHIND = 12;
 export const RESYNC_AHEAD = 20;
@@ -43,6 +45,11 @@ export function wordMatches(sw, hw) {
   if (sw.length > 3 && hw.startsWith(sw)) return true;
   // fuzzy: allow 1 edit for longer words (accent tolerance)
   if (sw.length > 4 && hw.length > 4 && editDistance(sw, hw, 1) <= 1) return true;
+  // digit-formatted script token ("14000") vs a spoken word ("fourteen")
+  if (/^\d/.test(sw)) {
+    const words = expandNumberToken(sw);
+    if (words && words.includes(hw)) return true;
+  }
   return false;
 }
 
@@ -54,11 +61,12 @@ export function createMatchState() {
 /**
  * Process ONE heard word and return the new pointer.
  *
- * 1. Nearest match inside the tiny lookahead window advances the pointer;
+ * 1. Nearest match inside the tiny lookahead window (LOOKAHEAD speakable
+ *    words — unspeakable tokens don't consume slots) advances the pointer;
  *    this is the hot path and can never skip a repeated phrase.
  * 2. On a miss, count it. From RESYNC_MISSES misses onward, try to re-lock:
- *    the previous + current heard words must match two consecutive script
- *    words inside [pointer − RESYNC_BEHIND, pointer + RESYNC_AHEAD); the
+ *    the previous + current heard words must match two consecutive SPEAKABLE
+ *    script words inside [pointer − RESYNC_BEHIND, pointer + RESYNC_AHEAD); the
  *    candidate closest to the pointer wins, so common pairs ("of the")
  *    re-lock at the natural spot. Backward wins let the tracker follow a
  *    speaker who restarts a sentence.
@@ -74,9 +82,14 @@ export function createMatchState() {
 export function stepPointer(scriptWords, hw, pointer, state) {
   if (!hw) return pointer;
 
-  const end = Math.min(scriptWords.length, pointer + LOOKAHEAD);
-  for (let j = pointer; j < end; j++) {
-    if (scriptWords[j] && wordMatches(scriptWords[j], hw)) {
+  // Lookahead counts SPEAKABLE words: unspeakable tokens ("—", "•", emoji,
+  // a standalone ":") normalize to "" and must not consume window slots, or
+  // a punctuation run would blind the matcher entirely.
+  let checked = 0;
+  for (let j = pointer; j < scriptWords.length && checked < LOOKAHEAD; j++) {
+    if (!scriptWords[j]) continue;
+    checked += 1;
+    if (wordMatches(scriptWords[j], hw)) {
       state.misses = 0;
       state.prev = hw;
       return j + 1;
@@ -94,19 +107,22 @@ export function stepPointer(scriptWords, hw, pointer, state) {
     let best = -1;
     let bestDist = Infinity;
     for (let j = lo; j < hi; j++) {
-      if (!scriptWords[j] || !scriptWords[j + 1]) continue;
-      if (wordMatches(scriptWords[j], state.prev) && wordMatches(scriptWords[j + 1], hw)) {
-        const dist = Math.abs(j - pointer);
-        if (dist < bestDist) {
-          best = j;
-          bestDist = dist;
-        }
+      if (!scriptWords[j] || !wordMatches(scriptWords[j], state.prev)) continue;
+      // The pair partner is the next SPEAKABLE word — punctuation between
+      // two spoken words must not break the bigram.
+      let k = j + 1;
+      while (k < scriptWords.length && !scriptWords[k]) k++;
+      if (k >= scriptWords.length || !wordMatches(scriptWords[k], hw)) continue;
+      const dist = Math.abs(j - pointer);
+      if (dist < bestDist) {
+        best = k;
+        bestDist = dist;
       }
     }
     if (best >= 0) {
       state.misses = 0;
       state.prev = hw;
-      return best + 2;
+      return best + 1;
     }
   }
 

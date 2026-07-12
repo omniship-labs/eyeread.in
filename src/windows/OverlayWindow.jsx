@@ -36,6 +36,7 @@ import {
   fitOverlayToPanel,
   getOverlayPos,
   manualDragProps,
+  setDockHidden,
   shieldActive,
   showSettingsWindow,
 } from '../lib/tauri';
@@ -242,6 +243,37 @@ export function OverlayWindow() {
     };
   }, [setPanelSize, sendSettingsContext]);
 
+  // ---- glass backdrop refresh on move ------------------------------------------
+  // WebKit renders the panel's backdrop-filter from a snapshot of what's behind
+  // the window, and only re-samples it on a webview layer commit. Moving the
+  // window changes nothing *inside* the webview, so after a drag the glass keeps
+  // showing the desktop content from before the move until some unrelated
+  // repaint (e.g. hovering the panel) forces a commit. Nudge the blur radius by
+  // an invisible epsilon on every move event to force that commit ourselves.
+  useEffect(() => {
+    if (!isTauri || !isMacOS) return undefined;
+    let un;
+    let disposed = false;
+    let flip = false;
+    (async () => {
+      const { getCurrentWebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+      const stop = await getCurrentWebviewWindow().onMoved(() => {
+        const el = panelRef.current;
+        if (!el) return;
+        flip = !flip;
+        const f = `blur(${effective.blur + (flip ? 0.01 : 0)}px) saturate(1.15)`;
+        el.style.webkitBackdropFilter = f;
+        el.style.backdropFilter = f;
+      });
+      if (disposed) stop();
+      else un = stop;
+    })();
+    return () => {
+      disposed = true;
+      un?.();
+    };
+  }, [effective.blur]);
+
   // ---- voice tracking / auto-scroll ------------------------------------------
   const jumpToRef = useRef((idx) => {
     setActive(idx);
@@ -344,9 +376,24 @@ export function OverlayWindow() {
   }, []);
   const headDragProps = manualDragProps('overlay', headDragRef);
 
+  // Stealth: while a shielded session runs, drop the Dock icon, ⌘-Tab entry
+  // and menu-bar presence (Accessory policy) — capture protection covers the
+  // app's windows, but not that system UI. Restored when the session ends or
+  // the shield is turned off.
+  const shielded = shieldActive(settings);
+  useEffect(() => {
+    if (!isTauri || !isMacOS) return undefined;
+    setDockHidden(sessionActive && shielded);
+    return undefined;
+  }, [sessionActive, shielded]);
+
   const close = useCallback(() => {
     setPlaying(false);
     setSessionActive(false); // release the mic even with keep-open enabled
+    // Restore the Dock/menu-bar BEFORE focusing main so the app owns the menu
+    // bar again by the time the editor is frontmost (the effect above also
+    // fires, but after this callback's IPC calls are already queued).
+    setDockHidden(false);
     hideOverlay();
     focusMain();
   }, []);
@@ -417,6 +464,8 @@ export function OverlayWindow() {
           WebkitBackdropFilter: `blur(${effective.blur}px) saturate(1.15)`,
         }}
       >
+        {/* Soft shadow lives on its own masked layer (see .ov-shade) */}
+        <span className="ov-shade" aria-hidden="true" />
         <div
           className="ov-head"
           // macOS drags manually (see manualDragProps); the native drag

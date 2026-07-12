@@ -21,6 +21,33 @@ fn set_app_protected(app: AppHandle, protected: bool) {
     }
 }
 
+/// Hide/show the app's Dock icon + menu-bar presence (macOS).
+///
+/// Windows are capture-excluded via `set_app_protected`, but the Dock tile,
+/// the ⌘-Tab entry and the app-name menus are system UI and always visible in
+/// a full-screen share. While a shielded reading session runs, the frontend
+/// drops the app to the Accessory activation policy so touching the overlay
+/// never reveals "eyeread.in" in the Dock or menu bar; Regular is restored
+/// when the session ends (giving the editor back its Dock icon + Edit menu).
+#[cfg(target_os = "macos")]
+#[tauri::command]
+fn set_dock_hidden(app: AppHandle, hidden: bool) {
+    use tauri::ActivationPolicy;
+    // AppKit requires the main thread (same trap as attach_window_to_all_spaces).
+    let handle = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        let _ = handle.set_activation_policy(if hidden {
+            ActivationPolicy::Accessory
+        } else {
+            ActivationPolicy::Regular
+        });
+    });
+}
+
+#[cfg(not(target_os = "macos"))]
+#[tauri::command]
+fn set_dock_hidden(_app: AppHandle, _hidden: bool) {}
+
 /// Let the overlay join full-screen Spaces, not just regular desktop Spaces.
 ///
 /// `setVisibleOnAllWorkspaces` (from JS) sets `CanJoinAllSpaces`, which makes
@@ -169,7 +196,24 @@ fn build_app_menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         &[&about, &sep, &hide, &hide_others, &show_all, &sep, &quit],
     )?;
 
-    Menu::with_items(app, &[&app_submenu])
+    // Without an Edit menu, macOS has nowhere to route the standard editing
+    // key equivalents (⌘C/⌘V/⌘X/⌘A/⌘Z) — replacing the default menu without
+    // one silently breaks copy/paste in every text field of the app.
+    let undo = PredefinedMenuItem::undo(app, None)?;
+    let redo = PredefinedMenuItem::redo(app, None)?;
+    let cut = PredefinedMenuItem::cut(app, None)?;
+    let copy = PredefinedMenuItem::copy(app, None)?;
+    let paste = PredefinedMenuItem::paste(app, None)?;
+    let select_all = PredefinedMenuItem::select_all(app, None)?;
+    let edit_sep = PredefinedMenuItem::separator(app)?;
+    let edit_submenu = Submenu::with_items(
+        app,
+        "Edit",
+        true,
+        &[&undo, &redo, &edit_sep, &cut, &copy, &paste, &select_all],
+    )?;
+
+    Menu::with_items(app, &[&app_submenu, &edit_submenu])
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -281,6 +325,7 @@ pub fn run() {
             install_update,
             show_about_window,
             set_app_protected,
+            set_dock_hidden,
             attach_window_to_all_spaces,
         ])
         .setup(|_app| Ok(()))

@@ -89,6 +89,34 @@ describe('stepPointer resync', () => {
   });
 });
 
+describe('unspeakable tokens (punctuation / emoji dividers)', () => {
+  // "agenda : - • budget • hiring • retro" — a colon-and-bullet list; the
+  // standalone punctuation normalizes to '' and must be invisible to matching.
+  const bullets = ['agenda', '', '', '', 'budget', '', 'hiring', '', 'retro'];
+
+  it('punctuation runs do not consume the lookahead window', () => {
+    // 3 empties sit between "agenda" and "budget" — a token-counting window
+    // would go blind here.
+    expect(advancePointer(bullets, ['agenda', 'budget', 'hiring', 'retro'], 0)).toBe(
+      bullets.length
+    );
+  });
+
+  it('bigram resync pairs across an unspeakable token', () => {
+    // pointer far behind; "hiring retro" straddles an empty token
+    const state = createMatchState();
+    let p = 0;
+    p = stepPointer(bullets, 'hiring', p, state); // miss (outside lookahead)
+    p = stepPointer(bullets, 'retro', p, state); // bigram across the ''
+    expect(p).toBe(bullets.length);
+  });
+
+  it('still refuses matches beyond LOOKAHEAD speakable words', () => {
+    // "retro" is the 4th speakable word ahead — outside the window of 3
+    expect(advancePointer(bullets, ['retro'], 0)).toBe(0);
+  });
+});
+
 describe('nextSpeakable', () => {
   // normalized script: punctuation-only tokens become ''
   const nw = ['say', '', 'what', 'this', '', '', 'team', ''];
