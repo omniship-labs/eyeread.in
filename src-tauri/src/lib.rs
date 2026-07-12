@@ -36,12 +36,12 @@ fn set_app_protected(app: AppHandle, protected: bool) {
 /// carries the Space flags: children follow their parent onto every Space,
 /// full-screen ones included.
 ///
-/// Idempotent — re-invoked on every overlay show; a no-op once the overlay
-/// has a parent. The anchor panel is created once and intentionally leaked
-/// (app-lifetime singleton).
+/// Idempotent — re-invoked on every show of the target window; a no-op once
+/// it has a parent. The anchor panel is created once and intentionally leaked
+/// (app-lifetime singleton, shared by all attached windows).
 #[cfg(target_os = "macos")]
 #[tauri::command]
-fn show_overlay_over_fullscreen(app: AppHandle) {
+fn attach_window_to_all_spaces(app: AppHandle, label: String) {
     use objc2_app_kit::{
         NSBackingStoreType, NSColor, NSPanel, NSWindowCollectionBehavior, NSWindowOrderingMode,
         NSWindowStyleMask,
@@ -53,7 +53,12 @@ fn show_overlay_over_fullscreen(app: AppHandle) {
     // cycle reuses it instead of leaking a panel per show.
     static ANCHOR_WINDOW_NUMBER: AtomicIsize = AtomicIsize::new(0);
 
-    let Some(win) = app.get_webview_window("overlay") else {
+    // Only floating companion windows may ride the anchor; the main window
+    // must stay a normal Space-bound window.
+    if !matches!(label.as_str(), "overlay" | "settings") {
+        return;
+    }
+    let Some(win) = app.get_webview_window(&label) else {
         return;
     };
     // NSWindow mutations must run on the AppKit main thread; command handlers
@@ -112,7 +117,7 @@ fn show_overlay_over_fullscreen(app: AppHandle) {
 
 #[cfg(not(target_os = "macos"))]
 #[tauri::command]
-fn show_overlay_over_fullscreen(_app: AppHandle) {}
+fn attach_window_to_all_spaces(_app: AppHandle, _label: String) {}
 
 /// Open the About window — called from JS menu listener or Settings screen.
 #[tauri::command]
@@ -276,7 +281,7 @@ pub fn run() {
             install_update,
             show_about_window,
             set_app_protected,
-            show_overlay_over_fullscreen,
+            attach_window_to_all_spaces,
         ])
         .setup(|_app| Ok(()))
         .run(tauri::generate_context!())
