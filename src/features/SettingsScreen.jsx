@@ -12,8 +12,9 @@ import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
 
-// Same collective the About window points at.
-const OC_URL = 'https://opencollective.com/eyereadin';
+// OmniShip Labs' single fiscal home — same collective the site and
+// .github/FUNDING.yml point at.
+const OC_URL = 'https://opencollective.com/omniship';
 
 export function SettingsScreen({ settings, onSettings }) {
   const { t } = useTranslation();

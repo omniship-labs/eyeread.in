@@ -17,7 +17,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const SLUG = process.env.OC_SLUG || 'eyereadin';
+const SLUG = process.env.OC_SLUG || 'omniship';
 const URL = `https://opencollective.com/${SLUG}/members/all.json`;
 const OUT = resolve(ROOT, 'src/data/sponsors.json');
 const AVATAR_DIR = resolve(ROOT, 'public/sponsors'); // served at /sponsors/<id>.png

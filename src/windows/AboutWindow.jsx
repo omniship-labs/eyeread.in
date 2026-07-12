@@ -10,7 +10,7 @@ import sponsors from '../data/sponsors.json';
 import omnishipMark from '../assets/logos/omniship-mark-beacon.svg';
 import './about/about-window.less';
 
-const OC_URL = 'https://opencollective.com/eyereadin';
+const OC_URL = 'https://opencollective.com/omniship';
 const OMNISHIP_URL = 'https://omniship.dev';
 
 const REPO_URL = 'https://github.com/omniship-labs/eyeread.in';

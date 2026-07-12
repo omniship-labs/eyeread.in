@@ -120,7 +120,7 @@ https://opencollective.com/<slug>/members/all.json
 
 Configure it in `config.js → sponsors`:
 
-- `collectiveSlug` — the Open Collective slug (default `eyereadin`)
+- `collectiveSlug` — the Open Collective slug (default `omniship`)
 - `sponsorThreshold` — lifetime USD total at/above which a contributor is shown
   as a **Sponsor** (larger avatar) rather than a **Backer**
 
