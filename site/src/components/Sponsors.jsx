@@ -97,7 +97,7 @@ export default function Sponsors({ data }) {
       </div>
 
       <a
-        className="btn btn-ghost"
+        className="btn btn-ghost btn-lg"
         href={data.ctaHref}
         target="_blank"
         rel="noopener noreferrer"

@@ -91,6 +91,10 @@
     "hkHide": "ഓവർലേ മറയ്ക്കുക",
     "languageGroup": "ഭാഷ",
     "languageHint": "ഇന്റർഫേസ് ഭാഷ",
+    "support": "പിന്തുണ",
+    "donateTitle": "eyeread.in AGPL-3.0 പ്രകാരം സൗജന്യമാണ്",
+    "donateHint": "ഇത് ഉപകാരപ്പെടുന്നെങ്കിൽ, നിലനിർത്താൻ സഹായിക്കൂ — പേവാളുകളല്ല, മനുഷ്യരാണ് ഇതിനെ താങ്ങുന്നത്.",
+    "donateCta": "ബാക്കർ ആകൂ",
     "about": "കുറിച്ച്",
     "aboutHint": "പതിപ്പ്, ക്രെഡിറ്റുകൾ, നിയമപരം",
     "open": "തുറക്കുക ↗",
@@ -144,6 +148,7 @@
   },
   "about": {
     "createdBy": "❤️ യോടെ നിർമ്മിച്ചത്",
+    "orgByline": "OmniShip Labs-ന്റെ ഒരു പ്രോജക്റ്റ്",
     "sourceLicense": "ഉറവിടവും ലൈസൻസും",
     "openSource": "ഓപ്പൺ സോഴ്സ് · AGPL-3.0",
     "github": "GitHub ↗",

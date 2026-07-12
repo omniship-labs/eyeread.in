@@ -91,6 +91,10 @@
     "hkHide": "オーバーレイを隠す",
     "languageGroup": "言語",
     "languageHint": "インターフェースの言語",
+    "support": "サポート",
+    "donateTitle": "eyeread.in は AGPL-3.0 の下で自由に使えます",
+    "donateHint": "役に立ったら、維持に協力してください — ペイウォールではなく、人々に支えられています。",
+    "donateCta": "バッカーになる",
     "about": "情報",
     "aboutHint": "バージョン、クレジット、法的情報",
     "open": "開く ↗",
@@ -144,6 +148,7 @@
   },
   "about": {
     "createdBy": "❤️ を込めて制作：",
+    "orgByline": "OmniShip Labs のプロジェクト",
     "sourceLicense": "ソースとライセンス",
     "openSource": "オープンソース · AGPL-3.0",
     "github": "GitHub ↗",

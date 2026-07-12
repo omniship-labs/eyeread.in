@@ -1,16 +1,19 @@
-import { Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { Heart, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
+import { openExternal, showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
+
+// Same collective the About window points at.
+const OC_URL = 'https://opencollective.com/eyereadin';
 
 export function SettingsScreen({ settings, onSettings }) {
   const { t } = useTranslation();
@@ -362,6 +365,21 @@ export function SettingsScreen({ settings, onSettings }) {
             <span>{t('settings.hkFocusedHint')}</span>
           </div>
           <span className="hotkey">Esc</span>
+        </div>
+      </div>
+
+      {/* ── Support — the OmniShip "line" donation ask: plain voice, no
+             urgency, one accent moment on the CTA. ── */}
+      <div className="set-group">
+        <div className="set-group-label">{t('settings.support')}</div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.donateTitle')}</b>
+            <span>{t('settings.donateHint')}</span>
+          </div>
+          <Button size="sm" iconLeft={<Heart size={14} />} onClick={() => openExternal(OC_URL)}>
+            {t('settings.donateCta')}
+          </Button>
         </div>
       </div>
 

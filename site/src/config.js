@@ -62,6 +62,12 @@ export const shared = {
     ctaHref: 'https://opencollective.com/omniship',
   },
 
+  // The OmniShip Labs collective card above the footer. The org name is a
+  // brand lockup and never translated; the copy comes from each locale.
+  collective: {
+    href: 'https://omniship.dev',
+  },
+
   // Footer link destinations, in the same order as each locale's footer.links.
   footerLinks: [
     { href: 'https://github.com/omniship-labs/eyeread.in' },
@@ -113,6 +119,11 @@ export function buildConfig(m) {
     sponsors: {
       ...m.sponsors,
       ...shared.sponsors,
+    },
+
+    collective: {
+      ...m.collective,
+      ...shared.collective,
     },
 
     footer: {

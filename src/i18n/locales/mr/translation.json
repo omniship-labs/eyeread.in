@@ -91,6 +91,10 @@
     "hkHide": "ओव्हरले लपवा",
     "languageGroup": "भाषा",
     "languageHint": "इंटरफेस भाषा",
+    "support": "पाठिंबा",
+    "donateTitle": "eyeread.in AGPL-3.0 अंतर्गत मोफत आहे",
+    "donateHint": "हे उपयोगी वाटल्यास, ते चालू ठेवण्यास मदत करा — हे पेवॉलने नाही, माणसांनी चालते.",
+    "donateCta": "बॅकर व्हा",
     "about": "विषयी",
     "aboutHint": "आवृत्ती, श्रेय आणि कायदेशीर",
     "open": "उघडा ↗",
@@ -144,6 +148,7 @@
   },
   "about": {
     "createdBy": "❤️ ने तयार केले",
+    "orgByline": "OmniShip Labs चा एक प्रकल्प",
     "sourceLicense": "स्रोत आणि परवाना",
     "openSource": "ओपन सोर्स · AGPL-3.0",
     "github": "GitHub ↗",

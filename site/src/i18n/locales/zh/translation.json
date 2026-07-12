@@ -141,6 +141,11 @@
     "sponsorsLabel": "赞助者",
     "backersLabel": "支持者"
   },
+  "collective": {
+    "kicker": "开源集体的一员",
+    "blurb": "为日常问题打造的开源 — 免费的 AGPL-3.0 工具，公开构建。",
+    "cta": "探索 OmniShip"
+  },
   "footer": {
     "links": ["GitHub", "文档", "Discord", "AGPL-3.0"],
     "copy": "永久免费"

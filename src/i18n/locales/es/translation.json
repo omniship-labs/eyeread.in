@@ -91,6 +91,10 @@
     "hkHide": "Ocultar overlay",
     "languageGroup": "Idioma",
     "languageHint": "Idioma de la interfaz",
+    "support": "Apoyo",
+    "donateTitle": "eyeread.in es libre bajo AGPL-3.0",
+    "donateHint": "Si te resulta útil, ayuda a mantenerlo — financiado por personas, no por muros de pago.",
+    "donateCta": "Hazte colaborador",
     "about": "Acerca de",
     "aboutHint": "Versión, créditos y aspectos legales",
     "open": "Abrir ↗",
@@ -144,6 +148,7 @@
   },
   "about": {
     "createdBy": "Creado con ❤️ por",
+    "orgByline": "Un proyecto de OmniShip Labs",
     "sourceLicense": "Código y licencia",
     "openSource": "Código abierto · AGPL-3.0",
     "github": "GitHub ↗",

@@ -141,6 +141,11 @@
     "sponsorsLabel": "スポンサー",
     "backersLabel": "バッカー"
   },
+  "collective": {
+    "kicker": "コレクティブの一員",
+    "blurb": "日常の問題のためのオープンソース — 無料の AGPL-3.0 ツールを、オープンに開発しています。",
+    "cta": "OmniShip を見る"
+  },
   "footer": {
     "links": ["GitHub", "ドキュメント", "Discord", "AGPL-3.0"],
     "copy": "ずっと無料"

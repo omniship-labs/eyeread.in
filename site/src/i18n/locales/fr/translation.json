@@ -141,6 +141,11 @@
     "sponsorsLabel": "Sponsors",
     "backersLabel": "Contributeurs"
   },
+  "collective": {
+    "kicker": "Membre du collectif",
+    "blurb": "De l’open source pour les problèmes du quotidien — des outils libres AGPL-3.0, développés au grand jour.",
+    "cta": "Découvrir OmniShip"
+  },
   "footer": {
     "links": ["GitHub", "Docs", "Discord", "AGPL-3.0"],
     "copy": "Gratuit pour toujours"
