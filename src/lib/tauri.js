@@ -141,6 +141,14 @@ export async function showOverlay(script, settings) {
     await win.setAlwaysOnTop(true).catch(() => {});
     await emitTo('overlay', 'overlay:load', { script, settings });
     await win.show();
+    // macOS: setVisibleOnAllWorkspaces alone doesn't cover Spaces owned by
+    // full-screen apps; the Rust side parents the overlay to an invisible
+    // NSPanel that can join them. Re-invoked on every show because hiding
+    // the overlay detaches it. No-op elsewhere.
+    if (isMacOS) {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('attach_window_to_all_spaces', { label: 'overlay' }).catch(() => {});
+    }
     // Windows quirk (tauri#14189): a content-protected transparent window can
     // render black in the capture stream after a hide→show cycle. Re-asserting
     // the display affinity right after show() clears it. No-op elsewhere.
@@ -187,6 +195,11 @@ export async function showSettingsWindow() {
   await win.setVisibleOnAllWorkspaces(true).catch(() => {});
   await win.setAlwaysOnTop(true).catch(() => {});
   await win.show();
+  // macOS: same full-screen-Space treatment as the overlay (see showOverlay).
+  if (isMacOS) {
+    const { invoke } = await import('@tauri-apps/api/core');
+    await invoke('attach_window_to_all_spaces', { label: 'settings' }).catch(() => {});
+  }
   await win.setFocus();
 }
 
@@ -241,6 +254,80 @@ export async function getOverlayPos() {
   } catch {
     return null;
   }
+}
+
+/**
+ * Manual window dragging for macOS.
+ *
+ * The native drag region / title bar (performWindowDragWithEvent) silently
+ * refuses to move a window that is riding another app's full-screen Space,
+ * so on macOS the floating windows are dragged by hand: capture the pointer,
+ * translate the window by screen-coordinate deltas. screenX/Y and window
+ * logical coords share the same unit (CSS points), including negative values
+ * on secondary displays.
+ */
+export async function beginWindowDrag(label, screenX, screenY) {
+  if (!isTauri) return null;
+  const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+  const win = await WebviewWindow.getByLabel(label);
+  if (!win) return null;
+  try {
+    const scale = await win.scaleFactor();
+    const pos = await win.outerPosition();
+    return { label, baseX: pos.x / scale, baseY: pos.y / scale, sx: screenX, sy: screenY };
+  } catch {
+    return null;
+  }
+}
+
+export async function dragWindowTo(drag, screenX, screenY) {
+  if (!isTauri || !drag) return;
+  const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+  const win = await WebviewWindow.getByLabel(drag.label);
+  if (!win) return;
+  const { LogicalPosition } = await import('@tauri-apps/api/window');
+  await win
+    .setPosition(
+      new LogicalPosition(
+        Math.round(drag.baseX + (screenX - drag.sx)),
+        Math.round(drag.baseY + (screenY - drag.sy))
+      )
+    )
+    .catch(() => {});
+}
+
+/**
+ * Shared pointer-event props implementing manual dragging on macOS. Spread
+ * onto the element acting as the drag handle; presses on interactive
+ * children (buttons, inputs, links) are left alone. `ref` holds the
+ * in-flight drag state; `onEnd` fires after a completed drag.
+ */
+export function manualDragProps(label, ref, onEnd) {
+  return {
+    onPointerDown: (e) => {
+      if (!isTauri || !isMacOS || e.button !== 0) return;
+      if (e.target.closest('button, [role="button"], input, select, textarea, a')) return;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      ref.current = { pending: true };
+      beginWindowDrag(label, e.screenX, e.screenY).then((d) => {
+        // ignore if the pointer was released before the state arrived
+        if (ref.current?.pending) ref.current = d;
+      });
+    },
+    onPointerMove: (e) => {
+      const d = ref.current;
+      if (!d || d.pending) return;
+      dragWindowTo(d, e.screenX, e.screenY);
+    },
+    onPointerCancel: () => {
+      ref.current = null;
+    },
+    onPointerUp: () => {
+      const wasDragging = ref.current && !ref.current.pending;
+      ref.current = null;
+      if (wasDragging) onEnd?.();
+    },
+  };
 }
 
 /** Reset the overlay to its default size and centered position. */

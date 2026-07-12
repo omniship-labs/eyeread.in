@@ -6,7 +6,7 @@
  * Cascade: script ▸ global ▸ default. State arrives via `settings:context`;
  * per-script edits broadcast over `script:settings`.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Timer as TimerIcon, Hourglass, Mic, MicOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
@@ -16,7 +16,15 @@ import { SettingItem } from '../components/SettingItem';
 import { requestMicPermission } from '../lib/mic';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { defaultSettings, fetchSettings } from '../lib/store';
-import { isTauri, listen, emitTo, hideSettingsWindow, resetOverlayLayout } from '../lib/tauri';
+import {
+  isTauri,
+  isMacOS,
+  listen,
+  emitTo,
+  hideSettingsWindow,
+  resetOverlayLayout,
+  manualDragProps,
+} from '../lib/tauri';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 
 const sliderFill = (value, min, max) => {
@@ -28,6 +36,8 @@ const sliderFill = (value, min, max) => {
 
 export function SettingsWindow() {
   const { t } = useTranslation();
+  // in-flight manual drag state (macOS); null when not dragging
+  const dragRef = useRef(null);
   const [global, setGlobal] = useState(defaultSettings);
   const [overrides, setOverrides] = useState({});
   const [scriptId, setScriptId] = useState(null);
@@ -131,7 +141,11 @@ export function SettingsWindow() {
 
   return (
     <div className="sw-root">
-      <div className="sw-titlebar" data-tauri-drag-region>
+      <div
+        className="sw-titlebar"
+        data-tauri-drag-region={!isMacOS || undefined}
+        {...manualDragProps('settings', dragRef)}
+      >
         <span className="sw-title">{t('prompter.title')}</span>
       </div>
 

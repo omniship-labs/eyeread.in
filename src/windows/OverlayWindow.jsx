@@ -28,12 +28,14 @@ import {
 } from '../lib/store';
 import {
   isTauri,
+  isMacOS,
   listen,
   emitTo,
   hideOverlay,
   focusMain,
   fitOverlayToPanel,
   getOverlayPos,
+  manualDragProps,
   shieldActive,
   showSettingsWindow,
 } from '../lib/tauri';
@@ -62,6 +64,8 @@ export function OverlayWindow() {
   const activeWordRef = useRef(null);
   const panelRef = useRef(null);
   const gripRef = useRef(null);
+  // in-flight manual drag state (macOS); null when not dragging
+  const headDragRef = useRef(null);
   const passthruBtnRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const scriptRef = useRef(script);
@@ -328,6 +332,18 @@ export function OverlayWindow() {
     });
   }, [words.length, jumpTo]);
 
+  // Persist the overlay position for the current script after any drag
+  // (manual on macOS, native drag region elsewhere).
+  const saveOverlayPos = useCallback(() => {
+    if (!isTauri || !scriptRef.current) return;
+    getOverlayPos().then((pos) => {
+      if (!pos) return;
+      const s = scriptRef.current;
+      emitTo('main', 'script:patch', { id: s.id, patch: { overlayPos: pos } });
+    });
+  }, []);
+  const headDragProps = manualDragProps('overlay', headDragRef);
+
   const close = useCallback(() => {
     setPlaying(false);
     setSessionActive(false); // release the mic even with keep-open enabled
@@ -403,20 +419,19 @@ export function OverlayWindow() {
       >
         <div
           className="ov-head"
-          data-tauri-drag-region
-          onPointerUp={() => {
-            if (!isTauri || !scriptRef.current) return;
-            getOverlayPos().then((pos) => {
-              if (!pos) return;
-              const s = scriptRef.current;
-              emitTo('main', 'script:patch', { id: s.id, patch: { overlayPos: pos } });
-            });
+          // macOS drags manually (see manualDragProps); the native drag
+          // region can't move a window riding a full-screen Space.
+          data-tauri-drag-region={!isMacOS || undefined}
+          {...headDragProps}
+          onPointerUp={(e) => {
+            headDragProps.onPointerUp(e);
+            saveOverlayPos();
           }}
         >
           <span
             ref={gripRef}
             className="grip"
-            data-tauri-drag-region
+            data-tauri-drag-region={!isMacOS || undefined}
             title={t('overlay.dragHint')}
             aria-hidden="true"
           >
