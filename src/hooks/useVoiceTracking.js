@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { normalizeWord } from '../lib/utils';
 import { stepPointer, createMatchState, nextSpeakable } from '../lib/voiceMatch';
+import { expandNumberToken } from '../lib/numberWords';
 import { useSpeechRecognition, srAvailable } from './useSpeechRecognition';
 
 export const voiceAvailable = srAvailable;
@@ -154,7 +155,14 @@ export function useVoiceTracking({
     (heardWords) => {
       if (!playingRef.current) return; // mic kept warm while paused — ignore
       const nw = normWordsRef.current;
-      const normalized = heardWords.map(normalizeWord).filter(Boolean);
+      // Recognizers format spoken numbers as digits ("fourteen thousand" →
+      // "14,000"); expand them back into words so they can match the script.
+      // The word list is English-only, so gate on the recognition language.
+      const expandNums = /^en/i.test(language || navigator.language || 'en');
+      const normalized = heardWords
+        .flatMap((w) => (expandNums && expandNumberToken(w)) || [w])
+        .map(normalizeWord)
+        .filter(Boolean);
       const state = matchStateRef.current;
 
       const start = pointerRef.current;
@@ -183,7 +191,7 @@ export function useVoiceTracking({
       // not the last word matched — skipping unspeakable tokens.
       slideTo(nextSpeakable(nw, Math.min(p, nw.length - 1)), rateRef.current.msPerWord);
     },
-    [setPointer, slideTo]
+    [setPointer, slideTo, language]
   );
 
   // Stable wrapper so useSpeechRecognition never re-subscribes

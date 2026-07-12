@@ -12,14 +12,19 @@
   padding: 22px 32px 32px;
   position: relative;
   overflow: visible;
+  /* Distance from the window's top edge to the panel — anchors the
+     shadow fade in .ov-shade. Must track padding-top. */
+  --panel-top: 22px;
 
   &.pos-top {
     padding-top: 0;
+    --panel-top: 0px;
   }
 
   &.demo {
     justify-content: flex-start;
     padding-top: 64px;
+    --panel-top: 64px;
     .overlay-panel {
       position: relative;
       z-index: 20;
@@ -34,7 +39,9 @@
   max-width: calc(100vw - 48px);
   border-radius: var(--radius-xl);
   border: var(--window-border);
-  box-shadow: var(--window-shadow);
+  /* Crisp ring only — the soft shadow lives on .ov-shade so it can
+     fade out at the window's top edge instead of clipping hard. */
+  box-shadow: var(--window-ring);
   background: color-mix(
     in srgb,
     var(--bg-base) calc(var(--ov-alpha, 0.62) * 100%),
@@ -62,17 +69,23 @@
 
   &.shielded {
     border-color: rgba(110, 86, 247, 0.45);
-    box-shadow: var(--window-shadow-shielded);
+    box-shadow: var(--window-ring-shielded);
     &::before {
       background: rgba(110, 86, 247, 0.1);
+    }
+    .ov-shade::before {
+      box-shadow: var(--window-shade-shielded);
     }
   }
 
   &.exposed {
     border-color: rgba(239, 68, 68, 0.45);
-    box-shadow: var(--window-shadow-exposed);
+    box-shadow: var(--window-ring-exposed);
     &::before {
       background: rgba(239, 68, 68, 0.13);
+    }
+    .ov-shade::before {
+      box-shadow: var(--window-shade-exposed);
     }
   }
 
@@ -80,6 +93,10 @@
   &.ghost {
     border-color: rgba(110, 86, 247, 0.16);
     box-shadow: none;
+
+    .ov-shade {
+      opacity: 0;
+    }
 
     .ov-head,
     .ov-foot,
@@ -102,6 +119,41 @@
   > * {
     position: relative;
     z-index: 1;
+  }
+
+  /* ===== Soft shadow layer =====
+     The window clips at the screen's top edge, so a plain box-shadow
+     on the panel ends in a hard horizontal cut where it flares past
+     the top corners. This layer repaints the soft shadow and masks it
+     with a vertical alpha ramp that reaches zero exactly at the
+     window's top edge — the clip line carries no alpha, so nothing
+     visibly truncates. The ramp spans 28px ≈ 1.75σ of the 32px blur
+     (σ = blur/2 = 16px), matching the shadow's own falloff.
+     The wrapper is oversized because a mask clips everything outside
+     the masked element's border box, shadows included; the inner
+     ::before recreates the panel's border-box (the 1px offsets undo
+     the panel border, since absolute children anchor to the padding
+     box) and casts the actual shadow. */
+  .ov-shade {
+    position: absolute;
+    top: calc(-1px - var(--panel-top, 22px));
+    left: -49px;
+    right: -49px;
+    bottom: -49px;
+    z-index: 0;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28px);
+    mask-image: linear-gradient(to bottom, transparent, #000 28px);
+    transition: opacity var(--dur-slow) var(--ease-out);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: var(--panel-top, 22px) 48px 48px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--window-shade);
+      transition: box-shadow var(--dur-slow) var(--ease-out);
+    }
   }
 }
 
@@ -236,7 +288,7 @@
   mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 72%, transparent 100%);
 
   .er-script {
-    padding: 56px 0;
+    padding: 20px 0;
   }
 }
 

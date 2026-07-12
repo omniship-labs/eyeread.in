@@ -14,7 +14,7 @@ const DB_PATH = 'sqlite:eyeread.db';
 export const defaultSettings = {
   size: 30, // px
   speed: 135, // wpm (auto-scroll fallback)
-  bellWords: 9, // upcoming words kept clearly lit ahead of the peak
+  bellWords: 15, // upcoming words kept clearly lit ahead of the peak
   opacity: 40, // % tint — low default: you're always reading over live content
   blur: 3, // px backdrop blur ("glassyness") — 0 = crystal clear
   mirror: false,

@@ -224,11 +224,11 @@ export function SettingsWindow() {
             type="range"
             className="er-slider"
             min={3}
-            max={15}
+            max={30}
             value={val('bellWords')}
             aria-label={t('reading.highlightAhead')}
             onChange={(e) => set('bellWords', +e.target.value)}
-            style={sliderFill(val('bellWords'), 3, 15)}
+            style={sliderFill(val('bellWords'), 3, 30)}
           />
         )}
         {si(

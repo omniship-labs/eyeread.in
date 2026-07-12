@@ -269,31 +269,54 @@ export async function getOverlayPos() {
 export async function beginWindowDrag(label, screenX, screenY) {
   if (!isTauri) return null;
   const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
+  const { LogicalPosition } = await import('@tauri-apps/api/window');
   const win = await WebviewWindow.getByLabel(label);
   if (!win) return null;
   try {
     const scale = await win.scaleFactor();
     const pos = await win.outerPosition();
-    return { label, baseX: pos.x / scale, baseY: pos.y / scale, sx: screenX, sy: screenY };
+    return {
+      label,
+      win,
+      LogicalPosition,
+      baseX: pos.x / scale,
+      baseY: pos.y / scale,
+      sx: screenX,
+      sy: screenY,
+      // IPC pump state — see dragWindowTo
+      next: null,
+      inFlight: false,
+    };
   } catch {
     return null;
   }
 }
 
-export async function dragWindowTo(drag, screenX, screenY) {
-  if (!isTauri || !drag) return;
-  const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow');
-  const win = await WebviewWindow.getByLabel(drag.label);
-  if (!win) return;
-  const { LogicalPosition } = await import('@tauri-apps/api/window');
-  await win
-    .setPosition(
-      new LogicalPosition(
-        Math.round(drag.baseX + (screenX - drag.sx)),
-        Math.round(drag.baseY + (screenY - drag.sy))
-      )
-    )
-    .catch(() => {});
+/* Keep exactly one setPosition IPC in flight; while it's pending only the
+   latest requested position is remembered. Unthrottled pointermove would
+   otherwise queue a round-trip per event and the window (and the compositor's
+   backdrop blur with it) trails the cursor by the whole queue. */
+function pumpWindowDrag(drag) {
+  if (drag.inFlight || !drag.next) return;
+  const { x, y } = drag.next;
+  drag.next = null;
+  drag.inFlight = true;
+  drag.win
+    .setPosition(new drag.LogicalPosition(x, y))
+    .catch(() => {})
+    .finally(() => {
+      drag.inFlight = false;
+      pumpWindowDrag(drag); // a newer position may have arrived meanwhile
+    });
+}
+
+export function dragWindowTo(drag, screenX, screenY) {
+  if (!isTauri || !drag?.win) return;
+  drag.next = {
+    x: Math.round(drag.baseX + (screenX - drag.sx)),
+    y: Math.round(drag.baseY + (screenY - drag.sy)),
+  };
+  pumpWindowDrag(drag);
 }
 
 /**
@@ -418,6 +441,19 @@ export async function setAppProtected(on) {
   if (!isTauri) return;
   const { invoke } = await import('@tauri-apps/api/core');
   await invoke('set_app_protected', { protected: on });
+}
+
+/**
+ * macOS: hide/show the app's Dock icon, ⌘-Tab entry and menu-bar presence
+ * (activation policy Accessory ↔ Regular). Windows are capture-excluded via
+ * setAppProtected, but the Dock tile and the "eyeread.in" app menus are
+ * system UI and always visible in a full-screen share — so a shielded
+ * reading session drops them entirely.
+ */
+export async function setDockHidden(hidden) {
+  if (!isTauri || !isMacOS) return;
+  const { invoke } = await import('@tauri-apps/api/core');
+  await invoke('set_dock_hidden', { hidden }).catch(() => {});
 }
 
 // Serialize hotkey registration so StrictMode double-invocation can't race.
