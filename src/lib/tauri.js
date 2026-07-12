@@ -141,6 +141,14 @@ export async function showOverlay(script, settings) {
     await win.setAlwaysOnTop(true).catch(() => {});
     await emitTo('overlay', 'overlay:load', { script, settings });
     await win.show();
+    // macOS: setVisibleOnAllWorkspaces alone doesn't cover Spaces owned by
+    // full-screen apps; the Rust side parents the overlay to an invisible
+    // NSPanel that can join them. Re-invoked on every show because hiding
+    // the overlay detaches it. No-op elsewhere.
+    if (isMacOS) {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('show_overlay_over_fullscreen').catch(() => {});
+    }
     // Windows quirk (tauri#14189): a content-protected transparent window can
     // render black in the capture stream after a hide→show cycle. Re-asserting
     // the display affinity right after show() clears it. No-op elsewhere.

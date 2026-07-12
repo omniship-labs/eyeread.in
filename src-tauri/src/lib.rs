@@ -21,6 +21,99 @@ fn set_app_protected(app: AppHandle, protected: bool) {
     }
 }
 
+/// Let the overlay join full-screen Spaces, not just regular desktop Spaces.
+///
+/// `setVisibleOnAllWorkspaces` (from JS) sets `CanJoinAllSpaces`, which makes
+/// the window sticky across ordinary desktop Spaces but not across Spaces
+/// owned by a full-screen app. The documented escape hatch for those —
+/// `NSWindowCollectionBehavior.FullScreenAuxiliary` — is only honored for
+/// NSPanel instances on current macOS: setting the flag (or the
+/// `.nonactivatingPanel` style bit, which AppKit strips) on a plain NSWindow
+/// leaves the window assigned to the desktop Space only, verified via
+/// CGSCopySpacesForWindows. Retyping tao's window into an NSPanel would drop
+/// its `sendEvent:`/focus overrides, so instead the overlay window is
+/// attached as a *child* of an invisible 1×1 non-activating NSPanel that
+/// carries the Space flags: children follow their parent onto every Space,
+/// full-screen ones included.
+///
+/// Idempotent — re-invoked on every overlay show; a no-op once the overlay
+/// has a parent. The anchor panel is created once and intentionally leaked
+/// (app-lifetime singleton).
+#[cfg(target_os = "macos")]
+#[tauri::command]
+fn show_overlay_over_fullscreen(app: AppHandle) {
+    use objc2_app_kit::{
+        NSBackingStoreType, NSColor, NSPanel, NSWindowCollectionBehavior, NSWindowOrderingMode,
+        NSWindowStyleMask,
+    };
+    use objc2_foundation::{NSPoint, NSRect, NSSize};
+    use std::sync::atomic::{AtomicIsize, Ordering};
+
+    // Window number of the anchor panel, so re-attachment after a hide/show
+    // cycle reuses it instead of leaking a panel per show.
+    static ANCHOR_WINDOW_NUMBER: AtomicIsize = AtomicIsize::new(0);
+
+    let Some(win) = app.get_webview_window("overlay") else {
+        return;
+    };
+    // NSWindow mutations must run on the AppKit main thread; command handlers
+    // run on a worker thread and AppKit calls silently no-op there (same trap
+    // as #41 / set_overlay_glass).
+    let w = win.clone();
+    let _ = win.run_on_main_thread(move || {
+        let Ok(ptr) = w.ns_window() else { return };
+        // run_on_main_thread guarantees this, and ns_window() would have
+        // panicked otherwise; MainThreadMarker is required by NSPanel APIs.
+        let Some(mtm) = objc2::MainThreadMarker::new() else {
+            return;
+        };
+        unsafe {
+            let ns_window: &objc2_app_kit::NSWindow = &*(ptr as *mut objc2_app_kit::NSWindow);
+            if ns_window.parentWindow().is_some() {
+                return; // already attached
+            }
+
+            let existing = match ANCHOR_WINDOW_NUMBER.load(Ordering::Relaxed) {
+                0 => None,
+                n => objc2_app_kit::NSApplication::sharedApplication(mtm).windowWithWindowNumber(n),
+            };
+            let anchor = existing.unwrap_or_else(|| {
+                let panel = NSPanel::initWithContentRect_styleMask_backing_defer(
+                    mtm.alloc(),
+                    NSRect::new(NSPoint::new(0.0, 0.0), NSSize::new(1.0, 1.0)),
+                    NSWindowStyleMask::Borderless | NSWindowStyleMask::NonactivatingPanel,
+                    NSBackingStoreType::Buffered,
+                    false,
+                );
+                panel.setCollectionBehavior(
+                    NSWindowCollectionBehavior::CanJoinAllSpaces
+                        | NSWindowCollectionBehavior::FullScreenAuxiliary,
+                );
+                // Match the overlay's own level (floating, from alwaysOnTop)
+                // so the pair doesn't jump the z-order of unrelated windows.
+                panel.setLevel(ns_window.level());
+                panel.setBackgroundColor(Some(&NSColor::clearColor()));
+                panel.setOpaque(false);
+                panel.setIgnoresMouseEvents(true);
+                // NSPanel hides itself when the app deactivates by default,
+                // which would order out the overlay with it.
+                panel.setHidesOnDeactivate(false);
+                panel.setReleasedWhenClosed(false);
+                ANCHOR_WINDOW_NUMBER.store(panel.windowNumber(), Ordering::Relaxed);
+                let anchor = objc2::rc::Retained::into_super(panel);
+                std::mem::forget(anchor.clone()); // intentional leak: app-lifetime
+                anchor
+            });
+            anchor.orderFrontRegardless();
+            anchor.addChildWindow_ordered(ns_window, NSWindowOrderingMode::Above);
+        }
+    });
+}
+
+#[cfg(not(target_os = "macos"))]
+#[tauri::command]
+fn show_overlay_over_fullscreen(_app: AppHandle) {}
+
 /// Open the About window — called from JS menu listener or Settings screen.
 #[tauri::command]
 fn show_about_window(app: AppHandle) {
@@ -183,6 +276,7 @@ pub fn run() {
             install_update,
             show_about_window,
             set_app_protected,
+            show_overlay_over_fullscreen,
         ])
         .setup(|_app| Ok(()))
         .run(tauri::generate_context!())
