@@ -275,6 +275,7 @@ the signing keys can sign software as you. Treat them accordingly.
   the moment a second public repo or another collaborator with repo-creation
   rights shows up.** (The Tauri **public** key is not a secret; it lives in
   `tauri.conf.json`.)
+
 - **Restrict where secrets can be used.** On the `release` environment add a
   **deployment tag rule** (`v*`); on `nightly`, a **deployment branch rule**
   (`main` only — scheduled runs execute on the default branch, so the rule must
