@@ -15,7 +15,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENCMTNDRkNFMDUzMUM2QzYKUldUR3hqRUZ6czhUeTVFT0lIb3NSVmhGNzVWcE5jTVhROHB3Z3hDY2k5MG5meTVjbUsrN0pqU2wK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGRjVCNTFCQzAwMDJGRjgKUldUNEx3REFHN1gxbjR6N1FEV2tWZEVRYnR3blI5YThlYjdrYVFXTWlTMTVjd3Z3OUladCt1SWUK",
       "endpoints": [
         "https://github.com/omniship-labs/eyeread.in/releases/download/nightly/latest.json"
       ]
