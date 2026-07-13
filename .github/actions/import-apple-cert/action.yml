@@ -1,5 +1,7 @@
 name: Import Apple signing certificate
-description: Decodes a base64 P12 certificate and imports it into a temporary macOS keychain.
+description: >-
+  Decodes a base64 P12 certificate and imports it into a temporary macOS
+  keychain, following https://v2.tauri.app/distribute/sign/macos/.
 
 inputs:
   certificate:
@@ -8,24 +10,55 @@ inputs:
   certificate-password:
     description: Password for the .p12 file.
     required: true
+  keychain-password:
+    description: Password for the temporary build keychain.
+    required: true
+
+outputs:
+  signing-identity:
+    description: >-
+      Code-signing identity found in the imported certificate (e.g.
+      "Developer ID Application: OmniShip (TEAMID)"). Use it as
+      APPLE_SIGNING_IDENTITY when building.
+    value: ${{ steps.verify.outputs.signing-identity }}
 
 runs:
   using: composite
   steps:
-    - name: Set up keychain and import certificate
+    - name: Import Apple Developer Certificate
       shell: bash
       env:
         APPLE_CERTIFICATE: ${{ inputs.certificate }}
         APPLE_CERTIFICATE_PASSWORD: ${{ inputs.certificate-password }}
+        KEYCHAIN_PASSWORD: ${{ inputs.keychain-password }}
       run: |
-        KEYCHAIN_PATH=$RUNNER_TEMP/build.keychain
-        CERT_PATH=$RUNNER_TEMP/cert.p12
+        # Keychain setup per the Tauri v2 docs. The .p12 lands in RUNNER_TEMP
+        # rather than the checkout so it can never end up in a bundle.
+        CERT_PATH="$RUNNER_TEMP/certificate.p12"
         echo "$APPLE_CERTIFICATE" | base64 --decode > "$CERT_PATH"
-        security create-keychain -p "" "$KEYCHAIN_PATH"
-        security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-        security unlock-keychain -p "" "$KEYCHAIN_PATH"
-        security import "$CERT_PATH" -k "$KEYCHAIN_PATH" \
-          -P "$APPLE_CERTIFICATE_PASSWORD" \
-          -T /usr/bin/codesign -T /usr/bin/security
-        security list-keychain -d user -s "$KEYCHAIN_PATH"
-        security set-key-partition-list -S apple-tool:,apple: -k "" "$KEYCHAIN_PATH"
+        security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+        security set-keychain-settings -t 3600 -u build.keychain
+        security import "$CERT_PATH" -k build.keychain \
+          -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s \
+          -k "$KEYCHAIN_PASSWORD" build.keychain
+        rm "$CERT_PATH"
+
+    - name: Verify Certificate
+      id: verify
+      shell: bash
+      run: |
+        # Distribution builds use a "Developer ID Application" certificate;
+        # fall back to the first identity so dev certs still work.
+        IDENTITIES=$(security find-identity -v -p codesigning build.keychain)
+        echo "$IDENTITIES"
+        CERT_INFO=$(echo "$IDENTITIES" | grep "Developer ID Application" || echo "$IDENTITIES" | grep -m1 '"' || true)
+        CERT_ID=$(echo "$CERT_INFO" | head -n1 | awk -F'"' '{print $2}')
+        if [ -z "$CERT_ID" ]; then
+          echo "::error::No code-signing identity found in the imported certificate."
+          exit 1
+        fi
+        echo "signing-identity=$CERT_ID" >> "$GITHUB_OUTPUT"
+        echo "Certificate imported."

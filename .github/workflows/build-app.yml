@@ -1,0 +1,192 @@
+# Shared build job for the stable and nightly workflows — builds, signs and
+# notarizes every platform target for one release channel.
+#
+# Only callable via workflow_call. The caller resolves the version string;
+# the channel selects everything else:
+#   stable  → environment `release`, default tauri.conf.json, `stable-*` artifacts
+#   nightly → environment `nightly`, tauri.nightly.conf.json overlay, `nightly-*` artifacts
+#
+# The deployment environments hold the signing secrets. Configure them in repo
+# settings: `release` with a deployment-tag rule (v*) and, optionally, required
+# reviewers so a human approves before any signing job can run; `nightly` with
+# a deployment-branch rule limited to `main` and no reviewers (it's automated —
+# note scheduled runs execute on the default branch, so the rule must be the
+# trunk, not a side branch).
+#
+# ── Secrets required (in both environments) ─────────────────────────────────
+#   TAURI_SIGNING_PRIVATE_KEY            output of `tauri signer generate`
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD   passphrase (can be empty string)
+#   APPLE_CERTIFICATE            base64-encoded Developer ID .p12 cert
+#   APPLE_CERTIFICATE_PASSWORD   password for the .p12
+#   KEYCHAIN_PASSWORD            password for the temporary build keychain
+#   APPLE_ID                     Apple ID email used for notarization
+#   APPLE_ID_PASSWORD            app-specific password for that Apple ID
+#   APPLE_TEAM_ID                10-char Apple team ID
+#   APPLE_SIGNING_IDENTITY       optional override — auto-detected from the
+#                                imported certificate when unset
+
+name: Build app (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Fully resolved version string to stamp into the manifests.
+        required: true
+        type: string
+      channel:
+        description: Release channel — `stable` or `nightly`.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            runner: macos-latest
+            bundles: dmg,updater
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            bundles: nsis,updater
+          - target: aarch64-pc-windows-msvc
+            runner: windows-latest
+            bundles: nsis,updater
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-22.04
+            bundles: appimage,deb,updater
+
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    environment: ${{ inputs.channel == 'nightly' && 'nightly' || 'release' }}
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        with:
+          workspaces: src-tauri
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - run: npm ci
+
+      - name: Generate icons
+        run: npx tauri icon src-tauri/icons/icon.png
+
+      - name: Stamp version
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          # Cross-platform stamp (runs on macOS and Windows runners) — Node
+          # rewrites both manifests, avoiding the BSD/GNU `sed -i` split.
+          node -e "
+            const fs = require('fs');
+            const v = process.env.VERSION;
+            const p = JSON.parse(fs.readFileSync('package.json'));
+            p.version = v;
+            fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+            const c = fs.readFileSync('src-tauri/Cargo.toml', 'utf8');
+            fs.writeFileSync('src-tauri/Cargo.toml', c.replace(/^version = \".*\"/m, 'version = \"' + v + '\"'));
+          "
+
+      - name: Import Apple signing certificate
+        if: runner.os == 'macOS'
+        id: apple-cert
+        uses: ./.github/actions/import-apple-cert
+        with:
+          certificate: ${{ secrets.APPLE_CERTIFICATE }}
+          certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+      - name: Configure Windows code signing (Azure Trusted Signing)
+        if: runner.os == 'Windows'
+        shell: bash
+        env:
+          AZURE_ENDPOINT: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
+          AZURE_ACCOUNT: ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT }}
+          AZURE_CERT_PROFILE: ${{ secrets.AZURE_TRUSTED_SIGNING_PROFILE }}
+        run: |
+          # Gated on secrets — when Azure Trusted Signing isn't configured the
+          # installer is still Tauri-signed (the updater works) but SmartScreen
+          # will warn. Setting the three secrets switches on Authenticode.
+          if [ -z "$AZURE_ENDPOINT" ]; then
+            echo "::notice::Azure Trusted Signing not configured — Windows installer will be Tauri-signed only."
+            exit 0
+          fi
+          cargo install trusted-signing-cli --locked
+          cat > sign.windows.conf.json <<EOF
+          {
+            "bundle": {
+              "windows": {
+                "signCommand": {
+                  "cmd": "trusted-signing-cli",
+                  "args": ["-e", "$AZURE_ENDPOINT", "-a", "$AZURE_ACCOUNT", "-c", "$AZURE_CERT_PROFILE", "%1"]
+                }
+              }
+            }
+          }
+          EOF
+          echo "WINDOWS_SIGN_CONFIG=--config sign.windows.conf.json" >> "$GITHUB_ENV"
+
+      - name: Build, sign & notarize
+        shell: bash
+        env:
+          RELEASE_CHANNEL: ${{ inputs.channel }}
+          # Nightly overlays productName/identifier/updater endpoint.
+          CHANNEL_CONFIG: ${{ inputs.channel == 'nightly' && '--config src-tauri/tauri.nightly.conf.json' || '' }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Prefer the explicit secret; otherwise use the identity detected in
+          # the certificate imported above (per the Tauri macOS signing docs).
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY || steps.apple-cert.outputs.signing-identity }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Azure Trusted Signing credential chain (used by trusted-signing-cli).
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          npm run tauri build -- \
+            --target ${{ matrix.target }} \
+            --bundles ${{ matrix.bundles }} \
+            $CHANNEL_CONFIG \
+            $WINDOWS_SIGN_CONFIG
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ inputs.channel }}-${{ matrix.target }}
+          if-no-files-found: ignore
+          path: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
+            src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz
+            src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz.sig
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe
+            src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe.sig
+            src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
+            src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage.sig
+            src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb

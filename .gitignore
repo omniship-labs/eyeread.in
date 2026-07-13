@@ -6,6 +6,9 @@ src-tauri/gen
 .DS_Store
 *.local
 
+# Private release/secrets notes — never meant for the public repo.
+docs/RELEASING.local.md
+
 # Sponsor avatars are downloaded at build time by scripts/fetch-sponsors.mjs.
 # src/data/sponsors.json IS committed so the app import always resolves.
 public/sponsors/

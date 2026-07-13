@@ -1,9 +1,11 @@
-# Release strategy
+# Releasing eyeread.in
 
 How eyeread.in is built, signed, and distributed — per OS, and where each
 artifact lands. The CI that implements this lives in
 [`.github/workflows/release.yml`](../.github/workflows/release.yml) (stable) and
-[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml) (nightly).
+[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml) (nightly);
+both delegate the actual build/sign/notarize matrix to the shared
+[`.github/workflows/build-app.yml`](../.github/workflows/build-app.yml).
 
 The product's whole value — staying invisible to screen capture — depends on
 OS-level primitives, so platform coverage and store eligibility are shaped more
@@ -11,12 +13,34 @@ by those primitives than by reach. Read the [Platform support](../README.md#plat
 table first; it explains why macOS/Windows are first-class and Linux is
 best-effort.
 
+## Cutting a release (what you do each time)
+
+**Stable — four actions, ~10 minutes of your attention:**
+
+1. Push a `v0.x.y` tag, or run the Release workflow manually with the version.
+2. If you set a required reviewer on `release`, approve the run when it pauses.
+3. After the ~30–60 min build, a **draft** release appears. Check that every
+   platform's artifacts and `latest.json` are attached, and edit the generated
+   notes.
+4. Click **Publish**. Nothing reaches users — updater or download links — until
+   this click. That's deliberate: keep `draft: true`.
+
+If any build leg fails, the publish job never runs; re-run the failed jobs from
+the run page rather than re-tagging. macOS legs fail fast at "Import Apple
+signing certificate" when secrets are missing or the cert expired; notarization
+problems surface in "Build, sign & notarize" (check the app-specific password
+and Apple's system status).
+
+**Nightly — zero actions.** Every push to `main` (or the 03:00 UTC cron)
+rebuilds and force-updates the `nightly` pre-release. If a nightly is broken,
+fix forward on `main`; don't hand-edit the release.
+
 ## Channels
 
 | Channel     | Trigger                         | Bundle ID                | Updater endpoint                        |
 | ----------- | ------------------------------- | ------------------------ | --------------------------------------- |
 | **Stable**  | `v*` tag (or workflow dispatch) | `in.eyeread.app`         | `releases/latest/.../latest.json`       |
-| **Nightly** | Push to `dev` or daily cron     | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
+| **Nightly** | Push to `main` or daily cron    | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
 
 Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
 and matches the running OS/arch to a `platforms` key.
@@ -25,20 +49,27 @@ and matches the running OS/arch to a `platforms` key.
 
 | OS          | Targets (Rust triple)                               | Bundles            | Updater key(s)                      |
 | ----------- | --------------------------------------------------- | ------------------ | ----------------------------------- |
-| **macOS**   | `aarch64-apple-darwin`, `x86_64-apple-darwin`       | `dmg` + `updater`  | `darwin-aarch64`, `darwin-x86_64`   |
+| **macOS**   | `aarch64-apple-darwin` (Apple Silicon only)         | `dmg` + `updater`  | `darwin-aarch64`                    |
 | **Windows** | `x86_64-pc-windows-msvc`, `aarch64-pc-windows-msvc` | `nsis` + `updater` | `windows-x86_64`, `windows-aarch64` |
 | **Linux**   | `x86_64-unknown-linux-gnu`                          | `appimage`, `deb`  | `linux-x86_64` (AppImage)           |
 
-Separate per-arch downloads (not a macOS Universal binary): smaller files, and
-the updater already keys on arch.
+macOS ships **Apple Silicon only** — the Intel (`x86_64`) target was dropped in
+July 2026, and there's no Universal binary. Windows stays per-arch as separate
+downloads; the updater keys on arch.
 
 ## Per-OS detail
 
-### macOS — fully supported
+### macOS — fully supported (Apple Silicon only)
 
-- **Signing:** Apple Developer ID + notarization + stapling (see the
-  `import-apple-cert` action and the `APPLE_*` secrets). This is mandatory —
-  Gatekeeper blocks unsigned/unnotarized apps.
+- **Apple Silicon only, macOS 11+.** Intel builds were dropped in July 2026.
+  Existing Intel installs don't get a farewell notice — the updater finds no
+  `darwin-x86_64` key in `latest.json` and quietly reports "no update
+  available".
+- **Signing:** Apple Developer ID + notarization + stapling. The keychain
+  import in [`import-apple-cert`](../.github/actions/import-apple-cert/action.yml)
+  follows the [Tauri v2 macOS signing docs](https://v2.tauri.app/distribute/sign/macos/),
+  and the signing identity is auto-detected from the imported certificate.
+  Signing is mandatory — Gatekeeper blocks unsigned/unnotarized apps.
 - **Invisibility:** capture exclusion uses `NSWindow.sharingType = .none` —
   this is **public** AppKit API, mapped from Tauri's `contentProtected`, and is
   _not_ itself an App Store blocker.
@@ -91,8 +122,8 @@ the updater already keys on arch.
   build already reaches 100% of Macs, **the spike's recommendation is to not
   pursue MAS** until there's concrete demand that only the App Store can serve.
 
-- **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `10.15` (Catalina). This
-  also sets the build's deployment target.
+- **Minimum OS:** `bundle.macOS.minimumSystemVersion` = `11.0` (Big Sur, the
+  first Apple Silicon release). This also sets the build's deployment target.
 
 ### Windows — fully supported
 
@@ -141,7 +172,7 @@ the updater already keys on arch.
 
 | OS      | Minimum                                   | Enforced by                              |
 | ------- | ----------------------------------------- | ---------------------------------------- |
-| macOS   | 10.15 Catalina                            | `bundle.macOS.minimumSystemVersion`      |
+| macOS   | 11.0 Big Sur (Apple Silicon only)         | `bundle.macOS.minimumSystemVersion`      |
 | Windows | 10 v2004 (build 19041)                    | runtime check (feature) + WebView2 floor |
 | Linux   | Ubuntu 22.04 / Debian 12 / glibc 2.35 era | build host (`ubuntu-22.04`)              |
 
@@ -158,6 +189,8 @@ Total recurring cost for full trust on all three OSes: **≈ $99/yr (Apple) +
 
 ### macOS — one-time setup
 
+Already done for the current cert (expires ~Feb 2027 — repeat this to renew):
+
 1. Join the **Apple Developer Program** ($99/yr).
 2. In the dev portal, create a **Developer ID Application** certificate; export
    it as a password-protected `.p12`.
@@ -165,14 +198,18 @@ Total recurring cost for full trust on all three OSes: **≈ $99/yr (Apple) +
    notarization).
 4. Note your 10-char **Team ID** (Membership page).
 
-Secrets to add (repo → Settings → Secrets and variables → Actions):
+Secrets to add — **ideally** to both the `release` and `nightly` environments
+(repo → Settings → Environments → pick one → Add secret); see
+[Handling secrets](#handling-secrets) for why:
 
 - `APPLE_CERTIFICATE` — `base64 -i cert.p12` output
 - `APPLE_CERTIFICATE_PASSWORD` — the `.p12` password
-- `APPLE_SIGNING_IDENTITY` — e.g. `Developer ID Application: Your Name (TEAMID)`
+- `KEYCHAIN_PASSWORD` — any random string; unlocks the throwaway CI keychain
 - `APPLE_ID` — your Apple ID email
 - `APPLE_ID_PASSWORD` — the app-specific password
 - `APPLE_TEAM_ID` — the 10-char team ID
+- `APPLE_SIGNING_IDENTITY` — **optional**; CI auto-detects the identity from
+  the imported certificate. Set it only to override.
 
 ### Windows — one-time setup (Azure Trusted Signing)
 
@@ -184,7 +221,7 @@ Secrets to add (repo → Settings → Secrets and variables → Actions):
 3. In **Entra ID**, register an **app (service principal)** and give it the
    _Trusted Signing Certificate Profile Signer_ role; create a client secret.
 
-Secrets to add:
+Secrets to add (same two environments):
 
 - `AZURE_TRUSTED_SIGNING_ENDPOINT` — e.g. `https://eus.codesigning.azure.net/`
 - `AZURE_TRUSTED_SIGNING_ACCOUNT` — Trusted Signing account name
@@ -194,16 +231,19 @@ Secrets to add:
 Until these are set, Windows builds are Tauri-signed only (updater works,
 SmartScreen warns) — nothing breaks.
 
-### Shared — Tauri updater key (free, do this first)
+### Shared — Tauri updater key
 
-The updater won't verify downloads until a public key is set. Run
-`npm run tauri signer generate` once, then:
+Already done (key `CB13CFCE0531C6C6`, both configs and both environments
+set). To rotate: run `npm run tauri signer generate` once, then:
 
-- Paste the **public key** into `plugins.updater.pubkey` in `tauri.conf.json`
-  (currently empty — must be filled before the updater is trusted).
-- Add the **private key** + passphrase as secrets:
+- Paste the **public key** into `plugins.updater.pubkey` in **both**
+  `tauri.conf.json` and `tauri.nightly.conf.json`.
+- Add the **private key** + passphrase as secrets in both environments:
   - `TAURI_SIGNING_PRIVATE_KEY`
   - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
+- **Back up the private key offline immediately** — lose it and you can never
+  ship an update to already-installed apps again (see
+  [Handling secrets](#handling-secrets)).
 
 ### Free-but-worse fallbacks (if you can't pay yet)
 
@@ -217,15 +257,28 @@ The updater won't verify downloads until a public key is set. Run
 The threat to manage: this is a **public, AGPL** repo that accepts fork PRs, and
 the signing keys can sign software as you. Treat them accordingly.
 
-- **Scope secrets to environments, not the repo.** Put every signing secret in
-  the `release` and `nightly` **environments** (repo → Settings → Environments),
-  _not_ in repo-wide Actions secrets. Environment secrets are only readable by
-  jobs that declare that `environment:` — which the build jobs now do — so PR/CI
-  jobs can never see them. (The Tauri **public** key is not a secret; it lives in
+- **Scope secrets to environments, not the repo — this is the target state,
+  not what's live for Apple today.** The Tauri updater secrets follow it: both
+  live in the `release` and `nightly` **environments** (repo → Settings →
+  Environments), readable only by jobs that declare that `environment:` (the
+  shared `build-app.yml` job does, picking the environment from its `channel`
+  input), so PR/CI jobs can never see them.
+
+  **The six Apple secrets are currently org-level** (visibility: all public
+  repos in `omniship-labs`), set that way because writing environment secrets
+  needs only repo access while org secrets need `admin:org` — the path of
+  least resistance in the moment, not a deliberate choice. The tradeoff: any
+  public repo later added to this org — not just `eyeread.in` — can read them,
+  and the tag/branch environment rules below don't apply to org secrets at
+  all. Fine for a single-maintainer org with one public repo; **re-scope them
+  into the `release`/`nightly` environments (delete the org copies afterward)
+  the moment a second public repo or another collaborator with repo-creation
+  rights shows up.** (The Tauri **public** key is not a secret; it lives in
   `tauri.conf.json`.)
 - **Restrict where secrets can be used.** On the `release` environment add a
   **deployment tag rule** (`v*`); on `nightly`, a **deployment branch rule**
-  (`dev` only). Now the secrets are unreachable from any fork, branch, or tag
+  (`main` only — scheduled runs execute on the default branch, so the rule must
+  be the trunk). Now the secrets are unreachable from any fork, branch, or tag
   outside those rules.
 - **Prefer OIDC over a stored Azure secret (free hardening).** Instead of
   `AZURE_CLIENT_SECRET`, configure a **federated credential** in Entra ID for
@@ -265,9 +318,9 @@ key.** It mostly already holds — here's how to keep it that way.
   a drive-by PR from running CI at all until a maintainer eyeballs it.
 - **CLA is already enforced** (cla-assistant) — keep it; it's your legal basis
   for the dual AGPL/commercial license.
-- **Branch protection on `main` and `dev`:** require CI to pass + at least one
-  review + Code Owner review; disallow force-push. `dev` feeds nightly and
-  `main` feeds tags, so protecting them protects the signed channels.
+- **Branch protection on `main`:** require CI to pass + at least one review +
+  Code Owner review; disallow force-push. `main` feeds both nightly (pushes/cron)
+  and stable (tags), so protecting it protects both signed channels.
 
 ## Should you gate releases? Yes — here's the layering
 
@@ -284,7 +337,7 @@ Gate by _consequence_, cheaply:
    signing runs. Worth it for a solo maintainer who wants a deliberate "go".
    Leave `nightly` reviewer-free so automation isn't blocked.
 
-Net: nightly is automatic but ref-locked to `dev`; stable needs a protected tag,
+Net: nightly is automatic but ref-locked to `main`; stable needs a protected tag,
 runs in a gated environment, and still won't go public until you publish the
 draft.
 
@@ -359,10 +412,8 @@ over a separate beta channel.
 
 1. **Azure Trusted Signing** for Windows — set the secrets; unblocks winget and
    kills SmartScreen friction. (CI scaffold already merged.)
-2. **Linux + Windows arm64 builds** — done; verify a release produces all
-   artifacts and a valid `latest.json`.
-3. **Homebrew Cask + winget** submissions (both consume signed GitHub assets).
-4. **Flathub** for Linux.
-5. **`get.eyeread.in` download page** with OS/arch auto-detect.
-6. **Opt-in crash/feedback telemetry** (`tauri-plugin-sentry`) — the genuine
+2. **Homebrew Cask + winget** submissions (both consume signed GitHub assets).
+3. **Flathub** for Linux.
+4. **`get.eyeread.in` download page** with OS/arch auto-detect.
+5. **Opt-in crash/feedback telemetry** (`tauri-plugin-sentry`) — the genuine
    TestFlight value; do before a dedicated `beta` channel.

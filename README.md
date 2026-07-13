@@ -28,7 +28,7 @@ capture pipeline before any capture software sees it.
 | **Windows** | ✅ Fully supported | `SetWindowDisplayAffinity(WDA_EXCLUDEFROMCAPTURE)` — Windows 10 2004+.                           |
 | **Linux**   | ⚠️ Experimental    | No portable exclusion exists — outcome depends entirely on the compositor.                       |
 
-**Minimum OS versions:** macOS 10.15 Catalina · Windows 10 v2004 (build 19041, required for capture exclusion) · Linux from the Ubuntu 22.04 / Debian 12 / glibc 2.35 era.
+**Minimum OS versions:** macOS 11 Big Sur (Apple Silicon) · Windows 10 v2004 (build 19041, required for capture exclusion) · Linux from the Ubuntu 22.04 / Debian 12 / glibc 2.35 era.
 
 **Windows.** `WDA_EXCLUDEFROMCAPTURE` is enforced by the Desktop Window Manager _before_ any
 capture API runs, so the window is excluded from **DXGI Desktop Duplication, Windows.Graphics.Capture,
@@ -175,7 +175,7 @@ Both channels install side-by-side. Nightly builds are stamped with the date
 (e.g. `0.1.0-nightly.20260612`) so the in-app updater treats each nightly as a distinct
 release.
 
-See **[docs/RELEASE_STRATEGY.md](docs/RELEASE_STRATEGY.md)** for the full
+See **[docs/RELEASING.md](docs/RELEASING.md)** for the full
 per-OS strategy (signing, store eligibility, distribution channels), and
 `.github/workflows/` for CI configuration and required secrets.
 
