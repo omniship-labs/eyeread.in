@@ -15,7 +15,7 @@
  * The brand name "eyeread.in" is part of each localized title and is never
  * translated — only the tagline around it changes.
  */
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -147,6 +147,13 @@ for (const page of docsPages) {
 // SPA fallback: GitHub Pages serves 404.html for any unmatched path. Ship the
 // bundle (root-absolute assets) so a deep link still boots the client router.
 await writeFile(resolve(DIST, '404.html'), rootAbsolute(template));
+
+// Expose the brand mark at a stable public URL (get.eyeread.in/eyeread-mark.svg
+// and /favicon.svg). Canonical file is repo-root public/favicon.svg — copied at
+// build time, never vendored, so consumers (e.g. omniship.dev) can hotlink it.
+const MARK = resolve(DIST, '..', '..', 'public', 'favicon.svg');
+await copyFile(MARK, resolve(DIST, 'eyeread-mark.svg'));
+await copyFile(MARK, resolve(DIST, 'favicon.svg'));
 
 await writeFile(resolve(DIST, 'sitemap.xml'), sitemap());
 await writeFile(
