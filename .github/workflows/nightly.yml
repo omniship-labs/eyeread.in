@@ -1,7 +1,6 @@
-# Nightly build — triggered on every push to `main` and once daily at
-# 03:00 UTC (the cron picks up dependency drift on quiet days). Always
-# force-updates the same "nightly" release tag so the updater endpoint URL
-# never changes.
+# Nightly build — runs once daily at 03:00 UTC, or on demand via
+# workflow_dispatch. Always force-updates the same "nightly" release tag so
+# the updater endpoint URL never changes.
 #
 # The stamp job computes the version string once and passes it to both
 # the build matrix and the publish job, preventing a midnight-crossing race
@@ -13,11 +12,16 @@
 name: Nightly
 
 on:
-  push:
-    branches: [main]
   schedule:
     - cron: '0 3 * * *'
   workflow_dispatch:
+
+# Only the latest run matters — every trigger force-updates the same rolling
+# "nightly" tag, so a superseded run (e.g. two manual dispatches in a row)
+# should be cancelled rather than race the newer one to publish.
+concurrency:
+  group: nightly
+  cancel-in-progress: true
 
 permissions:
   contents: write

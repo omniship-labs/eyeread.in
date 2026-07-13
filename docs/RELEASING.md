@@ -31,16 +31,17 @@ signing certificate" when secrets are missing or the cert expired; notarization
 problems surface in "Build, sign & notarize" (check the app-specific password
 and Apple's system status).
 
-**Nightly — zero actions.** Every push to `main` (or the 03:00 UTC cron)
-rebuilds and force-updates the `nightly` pre-release. If a nightly is broken,
+**Nightly — zero actions, most days.** The 03:00 UTC cron rebuilds and
+force-updates the `nightly` pre-release automatically. Trigger one on demand
+via workflow dispatch when you want a build sooner. If a nightly is broken,
 fix forward on `main`; don't hand-edit the release.
 
 ## Channels
 
-| Channel     | Trigger                         | Bundle ID                | Updater endpoint                        |
-| ----------- | ------------------------------- | ------------------------ | --------------------------------------- |
-| **Stable**  | `v*` tag (or workflow dispatch) | `in.eyeread.app`         | `releases/latest/.../latest.json`       |
-| **Nightly** | Push to `main` or daily cron    | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
+| Channel     | Trigger                           | Bundle ID                | Updater endpoint                        |
+| ----------- | --------------------------------- | ------------------------ | --------------------------------------- |
+| **Stable**  | `v*` tag (or workflow dispatch)   | `in.eyeread.app`         | `releases/latest/.../latest.json`       |
+| **Nightly** | Daily cron (or workflow dispatch) | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
 
 Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
 and matches the running OS/arch to a `platforms` key.
@@ -320,8 +321,9 @@ key.** It mostly already holds — here's how to keep it that way.
 - **CLA is already enforced** (cla-assistant) — keep it; it's your legal basis
   for the dual AGPL/commercial license.
 - **Branch protection on `main`:** require CI to pass + at least one review +
-  Code Owner review; disallow force-push. `main` feeds both nightly (pushes/cron)
-  and stable (tags), so protecting it protects both signed channels.
+  Code Owner review; disallow force-push. Both nightly (cron/dispatch, always
+  building `main`) and stable (tags) build off this branch, so protecting it
+  protects both signed channels.
 
 ## Should you gate releases? Yes — here's the layering
 
