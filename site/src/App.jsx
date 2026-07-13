@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useConfig } from './config.js';
 import { useDocumentMeta } from './hooks/useDocumentMeta.js';
+import { useLatestReleases } from './hooks/useLatestReleases.js';
 import { docsPages, DOCS_ROUTE, DOCS_SLUG_ROUTE } from './docs/registry.js';
 import Nav from './components/Nav.jsx';
 import Hero from './components/Hero.jsx';
@@ -17,11 +18,11 @@ import Download from './pages/Download.jsx';
 
 const DOCS_INDEX = docsPages.find((p) => p.slug === '');
 
-function Home({ config }) {
+function Home({ config, releases }) {
   useDocumentMeta(config.meta);
   return (
     <main>
-      <Hero config={config} />
+      <Hero config={config} releases={releases} />
       <Features data={config.features} />
       <HowItWorks data={config.how} />
       <OpenSource data={config.oss} links={config.links} />
@@ -52,15 +53,18 @@ function ScrollToTop() {
 
 export default function App() {
   const config = useConfig();
+  // Fetched once here (not per-page) so Nav's + Hero's one-click CTA and the
+  // /download page never trigger duplicate requests for the same manifests.
+  const releases = useLatestReleases();
   return (
     <>
       <ScrollToTop />
-      <Nav config={config} />
+      <Nav config={config} releases={releases} />
       <Routes>
         <Route path={DOCS_ROUTE} element={<DocsLayout page={DOCS_INDEX} />} />
         <Route path={DOCS_SLUG_ROUTE} element={<DocsRoute />} />
-        <Route path="/download" element={<Download config={config} />} />
-        <Route path="*" element={<Home config={config} />} />
+        <Route path="/download" element={<Download config={config} releases={releases} />} />
+        <Route path="*" element={<Home config={config} releases={releases} />} />
       </Routes>
       <Footer config={config} />
     </>

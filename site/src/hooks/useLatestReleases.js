@@ -1,24 +1,24 @@
 import { useEffect, useState } from 'react';
 
-/* Fetches both channels' latest.json manifests client-side. Same shape Tauri's
-   updater itself reads: { version, pub_date, platforms: { <os-arch>: { url,
-   signature } } }. Stable's manifest lives at a fixed GitHub "latest release"
-   URL (safe — each v* tag is only ever published once, so there's no
-   immutable-release conflict); nightly's lives on the nightly-manifest branch
-   because a single rolling release/tag isn't possible there (see
-   docs/RELEASING.md). Both are public, static JSON with permissive CORS. */
-const MANIFEST_URLS = {
-  stable: 'https://github.com/omniship-labs/eyeread.in/releases/latest/download/latest.json',
-  nightly:
-    'https://raw.githubusercontent.com/omniship-labs/eyeread.in/nightly-manifest/latest.json',
-};
+/* Fetches release data client-side via the GitHub REST API — NOT the raw
+   release-asset download URLs (github.com/.../releases/download/... and its
+   release-assets.githubusercontent.com redirect target send no CORS headers
+   at all, so a browser fetch() against them fails outright, regardless of
+   whether the release exists). api.github.com is designed for public API
+   consumption and sends `Access-Control-Allow-Origin: *` on every response,
+   including 404s, so it's the only one of the three GitHub domains involved
+   here that's actually usable from client-side JS.
 
-function useManifest(url) {
+   Unauthenticated api.github.com calls are rate-limited (60/hr per IP) — fine
+   for this traffic level; revisit with a cached edge proxy if that changes. */
+const API = 'https://api.github.com/repos/omniship-labs/eyeread.in';
+
+function useApiFetch(url) {
   const [state, setState] = useState({ loading: true, error: null, data: null });
 
   useEffect(() => {
     let cancelled = false;
-    fetch(url)
+    fetch(url, { headers: { Accept: 'application/vnd.github+json' } })
       .then((res) => {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         return res.json();
@@ -38,7 +38,17 @@ function useManifest(url) {
 }
 
 export function useLatestReleases() {
-  const stable = useManifest(MANIFEST_URLS.stable);
-  const nightly = useManifest(MANIFEST_URLS.nightly);
+  const stable = useApiFetch(`${API}/releases/latest`);
+  // Nightly has no single "latest" release — immutable releases forbid
+  // reusing one tag, so every nightly build gets its own permanent tag (see
+  // docs/RELEASING.md). List recent releases and take the first nightly-*
+  // one (the list is already sorted newest-first by GitHub).
+  const nightlyList = useApiFetch(`${API}/releases?per_page=10`);
+  const nightly = {
+    loading: nightlyList.loading,
+    error: nightlyList.error,
+    data: nightlyList.data?.find((r) => r.tag_name.startsWith('nightly-v')) ?? null,
+  };
+
   return { stable, nightly };
 }

@@ -4,16 +4,23 @@ import Brand from './Brand.jsx';
 import { Icon } from './Icon.jsx';
 import { docsPath } from '../docs/registry.js';
 import { useOSPlatform } from '../hooks/useOSPlatform.js';
+import { resolveDirectDownloadHref } from '../lib/releaseLinks.js';
 
-const NAV_OS_ICON = { macos: 'apple', windows: 'windows' };
-const NAV_OS_SIZE = { macos: 14, windows: 13 };
+const NAV_OS_ICON = { macos: 'apple', windows: 'windows', linux: 'linux' };
+const NAV_OS_SIZE = { macos: 14, windows: 13, linux: 13 };
 
-export default function Nav({ config }) {
+export default function Nav({ config, releases }) {
   const { brand, links, nav } = config;
   const { t } = useTranslation('docs');
   const os = useOSPlatform();
   const navIcon = NAV_OS_ICON[os];
   const navIconSize = NAV_OS_SIZE[os] ?? 0;
+  // Same rule as Hero's primary CTA: the OS icon implies a direct download,
+  // so the href must actually be one whenever the manifest has resolved —
+  // never silently just a link to the /download listing page.
+  const directHref = releases?.stable?.data
+    ? resolveDirectDownloadHref(os, releases.stable.data)
+    : null;
   return (
     <nav className="nav">
       <div className="nav-inner">
@@ -31,10 +38,17 @@ export default function Nav({ config }) {
             <Icon name="github" size={15} />
             <span className="btn-label">{nav.githubLabel}</span>
           </a>
-          <Link className="btn btn-accent btn-sm" to={links.download}>
-            {navIcon && <Icon name={navIcon} size={navIconSize} />}
-            {nav.cta}
-          </Link>
+          {directHref ? (
+            <a className="btn btn-accent btn-sm" href={directHref}>
+              {navIcon && <Icon name={navIcon} size={navIconSize} />}
+              {nav.cta}
+            </a>
+          ) : (
+            <Link className="btn btn-accent btn-sm" to={links.download}>
+              {navIcon && <Icon name={navIcon} size={navIconSize} />}
+              {nav.cta}
+            </Link>
+          )}
         </div>
       </div>
     </nav>

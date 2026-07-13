@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Icon } from './Icon.jsx';
 import Demo from './Demo.jsx';
 import { useOSPlatform } from '../hooks/useOSPlatform.js';
+import { resolveDirectDownloadHref } from '../lib/releaseLinks.js';
 
 /* headline is an array; string items render plain, {emphasis} renders accented */
 function Headline({ parts }) {
@@ -21,11 +22,19 @@ const OS_CONFIG = {
   other: { icon: null, size: 0, labelKey: 'primaryCta' },
 };
 
-export default function Hero({ config }) {
+export default function Hero({ config, releases }) {
   const { hero, links } = config;
   const os = useOSPlatform();
   const isLinux = os === 'linux';
   const osCfg = OS_CONFIG[os] ?? OS_CONFIG.other;
+  // Direct one-click download for the detected OS once the manifest has
+  // loaded; falls back to the /download page (all platforms + nightly)
+  // while loading, on fetch failure, or for an OS we can't resolve a link
+  // for. The icon/label always imply a direct download, so the href must
+  // actually be one whenever possible — never a page that just lists them.
+  const directHref = releases?.stable?.data
+    ? resolveDirectDownloadHref(os, releases.stable.data)
+    : null;
 
   return (
     <section className="hero" id="top">
@@ -54,10 +63,17 @@ export default function Hero({ config }) {
         </div>
       )}
       <div className="cta-row">
-        <Link className="btn btn-accent btn-lg" to={hero.primaryCta.href}>
-          {osCfg.icon && <Icon name={osCfg.icon} size={osCfg.size} />}
-          {hero[osCfg.labelKey] ?? hero.primaryCta}
-        </Link>
+        {directHref ? (
+          <a className="btn btn-accent btn-lg" href={directHref}>
+            {osCfg.icon && <Icon name={osCfg.icon} size={osCfg.size} />}
+            {hero[osCfg.labelKey] ?? hero.primaryCta}
+          </a>
+        ) : (
+          <Link className="btn btn-accent btn-lg" to={hero.primaryCta.href}>
+            {osCfg.icon && <Icon name={osCfg.icon} size={osCfg.size} />}
+            {hero[osCfg.labelKey] ?? hero.primaryCta}
+          </Link>
+        )}
         <a
           className="btn btn-ghost btn-lg"
           href={hero.secondaryCta.href}

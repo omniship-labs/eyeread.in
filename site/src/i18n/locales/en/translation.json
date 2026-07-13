@@ -171,7 +171,7 @@
     "errorLink": "Browse releases on GitHub instead",
     "recommended": "Recommended for you",
     "macos": "macOS (Apple Silicon)",
-    "macosSub": "Opens the release page — grab the .dmg there",
+    "macosSub": "",
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
