@@ -116,6 +116,10 @@ jobs:
           fi
           npx tauri icon "$ICON_SRC"
 
+      - name: Sync nightly window config
+        if: inputs.channel == 'nightly'
+        run: node scripts/sync-nightly-windows.mjs
+
       - name: Stamp version
         shell: bash
         env:

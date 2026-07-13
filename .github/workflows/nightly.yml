@@ -1,5 +1,8 @@
 # Nightly build — runs once daily at 03:00 UTC, or on demand via
-# workflow_dispatch.
+# workflow_dispatch. The daily cron skips the build entirely if `main` hasn't
+# changed since the last successful nightly (no point rebuilding identical
+# code); a manual dispatch always runs regardless, since that's explicit
+# intent.
 #
 # Each run gets its own permanent, uniquely-tagged GitHub Release
 # (nightly-YYYYMMDD-HHMMSS) — GitHub's immutable-releases policy forbids ever
@@ -47,11 +50,30 @@ jobs:
     outputs:
       nightly_version: ${{ steps.compute.outputs.nightly_version }}
       nightly_tag: ${{ steps.compute.outputs.nightly_tag }}
+      should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
+      - name: Skip if main hasn't changed since the last nightly
+        id: check
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only the daily cron gets this guard — a manual dispatch is
+          # explicit intent to build regardless, so it always runs.
+          LAST_SHA=$(gh run list --repo "${{ github.repository }}" --workflow=nightly.yml \
+            --status=success --limit 1 --json headSha --jq '.[0].headSha // ""')
+          if [ "$LAST_SHA" = "${{ github.sha }}" ]; then
+            echo "No commits on main since the last successful nightly ($LAST_SHA) — skipping."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Compute nightly version and release tag
         id: compute
+        if: steps.check.outputs.should_run != 'false'
         run: |
           STAMP=$(date -u +"%Y%m%d")
           TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
@@ -65,6 +87,7 @@ jobs:
 
   build:
     needs: [stamp]
+    if: needs.stamp.outputs.should_run != 'false'
     uses: ./.github/workflows/build-app.yml
     with:
       version: ${{ needs.stamp.outputs.nightly_version }}
@@ -73,6 +96,7 @@ jobs:
 
   publish:
     needs: [stamp, build]
+    if: needs.stamp.outputs.should_run != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
