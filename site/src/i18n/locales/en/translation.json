@@ -23,7 +23,8 @@
     "primaryCtaWindows": "Download for Windows",
     "primaryCtaLinux": "Download for Linux",
     "linuxWarning": "Linux support is experimental — invisibility depends on your compositor and isn't guaranteed. See the compatibility matrix below.",
-    "secondaryCta": "View on GitHub"
+    "secondaryCta": "View on GitHub",
+    "otherVersions": "Other platforms & versions"
   },
   "demo": {
     "cameraBadge": "Camera · eyeread.in hidden from recording",

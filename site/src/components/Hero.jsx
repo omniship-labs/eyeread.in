@@ -86,6 +86,9 @@ export default function Hero({ config, releases }) {
       <p className="hero-note">
         <Icon name="check" size={13} /> {hero.note}
       </p>
+      <Link className="hero-other-versions" to="/download">
+        {hero.otherVersions}
+      </Link>
 
       <Demo data={config.demo} />
     </section>
