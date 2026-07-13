@@ -1,6 +1,7 @@
 # Nightly build — runs once daily at 03:00 UTC, or on demand via
-# workflow_dispatch. Always force-updates the same "nightly" release tag so
-# the updater endpoint URL never changes.
+# workflow_dispatch. Deletes and recreates the same "nightly" release/tag
+# every run (GitHub's immutable-releases policy blocks re-uploading assets
+# to an already-published release) so the updater endpoint URL never changes.
 #
 # The stamp job computes the version string once and passes it to both
 # the build matrix and the publish job, preventing a midnight-crossing race
@@ -119,6 +120,17 @@ jobs:
           cp "$lin_src" "eyeread.in_nightly_amd64.AppImage"
           cp "${lin_src}.sig" "eyeread.in_nightly_amd64.AppImage.sig"
           cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/deb/*.deb)" "eyeread.in_nightly_amd64.deb"
+
+      - name: Delete previous nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # GitHub's immutable-releases policy blocks uploading assets to an
+          # already-published release, so this rolling channel can't update
+          # yesterday's release in place — it has to recreate it. Deleting the
+          # tag too ensures the fresh release points at today's commit rather
+          # than reusing an old tag ref.
+          gh release delete nightly --repo "${{ github.repository }}" --yes --cleanup-tag || true
 
       - name: Publish / update nightly release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
