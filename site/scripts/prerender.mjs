@@ -155,6 +155,28 @@ const MARK = resolve(DIST, '..', '..', 'public', 'favicon.svg');
 await copyFile(MARK, resolve(DIST, 'eyeread-mark.svg'));
 await copyFile(MARK, resolve(DIST, 'favicon.svg'));
 
+// Project manifest for the OmniShip Labs homepage build (and anyone else
+// listing this project) — this repo is the source of truth for its own
+// metadata, so the homepage fetches this instead of hand-copying fields.
+await writeFile(
+  resolve(DIST, 'omniship-project.json'),
+  JSON.stringify(
+    {
+      repo: 'eyeread.in',
+      name: 'eyeread.in',
+      category: 'Teleprompter',
+      description:
+        'Open-source teleprompter that floats your script over any screen — invisible to every recorder, with voice tracking built in. Live at get.eyeread.in.',
+      language: 'JavaScript',
+      accent: '#6E56F7',
+      href: SITE_URL,
+      mark: abs('/eyeread-mark.svg'),
+    },
+    null,
+    2
+  )
+);
+
 await writeFile(resolve(DIST, 'sitemap.xml'), sitemap());
 await writeFile(
   resolve(DIST, 'robots.txt'),
