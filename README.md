@@ -222,5 +222,5 @@ Contributors are listed in the [GitHub contributor graph](https://github.com/omn
 
 ---
 
-AGPL-3.0 © 2026 Mrithyunjay Jagannath Halinge — see [LICENSE](LICENSE).  
+AGPL-3.0 © 2026 Mrithyunjay Jagannath Halinge — see [LICENSE](LICENSE) and [LICENSING.md](LICENSING.md).  
 Commercial licenses available: [license@omniship.dev](mailto:license@omniship.dev)
