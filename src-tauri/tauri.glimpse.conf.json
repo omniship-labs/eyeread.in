@@ -77,7 +77,10 @@
     "shortDescription": "Invisible teleprompter (glimpse build)",
     "resources": [],
     "macOS": {
-      "infoPlist": "Info.glimpse.plist"
+      "infoPlist": "Info.glimpse.plist",
+      "dmg": {
+        "background": "../design/assets/dmg/dmg-background-glimpse.png"
+      }
     }
   },
   "plugins": {
