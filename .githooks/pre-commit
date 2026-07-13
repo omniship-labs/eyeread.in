@@ -1,9 +1,22 @@
 #!/bin/sh
-cd "$(git rev-parse --show-toplevel)" && npm run lint
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+npm run lint || exit 1
 
 # Format staged JS/JSX files with prettier and re-stage them
 STAGED=$(git diff --cached --name-only | grep -E '\.(js|jsx)$')
 if [ -n "$STAGED" ]; then
   echo "$STAGED" | xargs npx prettier --write
   echo "$STAGED" | xargs git add
+fi
+
+# Full test suite, JUnit XML (industry-standard test report format) + raw
+# log written to .githooks/last-run/ — gitignored, and only worth reading
+# when this step fails. A passing run stays quiet instead of dumping the
+# whole suite into every commit's terminal output.
+mkdir -p .githooks/last-run
+if ! npx vitest run --reporter=junit --outputFile=.githooks/last-run/junit.xml \
+  > .githooks/last-run/output.log 2>&1; then
+  echo "Tests failed — see .githooks/last-run/junit.xml or .githooks/last-run/output.log"
+  exit 1
 fi

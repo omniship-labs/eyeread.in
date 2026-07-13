@@ -27,8 +27,11 @@ export default defineConfig({
     outDir: 'dist',
   },
   // Vitest (unit tests). Playwright specs in site/tests/ share the *.spec.js
-  // extension but must not run under Vitest — exclude that dir.
+  // extension but must not run under Vitest — exclude that dir. Also exclude
+  // .claude/ entirely: git worktrees created there (see `git worktree list`)
+  // are full separate checkouts with their own site/tests/, and configDefaults
+  // doesn't already ignore that path since it's not node_modules-like.
   test: {
-    exclude: [...configDefaults.exclude, 'site/tests/**'],
+    exclude: [...configDefaults.exclude, 'site/tests/**', '.claude/**'],
   },
 });

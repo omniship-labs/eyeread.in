@@ -163,7 +163,10 @@
     "backers": "Contributeurs",
     "viewAllOC": "Voir tout sur Open Collective ↗",
     "beFirst": "Soyez le premier à",
-    "supportEyeread": "soutenir eyeread.in ↗"
+    "supportEyeread": "soutenir eyeread.in ↗",
+    "getOtherChannel": "le télécharger ici ↗",
+    "otherChannelGlimpse": "Essayez aussi les versions Glimpse —",
+    "otherChannelStable": "Vous préférez plus de stabilité ? —"
   },
   "consent": {
     "title": "Le masquage au partage d’écran est expérimental sous Linux",

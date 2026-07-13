@@ -23,7 +23,8 @@
     "primaryCtaMac": "Скачать для macOS и Windows",
     "primaryCtaWindows": "Скачать для macOS и Windows",
     "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "otherVersions": "Другие платформы и версии"
   },
   "demo": {
     "cameraBadge": "Камера · eyeread.in скрыт от записи",
@@ -152,5 +153,29 @@
   },
   "switcher": {
     "label": "Язык"
+  },
+  "download": {
+    "meta": {
+      "title": "Скачать · eyeread.in",
+      "description": "Скачайте eyeread.in для macOS, Windows и Linux — сборки Stable или Glimpse."
+    },
+    "eyebrow": "Получить eyeread.in",
+    "heading": "Загрузка для вашей платформы",
+    "stableHeading": "Stable",
+    "stableSub": "Рекомендуется для повседневного использования.",
+    "glimpseHeading": "Glimpse",
+    "glimpseSub": "Собирается автоматически из последнего кода, почти каждый день.",
+    "glimpseWarning": "Сборки Glimpse предназначены для тестировщиков — они могут быть нестабильными или содержать незавершённые функции. Большинству стоит использовать Stable выше.",
+    "version": "Версия {{version}}",
+    "loading": "Проверка последней версии…",
+    "error": "Не удалось загрузить информацию о релизе.",
+    "errorLink": "Просмотреть релизы на GitHub",
+    "recommended": "Рекомендуется для вас",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "Портативная версия — установка не требуется"
   }
 }

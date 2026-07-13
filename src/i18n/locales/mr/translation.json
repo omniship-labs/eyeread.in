@@ -163,7 +163,10 @@
     "backers": "पाठीराखे",
     "viewAllOC": "Open Collective वर सर्व पहा ↗",
     "beFirst": "पहिले व्यक्ती बना जे",
-    "supportEyeread": "eyeread.in ला पाठिंबा द्या ↗"
+    "supportEyeread": "eyeread.in ला पाठिंबा द्या ↗",
+    "getOtherChannel": "इथून मिळवा ↗",
+    "otherChannelGlimpse": "Glimpse बिल्ड्स सुद्धा वापरून पहा —",
+    "otherChannelStable": "अधिक स्थिर हवे आहे? —"
   },
   "consent": {
     "title": "स्क्रीन-शेअरपासून लपवणे Linux वर प्रायोगिक आहे",

@@ -163,7 +163,10 @@
     "backers": "バッカー",
     "viewAllOC": "Open Collective ですべて見る ↗",
     "beFirst": "最初の一人になって",
-    "supportEyeread": "eyeread.in を支援 ↗"
+    "supportEyeread": "eyeread.in を支援 ↗",
+    "getOtherChannel": "こちらから入手 ↗",
+    "otherChannelGlimpse": "Glimpse ビルドも試してみる —",
+    "otherChannelStable": "もっと安定した方がいい? —"
   },
   "consent": {
     "title": "画面共有からの非表示は Linux では実験的です",

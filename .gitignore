@@ -23,3 +23,7 @@ site/public/og-image.png
 site/tests/screenshots/
 test-results/
 playwright-report/
+
+# pre-commit hook's captured test output (.githooks/pre-commit) — JUnit XML
+# + raw log, read only on failure, never meant to be committed.
+.githooks/last-run/

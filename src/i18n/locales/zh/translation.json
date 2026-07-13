@@ -163,7 +163,10 @@
     "backers": "支持者",
     "viewAllOC": "在 Open Collective 上查看全部 ↗",
     "beFirst": "成为第一个",
-    "supportEyeread": "支持 eyeread.in 的人 ↗"
+    "supportEyeread": "支持 eyeread.in 的人 ↗",
+    "getOtherChannel": "点此获取 ↗",
+    "otherChannelGlimpse": "也可以试试 Glimpse 版本 —",
+    "otherChannelStable": "想要更稳定的版本? —"
   },
   "consent": {
     "title": "在 Linux 上，屏幕共享隐藏功能为实验性",

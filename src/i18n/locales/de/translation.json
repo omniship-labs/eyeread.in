@@ -163,7 +163,10 @@
     "backers": "Förderer",
     "viewAllOC": "Alle auf Open Collective ansehen ↗",
     "beFirst": "Sei der Erste, der",
-    "supportEyeread": "eyeread.in unterstützt ↗"
+    "supportEyeread": "eyeread.in unterstützt ↗",
+    "getOtherChannel": "hier holen ↗",
+    "otherChannelGlimpse": "Probier auch die Glimpse-Builds aus —",
+    "otherChannelStable": "Lieber etwas Stabileres? —"
   },
   "consent": {
     "title": "Das Verbergen bei Bildschirmfreigabe ist unter Linux experimentell",

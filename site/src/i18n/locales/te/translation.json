@@ -23,7 +23,8 @@
     "primaryCtaMac": "macOS మరియు Windows కోసం డౌన్‌లోడ్ చేయండి",
     "primaryCtaWindows": "macOS మరియు Windows కోసం డౌన్‌లోడ్ చేయండి",
     "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "otherVersions": "ఇతర ప్లాట్‌ఫారమ్‌లు & వెర్షన్‌లు"
   },
   "demo": {
     "cameraBadge": "కెమెరా · రికార్డింగ్ నుండి దాగిన eyeread.in",
@@ -152,5 +153,29 @@
   },
   "switcher": {
     "label": "భాష"
+  },
+  "download": {
+    "meta": {
+      "title": "డౌన్‌లోడ్ · eyeread.in",
+      "description": "macOS, Windows మరియు Linux కోసం eyeread.in డౌన్‌లోడ్ చేయండి — Stable లేదా Glimpse బిల్డ్‌లు."
+    },
+    "eyebrow": "eyeread.in పొందండి",
+    "heading": "మీ ప్లాట్‌ఫారమ్ కోసం డౌన్‌లోడ్",
+    "stableHeading": "Stable",
+    "stableSub": "రోజువారీ ఉపయోగం కోసం సిఫార్సు చేయబడింది.",
+    "glimpseHeading": "Glimpse",
+    "glimpseSub": "దాదాపు ప్రతిరోజూ తాజా కోడ్ నుండి స్వయంచాలకంగా నిర్మించబడుతుంది.",
+    "glimpseWarning": "Glimpse బిల్డ్‌లు టెస్టర్ల కోసం — ఇవి అస్థిరంగా ఉండవచ్చు లేదా అసంపూర్ణ ఫీచర్‌లను కలిగి ఉండవచ్చు. చాలా మంది పైన ఉన్న Stable ఉపయోగించాలి.",
+    "version": "వెర్షన్ {{version}}",
+    "loading": "తాజా విడుదల కోసం తనిఖీ చేస్తోంది…",
+    "error": "విడుదల సమాచారాన్ని లోడ్ చేయలేకపోయింది.",
+    "errorLink": "బదులుగా GitHub లో విడుదలలను బ్రౌజ్ చేయండి",
+    "recommended": "మీ కోసం సిఫార్సు చేయబడింది",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "పోర్టబుల్ — ఇన్‌స్టాల్ అవసరం లేదు"
   }
 }

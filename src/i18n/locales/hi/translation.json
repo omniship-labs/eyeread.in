@@ -163,7 +163,10 @@
     "backers": "समर्थक",
     "viewAllOC": "Open Collective पर सभी देखें ↗",
     "beFirst": "पहले व्यक्ति बनें जो",
-    "supportEyeread": "eyeread.in का समर्थन करें ↗"
+    "supportEyeread": "eyeread.in का समर्थन करें ↗",
+    "getOtherChannel": "यहाँ से प्राप्त करें ↗",
+    "otherChannelGlimpse": "Glimpse बिल्ड भी आज़माएं —",
+    "otherChannelStable": "कुछ ज़्यादा स्थिर चाहिए? —"
   },
   "consent": {
     "title": "स्क्रीन-शेयर छिपाना Linux पर प्रायोगिक है",

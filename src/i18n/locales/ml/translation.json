@@ -163,7 +163,10 @@
     "backers": "പിന്തുണക്കാർ",
     "viewAllOC": "Open Collective-ൽ എല്ലാം കാണുക ↗",
     "beFirst": "ആദ്യത്തെയാളാകുക",
-    "supportEyeread": "eyeread.in-നെ പിന്തുണയ്ക്കുക ↗"
+    "supportEyeread": "eyeread.in-നെ പിന്തുണയ്ക്കുക ↗",
+    "getOtherChannel": "ഇവിടെ നിന്ന് നേടുക ↗",
+    "otherChannelGlimpse": "Glimpse ബിൽഡുകളും പരീക്ഷിക്കൂ —",
+    "otherChannelStable": "കൂടുതൽ സ്ഥിരതയുള്ളത് വേണോ? —"
   },
   "consent": {
     "title": "സ്ക്രീൻ-ഷെയറിൽ നിന്ന് മറയ്ക്കൽ Linux-ൽ പരീക്ഷണാത്മകമാണ്",

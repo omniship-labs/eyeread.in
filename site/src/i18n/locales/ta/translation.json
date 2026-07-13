@@ -23,7 +23,8 @@
     "primaryCtaMac": "macOS மற்றும் Windows-க்காகப் பதிவிறக்கவும்",
     "primaryCtaWindows": "macOS மற்றும் Windows-க்காகப் பதிவிறக்கவும்",
     "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "otherVersions": "மற்ற தளங்கள் & பதிப்புகள்"
   },
   "demo": {
     "cameraBadge": "கேமரா · பதிவில் இருந்து மறைந்த eyeread.in",
@@ -152,5 +153,29 @@
   },
   "switcher": {
     "label": "மொழி"
+  },
+  "download": {
+    "meta": {
+      "title": "பதிவிறக்கம் · eyeread.in",
+      "description": "macOS, Windows, Linux ஆகியவற்றிற்கு eyeread.in பதிவிறக்கவும் — Stable அல்லது Glimpse பதிப்புகள்."
+    },
+    "eyebrow": "eyeread.in பெறவும்",
+    "heading": "உங்கள் தளத்திற்கான பதிவிறக்கம்",
+    "stableHeading": "Stable",
+    "stableSub": "தினசரி பயன்பாட்டிற்கு பரிந்துரைக்கப்படுகிறது.",
+    "glimpseHeading": "Glimpse",
+    "glimpseSub": "கிட்டத்தட்ட தினமும் சமீபத்திய குறியீட்டிலிருந்து தானாக உருவாக்கப்படுகிறது.",
+    "glimpseWarning": "Glimpse பதிப்புகள் சோதனையாளர்களுக்கானது — இவை நிலையற்றதாக இருக்கலாம் அல்லது முழுமையடையாத அம்சங்களைக் கொண்டிருக்கலாம். பெரும்பாலானோர் மேலே உள்ள Stable ஐப் பயன்படுத்த வேண்டும்.",
+    "version": "பதிப்பு {{version}}",
+    "loading": "சமீபத்திய வெளியீட்டை சரிபார்க்கிறது…",
+    "error": "வெளியீட்டு தகவலை ஏற்ற முடியவில்லை.",
+    "errorLink": "அதற்கு பதிலாக GitHub இல் வெளியீடுகளை உலாவவும்",
+    "recommended": "உங்களுக்காக பரிந்துரைக்கப்படுகிறது",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "போர்ட்டபிள் — நிறுவல் தேவையில்லை"
   }
 }

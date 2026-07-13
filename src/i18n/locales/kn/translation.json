@@ -163,7 +163,10 @@
     "backers": "ಬೆಂಬಲಿಗರು",
     "viewAllOC": "Open Collective ನಲ್ಲಿ ಎಲ್ಲವನ್ನೂ ನೋಡಿ ↗",
     "beFirst": "ಮೊದಲಿಗರಾಗಿ",
-    "supportEyeread": "eyeread.in ಅನ್ನು ಬೆಂಬಲಿಸಿ ↗"
+    "supportEyeread": "eyeread.in ಅನ್ನು ಬೆಂಬಲಿಸಿ ↗",
+    "getOtherChannel": "ಇಲ್ಲಿಂದ ಪಡೆಯಿರಿ ↗",
+    "otherChannelGlimpse": "Glimpse ಬಿಲ್ಡ್‌ಗಳನ್ನೂ ಪ್ರಯತ್ನಿಸಿ —",
+    "otherChannelStable": "ಹೆಚ್ಚು ಸ್ಥಿರವಾದದ್ದು ಬೇಕೇ? —"
   },
   "consent": {
     "title": "ಸ್ಕ್ರೀನ್-ಶೇರ್‌ನಿಂದ ಮರೆಮಾಡುವುದು Linux ನಲ್ಲಿ ಪ್ರಾಯೋಗಿಕ",

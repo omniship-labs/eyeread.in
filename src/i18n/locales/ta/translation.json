@@ -163,7 +163,10 @@
     "backers": "முதலீட்டாளர்கள்",
     "viewAllOC": "Open Collective இல் அனைத்தையும் காண்க ↗",
     "beFirst": "முதலில் ஆதரிப்பவராக இருங்கள்",
-    "supportEyeread": "eyeread.in ஐ ஆதரியுங்கள் ↗"
+    "supportEyeread": "eyeread.in ஐ ஆதரியுங்கள் ↗",
+    "getOtherChannel": "இங்கே பெறவும் ↗",
+    "otherChannelGlimpse": "Glimpse பதிப்புகளையும் முயற்சிக்கவும் —",
+    "otherChannelStable": "மேலும் நிலையானதை விரும்புகிறீர்களா? —"
   },
   "consent": {
     "title": "திரை-பகிர்விலிருந்து மறைத்தல் Linux இல் சோதனை நிலையில் உள்ளது",

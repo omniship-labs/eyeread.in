@@ -163,7 +163,10 @@
     "backers": "Покровители",
     "viewAllOC": "Посмотреть всех на Open Collective ↗",
     "beFirst": "Станьте первым, кто",
-    "supportEyeread": "поддержит eyeread.in ↗"
+    "supportEyeread": "поддержит eyeread.in ↗",
+    "getOtherChannel": "скачать здесь ↗",
+    "otherChannelGlimpse": "Также попробуйте сборки Glimpse —",
+    "otherChannelStable": "Предпочитаете что-то более стабильное? —"
   },
   "consent": {
     "title": "Скрытие от демонстрации экрана экспериментально в Linux",

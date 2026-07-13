@@ -163,7 +163,10 @@
     "backers": "Mecenas",
     "viewAllOC": "Ver todos en Open Collective ↗",
     "beFirst": "Sé el primero en",
-    "supportEyeread": "apoyar a eyeread.in ↗"
+    "supportEyeread": "apoyar a eyeread.in ↗",
+    "getOtherChannel": "consíguelo aquí ↗",
+    "otherChannelGlimpse": "Prueba también las versiones Glimpse —",
+    "otherChannelStable": "¿Prefieres algo más estable? —"
   },
   "consent": {
     "title": "Ocultar de la pantalla compartida es experimental en Linux",

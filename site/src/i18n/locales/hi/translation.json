@@ -23,7 +23,8 @@
     "primaryCtaMac": "macOS और Windows के लिए डाउनलोड करें",
     "primaryCtaWindows": "macOS और Windows के लिए डाउनलोड करें",
     "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "otherVersions": "अन्य प्लेटफ़ॉर्म और वर्शन"
   },
   "demo": {
     "cameraBadge": "कैमरा · रिकॉर्डिंग से छिपा eyeread.in",
@@ -152,5 +153,29 @@
   },
   "switcher": {
     "label": "भाषा"
+  },
+  "download": {
+    "meta": {
+      "title": "डाउनलोड · eyeread.in",
+      "description": "macOS, Windows और Linux के लिए eyeread.in डाउनलोड करें — Stable या Glimpse बिल्ड।"
+    },
+    "eyebrow": "eyeread.in प्राप्त करें",
+    "heading": "अपने प्लेटफ़ॉर्म के लिए डाउनलोड करें",
+    "stableHeading": "Stable",
+    "stableSub": "रोज़मर्रा के उपयोग के लिए अनुशंसित।",
+    "glimpseHeading": "Glimpse",
+    "glimpseSub": "लगभग हर दिन नवीनतम कोड से स्वचालित रूप से बनाया जाता है।",
+    "glimpseWarning": "Glimpse बिल्ड परीक्षकों के लिए हैं — ये अस्थिर हो सकते हैं या अधूरी सुविधाएं शामिल कर सकते हैं। अधिकांश लोगों को ऊपर दिया गया Stable उपयोग करना चाहिए।",
+    "version": "वर्शन {{version}}",
+    "loading": "नवीनतम रिलीज़ जाँची जा रही है…",
+    "error": "रिलीज़ जानकारी लोड नहीं हो सकी।",
+    "errorLink": "इसके बजाय GitHub पर रिलीज़ देखें",
+    "recommended": "आपके लिए अनुशंसित",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "पोर्टेबल — इंस्टॉल की ज़रूरत नहीं"
   }
 }

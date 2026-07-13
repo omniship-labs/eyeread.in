@@ -23,7 +23,8 @@
     "primaryCtaMac": "下载 macOS 和 Windows 版",
     "primaryCtaWindows": "下载 macOS 和 Windows 版",
     "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "otherVersions": "其他平台与版本"
   },
   "demo": {
     "cameraBadge": "摄像头 · eyeread.in 已从录制中隐藏",
@@ -152,5 +153,29 @@
   },
   "switcher": {
     "label": "语言"
+  },
+  "download": {
+    "meta": {
+      "title": "下载 · eyeread.in",
+      "description": "下载适用于 macOS、Windows 和 Linux 的 eyeread.in — Stable 或 Glimpse 版本。"
+    },
+    "eyebrow": "获取 eyeread.in",
+    "heading": "下载适用于你平台的版本",
+    "stableHeading": "Stable",
+    "stableSub": "推荐日常使用。",
+    "glimpseHeading": "Glimpse",
+    "glimpseSub": "几乎每天都会根据最新代码自动构建。",
+    "glimpseWarning": "Glimpse 版本面向测试人员 — 可能不稳定或包含未完成的功能。大多数人应使用上方的 Stable 版本。",
+    "version": "版本 {{version}}",
+    "loading": "正在检查最新版本…",
+    "error": "无法加载版本信息。",
+    "errorLink": "改为在 GitHub 上浏览发行版",
+    "recommended": "为你推荐",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "便携版 — 无需安装"
   }
 }

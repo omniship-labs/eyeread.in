@@ -23,7 +23,8 @@
     "primaryCtaMac": "Télécharger pour macOS",
     "primaryCtaWindows": "Télécharger pour Windows",
     "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only."
+    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "otherVersions": "Autres plateformes & versions"
   },
   "demo": {
     "cameraBadge": "Caméra · eyeread.in masqué de l’enregistrement",
@@ -152,5 +153,29 @@
   },
   "switcher": {
     "label": "Langue"
+  },
+  "download": {
+    "meta": {
+      "title": "Télécharger · eyeread.in",
+      "description": "Téléchargez eyeread.in pour macOS, Windows et Linux — versions Stable ou Glimpse."
+    },
+    "eyebrow": "Obtenir eyeread.in",
+    "heading": "Téléchargement pour votre plateforme",
+    "stableHeading": "Stable",
+    "stableSub": "Recommandé pour un usage quotidien.",
+    "glimpseHeading": "Glimpse",
+    "glimpseSub": "Généré automatiquement à partir du code le plus récent, presque tous les jours.",
+    "glimpseWarning": "Les versions Glimpse sont destinées aux testeurs — elles peuvent être instables ou contenir des fonctionnalités inachevées. La plupart des utilisateurs devraient utiliser Stable ci-dessus.",
+    "version": "Version {{version}}",
+    "loading": "Recherche de la dernière version…",
+    "error": "Impossible de charger les informations de version.",
+    "errorLink": "Parcourir les releases sur GitHub à la place",
+    "recommended": "Recommandé pour vous",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "Portable — aucune installation requise"
   }
 }

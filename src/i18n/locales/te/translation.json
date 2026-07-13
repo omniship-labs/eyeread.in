@@ -163,7 +163,10 @@
     "backers": "వెన్నుదన్నులు",
     "viewAllOC": "Open Collective లో అన్నీ చూడండి ↗",
     "beFirst": "మొదటివారు అవ్వండి",
-    "supportEyeread": "eyeread.in కు మద్దతు ఇవ్వండి ↗"
+    "supportEyeread": "eyeread.in కు మద్దతు ఇవ్వండి ↗",
+    "getOtherChannel": "ఇక్కడ నుండి పొందండి ↗",
+    "otherChannelGlimpse": "Glimpse బిల్డ్‌లను కూడా ప్రయత్నించండి —",
+    "otherChannelStable": "మరింత స్థిరమైనది కావాలా? —"
   },
   "consent": {
     "title": "స్క్రీన్-షేర్ నుండి దాచడం Linux లో ప్రయోగాత్మకం",
