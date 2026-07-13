@@ -141,13 +141,19 @@ jobs:
           cp "${lin_src}.sig" "eyeread.in_nightly_amd64.AppImage.sig"
           cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/deb/*.deb)" "eyeread.in_nightly_amd64.deb"
 
-      - name: Publish nightly release
+      - name: Create draft nightly release with assets
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
         with:
           tag_name: ${{ needs.stamp.outputs.nightly_tag }}
           name: eyeread.in Nightly (${{ needs.stamp.outputs.nightly_version }})
           prerelease: true
-          draft: false
+          # Immutable releases lock asset uploads the instant a release
+          # publishes — even on a brand-new tag, draft: false here would
+          # publish immediately and then reject this same action's own
+          # asset-upload calls. Create as a draft (mutable, assets attach
+          # fine) and flip it to published as a separate step below, once
+          # every asset is already in place.
+          draft: true
           body: |
             Automated nightly build from the `main` branch.
             Built: ${{ needs.stamp.outputs.nightly_version }}
@@ -165,6 +171,13 @@ jobs:
             eyeread.in_nightly_amd64.AppImage.sig
             eyeread.in_nightly_amd64.deb
             latest.json
+
+      - name: Publish the draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${{ needs.stamp.outputs.nightly_tag }}" \
+            --repo "${{ github.repository }}" --draft=false
 
       - name: Prune old nightly releases
         env:
