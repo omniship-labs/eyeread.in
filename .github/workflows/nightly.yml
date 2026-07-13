@@ -105,7 +105,7 @@ jobs:
           src=$(ls artifacts/nightly-aarch64-apple-darwin/macos/*.app.tar.gz)
           cp "$src" "eyeread.in_nightly_aarch64.app.tar.gz"
           cp "${src}.sig" "eyeread.in_nightly_aarch64.app.tar.gz.sig"
-          cp $(ls artifacts/nightly-aarch64-apple-darwin/dmg/*.dmg) "eyeread.in_nightly_aarch64.dmg"
+          cp "$(ls artifacts/nightly-aarch64-apple-darwin/dmg/*.dmg)" "eyeread.in_nightly_aarch64.dmg"
           # Windows installers — pin to stable names (the `nightly` tag is reused).
           win_src=$(ls artifacts/nightly-x86_64-pc-windows-msvc/nsis/*-setup.exe)
           cp "$win_src" "eyeread.in_nightly_x64-setup.exe"
