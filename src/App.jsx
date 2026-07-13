@@ -11,6 +11,13 @@ export function App() {
     document.body.classList.toggle('overlay-window', windowKind === 'overlay');
     document.body.classList.toggle('settings-window', windowKind === 'settings');
     document.body.classList.toggle('about-window', windowKind === 'about');
+    // Nightly gets the same amber accent as its app icon, everywhere in the
+    // app — not just the dock — so it's never confused with stable at a
+    // glance while actually in use.
+    document.body.classList.toggle(
+      'nightly-channel',
+      typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ === 'nightly'
+    );
   }, []);
 
   if (windowKind === 'overlay') return <OverlayWindow />;

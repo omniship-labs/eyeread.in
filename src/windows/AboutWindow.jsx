@@ -19,6 +19,7 @@ const COMPAT_REPORT_URL =
 const MJ_URL = 'https://m.halinge.in';
 const TERMS_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/TERMS.md';
 const PRIVACY_URL = 'https://github.com/omniship-labs/eyeread.in/blob/main/PRIVACY.md';
+const DOWNLOAD_URL = 'https://get.eyeread.in/download';
 
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
@@ -167,6 +168,7 @@ export function AboutWindow() {
         <div className="aw-name">eyeread.in</div>
         <div className="aw-version">{getVersion()}</div>
         <div className="aw-org">© 2026 OmniShip Labs</div>
+        <OtherChannelLink />
       </div>
 
       <div className="aw-credit">
@@ -286,6 +288,21 @@ export function AboutWindow() {
           <span className="aw-omniship-byline">{t('about.orgByline')}</span>
           <span className="aw-omniship-tagline">Open Meets New Ideas</span>
         </span>
+      </button>
+    </div>
+  );
+}
+
+function OtherChannelLink() {
+  const { t } = useTranslation();
+  const isNightly =
+    typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ === 'nightly';
+  const promptKey = isNightly ? 'about.otherChannelStable' : 'about.otherChannelNightly';
+  return (
+    <div className="aw-other-channel">
+      {t(promptKey)}{' '}
+      <button type="button" className="aw-link" onClick={() => openExternal(DOWNLOAD_URL)}>
+        {t('about.getOtherChannel')}
       </button>
     </div>
   );

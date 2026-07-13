@@ -205,19 +205,23 @@ jobs:
           # stable pointer. Force-push it to an orphan branch instead and
           # serve it via raw.githubusercontent.com, which just serves ref
           # content and isn't subject to release rules at all.
+          SRC_JSON="$(pwd)/latest.json"
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p /tmp/manifest
-          cp latest.json /tmp/manifest/latest.json
           cd /tmp/manifest
           git init -q
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          # Copy latest.json in AFTER checkout, not before — checking out an
+          # existing branch refuses to overwrite an already-present untracked
+          # file, which is exactly what copying it first here would create.
           if git ls-remote --exit-code --heads origin nightly-manifest > /dev/null 2>&1; then
             git fetch -q origin nightly-manifest
             git checkout -q -B nightly-manifest origin/nightly-manifest
           else
             git checkout -q --orphan nightly-manifest
           fi
+          cp "$SRC_JSON" latest.json
           git add latest.json
           git commit -q -m "Nightly manifest: ${{ needs.stamp.outputs.nightly_tag }}" --allow-empty
           git push -q origin nightly-manifest
