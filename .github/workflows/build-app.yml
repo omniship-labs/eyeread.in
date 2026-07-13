@@ -51,11 +51,16 @@ jobs:
       # separate switch — `bundle.createUpdaterArtifacts` in tauri.conf.json —
       # not a `--bundles` value. An older `,updater` suffix here was a silent
       # no-op left over from Tauri v1, where it did mean something.
+      #
+      # On macOS specifically, `dmg` alone doesn't count as "updater-enabled"
+      # (it's just the installer wrapper) — the bundler needs the `app` target
+      # too, since that's the actual .app.tar.gz that gets signed for updates.
+      # nsis/appimage are updater-enabled on their own, no extra target needed.
       matrix:
         include:
           - target: aarch64-apple-darwin
             runner: macos-latest
-            bundles: dmg
+            bundles: dmg,app
           - target: x86_64-pc-windows-msvc
             runner: windows-latest
             bundles: nsis
