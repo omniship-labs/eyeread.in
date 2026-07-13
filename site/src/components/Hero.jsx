@@ -28,7 +28,7 @@ export default function Hero({ config, releases }) {
   const isLinux = os === 'linux';
   const osCfg = OS_CONFIG[os] ?? OS_CONFIG.other;
   // Direct one-click download for the detected OS once the manifest has
-  // loaded; falls back to the /download page (all platforms + nightly)
+  // loaded; falls back to the /download page (all platforms + glimpse)
   // while loading, on fetch failure, or for an OS we can't resolve a link
   // for. The icon/label always imply a direct download, so the href must
   // actually be one whenever possible — never a page that just lists them.

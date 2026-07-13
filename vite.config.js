@@ -15,7 +15,7 @@ export default defineConfig({
   },
   envPrefix: ['VITE_', 'TAURI_'],
   // Bake the release channel into the bundle at build time.
-  // CI sets RELEASE_CHANNEL=stable or RELEASE_CHANNEL=nightly.
+  // CI sets RELEASE_CHANNEL=stable or RELEASE_CHANNEL=glimpse.
   // Local dev gets 'dev'.
   define: {
     __RELEASE_CHANNEL__: JSON.stringify(process.env.RELEASE_CHANNEL || 'dev'),

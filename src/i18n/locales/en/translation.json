@@ -164,9 +164,9 @@
     "viewAllOC": "View all on Open Collective ↗",
     "beFirst": "Be the first to",
     "supportEyeread": "support eyeread.in ↗",
-    "otherChannelNightly": "Also try Nightly builds —",
     "otherChannelStable": "Prefer something more stable? —",
-    "getOtherChannel": "get it here ↗"
+    "getOtherChannel": "get it here ↗",
+    "otherChannelGlimpse": "Also try Glimpse builds —"
   },
   "consent": {
     "title": "Screen-share hiding is experimental on Linux",

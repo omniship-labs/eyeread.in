@@ -295,9 +295,9 @@ export function AboutWindow() {
 
 function OtherChannelLink() {
   const { t } = useTranslation();
-  const isNightly =
-    typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ === 'nightly';
-  const promptKey = isNightly ? 'about.otherChannelStable' : 'about.otherChannelNightly';
+  const isGlimpse =
+    typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ === 'glimpse';
+  const promptKey = isGlimpse ? 'about.otherChannelStable' : 'about.otherChannelGlimpse';
   return (
     <div className="aw-other-channel">
       {t(promptKey)}{' '}

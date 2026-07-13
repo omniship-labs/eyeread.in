@@ -1,13 +1,13 @@
-# Nightly build — runs once daily at 03:00 UTC, or on demand via
+# Glimpse build — runs once daily at 03:00 UTC, or on demand via
 # workflow_dispatch. The daily cron skips the build entirely if `main` hasn't
-# changed since the last successful nightly (no point rebuilding identical
-# code); a manual dispatch always runs regardless, since that's explicit
-# intent.
+# changed since the last successful glimpse build (no point rebuilding
+# identical code); a manual dispatch always runs regardless, since that's
+# explicit intent.
 #
 # Each run gets its own permanent, uniquely-tagged GitHub Release
-# (nightly-YYYYMMDD-HHMMSS) — GitHub's immutable-releases policy forbids ever
-# reusing a tag that previously backed a published release, so a single
-# rolling "nightly" tag (the old design) is no longer possible. After
+# (glimpse-v<version>-YYYYMMDD-HHMMSS) — GitHub's immutable-releases policy
+# forbids ever reusing a tag that previously backed a published release, so a
+# single rolling tag (the old design) is no longer possible. After
 # publishing, all but the most recent few Release objects are pruned to keep
 # the Releases list from growing forever; the git tags themselves are kept
 # permanently (cheap, useful for `git log`/bisecting), only the Release +
@@ -15,7 +15,7 @@
 #
 # The updater needs one endpoint URL that never changes, so latest.json is
 # NOT a release asset (it would hit the same immutability wall) — it's force-
-# pushed to the orphan `nightly-manifest` branch and served via
+# pushed to the orphan `glimpse-manifest` branch and served via
 # raw.githubusercontent.com, which just serves ref content and isn't subject
 # to release rules at all.
 #
@@ -26,7 +26,7 @@
 # Building, signing and notarization live in the shared build-app.yml
 # workflow — see its header for the required secrets and environment setup.
 
-name: Nightly
+name: Glimpse
 
 on:
   schedule:
@@ -34,10 +34,10 @@ on:
   workflow_dispatch:
 
 # Only the latest run matters — every trigger force-updates the same rolling
-# "nightly" tag, so a superseded run (e.g. two manual dispatches in a row)
+# tag pointer, so a superseded run (e.g. two manual dispatches in a row)
 # should be cancelled rather than race the newer one to publish.
 concurrency:
-  group: nightly
+  group: glimpse
   cancel-in-progress: true
 
 permissions:
@@ -48,13 +48,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      nightly_version: ${{ steps.compute.outputs.nightly_version }}
-      nightly_tag: ${{ steps.compute.outputs.nightly_tag }}
+      glimpse_version: ${{ steps.compute.outputs.glimpse_version }}
+      glimpse_tag: ${{ steps.compute.outputs.glimpse_tag }}
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
-      - name: Skip if main hasn't changed since the last nightly
+      - name: Skip if main hasn't changed since the last glimpse build
         id: check
         if: github.event_name == 'schedule'
         env:
@@ -62,36 +62,36 @@ jobs:
         run: |
           # Only the daily cron gets this guard — a manual dispatch is
           # explicit intent to build regardless, so it always runs.
-          LAST_SHA=$(gh run list --repo "${{ github.repository }}" --workflow=nightly.yml \
+          LAST_SHA=$(gh run list --repo "${{ github.repository }}" --workflow=glimpse.yml \
             --status=success --limit 1 --json headSha --jq '.[0].headSha // ""')
           if [ "$LAST_SHA" = "${{ github.sha }}" ]; then
-            echo "No commits on main since the last successful nightly ($LAST_SHA) — skipping."
+            echo "No commits on main since the last successful glimpse build ($LAST_SHA) — skipping."
             echo "should_run=false" >> "$GITHUB_OUTPUT"
           else
             echo "should_run=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Compute nightly version and release tag
+      - name: Compute glimpse version and release tag
         id: compute
         if: steps.check.outputs.should_run != 'false'
         run: |
           STAMP=$(date -u +"%Y%m%d")
           TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
           BASE=$(node -p "require('./package.json').version")
-          echo "nightly_version=${BASE}-nightly.${STAMP}" >> "$GITHUB_OUTPUT"
+          echo "glimpse_version=${BASE}-glimpse.${STAMP}" >> "$GITHUB_OUTPUT"
           # Includes the base version for readability; seconds-granularity so
-          # same-day manual dispatches never collide. Every nightly release's
+          # same-day manual dispatches never collide. Every glimpse release's
           # tag is unique and permanent (see header) — no run ID needed since
           # the timestamp alone already guarantees uniqueness at this cadence.
-          echo "nightly_tag=nightly-v${BASE}-${TIMESTAMP}" >> "$GITHUB_OUTPUT"
+          echo "glimpse_tag=glimpse-v${BASE}-${TIMESTAMP}" >> "$GITHUB_OUTPUT"
 
   build:
     needs: [stamp]
     if: needs.stamp.outputs.should_run != 'false'
     uses: ./.github/workflows/build-app.yml
     with:
-      version: ${{ needs.stamp.outputs.nightly_version }}
-      channel: nightly
+      version: ${{ needs.stamp.outputs.glimpse_version }}
+      channel: glimpse
     secrets: inherit
 
   publish:
@@ -109,36 +109,36 @@ jobs:
 
       - name: Build latest.json
         env:
-          NIGHTLY_VERSION: ${{ needs.stamp.outputs.nightly_version }}
+          GLIMPSE_VERSION: ${{ needs.stamp.outputs.glimpse_version }}
         run: |
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          REPO="https://github.com/${{ github.repository }}/releases/download/${{ needs.stamp.outputs.nightly_tag }}"
+          REPO="https://github.com/${{ github.repository }}/releases/download/${{ needs.stamp.outputs.glimpse_tag }}"
 
-          ARM_SIG=$(cat artifacts/nightly-aarch64-apple-darwin/macos/*.app.tar.gz.sig)
-          WIN_SIG=$(cat artifacts/nightly-x86_64-pc-windows-msvc/nsis/*-setup.exe.sig)
-          WINARM_SIG=$(cat artifacts/nightly-aarch64-pc-windows-msvc/nsis/*-setup.exe.sig)
-          LINUX_SIG=$(cat artifacts/nightly-x86_64-unknown-linux-gnu/appimage/*.AppImage.sig)
+          ARM_SIG=$(cat artifacts/glimpse-aarch64-apple-darwin/macos/*.app.tar.gz.sig)
+          WIN_SIG=$(cat artifacts/glimpse-x86_64-pc-windows-msvc/nsis/*-setup.exe.sig)
+          WINARM_SIG=$(cat artifacts/glimpse-aarch64-pc-windows-msvc/nsis/*-setup.exe.sig)
+          LINUX_SIG=$(cat artifacts/glimpse-x86_64-unknown-linux-gnu/appimage/*.AppImage.sig)
 
           cat > latest.json <<EOF
           {
-            "version": "$NIGHTLY_VERSION",
-            "notes": "Nightly build — may be unstable.",
+            "version": "$GLIMPSE_VERSION",
+            "notes": "eyeread.in glimpse build — may be unstable.",
             "pub_date": "$DATE",
             "platforms": {
               "darwin-aarch64": {
-                "url": "$REPO/eyeread.in_nightly_aarch64.app.tar.gz",
+                "url": "$REPO/eyeread.in_glimpse_aarch64.app.tar.gz",
                 "signature": "$ARM_SIG"
               },
               "windows-x86_64": {
-                "url": "$REPO/eyeread.in_nightly_x64-setup.exe",
+                "url": "$REPO/eyeread.in_glimpse_x64-setup.exe",
                 "signature": "$WIN_SIG"
               },
               "windows-aarch64": {
-                "url": "$REPO/eyeread.in_nightly_arm64-setup.exe",
+                "url": "$REPO/eyeread.in_glimpse_arm64-setup.exe",
                 "signature": "$WINARM_SIG"
               },
               "linux-x86_64": {
-                "url": "$REPO/eyeread.in_nightly_amd64.AppImage",
+                "url": "$REPO/eyeread.in_glimpse_amd64.AppImage",
                 "signature": "$LINUX_SIG"
               }
             }
@@ -147,29 +147,29 @@ jobs:
 
       - name: Normalize artifact filenames
         run: |
-          src=$(ls artifacts/nightly-aarch64-apple-darwin/macos/*.app.tar.gz)
-          cp "$src" "eyeread.in_nightly_aarch64.app.tar.gz"
-          cp "${src}.sig" "eyeread.in_nightly_aarch64.app.tar.gz.sig"
-          cp "$(ls artifacts/nightly-aarch64-apple-darwin/dmg/*.dmg)" "eyeread.in_nightly_aarch64.dmg"
-          # Windows installers — pin to stable names (the `nightly` tag is reused).
-          win_src=$(ls artifacts/nightly-x86_64-pc-windows-msvc/nsis/*-setup.exe)
-          cp "$win_src" "eyeread.in_nightly_x64-setup.exe"
-          cp "${win_src}.sig" "eyeread.in_nightly_x64-setup.exe.sig"
-          winarm_src=$(ls artifacts/nightly-aarch64-pc-windows-msvc/nsis/*-setup.exe)
-          cp "$winarm_src" "eyeread.in_nightly_arm64-setup.exe"
-          cp "${winarm_src}.sig" "eyeread.in_nightly_arm64-setup.exe.sig"
+          src=$(ls artifacts/glimpse-aarch64-apple-darwin/macos/*.app.tar.gz)
+          cp "$src" "eyeread.in_glimpse_aarch64.app.tar.gz"
+          cp "${src}.sig" "eyeread.in_glimpse_aarch64.app.tar.gz.sig"
+          cp "$(ls artifacts/glimpse-aarch64-apple-darwin/dmg/*.dmg)" "eyeread.in_glimpse_aarch64.dmg"
+          # Windows installers — pin to stable names (the tag changes per run).
+          win_src=$(ls artifacts/glimpse-x86_64-pc-windows-msvc/nsis/*-setup.exe)
+          cp "$win_src" "eyeread.in_glimpse_x64-setup.exe"
+          cp "${win_src}.sig" "eyeread.in_glimpse_x64-setup.exe.sig"
+          winarm_src=$(ls artifacts/glimpse-aarch64-pc-windows-msvc/nsis/*-setup.exe)
+          cp "$winarm_src" "eyeread.in_glimpse_arm64-setup.exe"
+          cp "${winarm_src}.sig" "eyeread.in_glimpse_arm64-setup.exe.sig"
 
           # Linux AppImage + deb — pin to stable names too.
-          lin_src=$(ls artifacts/nightly-x86_64-unknown-linux-gnu/appimage/*.AppImage)
-          cp "$lin_src" "eyeread.in_nightly_amd64.AppImage"
-          cp "${lin_src}.sig" "eyeread.in_nightly_amd64.AppImage.sig"
-          cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/deb/*.deb)" "eyeread.in_nightly_amd64.deb"
+          lin_src=$(ls artifacts/glimpse-x86_64-unknown-linux-gnu/appimage/*.AppImage)
+          cp "$lin_src" "eyeread.in_glimpse_amd64.AppImage"
+          cp "${lin_src}.sig" "eyeread.in_glimpse_amd64.AppImage.sig"
+          cp "$(ls artifacts/glimpse-x86_64-unknown-linux-gnu/deb/*.deb)" "eyeread.in_glimpse_amd64.deb"
 
-      - name: Create draft nightly release with assets
+      - name: Create draft glimpse release with assets
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
         with:
-          tag_name: ${{ needs.stamp.outputs.nightly_tag }}
-          name: eyeread.in Nightly (${{ needs.stamp.outputs.nightly_version }})
+          tag_name: ${{ needs.stamp.outputs.glimpse_tag }}
+          name: eyeread.in glimpse (${{ needs.stamp.outputs.glimpse_version }})
           prerelease: true
           # Immutable releases lock asset uploads the instant a release
           # publishes — even on a brand-new tag, draft: false here would
@@ -179,52 +179,52 @@ jobs:
           # every asset is already in place.
           draft: true
           body: |
-            Automated nightly build from the `main` branch.
-            Built: ${{ needs.stamp.outputs.nightly_version }}
+            Automated glimpse build from the `main` branch.
+            Built: ${{ needs.stamp.outputs.glimpse_version }}
 
             > ⚠️ This build may be unstable. For production use, download the [latest stable release](https://github.com/${{ github.repository }}/releases/latest).
           files: |
-            eyeread.in_nightly_aarch64.app.tar.gz
-            eyeread.in_nightly_aarch64.app.tar.gz.sig
-            eyeread.in_nightly_aarch64.dmg
-            eyeread.in_nightly_x64-setup.exe
-            eyeread.in_nightly_x64-setup.exe.sig
-            eyeread.in_nightly_arm64-setup.exe
-            eyeread.in_nightly_arm64-setup.exe.sig
-            eyeread.in_nightly_amd64.AppImage
-            eyeread.in_nightly_amd64.AppImage.sig
-            eyeread.in_nightly_amd64.deb
+            eyeread.in_glimpse_aarch64.app.tar.gz
+            eyeread.in_glimpse_aarch64.app.tar.gz.sig
+            eyeread.in_glimpse_aarch64.dmg
+            eyeread.in_glimpse_x64-setup.exe
+            eyeread.in_glimpse_x64-setup.exe.sig
+            eyeread.in_glimpse_arm64-setup.exe
+            eyeread.in_glimpse_arm64-setup.exe.sig
+            eyeread.in_glimpse_amd64.AppImage
+            eyeread.in_glimpse_amd64.AppImage.sig
+            eyeread.in_glimpse_amd64.deb
             latest.json
 
       - name: Publish the draft
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release edit "${{ needs.stamp.outputs.nightly_tag }}" \
+          gh release edit "${{ needs.stamp.outputs.glimpse_tag }}" \
             --repo "${{ github.repository }}" --draft=false
 
-      - name: Prune old nightly releases
+      - name: Prune old glimpse releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Keep only the 3 most recent nightly releases (this one included);
+          # Keep only the 3 most recent glimpse releases (this one included);
           # delete the rest. Tags are kept forever for history/bisecting —
           # only the Release object and its assets are removed, so this is
           # never `--cleanup-tag`.
           OLD_TAGS=$(gh release list --repo "${{ github.repository }}" --limit 100 \
             --json tagName,createdAt \
-            --jq '[.[] | select(.tagName | startswith("nightly-"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName')
+            --jq '[.[] | select(.tagName | startswith("glimpse-"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName')
           for tag in $OLD_TAGS; do
-            echo "Pruning old nightly release: $tag"
+            echo "Pruning old glimpse release: $tag"
             gh release delete "$tag" --repo "${{ github.repository }}" --yes || true
           done
 
-      - name: Publish latest.json to the nightly-manifest branch
+      - name: Publish latest.json to the glimpse-manifest branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # The updater needs one endpoint URL that never changes, but every
-          # nightly release now has a unique tag (immutable releases forbid
+          # glimpse release now has a unique tag (immutable releases forbid
           # reusing one) — so latest.json can't live in Release assets as the
           # stable pointer. Force-push it to an orphan branch instead and
           # serve it via raw.githubusercontent.com, which just serves ref
@@ -239,13 +239,13 @@ jobs:
           # Copy latest.json in AFTER checkout, not before — checking out an
           # existing branch refuses to overwrite an already-present untracked
           # file, which is exactly what copying it first here would create.
-          if git ls-remote --exit-code --heads origin nightly-manifest > /dev/null 2>&1; then
-            git fetch -q origin nightly-manifest
-            git checkout -q -B nightly-manifest origin/nightly-manifest
+          if git ls-remote --exit-code --heads origin glimpse-manifest > /dev/null 2>&1; then
+            git fetch -q origin glimpse-manifest
+            git checkout -q -B glimpse-manifest origin/glimpse-manifest
           else
-            git checkout -q --orphan nightly-manifest
+            git checkout -q --orphan glimpse-manifest
           fi
           cp "$SRC_JSON" latest.json
           git add latest.json
-          git commit -q -m "Nightly manifest: ${{ needs.stamp.outputs.nightly_tag }}" --allow-empty
-          git push -q origin nightly-manifest
+          git commit -q -m "Glimpse manifest: ${{ needs.stamp.outputs.glimpse_tag }}" --allow-empty
+          git push -q origin glimpse-manifest

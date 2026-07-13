@@ -28,7 +28,7 @@ If applicable — especially helpful for overlay positioning or visibility issue
 - eyeread.in version: (check Settings → About)
 - macOS version:
 - Mac model (e.g. M3 MacBook Pro, Intel Mac mini):
-- Channel: stable / nightly
+- Channel: stable / glimpse
 
 **Additional context**
 Any other relevant details.

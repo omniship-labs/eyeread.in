@@ -1,14 +1,14 @@
-# Shared build job for the stable and nightly workflows — builds, signs and
+# Shared build job for the stable and glimpse workflows — builds, signs and
 # notarizes every platform target for one release channel.
 #
 # Only callable via workflow_call. The caller resolves the version string;
 # the channel selects everything else:
 #   stable  → environment `release`, default tauri.conf.json, `stable-*` artifacts
-#   nightly → environment `nightly`, tauri.nightly.conf.json overlay, `nightly-*` artifacts
+#   glimpse → environment `glimpse`, tauri.glimpse.conf.json overlay, `glimpse-*` artifacts
 #
 # The deployment environments hold the signing secrets. Configure them in repo
 # settings: `release` with a deployment-tag rule (v*) and, optionally, required
-# reviewers so a human approves before any signing job can run; `nightly` with
+# reviewers so a human approves before any signing job can run; `glimpse` with
 # a deployment-branch rule limited to `main` and no reviewers (it's automated —
 # note scheduled runs execute on the default branch, so the rule must be the
 # trunk, not a side branch).
@@ -35,7 +35,7 @@ on:
         required: true
         type: string
       channel:
-        description: Release channel — `stable` or `nightly`.
+        description: Release channel — `stable` or `glimpse`.
         required: true
         type: string
 
@@ -73,7 +73,7 @@ jobs:
 
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
-    environment: ${{ inputs.channel == 'nightly' && 'nightly' || 'release' }}
+    environment: ${{ inputs.channel == 'glimpse' && 'glimpse' || 'release' }}
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -106,19 +106,19 @@ jobs:
       - name: Generate icons
         shell: bash
         run: |
-          # Nightly ships a visually distinct icon (glitched cue-line + warm
+          # glimpse ships a visually distinct icon (glitched cue-line + warm
           # palette, legible even at dock/taskbar sizes) so it's never
           # confused with a stable install running side-by-side.
-          if [ "${{ inputs.channel }}" = "nightly" ]; then
-            ICON_SRC=src-tauri/icons/icon-nightly.png
+          if [ "${{ inputs.channel }}" = "glimpse" ]; then
+            ICON_SRC=src-tauri/icons/icon-glimpse.png
           else
             ICON_SRC=src-tauri/icons/icon.png
           fi
           npx tauri icon "$ICON_SRC"
 
-      - name: Sync nightly window config
-        if: inputs.channel == 'nightly'
-        run: node scripts/sync-nightly-windows.mjs
+      - name: Sync glimpse window config
+        if: inputs.channel == 'glimpse'
+        run: node scripts/sync-glimpse-windows.mjs
 
       - name: Stamp version
         shell: bash
@@ -180,8 +180,8 @@ jobs:
         shell: bash
         env:
           RELEASE_CHANNEL: ${{ inputs.channel }}
-          # Nightly overlays productName/identifier/updater endpoint.
-          CHANNEL_CONFIG: ${{ inputs.channel == 'nightly' && '--config src-tauri/tauri.nightly.conf.json' || '' }}
+          # glimpse overlays productName/identifier/updater endpoint.
+          CHANNEL_CONFIG: ${{ inputs.channel == 'glimpse' && '--config src-tauri/tauri.glimpse.conf.json' || '' }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # Prefer the explicit secret; otherwise use the identity detected in

@@ -107,7 +107,7 @@ function ChannelSection({ variant, heading, subhead, release, t }) {
 export default function Download({ config, releases }) {
   const { t } = useTranslation();
   useDocumentMeta(config.download.meta);
-  const { stable, nightly } = releases;
+  const { stable, glimpse } = releases;
 
   return (
     <main className="dl-page">
@@ -123,16 +123,16 @@ export default function Download({ config, releases }) {
           t={t}
         />
 
-        <div className="dl-nightly-wrap">
-          <div className="dl-nightly-banner">
+        <div className="dl-glimpse-wrap">
+          <div className="dl-glimpse-banner">
             <Icon name="info" size={15} />
-            {t('download.nightlyWarning')}
+            {t('download.glimpseWarning')}
           </div>
           <ChannelSection
-            variant="nightly"
-            heading={t('download.nightlyHeading')}
-            subhead={t('download.nightlySub')}
-            release={nightly}
+            variant="glimpse"
+            heading={t('download.glimpseHeading')}
+            subhead={t('download.glimpseSub')}
+            release={glimpse}
             t={t}
           />
         </div>

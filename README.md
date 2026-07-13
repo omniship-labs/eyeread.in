@@ -164,17 +164,17 @@ Builds are published automatically via GitHub Actions on two channels:
 | Channel     | Trigger                            | Bundle ID                |
 | ----------- | ---------------------------------- | ------------------------ |
 | **Stable**  | `v*` tag on `main`                 | `in.eyeread.app`         |
-| **Nightly** | Daily cron on `main` (or dispatch) | `in.eyeread.app.nightly` |
+| **Glimpse** | Daily cron on `main` (or dispatch) | `in.eyeread.app.glimpse` |
 
 Each channel builds for **macOS** (Apple Silicon only), **Windows** (x64 +
 arm64), and **Linux** (x86_64, experimental). Bundles per OS: `.dmg` on macOS,
 NSIS installer on Windows, AppImage + `.deb` on Linux. The in-app updater reads
 `latest.json` and matches your OS/arch.
 
-Both channels install side-by-side, and nightly ships a visually distinct app
+Both channels install side-by-side, and Glimpse ships a visually distinct app
 icon (a glitched cue-line + warm palette) so it's never confused with stable
-in your dock. Nightly builds are stamped with the date (e.g.
-`0.1.0-nightly.20260612`) so the in-app updater treats each nightly as a
+in your dock. Glimpse builds are stamped with the date (e.g.
+`0.1.0-glimpse.20260612`) so the in-app updater treats each one as a
 distinct release.
 
 See **[docs/RELEASING.md](docs/RELEASING.md)** for the full
@@ -204,7 +204,7 @@ If something isn't working, please check these first:
 When filing a bug, please include:
 
 - OS and version (e.g. macOS 15.3, Windows 11 24H2)
-- App version (stable or nightly + date stamp)
+- App version (stable or glimpse + date stamp)
 - Whether you're using the native build or web demo
 - Steps to reproduce and what you expected vs. what happened
 

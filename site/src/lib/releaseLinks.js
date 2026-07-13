@@ -3,7 +3,7 @@
    useLatestReleases) into an actual download URL for a given platform. */
 
 // Matches an asset's filename to a platform key. Filenames come from the
-// bundler (nightly.yml/release.yml normalize them, but the exact pattern —
+// bundler (glimpse.yml/release.yml normalize them, but the exact pattern —
 // e.g. the arch token in a Windows installer name — is set by Tauri/NSIS),
 // so match by suffix rather than assuming an exact name.
 const ASSET_MATCHERS = {
@@ -39,7 +39,7 @@ export function resolveDirectDownloadHref(os, release) {
 }
 
 // Display version string — the release's own title already has the exact
-// human-readable version embedded (e.g. "eyeread.in Nightly (0.1.0-nightly.
+// human-readable version embedded (e.g. "eyeread.in glimpse (0.1.0-glimpse.
 // 20260713)" or "eyeread.in v0.1.0"), so extract it rather than parsing the
 // git tag format.
 export function displayVersion(release) {

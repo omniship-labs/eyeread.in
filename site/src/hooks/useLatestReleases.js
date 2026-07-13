@@ -39,16 +39,16 @@ function useApiFetch(url) {
 
 export function useLatestReleases() {
   const stable = useApiFetch(`${API}/releases/latest`);
-  // Nightly has no single "latest" release — immutable releases forbid
-  // reusing one tag, so every nightly build gets its own permanent tag (see
-  // docs/RELEASING.md). List recent releases and take the first nightly-*
+  // Glimpse has no single "latest" release — immutable releases forbid
+  // reusing one tag, so every glimpse build gets its own permanent tag (see
+  // docs/RELEASING.md). List recent releases and take the first glimpse-*
   // one (the list is already sorted newest-first by GitHub).
-  const nightlyList = useApiFetch(`${API}/releases?per_page=10`);
-  const nightly = {
-    loading: nightlyList.loading,
-    error: nightlyList.error,
-    data: nightlyList.data?.find((r) => r.tag_name.startsWith('nightly-v')) ?? null,
+  const glimpseList = useApiFetch(`${API}/releases?per_page=10`);
+  const glimpse = {
+    loading: glimpseList.loading,
+    error: glimpseList.error,
+    data: glimpseList.data?.find((r) => r.tag_name.startsWith('glimpse-v')) ?? null,
   };
 
-  return { stable, nightly };
+  return { stable, glimpse };
 }

@@ -3,7 +3,7 @@
 How eyeread.in is built, signed, and distributed — per OS, and where each
 artifact lands. The CI that implements this lives in
 [`.github/workflows/release.yml`](../.github/workflows/release.yml) (stable) and
-[`.github/workflows/nightly.yml`](../.github/workflows/nightly.yml) (nightly);
+[`.github/workflows/glimpse.yml`](../.github/workflows/glimpse.yml) (glimpse);
 both delegate the actual build/sign/notarize matrix to the shared
 [`.github/workflows/build-app.yml`](../.github/workflows/build-app.yml).
 
@@ -31,32 +31,33 @@ signing certificate" when secrets are missing or the cert expired; notarization
 problems surface in "Build, sign & notarize" (check the app-specific password
 and Apple's system status).
 
-**Nightly — zero actions, most days.** The 03:00 UTC cron builds and publishes
-a fresh nightly release automatically — each run gets its own permanent,
-uniquely-tagged release (`nightly-v<version>-YYYYMMDD-HHMMSS`). GitHub's
-immutable-releases policy forbids ever reusing a tag that backed a published
-release, so there's no single rolling "nightly" release to update in place
-anymore. Only the 3 most recent nightly Releases are kept; older ones are
-pruned automatically after each publish. The tags themselves are kept forever
-(cheap, useful history) — only the Release object and its assets get deleted.
-The updater's endpoint URL never changes: it points at `latest.json` on the
-`nightly-manifest` branch (served via raw.githubusercontent.com), which gets
-force-pushed to point at whichever release is current. Trigger a nightly on
-demand via workflow dispatch when you want a build sooner. If a nightly is
-broken, fix forward on `main`; don't hand-edit the release.
+**Glimpse — zero actions, most days.** The 03:00 UTC cron builds and
+publishes a fresh glimpse release automatically — each run gets its own
+permanent, uniquely-tagged release (`glimpse-v<version>-YYYYMMDD-HHMMSS`).
+GitHub's immutable-releases policy forbids ever reusing a tag that backed a
+published release, so there's no single rolling release to update in place
+anymore. Only the 3 most recent glimpse Releases are kept; older ones are
+pruned automatically after each publish. The tags themselves are kept
+forever (cheap, useful history) — only the Release object and its assets get
+deleted. The updater's endpoint URL never changes: it points at
+`latest.json` on the `glimpse-manifest` branch (served via
+raw.githubusercontent.com), which gets force-pushed to point at whichever
+release is current. Trigger a glimpse build on demand via workflow dispatch
+when you want one sooner. If a build is broken, fix forward on `main`; don't
+hand-edit the release.
 
 ## Channels
 
 | Channel     | Trigger                           | Bundle ID                | Updater endpoint                                      |
 | ----------- | --------------------------------- | ------------------------ | ----------------------------------------------------- |
 | **Stable**  | `v*` tag (or workflow dispatch)   | `in.eyeread.app`         | `releases/latest/.../latest.json`                     |
-| **Nightly** | Daily cron (or workflow dispatch) | `in.eyeread.app.nightly` | `nightly-manifest` branch (raw.githubusercontent.com) |
+| **Glimpse** | Daily cron (or workflow dispatch) | `in.eyeread.app.glimpse` | `glimpse-manifest` branch (raw.githubusercontent.com) |
 
 Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
 and matches the running OS/arch to a `platforms` key. Stable's `latest.json`
 can safely live as a release asset under the fixed `releases/latest/download/`
 URL, because each `v*` tag is only ever published once — no immutability
-conflict. Nightly can't do that (see above), hence the separate manifest
+conflict. Glimpse can't do that (see above), hence the separate manifest
 branch.
 
 ## Build matrix
@@ -212,7 +213,7 @@ Already done for the current cert (expires ~Feb 2027 — repeat this to renew):
    notarization).
 4. Note your 10-char **Team ID** (Membership page).
 
-Secrets to add — **ideally** to both the `release` and `nightly` environments
+Secrets to add — **ideally** to both the `release` and `glimpse` environments
 (repo → Settings → Environments → pick one → Add secret); see
 [Handling secrets](#handling-secrets) for why:
 
@@ -251,7 +252,7 @@ Already done (key `CB13CFCE0531C6C6`, both configs and both environments
 set). To rotate: run `npm run tauri signer generate` once, then:
 
 - Paste the **public key** into `plugins.updater.pubkey` in **both**
-  `tauri.conf.json` and `tauri.nightly.conf.json`.
+  `tauri.conf.json` and `tauri.glimpse.conf.json`.
 - Add the **private key** + passphrase as secrets in both environments:
   - `TAURI_SIGNING_PRIVATE_KEY`
   - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
@@ -273,7 +274,7 @@ the signing keys can sign software as you. Treat them accordingly.
 
 - **Scope secrets to environments, not the repo — this is the target state,
   not what's live for Apple today.** The Tauri updater secrets follow it: both
-  live in the `release` and `nightly` **environments** (repo → Settings →
+  live in the `release` and `glimpse` **environments** (repo → Settings →
   Environments), readable only by jobs that declare that `environment:` (the
   shared `build-app.yml` job does, picking the environment from its `channel`
   input), so PR/CI jobs can never see them.
@@ -285,13 +286,13 @@ the signing keys can sign software as you. Treat them accordingly.
   public repo later added to this org — not just `eyeread.in` — can read them,
   and the tag/branch environment rules below don't apply to org secrets at
   all. Fine for a single-maintainer org with one public repo; **re-scope them
-  into the `release`/`nightly` environments (delete the org copies afterward)
+  into the `release`/`glimpse` environments (delete the org copies afterward)
   the moment a second public repo or another collaborator with repo-creation
   rights shows up.** (The Tauri **public** key is not a secret; it lives in
   `tauri.conf.json`.)
 
 - **Restrict where secrets can be used.** On the `release` environment add a
-  **deployment tag rule** (`v*`); on `nightly`, a **deployment branch rule**
+  **deployment tag rule** (`v*`); on `glimpse`, a **deployment branch rule**
   (`main` only — scheduled runs execute on the default branch, so the rule must
   be the trunk). Now the secrets are unreachable from any fork, branch, or tag
   outside those rules.
@@ -334,7 +335,7 @@ key.** It mostly already holds — here's how to keep it that way.
 - **CLA is already enforced** (cla-assistant) — keep it; it's your legal basis
   for the dual AGPL/commercial license.
 - **Branch protection on `main`:** require CI to pass + at least one review +
-  Code Owner review; disallow force-push. Both nightly (cron/dispatch, always
+  Code Owner review; disallow force-push. Both Glimpse (cron/dispatch, always
   building `main`) and stable (tags) build off this branch, so protecting it
   protects both signed channels.
 
@@ -351,9 +352,9 @@ Gate by _consequence_, cheaply:
 4. **Optional required reviewers on `release`.** Add yourself as a required
    reviewer so even a correctly-tagged build pauses for one approval before
    signing runs. Worth it for a solo maintainer who wants a deliberate "go".
-   Leave `nightly` reviewer-free so automation isn't blocked.
+   Leave `glimpse` reviewer-free so automation isn't blocked.
 
-Net: nightly is automatic but ref-locked to `main`; stable needs a protected tag,
+Net: Glimpse is automatic but ref-locked to `main`; stable needs a protected tag,
 runs in a gated environment, and still won't go public until you publish the
 draft.
 
@@ -395,22 +396,22 @@ desktop-only. If a mobile companion without the capture-exclusion feature is eve
 built, TestFlight would apply to _that_, not to this binary.)
 
 The good news: for a directly-distributed, notarized app you don't need it — the
-**`nightly` channel already is our TestFlight equivalent**, and avoiding review
+**Glimpse channel already is our TestFlight equivalent**, and avoiding review
 is a feature, not a gap. Map of what TestFlight gives vs. how we cover it:
 
 | TestFlight capability      | Our equivalent (no store)                                              |
 | -------------------------- | ---------------------------------------------------------------------- |
-| Beta build distribution    | `nightly` GitHub pre-release (Developer ID-signed + notarized)         |
-| Auto-update for testers    | Tauri updater on the nightly endpoint (works once `pubkey` is set)     |
+| Beta build distribution    | Glimpse GitHub pre-release (Developer ID-signed + notarized)           |
+| Auto-update for testers    | Tauri updater on the glimpse endpoint (works once `pubkey` is set)     |
 | Tester management / groups | GitHub (watchers), a Discord/mailing list, or a private `beta` channel |
 | Crash reports & feedback   | Add `tauri-plugin-sentry` (or similar) + the compat-report issue form  |
-| Staged rollout             | Promote nightly → optional `beta` (RC) → stable                        |
+| Staged rollout             | Promote Glimpse → optional `beta` (RC) → stable                        |
 | 90-day build expiry        | N/A — direct builds don't expire                                       |
 
 ### Optional: a third `beta` (release-candidate) channel
 
-Two channels (nightly, stable) are enough today. If you want a calmer pre-release
-ring than nightly without touching stable, add a `beta` channel that mirrors the
+Two channels (Glimpse, stable) are enough today. If you want a calmer pre-release
+ring than Glimpse without touching stable, add a `beta` channel that mirrors the
 release workflow but triggers on `v*-beta.*` tags, publishes a **pre-release**
 (not draft), and serves its own `latest.json` under a `beta` tag with bundle id
 `in.eyeread.app.beta`. Opt-in users point the updater at the beta endpoint.
