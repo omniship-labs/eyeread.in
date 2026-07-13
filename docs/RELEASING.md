@@ -31,20 +31,33 @@ signing certificate" when secrets are missing or the cert expired; notarization
 problems surface in "Build, sign & notarize" (check the app-specific password
 and Apple's system status).
 
-**Nightly — zero actions, most days.** The 03:00 UTC cron rebuilds and
-force-updates the `nightly` pre-release automatically. Trigger one on demand
-via workflow dispatch when you want a build sooner. If a nightly is broken,
-fix forward on `main`; don't hand-edit the release.
+**Nightly — zero actions, most days.** The 03:00 UTC cron builds and publishes
+a fresh nightly release automatically — each run gets its own permanent,
+uniquely-tagged release (`nightly-v<version>-YYYYMMDD-HHMMSS`). GitHub's
+immutable-releases policy forbids ever reusing a tag that backed a published
+release, so there's no single rolling "nightly" release to update in place
+anymore. Only the 3 most recent nightly Releases are kept; older ones are
+pruned automatically after each publish. The tags themselves are kept forever
+(cheap, useful history) — only the Release object and its assets get deleted.
+The updater's endpoint URL never changes: it points at `latest.json` on the
+`nightly-manifest` branch (served via raw.githubusercontent.com), which gets
+force-pushed to point at whichever release is current. Trigger a nightly on
+demand via workflow dispatch when you want a build sooner. If a nightly is
+broken, fix forward on `main`; don't hand-edit the release.
 
 ## Channels
 
-| Channel     | Trigger                           | Bundle ID                | Updater endpoint                        |
-| ----------- | --------------------------------- | ------------------------ | --------------------------------------- |
-| **Stable**  | `v*` tag (or workflow dispatch)   | `in.eyeread.app`         | `releases/latest/.../latest.json`       |
-| **Nightly** | Daily cron (or workflow dispatch) | `in.eyeread.app.nightly` | `releases/download/nightly/latest.json` |
+| Channel     | Trigger                           | Bundle ID                | Updater endpoint                                      |
+| ----------- | --------------------------------- | ------------------------ | ----------------------------------------------------- |
+| **Stable**  | `v*` tag (or workflow dispatch)   | `in.eyeread.app`         | `releases/latest/.../latest.json`                     |
+| **Nightly** | Daily cron (or workflow dispatch) | `in.eyeread.app.nightly` | `nightly-manifest` branch (raw.githubusercontent.com) |
 
 Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
-and matches the running OS/arch to a `platforms` key.
+and matches the running OS/arch to a `platforms` key. Stable's `latest.json`
+can safely live as a release asset under the fixed `releases/latest/download/`
+URL, because each `v*` tag is only ever published once — no immutability
+conflict. Nightly can't do that (see above), hence the separate manifest
+branch.
 
 ## Build matrix
 

@@ -1,9 +1,22 @@
 # Nightly build — runs once daily at 03:00 UTC, or on demand via
-# workflow_dispatch. Deletes and recreates the same "nightly" release/tag
-# every run (GitHub's immutable-releases policy blocks re-uploading assets
-# to an already-published release) so the updater endpoint URL never changes.
+# workflow_dispatch.
 #
-# The stamp job computes the version string once and passes it to both
+# Each run gets its own permanent, uniquely-tagged GitHub Release
+# (nightly-YYYYMMDD-HHMMSS) — GitHub's immutable-releases policy forbids ever
+# reusing a tag that previously backed a published release, so a single
+# rolling "nightly" tag (the old design) is no longer possible. After
+# publishing, all but the most recent few Release objects are pruned to keep
+# the Releases list from growing forever; the git tags themselves are kept
+# permanently (cheap, useful for `git log`/bisecting), only the Release +
+# its assets are deleted.
+#
+# The updater needs one endpoint URL that never changes, so latest.json is
+# NOT a release asset (it would hit the same immutability wall) — it's force-
+# pushed to the orphan `nightly-manifest` branch and served via
+# raw.githubusercontent.com, which just serves ref content and isn't subject
+# to release rules at all.
+#
+# The stamp job computes the version and tag once and passes them to both
 # the build matrix and the publish job, preventing a midnight-crossing race
 # where the two jobs would stamp different dates.
 #
@@ -33,15 +46,22 @@ jobs:
     timeout-minutes: 5
     outputs:
       nightly_version: ${{ steps.compute.outputs.nightly_version }}
+      nightly_tag: ${{ steps.compute.outputs.nightly_tag }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
-      - name: Compute nightly version
+      - name: Compute nightly version and release tag
         id: compute
         run: |
           STAMP=$(date -u +"%Y%m%d")
+          TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
           BASE=$(node -p "require('./package.json').version")
           echo "nightly_version=${BASE}-nightly.${STAMP}" >> "$GITHUB_OUTPUT"
+          # Includes the base version for readability; seconds-granularity so
+          # same-day manual dispatches never collide. Every nightly release's
+          # tag is unique and permanent (see header) — no run ID needed since
+          # the timestamp alone already guarantees uniqueness at this cadence.
+          echo "nightly_tag=nightly-v${BASE}-${TIMESTAMP}" >> "$GITHUB_OUTPUT"
 
   build:
     needs: [stamp]
@@ -68,7 +88,7 @@ jobs:
           NIGHTLY_VERSION: ${{ needs.stamp.outputs.nightly_version }}
         run: |
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          REPO="https://github.com/${{ github.repository }}/releases/download/nightly"
+          REPO="https://github.com/${{ github.repository }}/releases/download/${{ needs.stamp.outputs.nightly_tag }}"
 
           ARM_SIG=$(cat artifacts/nightly-aarch64-apple-darwin/macos/*.app.tar.gz.sig)
           WIN_SIG=$(cat artifacts/nightly-x86_64-pc-windows-msvc/nsis/*-setup.exe.sig)
@@ -121,21 +141,10 @@ jobs:
           cp "${lin_src}.sig" "eyeread.in_nightly_amd64.AppImage.sig"
           cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/deb/*.deb)" "eyeread.in_nightly_amd64.deb"
 
-      - name: Delete previous nightly release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # GitHub's immutable-releases policy blocks uploading assets to an
-          # already-published release, so this rolling channel can't update
-          # yesterday's release in place — it has to recreate it. Deleting the
-          # tag too ensures the fresh release points at today's commit rather
-          # than reusing an old tag ref.
-          gh release delete nightly --repo "${{ github.repository }}" --yes --cleanup-tag || true
-
-      - name: Publish / update nightly release
+      - name: Publish nightly release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
         with:
-          tag_name: nightly
+          tag_name: ${{ needs.stamp.outputs.nightly_tag }}
           name: eyeread.in Nightly (${{ needs.stamp.outputs.nightly_version }})
           prerelease: true
           draft: false
@@ -156,3 +165,46 @@ jobs:
             eyeread.in_nightly_amd64.AppImage.sig
             eyeread.in_nightly_amd64.deb
             latest.json
+
+      - name: Prune old nightly releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Keep only the 3 most recent nightly releases (this one included);
+          # delete the rest. Tags are kept forever for history/bisecting —
+          # only the Release object and its assets are removed, so this is
+          # never `--cleanup-tag`.
+          OLD_TAGS=$(gh release list --repo "${{ github.repository }}" --limit 100 \
+            --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("nightly-"))] | sort_by(.createdAt) | reverse | .[3:] | .[].tagName')
+          for tag in $OLD_TAGS; do
+            echo "Pruning old nightly release: $tag"
+            gh release delete "$tag" --repo "${{ github.repository }}" --yes || true
+          done
+
+      - name: Publish latest.json to the nightly-manifest branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The updater needs one endpoint URL that never changes, but every
+          # nightly release now has a unique tag (immutable releases forbid
+          # reusing one) — so latest.json can't live in Release assets as the
+          # stable pointer. Force-push it to an orphan branch instead and
+          # serve it via raw.githubusercontent.com, which just serves ref
+          # content and isn't subject to release rules at all.
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p /tmp/manifest
+          cp latest.json /tmp/manifest/latest.json
+          cd /tmp/manifest
+          git init -q
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          if git ls-remote --exit-code --heads origin nightly-manifest > /dev/null 2>&1; then
+            git fetch -q origin nightly-manifest
+            git checkout -q -B nightly-manifest origin/nightly-manifest
+          else
+            git checkout -q --orphan nightly-manifest
+          fi
+          git add latest.json
+          git commit -q -m "Nightly manifest: ${{ needs.stamp.outputs.nightly_tag }}" --allow-empty
+          git push -q origin nightly-manifest
