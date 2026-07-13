@@ -11,7 +11,11 @@
     ]
   },
   "bundle": {
-    "shortDescription": "Invisible teleprompter (nightly build)"
+    "shortDescription": "Invisible teleprompter (nightly build)",
+    "resources": [],
+    "macOS": {
+      "infoPlist": "Info.nightly.plist"
+    }
   },
   "plugins": {
     "updater": {

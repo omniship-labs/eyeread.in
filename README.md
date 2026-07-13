@@ -161,19 +161,21 @@ src-tauri/            Tauri 2 shell — window config, migrations, capabilities,
 
 Builds are published automatically via GitHub Actions on two channels:
 
-| Channel     | Trigger                     | Bundle ID                |
-| ----------- | --------------------------- | ------------------------ |
-| **Stable**  | `v*` tag on `main`          | `in.eyeread.app`         |
-| **Nightly** | Push to `dev` or daily cron | `in.eyeread.app.nightly` |
+| Channel     | Trigger                            | Bundle ID                |
+| ----------- | ---------------------------------- | ------------------------ |
+| **Stable**  | `v*` tag on `main`                 | `in.eyeread.app`         |
+| **Nightly** | Daily cron on `main` (or dispatch) | `in.eyeread.app.nightly` |
 
-Each channel builds for **macOS** (Apple Silicon + Intel), **Windows** (x64 +
+Each channel builds for **macOS** (Apple Silicon only), **Windows** (x64 +
 arm64), and **Linux** (x86_64, experimental). Bundles per OS: `.dmg` on macOS,
 NSIS installer on Windows, AppImage + `.deb` on Linux. The in-app updater reads
 `latest.json` and matches your OS/arch.
 
-Both channels install side-by-side. Nightly builds are stamped with the date
-(e.g. `0.1.0-nightly.20260612`) so the in-app updater treats each nightly as a distinct
-release.
+Both channels install side-by-side, and nightly ships a visually distinct app
+icon (a glitched cue-line + warm palette) so it's never confused with stable
+in your dock. Nightly builds are stamped with the date (e.g.
+`0.1.0-nightly.20260612`) so the in-app updater treats each nightly as a
+distinct release.
 
 See **[docs/RELEASING.md](docs/RELEASING.md)** for the full
 per-OS strategy (signing, store eligibility, distribution channels), and

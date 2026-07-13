@@ -104,7 +104,17 @@ jobs:
       - run: npm ci
 
       - name: Generate icons
-        run: npx tauri icon src-tauri/icons/icon.png
+        shell: bash
+        run: |
+          # Nightly ships a visually distinct icon (glitched cue-line + warm
+          # palette, legible even at dock/taskbar sizes) so it's never
+          # confused with a stable install running side-by-side.
+          if [ "${{ inputs.channel }}" = "nightly" ]; then
+            ICON_SRC=src-tauri/icons/icon-nightly.png
+          else
+            ICON_SRC=src-tauri/icons/icon.png
+          fi
+          npx tauri icon "$ICON_SRC"
 
       - name: Stamp version
         shell: bash
