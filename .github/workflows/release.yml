@@ -92,22 +92,22 @@ jobs:
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           REPO="https://github.com/${{ github.repository }}/releases/download/v${VERSION}"
 
-          ARM_SIG=$(cat artifacts/stable-aarch64-apple-darwin/*.app.tar.gz.sig)
+          ARM_SIG=$(cat artifacts/stable-aarch64-apple-darwin/macos/*.app.tar.gz.sig)
 
           # Windows NSIS updater artifacts — discover the exact installer names
           # (the arch token in `*_x64-setup.exe` / `*_arm64-setup.exe` is set by
           # the bundler).
-          WIN_DIR=artifacts/stable-x86_64-pc-windows-msvc
+          WIN_DIR=artifacts/stable-x86_64-pc-windows-msvc/nsis
           WIN_EXE=$(basename "$(ls "$WIN_DIR"/*-setup.exe)")
           WIN_SIG=$(cat "$WIN_DIR"/*-setup.exe.sig)
 
-          WINARM_DIR=artifacts/stable-aarch64-pc-windows-msvc
+          WINARM_DIR=artifacts/stable-aarch64-pc-windows-msvc/nsis
           WINARM_EXE=$(basename "$(ls "$WINARM_DIR"/*-setup.exe)")
           WINARM_SIG=$(cat "$WINARM_DIR"/*-setup.exe.sig)
 
           # Linux AppImage updater artifact — arch token (`amd64`) is set by the
           # bundler, so discover the name rather than hardcoding it.
-          LINUX_DIR=artifacts/stable-x86_64-unknown-linux-gnu
+          LINUX_DIR=artifacts/stable-x86_64-unknown-linux-gnu/appimage
           LINUX_APP=$(basename "$(ls "$LINUX_DIR"/*.AppImage)")
           LINUX_SIG=$(cat "$LINUX_DIR"/*.AppImage.sig)
 

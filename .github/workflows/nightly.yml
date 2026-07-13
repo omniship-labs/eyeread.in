@@ -69,10 +69,10 @@ jobs:
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           REPO="https://github.com/${{ github.repository }}/releases/download/nightly"
 
-          ARM_SIG=$(cat artifacts/nightly-aarch64-apple-darwin/*.app.tar.gz.sig)
-          WIN_SIG=$(cat artifacts/nightly-x86_64-pc-windows-msvc/*-setup.exe.sig)
-          WINARM_SIG=$(cat artifacts/nightly-aarch64-pc-windows-msvc/*-setup.exe.sig)
-          LINUX_SIG=$(cat artifacts/nightly-x86_64-unknown-linux-gnu/*.AppImage.sig)
+          ARM_SIG=$(cat artifacts/nightly-aarch64-apple-darwin/macos/*.app.tar.gz.sig)
+          WIN_SIG=$(cat artifacts/nightly-x86_64-pc-windows-msvc/nsis/*-setup.exe.sig)
+          WINARM_SIG=$(cat artifacts/nightly-aarch64-pc-windows-msvc/nsis/*-setup.exe.sig)
+          LINUX_SIG=$(cat artifacts/nightly-x86_64-unknown-linux-gnu/appimage/*.AppImage.sig)
 
           cat > latest.json <<EOF
           {
@@ -102,23 +102,23 @@ jobs:
 
       - name: Normalize artifact filenames
         run: |
-          src=$(ls artifacts/nightly-aarch64-apple-darwin/*.app.tar.gz)
+          src=$(ls artifacts/nightly-aarch64-apple-darwin/macos/*.app.tar.gz)
           cp "$src" "eyeread.in_nightly_aarch64.app.tar.gz"
           cp "${src}.sig" "eyeread.in_nightly_aarch64.app.tar.gz.sig"
-          cp $(ls artifacts/nightly-aarch64-apple-darwin/*.dmg) "eyeread.in_nightly_aarch64.dmg"
+          cp $(ls artifacts/nightly-aarch64-apple-darwin/dmg/*.dmg) "eyeread.in_nightly_aarch64.dmg"
           # Windows installers — pin to stable names (the `nightly` tag is reused).
-          win_src=$(ls artifacts/nightly-x86_64-pc-windows-msvc/*-setup.exe)
+          win_src=$(ls artifacts/nightly-x86_64-pc-windows-msvc/nsis/*-setup.exe)
           cp "$win_src" "eyeread.in_nightly_x64-setup.exe"
           cp "${win_src}.sig" "eyeread.in_nightly_x64-setup.exe.sig"
-          winarm_src=$(ls artifacts/nightly-aarch64-pc-windows-msvc/*-setup.exe)
+          winarm_src=$(ls artifacts/nightly-aarch64-pc-windows-msvc/nsis/*-setup.exe)
           cp "$winarm_src" "eyeread.in_nightly_arm64-setup.exe"
           cp "${winarm_src}.sig" "eyeread.in_nightly_arm64-setup.exe.sig"
 
           # Linux AppImage + deb — pin to stable names too.
-          lin_src=$(ls artifacts/nightly-x86_64-unknown-linux-gnu/*.AppImage)
+          lin_src=$(ls artifacts/nightly-x86_64-unknown-linux-gnu/appimage/*.AppImage)
           cp "$lin_src" "eyeread.in_nightly_amd64.AppImage"
           cp "${lin_src}.sig" "eyeread.in_nightly_amd64.AppImage.sig"
-          cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/*.deb)" "eyeread.in_nightly_amd64.deb"
+          cp "$(ls artifacts/nightly-x86_64-unknown-linux-gnu/deb/*.deb)" "eyeread.in_nightly_amd64.deb"
 
       - name: Publish / update nightly release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
