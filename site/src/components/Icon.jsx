@@ -1,10 +1,10 @@
 /* One <Icon name="..." /> entry point so config stays framework-agnostic
    (it just names icons as strings).
    - Generic UI icons: lucide-react.
-   - Brand marks (GitHub, Apple): lucide ships none, so these come from
-     Iconify's Material Design Icons — imported per-icon and bundled at build
-     time (offline, tree-shaken to just these two, no runtime CDN). They render
-     as inline SVG, so currentColor still applies. */
+   - Brand marks (GitHub, Apple, Windows, Linux): lucide ships none, so these
+     come from Iconify's Material Design Icons — imported per-icon and
+     bundled at build time (offline, tree-shaken, no runtime CDN). They
+     render as inline SVG, so currentColor still applies. */
 import {
   EyeOff,
   Mic,
@@ -26,6 +26,7 @@ import { Icon as IconifyIcon } from '@iconify/react';
 import githubIcon from '@iconify-icons/mdi/github';
 import appleIcon from '@iconify-icons/mdi/apple';
 import windowsIcon from '@iconify-icons/mdi/microsoft-windows';
+import linuxIcon from '@iconify-icons/mdi/linux';
 
 const LUCIDE = {
   'eye-off': EyeOff,
@@ -49,6 +50,7 @@ const BRAND = {
   github: githubIcon,
   apple: appleIcon,
   windows: windowsIcon,
+  linux: linuxIcon,
 };
 
 export function Icon({ name, size = 24 }) {

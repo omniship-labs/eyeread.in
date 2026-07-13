@@ -1,0 +1,140 @@
+/* ============================================================
+   eyeread.in · marketing site — /download page
+   Platform cards for Stable + Nightly, sourced live from each
+   channel's latest.json manifest (see hooks/useLatestReleases.js).
+   ============================================================ */
+
+.dl-page {
+  padding-top: 60px; /* clear the fixed nav */
+}
+
+.dl-hero {
+  padding-top: var(--space-16);
+}
+
+.dl-channel {
+  margin-top: var(--space-16);
+}
+
+.dl-channel-h {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: var(--weight-bold);
+  color: #fff;
+  text-align: center;
+}
+
+.dl-channel-sub {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-top: var(--space-2);
+}
+
+.dl-version {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-8);
+}
+
+.dl-status {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-top: var(--space-8);
+}
+
+.dl-status-error a {
+  color: var(--accent-text);
+}
+
+.dl-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-6);
+}
+
+.dl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 200px;
+  padding: var(--space-8) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  text-align: center;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+  }
+}
+
+.dl-card-rec {
+  border-color: var(--accent-subtle-border);
+  background: var(--accent-subtle-bg);
+
+  &:hover {
+    background: var(--accent-subtle-bg-hover);
+  }
+}
+
+.dl-rec-badge {
+  position: absolute;
+  top: -11px;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent-text);
+  background: var(--bg-base);
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent-subtle-border);
+}
+
+.dl-card-label {
+  font-weight: var(--weight-semibold);
+}
+
+.dl-card-sub {
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+}
+
+/* ---- Nightly: secondary styling, clearly set apart ---------- */
+.dl-nightly-wrap {
+  margin-top: var(--space-20);
+}
+
+.dl-nightly-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  max-width: 560px;
+  margin: 0 auto var(--space-6);
+  padding: var(--space-4) var(--space-6);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.dl-channel-nightly {
+  opacity: 0.9;
+
+  .dl-card {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}

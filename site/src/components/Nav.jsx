@@ -31,10 +31,10 @@ export default function Nav({ config }) {
             <Icon name="github" size={15} />
             <span className="btn-label">{nav.githubLabel}</span>
           </a>
-          <a className="btn btn-accent btn-sm" href={links.download}>
+          <Link className="btn btn-accent btn-sm" to={links.download}>
             {navIcon && <Icon name={navIcon} size={navIconSize} />}
             {nav.cta}
-          </a>
+          </Link>
         </div>
       </div>
     </nav>

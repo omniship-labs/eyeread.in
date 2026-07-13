@@ -103,6 +103,25 @@ function renderDocs(template, page) {
   return html;
 }
 
+// /download is English-only for now (like docs) — the release data itself
+// is always English regardless of locale, so a translated shell around it
+// isn't worth the upkeep yet.
+function renderDownload(template) {
+  const { title, description } = resources[DEFAULT_LOCALE].translation.download.meta;
+  const url = abs('/download/');
+
+  let html = rootAbsolute(template);
+  html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(title)}</title>`);
+  html = setMeta(html, 'name="description"', description);
+  html = setMeta(html, 'property="og:title"', title);
+  html = setMeta(html, 'property="og:description"', description);
+  html = setMeta(html, 'property="og:url"', url);
+  html = setMeta(html, 'name="twitter:title"', title);
+  html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`);
+
+  return html;
+}
+
 function sitemap() {
   const urls = locales
     .map((l) => {
@@ -115,11 +134,12 @@ function sitemap() {
       return `  <url>\n    <loc>${abs(localePath(l.code))}</loc>\n${alts}\n    <xhtml:link rel="alternate" hreflang="x-default" href="${abs('/')}"/>\n  </url>`;
     })
     .join('\n');
-  // Docs are English-only — a plain <loc> per page, no hreflang alternates.
+  // Docs (and /download) are English-only — a plain <loc>, no hreflang alternates.
   const docs = docsPages
     .map((p) => `  <url>\n    <loc>${abs(docsPath(p.slug))}</loc>\n  </url>`)
     .join('\n');
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n${docs}\n</urlset>\n`;
+  const download = `  <url>\n    <loc>${abs('/download/')}</loc>\n  </url>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n${docs}\n${download}\n</urlset>\n`;
 }
 
 const template = await readFile(resolve(DIST, 'index.html'), 'utf8');
@@ -143,6 +163,10 @@ for (const page of docsPages) {
   await mkdir(dirname(out), { recursive: true });
   await writeFile(out, html);
 }
+
+// Static page for /download (dist/download/index.html).
+await mkdir(resolve(DIST, 'download'), { recursive: true });
+await writeFile(resolve(DIST, 'download', 'index.html'), renderDownload(template));
 
 // SPA fallback: GitHub Pages serves 404.html for any unmatched path. Ship the
 // bundle (root-absolute assets) so a deep link still boots the client router.
@@ -184,5 +208,5 @@ await writeFile(
 );
 
 console.log(
-  `[site:prerender] wrote ${locales.length} locale pages + ${docsPages.length} docs pages + 404.html + sitemap.xml + robots.txt`
+  `[site:prerender] wrote ${locales.length} locale pages + ${docsPages.length} docs pages + 1 download page + 404.html + sitemap.xml + robots.txt`
 );

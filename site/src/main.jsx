@@ -9,6 +9,7 @@ import './styles/base.less';
 import './styles/layout.less';
 import './styles/components.less';
 import './styles/docs.less';
+import './styles/download.less';
 
 // Initialise i18next (language detection + resources) before the app mounts.
 import { BrowserRouter } from 'react-router-dom';

@@ -28,12 +28,12 @@ export const shared = {
     license: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE',
     docs: '/docs',
     discord: '#',
-    download: '#',
+    download: '/download',
   },
 
   // Hero CTA destinations (labels come from the locale).
   hero: {
-    primaryHref: '#',
+    primaryHref: '/download',
     secondaryHref: 'https://github.com/omniship-labs/eyeread.in',
   },
 
@@ -130,6 +130,8 @@ export function buildConfig(m) {
       links: m.footer.links.map((label, i) => ({ label, ...shared.footerLinks[i] })),
       copy: m.footer.copy,
     },
+
+    download: m.download,
 
     switcher: m.switcher,
   };

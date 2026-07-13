@@ -13,6 +13,7 @@ import Sponsors from './components/Sponsors.jsx';
 import Credits from './components/Credits.jsx';
 import Footer from './components/Footer.jsx';
 import DocsLayout from './docs/DocsLayout.jsx';
+import Download from './pages/Download.jsx';
 
 const DOCS_INDEX = docsPages.find((p) => p.slug === '');
 
@@ -58,6 +59,7 @@ export default function App() {
       <Routes>
         <Route path={DOCS_ROUTE} element={<DocsLayout page={DOCS_INDEX} />} />
         <Route path={DOCS_SLUG_ROUTE} element={<DocsRoute />} />
+        <Route path="/download" element={<Download config={config} />} />
         <Route path="*" element={<Home config={config} />} />
       </Routes>
       <Footer config={config} />

@@ -21,8 +21,8 @@
     "primaryCta": "Download for macOS & Windows",
     "primaryCtaMac": "Download for macOS",
     "primaryCtaWindows": "Download for Windows",
-    "primaryCtaLinux": "Not yet available on Linux",
-    "linuxWarning": "Linux support is coming soon. For now, download is available for macOS and Windows only.",
+    "primaryCtaLinux": "Download for Linux",
+    "linuxWarning": "Linux support is experimental — invisibility depends on your compositor and isn't guaranteed. See the compatibility matrix below.",
     "secondaryCta": "View on GitHub"
   },
   "demo": {
@@ -152,5 +152,29 @@
   },
   "switcher": {
     "label": "Language"
+  },
+  "download": {
+    "meta": {
+      "title": "Download · eyeread.in",
+      "description": "Download eyeread.in for macOS, Windows, and Linux — stable or nightly builds."
+    },
+    "eyebrow": "Get eyeread.in",
+    "heading": "Download for your platform",
+    "stableHeading": "Stable",
+    "stableSub": "Recommended for everyday use.",
+    "nightlyHeading": "Nightly",
+    "nightlySub": "Built automatically from the latest code, most days.",
+    "nightlyWarning": "Nightly builds are for testers — they may be unstable or contain unfinished features. Most people should use Stable above.",
+    "version": "Version {{version}}",
+    "loading": "Checking for the latest release…",
+    "error": "Could not load release info.",
+    "errorLink": "Browse releases on GitHub instead",
+    "recommended": "Recommended for you",
+    "macos": "macOS (Apple Silicon)",
+    "macosSub": "Opens the release page — grab the .dmg there",
+    "windowsX64": "Windows (x64)",
+    "windowsArm64": "Windows (ARM64)",
+    "linux": "Linux (AppImage)",
+    "linuxSub": "Portable — no install needed"
   }
 }
