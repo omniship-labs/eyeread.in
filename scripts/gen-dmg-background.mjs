@@ -27,7 +27,6 @@ const H = 400;
 const SPLIT_X = 300;
 const DIVIDER_X = 298;
 const DIVIDER_W = 4;
-const SCALE = 2;
 
 const CHANNELS = {
   stable: {
@@ -63,7 +62,7 @@ for (const channel of Object.values(CHANNELS)) {
   const resvg = new Resvg(svgFor(channel), {
     font: { fontFiles: FONT_FILES, loadSystemFonts: false, defaultFontFamily: 'Space Grotesk' },
     background: channel.leftColor,
-    fitTo: { mode: 'width', value: W * SCALE },
+    fitTo: { mode: 'width', value: W },
   });
   const png = resvg.render().asPng();
   const outPath = path.join(repoRoot, channel.out);
