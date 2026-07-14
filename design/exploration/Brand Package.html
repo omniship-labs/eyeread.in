@@ -1428,7 +1428,7 @@ Free. Open source. AGPL-3.0.">Copy</button>
         e.stopPropagation();
         const text = btn.dataset.copy
           .replace(/&#10;/g, '\n')
-          .replace(/\n/g, '\n');
+          .replace(/\\n/g, '\n');
         navigator.clipboard.writeText(text).then(() => {
           const orig = btn.textContent;
           btn.textContent = 'Copied ✓';
