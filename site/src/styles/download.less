@@ -138,3 +138,98 @@
     background: rgba(255, 255, 255, 0.03);
   }
 }
+
+/* ---- Release history: collapsible past-release changelog ---- */
+.dl-history {
+  padding-top: var(--space-20);
+  padding-bottom: var(--space-20);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.dl-history-list {
+  margin-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dl-history-item {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+  background: var(--surface-2);
+
+  > summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    cursor: pointer;
+    list-style: none;
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+}
+
+.dl-history-version {
+  font-family: var(--font-mono);
+}
+
+.dl-history-date {
+  font-size: var(--text-2xs);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.dl-history-notes {
+  margin-top: var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--text-primary);
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  p {
+    margin: var(--space-2) 0;
+  }
+
+  ul {
+    margin: var(--space-2) 0;
+    padding-left: var(--space-6);
+  }
+
+  li {
+    margin: var(--space-1) 0;
+  }
+
+  a {
+    color: var(--accent-text);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 1px 5px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+.dl-history-link {
+  display: inline-block;
+  margin-top: var(--space-4);
+  font-size: var(--text-2xs);
+  color: var(--accent-text);
+}

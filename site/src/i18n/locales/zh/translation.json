@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "便携版 — 无需安装"
+    "linuxSub": "便携版 — 无需安装",
+    "historyHeading": "发布历史",
+    "historySub": "每个稳定版发布及其更新日志。",
+    "historyViewOnGithub": "在 GitHub 上查看"
   }
 }

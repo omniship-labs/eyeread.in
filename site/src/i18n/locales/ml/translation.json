@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "പോർട്ടബിൾ — ഇൻസ്റ്റാൾ ചെയ്യേണ്ട ആവശ്യമില്ല"
+    "linuxSub": "പോർട്ടബിൾ — ഇൻസ്റ്റാൾ ചെയ്യേണ്ട ആവശ്യമില്ല",
+    "historyHeading": "റിലീസ് ചരിത്രം",
+    "historySub": "ഓരോ സ്ഥിരതയുള്ള റിലീസും അതിന്റെ ചേഞ്ച്‌ലോഗ് സഹിതം.",
+    "historyViewOnGithub": "GitHub-ൽ കാണുക"
   }
 }

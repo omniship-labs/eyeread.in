@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "போர்ட்டபிள் — நிறுவல் தேவையில்லை"
+    "linuxSub": "போர்ட்டபிள் — நிறுவல் தேவையில்லை",
+    "historyHeading": "வெளியீட்டு வரலாறு",
+    "historySub": "ஒவ்வொரு நிலையான வெளியீடும், அதன் மாற்றப் பட்டியலுடன்.",
+    "historyViewOnGithub": "GitHub-இல் காண்க"
   }
 }

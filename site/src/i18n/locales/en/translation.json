@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "Portable — no install needed"
+    "linuxSub": "Portable — no install needed",
+    "historyHeading": "Release history",
+    "historySub": "Every stable release, with its changelog.",
+    "historyViewOnGithub": "View on GitHub"
   }
 }

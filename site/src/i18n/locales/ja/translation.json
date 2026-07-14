@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "ポータブル — インストール不要"
+    "linuxSub": "ポータブル — インストール不要",
+    "historyHeading": "リリース履歴",
+    "historySub": "すべての安定版リリースと変更履歴。",
+    "historyViewOnGithub": "GitHub で見る"
   }
 }

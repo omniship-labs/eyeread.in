@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "Портативная версия — установка не требуется"
+    "linuxSub": "Портативная версия — установка не требуется",
+    "historyHeading": "История релизов",
+    "historySub": "Каждый стабильный релиз с его журналом изменений.",
+    "historyViewOnGithub": "Смотреть на GitHub"
   }
 }
