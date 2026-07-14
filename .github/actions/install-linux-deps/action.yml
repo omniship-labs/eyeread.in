@@ -1,0 +1,16 @@
+name: Install Linux system dependencies
+description: >-
+  Installs the apt packages needed to build/lint the Tauri app on Linux
+  (gtk, webkit2gtk, appindicator, librsvg).
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgtk-3-dev \
+          libwebkit2gtk-4.1-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev
