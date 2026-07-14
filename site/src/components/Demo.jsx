@@ -11,6 +11,17 @@ function Lines({ items }) {
   ));
 }
 
+function Slide({ slide }) {
+  return (
+    <div className="slide">
+      <div className="slide-ey">{slide.eyebrow}</div>
+      <div className="slide-h">
+        <Lines items={slide.heading} />
+      </div>
+    </div>
+  );
+}
+
 /* The teleprompter line, shared shape: spoken → active → upcoming */
 function PrompterLine({ spoken, active, upcoming }) {
   return (
@@ -40,15 +51,6 @@ export default function Demo({ data }) {
   const onMove = (e) => dragging.current && setFromX(e.clientX);
   const stop = () => (dragging.current = false);
 
-  const Slide = () => (
-    <div className="slide">
-      <div className="slide-ey">{data.slide.eyebrow}</div>
-      <div className="slide-h">
-        <Lines items={data.slide.heading} />
-      </div>
-    </div>
-  );
-
   return (
     <div className="demo">
       <div className="demo-badge">
@@ -66,14 +68,14 @@ export default function Demo({ data }) {
           onPointerCancel={stop}
         >
           {/* base: slide without overlay */}
-          <Slide />
+          <Slide slide={data.slide} />
 
           {/* reveal layer: same slide + floating prompter, clipped by the handle */}
           <div
             className="slider-reveal"
             style={{ clipPath: `inset(0 ${(100 - pct).toFixed(1)}% 0 0)` }}
           >
-            <Slide />
+            <Slide slide={data.slide} />
             <div className="float-overlay">
               <div className="ov-head">
                 <span className="dot" />

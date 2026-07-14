@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { isTauri } from '../lib/tauri';
 
 /**
@@ -34,7 +34,9 @@ import { isTauri } from '../lib/tauri';
  */
 export function useClickThrough(refs, enabled = true, mode) {
   const refsRef = useRef(refs);
-  refsRef.current = refs;
+  useLayoutEffect(() => {
+    refsRef.current = refs;
+  });
 
   useEffect(() => {
     if (!isTauri || !enabled) return undefined;

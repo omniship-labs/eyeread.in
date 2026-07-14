@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 // min keeps the controls usable; max is just sanity — the native window
 // resizes to follow the panel, so your screen is the real ceiling
@@ -18,7 +18,9 @@ export function usePanelResize(initialSize, onResizeEnd) {
   const [panelSize, setPanelSize] = useState(() => clampSize(initialSize));
   const [resizing, setResizing] = useState(false);
   const endRef = useRef(onResizeEnd);
-  endRef.current = onResizeEnd;
+  useLayoutEffect(() => {
+    endRef.current = onResizeEnd;
+  });
 
   const startResize = useCallback(
     (e) => {

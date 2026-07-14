@@ -5,7 +5,7 @@
  * pointer + active are owned by OverlayWindow; this hook drives both
  * voice-match advancement and timed auto-scroll.
  */
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { normalizeWord } from '../lib/utils';
 import { stepPointer, createMatchState, nextSpeakable } from '../lib/voiceMatch';
 import { expandNumberToken } from '../lib/numberWords';
@@ -151,7 +151,7 @@ export function useVoiceTracking({
   // onWords is kept in a ref so useSpeechRecognition never needs to restart
   // when normWords or other deps change — the ref is always current.
   const onWordsRef = useRef(null);
-  onWordsRef.current = useCallback(
+  const handleWords = useCallback(
     (heardWords) => {
       if (!playingRef.current) return; // mic kept warm while paused — ignore
       const nw = normWordsRef.current;
@@ -193,6 +193,9 @@ export function useVoiceTracking({
     },
     [setPointer, slideTo, language]
   );
+  useLayoutEffect(() => {
+    onWordsRef.current = handleWords;
+  });
 
   // Stable wrapper so useSpeechRecognition never re-subscribes
   const onWords = useCallback((hw) => onWordsRef.current(hw), []);

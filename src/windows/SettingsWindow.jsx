@@ -144,6 +144,9 @@ export function SettingsWindow() {
       <div
         className="sw-titlebar"
         data-tauri-drag-region={!isMacOS || undefined}
+        // manualDragProps only closes over `ref`; it never reads ref.current at
+        // call time, only inside the returned pointer-event handlers.
+        // eslint-disable-next-line react-hooks/refs
         {...manualDragProps('settings', dragRef)}
       >
         <span className="sw-title">{t('prompter.title')}</span>
