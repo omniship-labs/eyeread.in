@@ -27,7 +27,7 @@ export const shared = {
     repo: 'omniship-labs/eyeread.in',
     license: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE',
     docs: '/docs',
-    discord: '#',
+    discord: 'https://discord.gg/4CyywbGyAu',
     download: '/download',
   },
 
@@ -72,7 +72,7 @@ export const shared = {
   footerLinks: [
     { href: 'https://github.com/omniship-labs/eyeread.in' },
     { href: '/docs' },
-    { href: '#' },
+    { href: 'https://discord.gg/4CyywbGyAu' },
     { href: 'https://github.com/omniship-labs/eyeread.in/blob/main/LICENSE', mono: true },
   ],
 };
