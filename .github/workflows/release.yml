@@ -6,7 +6,7 @@
 # signing and notarization live in the shared build-app.yml workflow —
 # see its header for the required secrets and environment setup.
 
-name: Release (stable)
+name: Release stable
 
 on:
   push:

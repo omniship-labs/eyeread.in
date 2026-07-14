@@ -1,8 +1,15 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
+
+// beforeBuildCommand runs for every target in the build matrix, but only the
+// macOS dmg bundler ever reads this background image — skip it elsewhere.
+if (process.platform !== 'darwin') {
+  console.log('[gen-dmg-background] skipping — not a macOS build');
+  process.exit(0);
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -60,6 +67,9 @@ for (const channel of Object.values(CHANNELS)) {
   });
   const png = resvg.render().asPng();
   const outPath = path.join(repoRoot, channel.out);
+  // design/assets/dmg/*.png is gitignored (generated output) and the
+  // directory itself isn't tracked, so a fresh CI checkout never has it.
+  mkdirSync(path.dirname(outPath), { recursive: true });
   writeFileSync(outPath, png);
   console.log(`wrote ${channel.out} (${png.length} bytes)`);
 }
