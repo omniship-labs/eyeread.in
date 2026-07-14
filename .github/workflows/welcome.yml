@@ -17,9 +17,9 @@ jobs:
     steps:
       - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d # v3.1.0
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_message: |
             👋 Thanks for opening your first issue! We'll take a look soon.
             Please make sure you've described the problem clearly and included steps to reproduce if it's a bug.
-          pr-message: |
+          pr_message: |
             👋 Thanks for your first pull request! Before we review, please make sure the [CLA](https://github.com/omniship-labs/eyeread.in/blob/main/CLA.md) is signed — a bot will check automatically and prompt you if needed.
