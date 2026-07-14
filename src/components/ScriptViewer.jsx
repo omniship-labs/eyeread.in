@@ -36,7 +36,17 @@ export function ScriptViewer({
   ...rest
 }) {
   const tokens = React.useMemo(() => text.split(/(\s+)/), [text]);
-  let wordIdx = -1;
+  // Word index per token (-1 for whitespace tokens), computed outside the
+  // JSX-producing callback below so that callback stays a pure render of
+  // already-known indices rather than a stateful loop.
+  const wordIndices = React.useMemo(() => {
+    const indices = new Array(tokens.length);
+    let idx = -1;
+    for (let i = 0; i < tokens.length; i++) {
+      indices[i] = /^\s+$/.test(tokens[i]) ? -1 : (idx += 1);
+    }
+    return indices;
+  }, [tokens]);
 
   const cls = [
     'er-script',
@@ -57,9 +67,8 @@ export function ScriptViewer({
   return (
     <div className={cls} style={inlineStyle} {...rest}>
       {tokens.map((tok, i) => {
-        if (/^\s+$/.test(tok)) return tok;
-        wordIdx += 1;
-        const wc = wordIdx;
+        const wc = wordIndices[i];
+        if (wc === -1) return tok;
         const delta = wc - active; // negative = behind, 0 = peak, positive = ahead
 
         let state;

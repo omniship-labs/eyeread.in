@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   RotateCcw,
   Play,
@@ -70,11 +70,13 @@ export function OverlayWindow() {
   const passthruBtnRef = useRef(null);
   const settingsBtnRef = useRef(null);
   const scriptRef = useRef(script);
-  scriptRef.current = script;
   // `settings` is the GLOBAL layer; keep a ref so once-registered listeners and
   // the gear handler always read the latest global without re-subscribing.
   const settingsRef = useRef(settings);
-  settingsRef.current = settings;
+  useLayoutEffect(() => {
+    scriptRef.current = script;
+    settingsRef.current = settings;
+  });
 
   const words = useMemo(
     () => (script ? script.text.split(/\s+/).filter(Boolean) : []),
@@ -291,10 +293,12 @@ export function OverlayWindow() {
     keepMicOpen: settings.keepMicOpen,
     sessionActive,
   });
-  // Keep ref current so overlay:load listener (registered once) always calls latest jumpTo
-  useEffect(() => {
+  // Keep ref current so overlay:load listener (registered once, deliberately
+  // never re-subscribed) always calls latest jumpTo.
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     jumpToRef.current = jumpTo;
-  }, [jumpTo]);
+  });
 
   // ---- timer -----------------------------------------------------------------
   useEffect(() => {
@@ -374,6 +378,10 @@ export function OverlayWindow() {
       emitTo('main', 'script:patch', { id: s.id, patch: { overlayPos: pos } });
     });
   }, []);
+  // manualDragProps only closes over `ref`; it never reads ref.current at call
+  // time, only inside the returned pointer-event handlers, so this is safe
+  // despite the rule's static heuristic.
+  // eslint-disable-next-line react-hooks/refs
   const headDragProps = manualDragProps('overlay', headDragRef);
 
   // Stealth: while a shielded session runs, drop the Dock icon, ⌘-Tab entry

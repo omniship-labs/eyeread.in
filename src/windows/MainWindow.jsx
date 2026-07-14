@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, Component } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, Component } from 'react';
 import { Settings as SettingsIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
@@ -91,8 +91,10 @@ export function MainWindow() {
   const settingsRef = useRef(settings);
   const scriptsRef = useRef(scripts);
   const savedRef = useRef(new Map());
-  settingsRef.current = settings;
-  scriptsRef.current = scripts;
+  useLayoutEffect(() => {
+    settingsRef.current = settings;
+    scriptsRef.current = scripts;
+  });
 
   // ---- accessibility: UI scale + reduced motion ---------------------------
   useUiScale(settings.uiScale);
@@ -196,7 +198,9 @@ export function MainWindow() {
   // ---- overlay hotkeys ----------------------------------------------------
   const sel = scripts.find((s) => s.id === selId) || scripts[0] || null;
   const selRef = useRef(sel);
-  selRef.current = sel;
+  useLayoutEffect(() => {
+    selRef.current = sel;
+  });
 
   const toggleOverlay = useCallback(async () => {
     if (await isOverlayVisible()) {

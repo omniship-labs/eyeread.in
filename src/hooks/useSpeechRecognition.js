@@ -13,7 +13,7 @@
  *   window — any drag/click re-arms the mic without a dedicated button.
  *   `retry` stays exposed for an explicit recovery control.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const SR =
   typeof window !== 'undefined'
@@ -30,11 +30,13 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
   const [error, setError] = useState(null);
   const recRef = useRef(null);
   const onWordsRef = useRef(onWords);
-  onWordsRef.current = onWords;
   const enabledRef = useRef(enabled);
-  enabledRef.current = enabled;
   const languageRef = useRef(language);
-  languageRef.current = language;
+  useLayoutEffect(() => {
+    onWordsRef.current = onWords;
+    enabledRef.current = enabled;
+    languageRef.current = language;
+  });
 
   const backoffRef = useRef(BACKOFF_MIN);
   const restartTimerRef = useRef(null);
@@ -138,15 +140,19 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     try {
       rec.start();
     } catch {
-      setError('start-failed');
       recRef.current = null;
+      // Defer off the synchronous throw path so this never sets state within
+      // the same tick as the caller's effect (rare: most SR implementations
+      // fail via onerror, not a thrown start()).
+      queueMicrotask(() => setError('start-failed'));
     }
   }, []);
-  startSessionRef.current = startSession;
+  useLayoutEffect(() => {
+    startSessionRef.current = startSession;
+  });
 
   useEffect(() => {
     if (!enabled || !SR) return undefined;
-    setError(null);
     startSession();
     return stopSession;
   }, [enabled, language, startSession, stopSession]);
