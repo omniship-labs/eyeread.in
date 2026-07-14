@@ -1,5 +1,21 @@
 # eyeread.in
 
+[![GitHub License](https://img.shields.io/github/license/omniship-labs/eyeread.in)](LICENSE)
+[![GitHub downloads](https://img.shields.io/github/downloads/omniship-labs/eyeread.in/total)](https://github.com/omniship-labs/eyeread.in/releases)
+[![CII Best Practices](https://img.shields.io/cii/summary/13607)](https://bestpractices.coreinfrastructure.org/projects/13607)
+
+[![GitHub commits since latest release](https://img.shields.io/github/commits-since/omniship-labs/eyeread.in/latest)](https://github.com/omniship-labs/eyeread.in/commits/main)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/omniship-labs/eyeread.in)](https://github.com/omniship-labs/eyeread.in/commits/main)
+
+[![Latest glimpse](https://img.shields.io/github/v/release/omniship-labs/eyeread.in?include_prereleases&label=glimpse)](https://github.com/omniship-labs/eyeread.in/releases)
+[![Glimpse date](https://img.shields.io/github/release-date-pre/omniship-labs/eyeread.in?label=glimpse%20date)](https://github.com/omniship-labs/eyeread.in/releases)
+[![Latest stable](https://img.shields.io/github/v/release/omniship-labs/eyeread.in?label=stable)](https://github.com/omniship-labs/eyeread.in/releases/latest)
+[![Stable date](https://img.shields.io/github/release-date/omniship-labs/eyeread.in?label=stable%20date)](https://github.com/omniship-labs/eyeread.in/releases/latest)
+
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fget.eyeread.in)](https://get.eyeread.in)
+[![Mozilla Observatory](https://img.shields.io/mozilla-observatory/grade/get.eyeread.in)](https://developer.mozilla.org/en-US/observatory/analyze?host=get.eyeread.in)
+[![W3C Validation](https://img.shields.io/w3c-validation/default?targetUrl=https%3A%2F%2Fget.eyeread.in)](https://validator.w3.org/nu/?doc=https%3A%2F%2Fget.eyeread.in)
+[![GitHub stars](https://img.shields.io/github/stars/omniship-labs/eyeread.in?style=flat)](https://github.com/omniship-labs/eyeread.in/stargazers)
 [![CLA assistant](https://cla-assistant.io/readme/badge/omniship-labs/eyeread.in)](https://cla-assistant.io/omniship-labs/eyeread.in)
 
 > Look at the lens. Not your notes.
