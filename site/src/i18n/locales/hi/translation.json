@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "पोर्टेबल — इंस्टॉल की ज़रूरत नहीं"
+    "linuxSub": "पोर्टेबल — इंस्टॉल की ज़रूरत नहीं",
+    "historyHeading": "रिलीज़ इतिहास",
+    "historySub": "हर स्थिर रिलीज़, उसके चेंजलॉग के साथ.",
+    "historyViewOnGithub": "GitHub पर देखें"
   }
 }

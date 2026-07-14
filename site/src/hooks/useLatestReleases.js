@@ -52,3 +52,40 @@ export function useLatestReleases() {
 
   return { stable, glimpse };
 }
+
+// Full stable release history (glimpse builds excluded — they're frequent,
+// pre-release, and not meant to be read as a changelog). Paginates through
+// api.github.com/.../releases since the list can outgrow one page over time.
+export function useReleaseHistory() {
+  const [state, setState] = useState({ loading: true, error: null, data: null });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      try {
+        const all = [];
+        for (let page = 1; ; page += 1) {
+          const res = await fetch(`${API}/releases?per_page=100&page=${page}`, {
+            headers: { Accept: 'application/vnd.github+json' },
+          });
+          if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          const batch = await res.json();
+          all.push(...batch);
+          if (batch.length < 100) break;
+        }
+        const stableOnly = all.filter((r) => !r.draft && !r.tag_name.startsWith('glimpse-v'));
+        if (!cancelled) setState({ loading: false, error: null, data: stableOnly });
+      } catch (error) {
+        if (!cancelled) setState({ loading: false, error, data: null });
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return state;
+}

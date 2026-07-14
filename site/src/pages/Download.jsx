@@ -2,7 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from '../components/Icon.jsx';
 import { useOSPlatform } from '../hooks/useOSPlatform.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
+import { useReleaseHistory } from '../hooks/useLatestReleases.js';
 import { findAssetUrl, displayVersion } from '../lib/releaseLinks.js';
+import { renderReleaseNotesHtml } from '../lib/releaseNotes.js';
 
 const PLATFORM_ORDER = ['macos', 'windows', 'linux'];
 
@@ -104,8 +106,77 @@ function ChannelSection({ variant, heading, subhead, release, t }) {
   );
 }
 
+function ReleaseHistory({ t, i18n }) {
+  const history = useReleaseHistory();
+
+  if (history.loading) {
+    return (
+      <section className="section dl-history">
+        <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
+        <p className="dl-status">{t('download.loading')}</p>
+      </section>
+    );
+  }
+
+  if (history.error || !history.data?.length) {
+    return (
+      <section className="section dl-history">
+        <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
+        <p className="dl-status dl-status-error">
+          {t('download.error')}{' '}
+          <a
+            href="https://github.com/omniship-labs/eyeread.in/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('download.errorLink')}
+          </a>
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="section dl-history">
+      <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
+      <p className="dl-channel-sub">{t('download.historySub')}</p>
+      <div className="dl-history-list">
+        {history.data.map((rel) => (
+          <details key={rel.id} className="dl-history-item">
+            <summary>
+              <span className="dl-history-version">{displayVersion(rel)}</span>
+              <span className="dl-history-date">
+                {new Date(rel.published_at).toLocaleDateString(
+                  i18n.resolvedLanguage || i18n.language,
+                  {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  }
+                )}
+              </span>
+            </summary>
+            <div
+              className="dl-history-notes"
+              dangerouslySetInnerHTML={{ __html: renderReleaseNotesHtml(rel.body) }}
+            />
+            <a
+              className="dl-history-link"
+              href={rel.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('download.historyViewOnGithub')}
+            </a>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function Download({ config, releases }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   useDocumentMeta(config.download.meta);
   const { stable, glimpse } = releases;
 
@@ -137,6 +208,8 @@ export default function Download({ config, releases }) {
           />
         </div>
       </section>
+
+      <ReleaseHistory t={t} i18n={i18n} />
     </main>
   );
 }

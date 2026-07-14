@@ -176,6 +176,9 @@
     "windowsX64": "Windows (x64)",
     "windowsArm64": "Windows (ARM64)",
     "linux": "Linux (AppImage)",
-    "linuxSub": "పోర్టబుల్ — ఇన్‌స్టాల్ అవసరం లేదు"
+    "linuxSub": "పోర్టబుల్ — ఇన్‌స్టాల్ అవసరం లేదు",
+    "historyHeading": "విడుదల చరిత్ర",
+    "historySub": "ప్రతి స్థిరమైన విడుదల, దాని మార్పుల జాబితాతో.",
+    "historyViewOnGithub": "GitHubలో చూడండి"
   }
 }
