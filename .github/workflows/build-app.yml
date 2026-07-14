@@ -189,6 +189,10 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          # The dmg bundler skips Finder-scripted background/icon layout when
+          # it detects CI:true (GitHub Actions sets this on every runner) —
+          # this forces it to style the dmg window anyway.
+          TAURI_BUNDLER_DMG_IGNORE_CI: true
         run: |
           npm run tauri build -- \
             --target ${{ matrix.target }} \
