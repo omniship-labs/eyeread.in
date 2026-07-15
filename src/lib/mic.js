@@ -19,3 +19,20 @@ export async function requestMicPermission() {
     return false;
   }
 }
+
+// Non-prompting read of the current permission state, for UI display.
+// Returns 'granted' | 'denied' | 'prompt' | 'unknown'.
+export async function getMicPermissionState() {
+  try {
+    if (navigator.permissions) {
+      const status = await navigator.permissions.query({ name: 'microphone' });
+      return status.state;
+    }
+  } catch {
+    /* Permissions API unsupported for 'microphone' on this platform */
+  }
+  return 'unknown';
+}
+
+export const MIC_PRIVACY_SETTINGS_URL =
+  'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone';
