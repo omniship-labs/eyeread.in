@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Hardened Runtime gates protected resources by entitlement, separately
+       from the App Sandbox — the Info.plist usage-description strings alone
+       are not enough for a notarized (Developer ID + hardened runtime) build.
+       Without these, getUserMedia()/SpeechRecognition never reach the TCC
+       prompt at all: the OS silently denies before showing a dialog, so the
+       app never appears in System Settings > Privacy for the user to grant
+       access either. -->
+  <key>com.apple.security.device.audio-input</key>
+  <true/>
+  <key>com.apple.security.personal-information.speech-recognition</key>
+  <true/>
+</dict>
+</plist>

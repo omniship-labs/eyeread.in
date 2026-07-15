@@ -386,9 +386,14 @@ export async function fitOverlayToPanel(panel) {
   const win = await overlayWindow();
   if (!win) return;
   try {
-    const scale = await win.scaleFactor();
-    const pos = await win.outerPosition();
-    const size = await win.outerSize();
+    // These three reads don't depend on each other — fetching them serially
+    // (three round trips) is what made the window's resize visibly trail the
+    // panel during a drag; running them concurrently cuts that to one.
+    const [scale, pos, size] = await Promise.all([
+      win.scaleFactor(),
+      win.outerPosition(),
+      win.outerSize(),
+    ]);
     const oldW = size.width / scale;
     const oldH = size.height / scale;
     const newW = Math.round(panel.w + 96); // 32px padding each side
@@ -401,15 +406,20 @@ export async function fitOverlayToPanel(panel) {
     const neededH = panel.h ? Math.round(panel.h + VERTICAL_CHROME) : oldH;
     const newH = Math.max(oldH, neededH);
     if (Math.abs(newW - oldW) < 2 && newH <= oldH) return; // nothing to do
-    await win.setSize(new LogicalSize(newW, newH));
-    // compensate horizontally so the panel stays centred; height only ever
-    // grows downward, so no vertical position compensation is needed.
-    await win.setPosition(
-      new LogicalPosition(
-        Math.round(pos.x / scale + (oldW - newW) / 2),
-        Math.round(pos.y / scale)
-      )
-    );
+    // setSize and setPosition both derive only from the already-known
+    // oldW/pos/scale above (not from each other's result), so they can also
+    // fire concurrently instead of waiting on one another.
+    await Promise.all([
+      win.setSize(new LogicalSize(newW, newH)),
+      // compensate horizontally so the panel stays centred; height only
+      // ever grows downward, so no vertical position compensation is needed.
+      win.setPosition(
+        new LogicalPosition(
+          Math.round(pos.x / scale + (oldW - newW) / 2),
+          Math.round(pos.y / scale)
+        )
+      ),
+    ]);
   } catch {
     /* window hidden mid-call */
   }

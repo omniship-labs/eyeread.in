@@ -19,7 +19,7 @@ function bellOpacity(delta, bellAhead, highContrast) {
   return Math.min(1, highContrast ? o + CONTRAST_LIFT : o);
 }
 
-export function ScriptViewer({
+export const ScriptViewer = React.memo(function ScriptViewer({
   text = '',
   active = 0,
   bellAhead = 15,
@@ -105,4 +105,4 @@ export function ScriptViewer({
       })}
     </div>
   );
-}
+});
