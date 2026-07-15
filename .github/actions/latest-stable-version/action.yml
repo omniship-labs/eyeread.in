@@ -30,7 +30,7 @@ runs:
       shell: bash
       run: |
         LATEST_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' \
-          | grep -v "^${{ inputs.exclude }}\$" \
+          | { grep -v "^${{ inputs.exclude }}\$" || true; } \
           | sort -V | tail -n1)
         VERSION="${LATEST_TAG#v}"
         echo "version=${VERSION:-0.0.0}" >> "$GITHUB_OUTPUT"
