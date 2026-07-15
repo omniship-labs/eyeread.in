@@ -53,6 +53,8 @@ jobs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
 
       - name: Skip if main hasn't changed since the last glimpse build
         id: check
@@ -71,13 +73,18 @@ jobs:
             echo "should_run=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Find latest stable version
+        id: latest
+        if: steps.check.outputs.should_run != 'false'
+        uses: ./.github/actions/latest-stable-version
+
       - name: Compute glimpse version and release tag
         id: compute
         if: steps.check.outputs.should_run != 'false'
         run: |
           STAMP=$(date -u +"%Y%m%d%H%M")
           TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
-          BASE=$(node -p "require('./package.json').version")
+          BASE="${{ steps.latest.outputs.version }}"
           echo "glimpse_version=${BASE}-glimpse.${STAMP}" >> "$GITHUB_OUTPUT"
           # Includes the base version for readability; seconds-granularity so
           # same-day manual dispatches never collide. Every glimpse release's

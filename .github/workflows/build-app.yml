@@ -130,6 +130,13 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
             const c = fs.readFileSync('src-tauri/Cargo.toml', 'utf8');
             fs.writeFileSync('src-tauri/Cargo.toml', c.replace(/^version = \".*\"/m, 'version = \"' + v + '\"'));
+            // tauri.conf.json has its own version field, separate from
+            // package.json/Cargo.toml — it's what actually lands in the
+            // native bundle metadata (Info.plist CFBundleShortVersionString,
+            // the Windows installer version, etc.), so it needs stamping too.
+            const t = JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json'));
+            t.version = v;
+            fs.writeFileSync('src-tauri/tauri.conf.json', JSON.stringify(t, null, 2) + '\n');
           "
 
       - name: Import Apple signing certificate

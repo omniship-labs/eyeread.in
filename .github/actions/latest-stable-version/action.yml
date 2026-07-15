@@ -1,0 +1,36 @@
+name: Latest stable version
+description: >-
+  Finds the latest vX.Y.Z tag in the repo's history and outputs its version
+  string (without the "v" prefix). Used as the single source of truth for
+  "what's the current shipped version" — package.json/Cargo.toml/
+  tauri.conf.json are permanent 0.0.0 placeholders (overwritten by
+  build-app.yml's Stamp version step on every build, never committed back),
+  so tags are the only durable record. Requires the caller's checkout step
+  to use `fetch-depth: 0` — a shallow clone won't see tags.
+
+inputs:
+  exclude:
+    description: >-
+      A tag to exclude from consideration (e.g. the one that just triggered
+      the current run) — pass with the "v" prefix, e.g. "v0.1.1".
+    required: false
+    default: ''
+
+outputs:
+  version:
+    description: >-
+      The latest stable version found, without the "v" prefix (e.g. "0.1.1"),
+      or "0.0.0" if no vX.Y.Z tag exists yet.
+    value: ${{ steps.find.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - id: find
+      shell: bash
+      run: |
+        LATEST_TAG=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' \
+          | grep -v "^${{ inputs.exclude }}\$" \
+          | sort -V | tail -n1)
+        VERSION="${LATEST_TAG#v}"
+        echo "version=${VERSION:-0.0.0}" >> "$GITHUB_OUTPUT"

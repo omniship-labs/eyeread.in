@@ -1,7 +1,7 @@
 {
   "name": "eyeread.in",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "eyeread.in — free teleprompter that floats your script as a glass overlay, invisible to screen-share. Open source under AGPL-3.0.",
   "license": "AGPL-3.0",
   "type": "module",
