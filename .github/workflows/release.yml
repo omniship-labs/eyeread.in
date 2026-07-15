@@ -1,10 +1,17 @@
-# Stable release — triggered by pushing a version tag (e.g. v0.1.0)
-# or via workflow_dispatch with a version number input.
+# Stable release — triggered only by pushing a version tag (e.g. v0.1.1).
 #
-# The prepare job validates the version, optionally creates the git tag,
-# and passes the version string to the build and publish jobs. Building,
-# signing and notarization live in the shared build-app.yml workflow —
-# see its header for the required secrets and environment setup.
+# workflow_dispatch used to offer a "just type the version" alternative, but
+# the release environment's deployment rule requires the *ref that triggered
+# the run* to be a v* tag — workflow_dispatch's ref is fixed to whatever
+# branch it was dispatched on (main) for the run's whole lifetime, even after
+# a job creates a real tag mid-run, so a dispatched run can never satisfy
+# that policy. Pushing the tag yourself sidesteps this entirely: the push
+# itself is the triggering ref, which is the tag.
+#
+# The prepare job validates the version, and passes it to the build and
+# publish jobs. Building, signing and notarization live in the shared
+# build-app.yml workflow — see its header for the required secrets and
+# environment setup.
 
 name: Release stable
 
@@ -12,12 +19,6 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number to release (e.g. 0.1.1)'
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -34,11 +35,7 @@ jobs:
       - name: Resolve version
         id: resolve
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ inputs.version }}"
-          else
-            VERSION="${GITHUB_REF_NAME#v}"
-          fi
+          VERSION="${GITHUB_REF_NAME#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Validate semver and ordering
@@ -56,14 +53,6 @@ jobs:
               process.exit(1);
             }
           "
-
-      - name: Create and push tag
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ steps.resolve.outputs.version }}"
-          git push origin "v${{ steps.resolve.outputs.version }}"
 
   build:
     needs: [prepare]
