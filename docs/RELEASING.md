@@ -18,7 +18,7 @@ best-effort.
 **Stable — four actions, ~10 minutes of your attention:**
 
 1. Push a `v0.x.y` tag (`git tag v0.1.1 && git push origin v0.1.1`) — this is
-   the *only* trigger. There's no workflow_dispatch alternative: the
+   the _only_ trigger. There's no workflow_dispatch alternative: the
    `release` environment's deployment rule requires the triggering ref itself
    to be a `v*` tag, and a dispatched run's ref stays whatever branch you
    dispatched from for its whole lifetime, even after a job creates a real
@@ -56,7 +56,7 @@ hand-edit the release.
 
 | Channel     | Trigger                           | Bundle ID                | Updater endpoint                                      |
 | ----------- | --------------------------------- | ------------------------ | ----------------------------------------------------- |
-| **Stable**  | `v*` tag (or workflow dispatch)   | `in.eyeread.app`         | `releases/latest/.../latest.json`                     |
+| **Stable**  | `v*` tag                          | `in.eyeread.app`         | `releases/latest/.../latest.json`                     |
 | **Glimpse** | Daily cron (or workflow dispatch) | `in.eyeread.app.glimpse` | `glimpse-manifest` branch (raw.githubusercontent.com) |
 
 Both channels install side-by-side. The Tauri auto-updater reads `latest.json`
