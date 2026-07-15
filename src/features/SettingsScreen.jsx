@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Heart, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
@@ -7,10 +8,16 @@ import { Segmented } from '../components/Segmented';
 import { openExternal, showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { ShieldToggle } from '../components/ShieldToggle';
+import { PermissionRow } from '../components/PermissionRow';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { defaultSettings, OVERRIDABLE_KEYS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
-import { requestMicPermission } from '../lib/mic';
+import {
+  requestMicPermission,
+  getMicPermissionState,
+  MIC_PRIVACY_SETTINGS_URL,
+} from '../lib/mic';
+import { requestSpeechRecognitionPermission, SPEECH_PRIVACY_SETTINGS_URL } from '../lib/speech';
 
 // OmniShip Labs' single fiscal home — same collective the site and
 // .github/FUNDING.yml point at.
@@ -56,6 +63,26 @@ export function SettingsScreen({ settings, onSettings }) {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
   };
 
+  const [micState, setMicState] = useState('unknown');
+  useEffect(() => {
+    getMicPermissionState().then(setMicState);
+  }, []);
+  const [speechState, setSpeechState] = useState('unknown');
+
+  const micStateLabels = {
+    granted: t('settings.micGranted'),
+    denied: t('settings.micDenied'),
+    prompt: t('settings.micPrompt'),
+    unknown: t('settings.micUnknown'),
+    openSettings: t('settings.openSystemSettings'),
+  };
+  const speechStateLabels = {
+    granted: t('settings.speechGranted'),
+    denied: t('settings.speechDenied'),
+    unknown: t('settings.speechUnknown'),
+    openSettings: t('settings.openSystemSettings'),
+  };
+
   return (
     <div className="settings-main">
       <div className="settings-title">{t('settings.title')}</div>
@@ -88,6 +115,31 @@ export function SettingsScreen({ settings, onSettings }) {
         </div>
       </div>
 
+      {/* ── Permissions ── */}
+      <div className="set-group">
+        <div className="set-group-label">{t('settings.permissions')}</div>
+        <PermissionRow
+          label={t('settings.micAccess')}
+          hint={t('settings.micAccessHint')}
+          state={micState}
+          stateLabels={micStateLabels}
+          onRequest={async () =>
+            setMicState((await requestMicPermission()) ? 'granted' : 'denied')
+          }
+          onOpenSettings={() => isMacOS && openExternal(MIC_PRIVACY_SETTINGS_URL)}
+        />
+        <PermissionRow
+          label={t('settings.speechAccess')}
+          hint={t('settings.speechAccessHint')}
+          state={speechState}
+          stateLabels={speechStateLabels}
+          onRequest={async () =>
+            setSpeechState((await requestSpeechRecognitionPermission()) ? 'granted' : 'denied')
+          }
+          onOpenSettings={() => isMacOS && openExternal(SPEECH_PRIVACY_SETTINGS_URL)}
+        />
+      </div>
+
       {/* ── Reading defaults ── */}
       <div className="set-group">
         <div className="set-group-label">{t('settings.readingDefaults')}</div>
@@ -105,8 +157,11 @@ export function SettingsScreen({ settings, onSettings }) {
             value={mode}
             onChange={(m) => {
               const on = m === 'voice';
-              if (on && voiceAvailable) requestMicPermission();
-              onSettings({ voice: on });
+              if (on && voiceAvailable) {
+                requestMicPermission().then((granted) => onSettings({ voice: granted }));
+              } else {
+                onSettings({ voice: on });
+              }
             }}
           />
         </div>

@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="eyeread.in glimpse">
+  <defs>
+    <filter id="lmblgf" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+    <filter id="lmblgs" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+    <clipPath id="lmblsq"><rect x="4" y="4" width="80" height="80" rx="20"></rect></clipPath>
+    <linearGradient id="lmblsh" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.06)"></stop>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"></stop>
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="84" height="84" rx="22" fill="rgba(255,255,255,0.28)"></rect>
+  <g clip-path="url(#lmblsq)">
+    <rect x="4" y="4" width="80" height="40" fill="#2a2010"></rect>
+    <rect x="4" y="44" width="80" height="40" fill="#f4ecdc"></rect>
+    <rect x="4" y="41.5" width="80" height="5" fill="#c79428" filter="url(#lmblgf)"></rect>
+    <rect x="11" y="42" width="66" height="4" fill="rgba(199,148,40,0.5)" filter="url(#lmblgs)"></rect>
+    <rect x="4" y="4" width="80" height="80" fill="url(#lmblsh)"></rect>
+  </g>
+</svg>

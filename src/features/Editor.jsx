@@ -134,8 +134,11 @@ export function Editor({
                     value={mode}
                     onChange={(m) => {
                       const on = m === 'voice';
-                      if (on && voiceAvailable) requestMicPermission();
-                      set('voice', on);
+                      if (on && voiceAvailable) {
+                        requestMicPermission().then((granted) => set('voice', granted));
+                      } else {
+                        set('voice', on);
+                      }
                     }}
                   />
                   <div className="ep-mode-detail">

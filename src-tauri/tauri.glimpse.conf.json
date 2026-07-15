@@ -79,7 +79,7 @@
     "macOS": {
       "infoPlist": "Info.glimpse.plist",
       "dmg": {
-        "background": "../design/assets/dmg/dmg-background-glimpse.png"
+        "background": "../design/assets/dmg/dmg-background-glimpse.tiff"
       }
     }
   },
