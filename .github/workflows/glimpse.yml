@@ -75,7 +75,7 @@ jobs:
         id: compute
         if: steps.check.outputs.should_run != 'false'
         run: |
-          STAMP=$(date -u +"%Y%m%d")
+          STAMP=$(date -u +"%Y%m%d%H%M")
           TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
           BASE=$(node -p "require('./package.json').version")
           echo "glimpse_version=${BASE}-glimpse.${STAMP}" >> "$GITHUB_OUTPUT"

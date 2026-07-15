@@ -28,3 +28,4 @@ playwright-report/
 # + raw log, read only on failure, never meant to be committed.
 .githooks/last-run/
 design/assets/dmg/*.png
+design/assets/dmg/*.tiff
