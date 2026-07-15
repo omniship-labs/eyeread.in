@@ -84,6 +84,27 @@ Keep it to what changed for the _user_ — link to the full commit range
 the bottom for anyone who wants the raw diff, rather than trying to itemize
 every commit.
 
+## Applying the notes to the draft
+
+Once the notes (and, ideally, a short descriptive title beyond the default
+"eyeread.in vX.Y.Z") are drafted and the maintainer has approved them:
+
+```
+gh release edit vX.Y.Z \
+  --title "eyeread.in vX.Y.Z — <short highlight>" \
+  --notes-file notes.md
+```
+
+This only updates the draft — it does **not** publish it. Publishing is the
+maintainer's deliberate final gate (`docs/RELEASING.md` step 4: "nothing
+reaches users — updater or download links — until this click"). Only run
+the publish step yourself if the maintainer has explicitly said to publish,
+not merely to draft/apply notes:
+
+```
+gh release edit vX.Y.Z --draft=false
+```
+
 ## Glimpse channel
 
 Glimpse is a different situation: `glimpse.yml`'s `publish` job auto-publishes
