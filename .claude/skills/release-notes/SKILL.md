@@ -5,72 +5,30 @@ description: Generate user-facing release notes for an eyeread.in stable release
 
 # Release notes for eyeread.in
 
-Produces the release-notes body a maintainer pastes into the draft GitHub
-Release before publishing (see `docs/RELEASING.md`'s "Cutting a release"
-section, step 3 — GitHub's `generate_release_notes: true` already fills the
-draft with a raw commit/PR list; this skill turns that into something a user
-downloading the app would actually want to read).
+Turns the raw commit list GitHub's `generate_release_notes: true` fills a
+draft with into something a user downloading the app would want to read.
+Rendered on the download page via `site/src/lib/releaseNotes.js` — plain
+Markdown (headings, bullets, bold/italic, links), kept short.
 
-## Where the notes end up
+## Method
 
-The release body is rendered on the site's download page
-(`site/src/pages/Download.jsx` → `renderReleaseNotesHtml`, in
-`site/src/lib/releaseNotes.js`) as Markdown-to-HTML inside a collapsible
-`<details>` per release. Write plain Markdown; keep it short — this is a
-summary, not a full changelog.
+1. **Range**: `git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n2` for
+   the previous tag, then `git log --oneline <prev>..<new>`.
+2. **Read diffs, not just subjects** — `git show <sha>` for anything whose
+   user impact isn't obvious from the message alone.
+3. **Group by user impact**: New / Improved / Fixed / Under the hood (only
+   if genuinely worth a curious user's attention — never for CI/lint/
+   refactor/test-only commits). Omit empty sections; don't pad.
+4. **One user sentence per note** — "Fixed DMG background clipping on some
+   displays," never a commit message. No file names, no implementation
+   detail. Unclear impact → ask the maintainer, don't guess.
+5. **Flag separately** (not as a notes section) anything needing a manual
+   callout: breaking changes, new permissions, platform-support changes.
 
-## Steps
-
-1. **Find the version range.** Read the current draft's tag (e.g. `v0.1.1`)
-   and find the previous stable tag:
-
-   ```
-   git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n2
-   ```
-
-   (excludes glimpse tags automatically — they're named `glimpse-v...`, not
-   `v...`).
-
-2. **Read the commits, not just messages.** List commits between the two
-   tags, then read the actual diffs for anything non-obvious — commit
-   subjects alone often undersell or bury what a user-facing note should say:
-
-   ```
-   git log --oneline v0.1.0..v0.1.1
-   git show <sha>   # for any commit whose subject doesn't make the user impact obvious
-   ```
-
-3. **Categorize by user impact, not by commit type.** Group into whatever
-   subset of these actually apply — skip empty sections entirely, don't pad:
-   - **New** — user-visible features
-   - **Improved** — changes to existing behavior a user would notice
-   - **Fixed** — bug fixes
-   - **Under the hood** — only include if there's something worth a curious
-     user knowing (e.g. a security fix, a dependency bump with real impact);
-     otherwise omit — CI/lint/refactor/test-only commits don't belong here.
-
-4. **Write each note as a user sentence, not a commit message.** "Fixed DMG
-   background clipping on some displays" — not "Fix DMG bottom content
-   clipping — position was scaling with H". No implementation detail, no
-   file names, no internal reasoning. If a commit's actual user impact is
-   unclear from its message/diff, don't guess — ask the maintainer rather
-   than inventing a plausible-sounding note.
-
-5. **Flag anything that needs a manual callout**, separately from the notes
-   themselves — a version bump alone doesn't need a section, but do call it
-   out to the maintainer when you spot: a breaking change, a new required
-   permission (e.g. this release added microphone/speech-recognition
-   permission prompts — worth a heads-up line), or a platform-support change
-   (e.g. the Intel-macOS-drop precedent in `docs/RELEASING.md`).
-
-## Output format
+## Output
 
 ```markdown
 ## New
-
-- ...
-
-## Improved
 
 - ...
 
@@ -79,51 +37,14 @@ summary, not a full changelog.
 - ...
 ```
 
-Keep it to what changed for the _user_ — link to the full commit range
-(`https://github.com/omniship-labs/eyeread.in/compare/vX.Y.Z...vA.B.C`) at
-the bottom for anyone who wants the raw diff, rather than trying to itemize
-every commit.
+Link the full range (`.../compare/vX.Y.Z...vA.B.C`) at the bottom instead
+of itemizing every commit.
 
-## Applying the notes to the draft
-
-Once the notes (and, ideally, a short descriptive title beyond the default
-"eyeread.in vX.Y.Z") are drafted and the maintainer has approved them:
+## Applying
 
 ```
-gh release edit vX.Y.Z \
-  --title "eyeread.in vX.Y.Z — <short highlight>" \
-  --notes-file notes.md
+gh release edit vX.Y.Z --title "eyeread.in vX.Y.Z — <highlight>" --notes-file notes.md
 ```
 
-This only updates the draft — it does **not** publish it. Publishing is the
-maintainer's deliberate final gate (`docs/RELEASING.md` step 4: "nothing
-reaches users — updater or download links — until this click"). Only run
-the publish step yourself if the maintainer has explicitly said to publish,
-not merely to draft/apply notes:
-
-```
-gh release edit vX.Y.Z --draft=false
-```
-
-## Glimpse channel
-
-Glimpse is a different situation: `glimpse.yml`'s `publish` job auto-publishes
-every build with a fixed static body ("Automated glimpse build from the
-`main` branch...") — there's no draft, no review step, and it ships
-multiple times a day, so per-build curated notes aren't wired into CI and
-wouldn't be worth writing for every single one.
-
-Use this skill for glimpse only on request — e.g. a maintainer wants a
-"what's new since the last glimpse build" summary to post somewhere (Discord,
-a tester channel), not as part of the automated publish flow. Same method,
-different range:
-
-```
-git tag -l 'glimpse-v*' | sort -V | tail -n2   # previous glimpse tag vs. current
-git log --oneline <prev-glimpse-tag>..HEAD
-```
-
-Same categorization and per-note style as above, but looser — glimpse
-testers expect to see in-progress/experimental items, so it's fine to
-include something like "Trying out: new DMG background arrow" that stable's
-notes wouldn't carry.
+Updates the draft only — never publish (`--draft=false`) unless explicitly
+told to. That's the maintainer's deliberate final gate.
