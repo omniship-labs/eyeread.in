@@ -40,11 +40,6 @@ Markdown (headings, bullets, bold/italic, links), kept short.
 Link the full range (`.../compare/vX.Y.Z...vA.B.C`) at the bottom instead
 of itemizing every commit.
 
-## Applying
-
-```
-gh release edit vX.Y.Z --title "eyeread.in vX.Y.Z — <highlight>" --notes-file notes.md
-```
-
-Updates the draft only — never publish (`--draft=false`) unless explicitly
-told to. That's the maintainer's deliberate final gate.
+The generated notes text is the entire output of this skill — applying it
+to a draft or publishing is out of scope here (see the `publish-release`
+skill).

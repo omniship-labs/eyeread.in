@@ -36,8 +36,10 @@ deliberate human decision.
    version. If the filenames don't match the tag, stop — the draft needs a
    rebuild (delete the tag, fix the stamping bug, re-push), not a publish.
 
-3. **Draft the release notes and title** using the `release-notes` skill —
-   invoke it for this exact version range, don't re-derive the method here.
+3. **Get the release notes body** by invoking the `release-notes` skill for
+   this exact version range — that skill's whole output is the notes text,
+   nothing more. Propose a short descriptive title yourself (beyond the
+   default "eyeread.in vX.Y.Z") based on what the notes say.
 
 4. **Show the maintainer the drafted title + notes and wait for approval**
    before touching the release. Don't apply or publish on your own judgment
