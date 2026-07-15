@@ -132,12 +132,12 @@
   transition: all var(--dur-fast) var(--ease-out);
 
   &.shielded {
-    background: rgba(110, 86, 247, 0.12);
-    color: rgba(110, 86, 247, 0.85);
-    border: 1px solid rgba(110, 86, 247, 0.3);
+    background: var(--accent-subtle-bg);
+    color: var(--accent-text);
+    border: 1px solid var(--accent-subtle-border);
     &:hover {
-      background: rgba(110, 86, 247, 0.2);
-      color: rgba(110, 86, 247, 1);
+      background: var(--accent-subtle-bg-hover);
+      color: var(--accent);
     }
   }
 
@@ -892,6 +892,13 @@
   &:hover {
     color: var(--paper-100);
   }
+}
+
+.set-status-ok {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success, #4ade80);
 }
 
 .set-select {
