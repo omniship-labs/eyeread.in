@@ -167,6 +167,7 @@
     "glimpseSub": "Built automatically from the latest code, most days.",
     "glimpseWarning": "Glimpse builds are for testers — they may be unstable or contain unfinished features. Most people should use Stable above.",
     "version": "Version {{version}}",
+    "releasedAgo": "released {{time}}",
     "loading": "Checking for the latest release…",
     "error": "Could not load release info.",
     "errorLink": "Browse releases on GitHub instead",

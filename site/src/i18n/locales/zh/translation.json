@@ -167,6 +167,7 @@
     "glimpseSub": "几乎每天都会根据最新代码自动构建。",
     "glimpseWarning": "Glimpse 版本面向测试人员 — 可能不稳定或包含未完成的功能。大多数人应使用上方的 Stable 版本。",
     "version": "版本 {{version}}",
+    "releasedAgo": "{{time}}发布",
     "loading": "正在检查最新版本…",
     "error": "无法加载版本信息。",
     "errorLink": "改为在 GitHub 上浏览发行版",
