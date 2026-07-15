@@ -3,14 +3,13 @@ import { Settings as SettingsIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { ShieldToggle } from '../components/ShieldToggle';
-import logoMarkDark from '../assets/logos/eyeread-mark-bounded-dark.svg';
-import logoMarkLight from '../assets/logos/eyeread-mark-bounded-light.svg';
+import { LOGO_MARK_DARK, LOGO_MARK_LIGHT } from '../lib/branding';
 
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 function useSystemLogo() {
-  const [logo, setLogo] = useState(prefersDark.matches ? logoMarkDark : logoMarkLight);
+  const [logo, setLogo] = useState(prefersDark.matches ? LOGO_MARK_DARK : LOGO_MARK_LIGHT);
   useEffect(() => {
-    const handler = (e) => setLogo(e.matches ? logoMarkDark : logoMarkLight);
+    const handler = (e) => setLogo(e.matches ? LOGO_MARK_DARK : LOGO_MARK_LIGHT);
     prefersDark.addEventListener('change', handler);
     return () => prefersDark.removeEventListener('change', handler);
   }, []);

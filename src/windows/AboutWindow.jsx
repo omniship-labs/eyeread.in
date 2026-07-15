@@ -8,6 +8,8 @@ import { getTesters } from '../lib/credits';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 import sponsors from '../data/sponsors.json';
 import omnishipMark from '../assets/logos/omniship-mark-beacon.svg';
+import { LOGO_MARK_DARK } from '../lib/branding';
+import { isGlimpse } from '../lib/channel';
 import './about/about-window.less';
 
 const OC_URL = 'https://opencollective.com/omniship';
@@ -24,15 +26,7 @@ const DOWNLOAD_URL = 'https://get.eyeread.in/download';
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 function getVersion() {
-  const ver = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
-  try {
-    if (typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ !== 'stable') {
-      return `${ver} · ${__RELEASE_CHANNEL__}`;
-    }
-  } catch {
-    /* */
-  }
-  return ver;
+  return typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
 }
 
 export function AboutWindow() {
@@ -152,7 +146,7 @@ export function AboutWindow() {
       <div className="aw-hero">
         <img
           className="aw-icon"
-          src="/app-icon.png"
+          src={LOGO_MARK_DARK}
           alt="eyeread.in"
           draggable={false}
           style={{
@@ -295,8 +289,6 @@ export function AboutWindow() {
 
 function OtherChannelLink() {
   const { t } = useTranslation();
-  const isGlimpse =
-    typeof __RELEASE_CHANNEL__ !== 'undefined' && __RELEASE_CHANNEL__ === 'glimpse';
   const promptKey = isGlimpse ? 'about.otherChannelStable' : 'about.otherChannelGlimpse';
   return (
     <div className="aw-other-channel">
