@@ -167,6 +167,7 @@
     "glimpseSub": "Compilado automáticamente desde el código más reciente, casi todos los días.",
     "glimpseWarning": "Las compilaciones Glimpse son para testers — pueden ser inestables o contener funciones incompletas. La mayoría debería usar Stable arriba.",
     "version": "Versión {{version}}",
+    "releasedAgo": "publicado {{time}}",
     "loading": "Buscando la última versión…",
     "error": "No se pudo cargar la información de la versión.",
     "errorLink": "Explorar releases en GitHub en su lugar",

@@ -3,7 +3,7 @@ import { Icon } from '../components/Icon.jsx';
 import { useOSPlatform } from '../hooks/useOSPlatform.js';
 import { useDocumentMeta } from '../hooks/useDocumentMeta.js';
 import { useReleaseHistory } from '../hooks/useLatestReleases.js';
-import { findAssetUrl, displayVersion } from '../lib/releaseLinks.js';
+import { findAssetUrl, displayVersion, relativeReleaseTime } from '../lib/releaseLinks.js';
 import { renderReleaseNotesHtml } from '../lib/releaseNotes.js';
 
 const PLATFORM_ORDER = ['macos', 'windows', 'linux'];
@@ -20,7 +20,7 @@ function PlatformCard({ id, icon, label, sublabel, href, recommended, t }) {
   );
 }
 
-function ChannelSection({ variant, heading, subhead, release, t }) {
+function ChannelSection({ variant, heading, subhead, release, t, i18n }) {
   const os = useOSPlatform();
 
   if (release.loading) {
@@ -96,7 +96,16 @@ function ChannelSection({ variant, heading, subhead, release, t }) {
     <div className={`dl-channel dl-channel-${variant}`}>
       <h2 className="dl-channel-h">{heading}</h2>
       <p className="dl-channel-sub">{subhead}</p>
-      <p className="dl-version">{t('download.version', { version: displayVersion(rel) })}</p>
+      <p className="dl-version">
+        {t('download.version', { version: displayVersion(rel) })}
+        <span className="dl-version-age">
+          {' '}
+          ·{' '}
+          {t('download.releasedAgo', {
+            time: relativeReleaseTime(rel.published_at, i18n.resolvedLanguage || i18n.language),
+          })}
+        </span>
+      </p>
       <div className="dl-grid">
         {PLATFORM_ORDER.flatMap((platform) =>
           cards[platform].map((card) => <PlatformCard key={card.id} {...card} t={t} />)
@@ -192,6 +201,7 @@ export default function Download({ config, releases }) {
           subhead={t('download.stableSub')}
           release={stable}
           t={t}
+          i18n={i18n}
         />
 
         <div className="dl-glimpse-wrap">
@@ -205,6 +215,7 @@ export default function Download({ config, releases }) {
             subhead={t('download.glimpseSub')}
             release={glimpse}
             t={t}
+            i18n={i18n}
           />
         </div>
       </section>

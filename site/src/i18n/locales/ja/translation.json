@@ -167,6 +167,7 @@
     "glimpseSub": "ほぼ毎日、最新のコードから自動的にビルドされます。",
     "glimpseWarning": "Glimpse ビルドはテスター向けです — 不安定だったり、未完成の機能が含まれる場合があります。通常は上記の Stable をご利用ください。",
     "version": "バージョン {{version}}",
+    "releasedAgo": "{{time}}リリース",
     "loading": "最新リリースを確認中…",
     "error": "リリース情報を読み込めませんでした。",
     "errorLink": "代わりに GitHub でリリースを見る",

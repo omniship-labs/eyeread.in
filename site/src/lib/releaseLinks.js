@@ -46,3 +46,25 @@ export function displayVersion(release) {
   const match = release?.name?.match(/\(([^)]+)\)/);
   return match ? match[1] : (release?.tag_name?.replace(/^v/, '') ?? '');
 }
+
+const RELATIVE_UNITS = [
+  ['year', 31536000],
+  ['month', 2592000],
+  ['week', 604800],
+  ['day', 86400],
+  ['hour', 3600],
+  ['minute', 60],
+];
+
+// "3 hours ago" / "2 days ago" — glimpse ships multiple times a day, so a
+// relative label is far more useful there than an absolute date; falls back
+// to "just now" for anything under a minute.
+export function relativeReleaseTime(publishedAt, locale) {
+  const seconds = (Date.now() - new Date(publishedAt).getTime()) / 1000;
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  for (const [unit, secondsInUnit] of RELATIVE_UNITS) {
+    const value = Math.floor(seconds / secondsInUnit);
+    if (value >= 1) return rtf.format(-value, unit);
+  }
+  return rtf.format(0, 'minute');
+}

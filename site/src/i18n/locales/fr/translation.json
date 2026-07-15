@@ -167,6 +167,7 @@
     "glimpseSub": "Généré automatiquement à partir du code le plus récent, presque tous les jours.",
     "glimpseWarning": "Les versions Glimpse sont destinées aux testeurs — elles peuvent être instables ou contenir des fonctionnalités inachevées. La plupart des utilisateurs devraient utiliser Stable ci-dessus.",
     "version": "Version {{version}}",
+    "releasedAgo": "publiée {{time}}",
     "loading": "Recherche de la dernière version…",
     "error": "Impossible de charger les informations de version.",
     "errorLink": "Parcourir les releases sur GitHub à la place",

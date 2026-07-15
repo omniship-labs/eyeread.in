@@ -24,12 +24,17 @@ const FONT_FILES = [
 ];
 
 // windowSize in tauri.conf.json's dmg config sets the OUTER Finder window
-// frame, title bar included — the content viewport is shorter than that by
-// the title bar's height, so the canvas needs the same padding or its
-// bottom edge (and anything positioned near it) renders outside the
-// visible area. Must match src-tauri/tauri.conf.json's dmg.windowSize.
+// frame, title bar included — measured directly from a real build's
+// screenshot, the visible content viewport is ~37pt shorter than that
+// (title-bar overhead), a roughly fixed amount independent of H. Content
+// was previously positioned at "H - constant", which grows exactly as
+// fast as the visible boundary itself grows with H — so bumping H alone
+// never added any real margin. BOTTOM_ROW_Y is a fixed value instead
+// (not H-relative) so increasing H actually adds clearance below it.
+// Must match src-tauri/tauri.conf.json's dmg.windowSize.
 const W = 660;
-const H = 440;
+const H = 450;
+const BOTTOM_ROW_Y = 360;
 const SPLIT_X = 300;
 const DIVIDER_X = 298;
 const DIVIDER_W = 4;
@@ -133,12 +138,12 @@ function svgFor({ leftColor, rightColor, tag, tagline }) {
   <rect x="${DIVIDER_X}" width="${DIVIDER_W}" height="${H}" fill="#ffffff"/>
   <text x="32" y="41" font-family="Space Grotesk" font-weight="700" font-size="17" fill="#ffffff">eyeread<tspan fill="${rightColor}">.in</tspan></text>
   <text x="${W - 32}" y="38" text-anchor="end" font-family="JetBrains Mono" font-size="10" letter-spacing="1.6" fill="#54546e">${tag.toUpperCase()}</text>
-  <text x="32" y="${H - 48}" font-family="Space Grotesk Medium" font-size="13" fill="#7a7a92">${tagline}</text>
+  <text x="32" y="${BOTTOM_ROW_Y}" font-family="Space Grotesk Medium" font-size="13" fill="#7a7a92">${tagline}</text>
   <!-- OmniShip credit: exact lockup from the "DMG Background - Options.html"
        design doc (options 1a/1b/1d) — beacon-mark icon + two-line mono
        byline, "IBM Plex Mono" swapped for JetBrains Mono (already embedded
        here for the version tag) to avoid a second font dependency. -->
-  <g transform="translate(${W - 32 - 177}, ${H - 56})">
+  <g transform="translate(${W - 32 - 177}, ${BOTTOM_ROW_Y - 8})">
     <g transform="scale(0.2)">
       <rect x="5" y="5" width="90" height="90" rx="24" fill="#F24E1E"/>
       <path d="M19,63 L81,63 L72,73 Q50,79 28,73 Z" fill="#FFFFFF" stroke-linejoin="round"/>
