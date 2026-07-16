@@ -9,7 +9,7 @@ both delegate the actual build/sign/notarize matrix to the shared
 
 The product's whole value — staying invisible to screen capture — depends on
 OS-level primitives, so platform coverage and store eligibility are shaped more
-by those primitives than by reach. Read the [Platform support](../README.md#platform-support)
+by those primitives than by reach. Read the [Platform support](PLATFORM_SUPPORT.md)
 table first; it explains why macOS/Windows are first-class and Linux is
 best-effort.
 

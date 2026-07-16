@@ -33,7 +33,7 @@ npm run tauri dev
 - Accessibility improvements
 - Tests for logic in `src/lib/` and `src/hooks/`
 
-Linux is officially experimental — see [Platform support](README.md#platform-support).
+Linux is officially experimental — see [Platform support](docs/PLATFORM_SUPPORT.md).
 **Compatibility reports and compositor testing on Linux are especially welcome.**
 
 ## What we're probably not looking for (ask first)
