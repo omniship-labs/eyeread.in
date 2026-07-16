@@ -77,6 +77,7 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
+import { useUpdateCheck } from '../hooks/useUpdateCheck';
 
 export function MainWindow() {
   const { t } = useTranslation();
@@ -158,6 +159,8 @@ export function MainWindow() {
 
   // Screen-share shield toggle (with the Linux risk-acknowledgement gate).
   const { setShielded, consentModal } = useShareProtection(settings, applySettings);
+
+  const update = useUpdateCheck(settings.updateCheckHours);
 
   useEffect(() => {
     let un1, un2, un3, un4;
@@ -289,13 +292,16 @@ export function MainWindow() {
           aria-pressed={pane === 'settings'}
         >
           <SettingsIcon size={15} aria-hidden="true" />
+          {update.status === 'available' && (
+            <span className="tl-settings-badge" aria-hidden="true" />
+          )}
         </button>
       </div>
 
       <div className="main">
         {pane === 'settings' ? (
           <ErrorBoundary>
-            <SettingsScreen settings={settings} onSettings={applySettings} />
+            <SettingsScreen settings={settings} onSettings={applySettings} update={update} />
           </ErrorBoundary>
         ) : (
           <>

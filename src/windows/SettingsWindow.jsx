@@ -244,7 +244,7 @@ export function SettingsWindow() {
           <input
             type="range"
             className="er-slider"
-            min={10}
+            min={0}
             max={100}
             value={val('opacity')}
             aria-label={t('reading.overlayOpacity')}
