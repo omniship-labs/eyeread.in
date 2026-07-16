@@ -245,36 +245,28 @@ export function OverlayWindow() {
     };
   }, [setPanelSize, sendSettingsContext]);
 
-  // ---- glass backdrop refresh on move ------------------------------------------
+  // ---- glass backdrop refresh --------------------------------------------------
   // WebKit renders the panel's backdrop-filter from a snapshot of what's behind
-  // the window, and only re-samples it on a webview layer commit. Moving the
-  // window changes nothing *inside* the webview, so after a drag the glass keeps
-  // showing the desktop content from before the move until some unrelated
-  // repaint (e.g. hovering the panel) forces a commit. Nudge the blur radius by
-  // an invisible epsilon on every move event to force that commit ourselves.
+  // the window, and only re-samples it on a webview layer commit — nothing
+  // *inside* the webview changes just because the window moved, or because a
+  // shared slide advanced, or a video played behind it, so left alone the glass
+  // can lag well behind (or freeze on) a stale frame indefinitely, not just
+  // after a drag. Nudge the blur radius by an invisible epsilon on a steady
+  // tick, while a session is actually showing the panel, to force a re-sample
+  // on a regular cadence regardless of what's causing the backdrop to change.
   useEffect(() => {
-    if (!isTauri || !isMacOS) return undefined;
-    let un;
-    let disposed = false;
+    if (!isTauri || !isMacOS || !sessionActive) return undefined;
     let flip = false;
-    (async () => {
-      const { getCurrentWebviewWindow } = await import('@tauri-apps/api/webviewWindow');
-      const stop = await getCurrentWebviewWindow().onMoved(() => {
-        const el = panelRef.current;
-        if (!el) return;
-        flip = !flip;
-        const f = `blur(${effective.blur + (flip ? 0.01 : 0)}px) saturate(1.15)`;
-        el.style.webkitBackdropFilter = f;
-        el.style.backdropFilter = f;
-      });
-      if (disposed) stop();
-      else un = stop;
-    })();
-    return () => {
-      disposed = true;
-      un?.();
-    };
-  }, [effective.blur]);
+    const id = setInterval(() => {
+      const el = panelRef.current;
+      if (!el) return;
+      flip = !flip;
+      const f = `blur(${effective.blur + (flip ? 0.01 : 0)}px) saturate(1.15)`;
+      el.style.webkitBackdropFilter = f;
+      el.style.backdropFilter = f;
+    }, 100);
+    return () => clearInterval(id);
+  }, [effective.blur, sessionActive]);
 
   // ---- voice tracking / auto-scroll ------------------------------------------
   const jumpToRef = useRef((idx) => {
