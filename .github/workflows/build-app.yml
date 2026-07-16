@@ -91,6 +91,18 @@ jobs:
       - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
           workspaces: src-tauri
+          # Default cache key is host OS/arch only (e.g. "Windows_NT-x64"),
+          # which the x64 and arm64 Windows jobs share since both run on
+          # windows-latest — the arm64 cross-compile job was restoring the
+          # x64 job's target dir (useless for aarch64-pc-windows-msvc object
+          # files) and rebuilding from scratch every release. Key by target
+          # triple so each gets its own cache. Channel is included too:
+          # tauri_build::build() embeds the channel's tauri.conf.json overlay
+          # (different identifier/productName) into the compiled binary, so
+          # stable and glimpse produce different app-crate artifacts from the
+          # same target — without this they'd evict each other's cache the
+          # same way the two Windows targets used to.
+          key: ${{ inputs.channel }}-${{ matrix.target }}
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
