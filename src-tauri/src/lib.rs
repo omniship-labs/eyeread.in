@@ -1,6 +1,6 @@
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},
-    AppHandle, Manager, WindowEvent,
+    AppHandle, Manager, RunEvent, WindowEvent,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
 use tauri_plugin_updater::UpdaterExt;
@@ -145,6 +145,36 @@ fn attach_window_to_all_spaces(app: AppHandle, label: String) {
 #[cfg(not(target_os = "macos"))]
 #[tauri::command]
 fn attach_window_to_all_spaces(_app: AppHandle, _label: String) {}
+
+/// Detach the overlay/settings windows from the anchor NSPanel (see
+/// `attach_window_to_all_spaces`) before the app actually quits.
+///
+/// A window that still has a live AppKit parent-child relationship when
+/// NSApplication tears down its windows during termination can hang the
+/// whole process indefinitely instead of exiting — a known AppKit/tao
+/// interaction (tauri-apps/tauri#13534). Breaking the relationship first
+/// avoids it; the windows themselves close normally right after as part of
+/// the same exit.
+#[cfg(target_os = "macos")]
+fn detach_all_from_anchor(app: &AppHandle) {
+    for label in ["overlay", "settings"] {
+        let Some(win) = app.get_webview_window(label) else {
+            continue;
+        };
+        let Ok(ptr) = win.ns_window() else {
+            continue;
+        };
+        unsafe {
+            let ns_window: &objc2_app_kit::NSWindow = &*(ptr as *mut objc2_app_kit::NSWindow);
+            if let Some(parent) = ns_window.parentWindow() {
+                parent.removeChildWindow(ns_window);
+            }
+        }
+    }
+}
+
+#[cfg(not(target_os = "macos"))]
+fn detach_all_from_anchor(_app: &AppHandle) {}
 
 /// Open the About window — called from JS menu listener or Settings screen.
 #[tauri::command]
@@ -329,6 +359,11 @@ pub fn run() {
             attach_window_to_all_spaces,
         ])
         .setup(|_app| Ok(()))
-        .run(tauri::generate_context!())
-        .expect("error while running eyeread.in");
+        .build(tauri::generate_context!())
+        .expect("error while building eyeread.in")
+        .run(|app_handle, event| {
+            if let RunEvent::ExitRequested { .. } = event {
+                detach_all_from_anchor(app_handle);
+            }
+        });
 }

@@ -8,9 +8,15 @@
 export async function requestMicPermission() {
   try {
     if (navigator.permissions) {
-      const status = await navigator.permissions.query({ name: 'microphone' });
-      if (status.state === 'granted') return true;
-      if (status.state === 'denied') return false;
+      try {
+        const status = await navigator.permissions.query({ name: 'microphone' });
+        if (status.state === 'granted') return true;
+        if (status.state === 'denied') return false;
+      } catch {
+        // Permissions API query unsupported for 'microphone' on this
+        // platform — fall through to the actual prompt below instead of
+        // treating an unrelated query failure as a denial.
+      }
     }
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     stream.getTracks().forEach((t) => t.stop());

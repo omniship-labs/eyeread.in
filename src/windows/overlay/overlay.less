@@ -431,19 +431,25 @@
   font-weight: 700;
 }
 
-/* corner resize handle */
+/* corner resize handle — sized and tinted to read as an affordance at rest,
+   not just discoverable on hover (it used to be a near-invisible 16px glyph). */
 .ov-resize {
   position: absolute;
-  right: 4px;
-  bottom: 4px;
-  width: 16px;
-  height: 16px;
+  right: 3px;
+  bottom: 3px;
+  width: 22px;
+  height: 22px;
   cursor: nwse-resize;
-  color: var(--text-tertiary);
-  opacity: 0.45;
+  color: var(--text-secondary);
+  background: var(--accent-subtle-bg);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px var(--accent-subtle-border);
+  opacity: 0.7;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+  padding: 3px;
+  box-sizing: border-box;
   transition:
     opacity var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
@@ -455,8 +461,8 @@
     color: var(--accent-text);
   }
   svg {
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
     pointer-events: none;
   }
 }
