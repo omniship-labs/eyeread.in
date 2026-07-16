@@ -18,7 +18,22 @@
       <rect x="4" y="4" width="80" height="80" fill="url(#ogsh)"></rect>
     </g>
   </svg>
-  <text x="660" y="290" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="700" font-size="72" letter-spacing="-2" fill="#f2f2f7">eyeread<tspan fill="#6e56f7">.in</tspan></text>
-  <text x="660" y="344" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="500" font-size="22" fill="#7a7a92">Invisible teleprompter.</text>
-  <text x="660" y="374" font-family="&#39;Space Grotesk&#39;,system-ui,sans-serif" font-weight="500" font-size="22" fill="#7a7a92">Voice tracking built in.</text>
+  <!--
+    The three text runs below are placeholders, replaced at build time by
+    site/scripts/og-image.mjs with pre-shaped <path> outlines (via
+    opentype.js) instead of being rendered live by resvg. resvg-js 2.6.2 has
+    a font-matching bug specific to its Linux binary — <text> with a custom
+    buffered font silently falls back to a generic placeholder face there
+    (confirmed: identical script/font renders correctly on macOS, wrong on
+    Linux/CI, reproduced in a linux/amd64 container). Baking glyphs to paths
+    at build time sidesteps runtime font matching entirely, so rasterization
+    is deterministic on every platform. data-* attributes carry what the
+    script needs (text, weight, size, letter-spacing) to reproduce each run;
+    they're not real SVG semantics.
+  -->
+  <g data-og-text="wordmark" data-x="660" data-y="290" data-weight="700" data-size="72" data-letter-spacing="-2">
+    <!-- run 1: "eyeread" #f2f2f7, run 2: ".in" #6e56f7 -->
+  </g>
+  <g data-og-text="subtitle1" data-x="660" data-y="344" data-weight="500" data-size="22" data-fill="#7a7a92">Invisible teleprompter.</g>
+  <g data-og-text="subtitle2" data-x="660" data-y="374" data-weight="500" data-size="22" data-fill="#7a7a92">Voice tracking built in.</g>
 </svg>
