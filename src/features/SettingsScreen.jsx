@@ -17,7 +17,11 @@ import {
   getMicPermissionState,
   MIC_PRIVACY_SETTINGS_URL,
 } from '../lib/mic';
-import { requestSpeechRecognitionPermission, SPEECH_PRIVACY_SETTINGS_URL } from '../lib/speech';
+import {
+  requestSpeechRecognitionPermission,
+  getSpeechPermissionState,
+  SPEECH_PRIVACY_SETTINGS_URL,
+} from '../lib/speech';
 
 // OmniShip Labs' single fiscal home — same collective the site and
 // .github/FUNDING.yml point at.
@@ -87,7 +91,7 @@ export function SettingsScreen({ settings, onSettings, update }) {
   useEffect(() => {
     getMicPermissionState().then(setMicState);
   }, []);
-  const [speechState, setSpeechState] = useState('unknown');
+  const [speechState, setSpeechState] = useState(getSpeechPermissionState);
 
   const micStateLabels = {
     granted: t('settings.micGranted'),

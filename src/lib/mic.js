@@ -1,3 +1,10 @@
+// Cache of the last known decision, since WKWebView (macOS Tauri's engine)
+// doesn't support navigator.permissions.query({name:'microphone'}) — it
+// throws — so without this, getMicPermissionState() always fell through to
+// 'unknown' and the Settings row showed "Grant access" forever, even right
+// after the user granted it.
+const MIC_GRANTED_KEY = 'eyeread.micGranted.v1';
+
 /**
  * Request microphone access.
  * - Checks current permission state first (no dialog if already granted).
@@ -10,8 +17,14 @@ export async function requestMicPermission() {
     if (navigator.permissions) {
       try {
         const status = await navigator.permissions.query({ name: 'microphone' });
-        if (status.state === 'granted') return true;
-        if (status.state === 'denied') return false;
+        if (status.state === 'granted') {
+          localStorage.setItem(MIC_GRANTED_KEY, '1');
+          return true;
+        }
+        if (status.state === 'denied') {
+          localStorage.removeItem(MIC_GRANTED_KEY);
+          return false;
+        }
       } catch {
         // Permissions API query unsupported for 'microphone' on this
         // platform — fall through to the actual prompt below instead of
@@ -20,8 +33,10 @@ export async function requestMicPermission() {
     }
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     stream.getTracks().forEach((t) => t.stop());
+    localStorage.setItem(MIC_GRANTED_KEY, '1');
     return true;
   } catch {
+    localStorage.removeItem(MIC_GRANTED_KEY);
     return false;
   }
 }
@@ -35,7 +50,21 @@ export async function getMicPermissionState() {
       return status.state;
     }
   } catch {
-    /* Permissions API unsupported for 'microphone' on this platform */
+    /* Permissions API unsupported for 'microphone' on this platform (WKWebView) */
+  }
+  // Fall back to the cached decision from a prior requestMicPermission()
+  // call. If we've previously seen a grant, silently reconfirm it via
+  // getUserMedia — once the OS has decided, that call resolves/rejects
+  // immediately with no dialog, so this never surprises the user.
+  if (localStorage.getItem(MIC_GRANTED_KEY) === '1') {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+      return 'granted';
+    } catch {
+      localStorage.removeItem(MIC_GRANTED_KEY);
+      return 'denied';
+    }
   }
   return 'unknown';
 }
