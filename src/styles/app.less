@@ -240,6 +240,18 @@ textarea {
     transition:
       color 0.3s var(--ease-out),
       opacity 0.3s var(--ease-out);
+    /* Baseline dark stroke on every word, always on — not just in High
+       Contrast mode. The panel can be dialled down to near-fully
+       transparent, and light prompter text with no outline disappears
+       against a bright slide/video behind it. A dark ring reads fine on
+       dark backdrops too (it's simply invisible there), so this is a
+       one-way fix with no downside on the dark end. */
+    text-shadow:
+      -1px -1px 0 rgba(0, 0, 0, 0.55),
+      1px -1px 0 rgba(0, 0, 0, 0.55),
+      -1px 1px 0 rgba(0, 0, 0, 0.55),
+      1px 1px 0 rgba(0, 0, 0, 0.55),
+      0 0 6px rgba(0, 0, 0, 0.5);
 
     &--spoken {
       color: var(--prompt-upcoming);
@@ -255,6 +267,10 @@ textarea {
       opacity: 1;
       font-weight: 700;
       text-shadow:
+        -1px -1px 0 rgba(0, 0, 0, 0.6),
+        1px -1px 0 rgba(0, 0, 0, 0.6),
+        -1px 1px 0 rgba(0, 0, 0, 0.6),
+        1px 1px 0 rgba(0, 0, 0, 0.6),
         0 0 6px rgba(255, 255, 255, 1),
         0 0 18px rgba(255, 255, 255, 0.95),
         0 0 40px rgba(140, 110, 255, 1),
@@ -272,12 +288,15 @@ textarea {
     }
   }
 
-  /* High contrast — lift dim states, add dark halo */
+  /* High contrast — lift dim states, thicken the baseline stroke */
   &--contrast {
     .er-script__w {
       text-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.95),
-        0 0 6px rgba(0, 0, 0, 0.9);
+        -1px -1px 0 rgba(0, 0, 0, 0.95),
+        1px -1px 0 rgba(0, 0, 0, 0.95),
+        -1px 1px 0 rgba(0, 0, 0, 0.95),
+        1px 1px 0 rgba(0, 0, 0, 0.95),
+        0 0 8px rgba(0, 0, 0, 0.9);
 
       &--spoken {
         opacity: 0.4;
@@ -290,7 +309,10 @@ textarea {
       &--active {
         color: #fff;
         text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.95),
+          -1px -1px 0 rgba(0, 0, 0, 0.95),
+          1px -1px 0 rgba(0, 0, 0, 0.95),
+          -1px 1px 0 rgba(0, 0, 0, 0.95),
+          1px 1px 0 rgba(0, 0, 0, 0.95),
           0 0 8px rgba(255, 255, 255, 0.9),
           0 0 18px rgba(140, 110, 255, 1),
           0 0 38px rgba(110, 86, 247, 0.8);

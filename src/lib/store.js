@@ -32,7 +32,12 @@ export const defaultSettings = {
   highContrast: false, // boost text contrast in overlay
   dyslexicFont: false, // OpenDyslexic + roomier spacing for the reading text
   uiScale: 100, // app UI zoom, % (affects main / settings / about windows)
+  updateCheckHours: 6, // periodic update-check interval, hours; 0 = off
 };
+
+// Selectable periodic-check cadences, hours; 0 = off. Single source of truth
+// for the Settings UI options list and the useUpdateCheck hook.
+export const UPDATE_CHECK_HOURS_OPTIONS = [0, 1, 3, 6, 12, 24];
 
 // Prompter settings a script may override. Anything not listed (position,
 // hideFromShare, overlaySize, accessibility) stays global only.
