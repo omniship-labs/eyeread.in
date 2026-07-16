@@ -3,7 +3,7 @@
 The app is a single React codebase that runs in four Tauri windows, selected by `?window=` query param at startup.
 
 | Window     | Purpose                          | Notable config                                                                             |
-| ---------- | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| ---------- | -------------------------------- | ------------------------------------------------------------------------------------------ |
 | `main`     | Script library, editor, settings | Standard window with macOS overlay title bar                                               |
 | `overlay`  | The floating glass prompter      | Transparent, frameless, always-on-top, `contentProtected: true`, visible across all Spaces |
 | `settings` | Prompter settings (per-script)   | Independent window so it can never clip or resize the overlay; hides on blur               |
@@ -27,7 +27,7 @@ start — the app retries automatically on your first interaction.
 **Hotkeys.**
 
 | Shortcut  | Action                             |
-| --------- | ----------------------------------- |
+| --------- | ---------------------------------- |
 | ⌘ Shift E | Show / hide overlay (system-wide)  |
 | ⌥ Shift E | Toggle click-through (system-wide) |
 | Space     | Play / pause scroll                |
