@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '../components/Icon.jsx';
 import { useOSPlatform } from '../hooks/useOSPlatform.js';
@@ -118,9 +119,25 @@ function ChannelSection({ variant, heading, subhead, release, t, i18n }) {
 function ReleaseHistory({ t, i18n }) {
   const history = useReleaseHistory();
 
+  // Deep-link support: /download#v1.2.0 opens and scrolls to that release's
+  // entry. The list only exists once the fetch resolves, so this can't rely
+  // on browsers' native "open a <details> targeted by fragment navigation"
+  // behavior — that only sees DOM present at initial navigation, and this
+  // list renders later, client-side, off the async fetch.
+  useEffect(() => {
+    if (!history.data?.length) return;
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    const target = document.getElementById(hash);
+    if (target instanceof HTMLDetailsElement) {
+      target.open = true;
+      target.scrollIntoView({ block: 'start' });
+    }
+  }, [history.data]);
+
   if (history.loading) {
     return (
-      <section className="section dl-history">
+      <section className="section dl-history" id="history">
         <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
         <p className="dl-status">{t('download.loading')}</p>
       </section>
@@ -129,7 +146,7 @@ function ReleaseHistory({ t, i18n }) {
 
   if (history.error || !history.data?.length) {
     return (
-      <section className="section dl-history">
+      <section className="section dl-history" id="history">
         <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
         <p className="dl-status dl-status-error">
           {t('download.error')}{' '}
@@ -146,12 +163,12 @@ function ReleaseHistory({ t, i18n }) {
   }
 
   return (
-    <section className="section dl-history">
+    <section className="section dl-history" id="history">
       <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
       <p className="dl-channel-sub">{t('download.historySub')}</p>
       <div className="dl-history-list">
         {history.data.map((rel) => (
-          <details key={rel.id} className="dl-history-item">
+          <details key={rel.id} id={`v${displayVersion(rel)}`} className="dl-history-item">
             <summary>
               <span className="dl-history-version">{displayVersion(rel)}</span>
               <span className="dl-history-date">

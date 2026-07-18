@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { isTauri, checkForUpdate, installUpdate } from '../lib/tauri';
+import { isTauri, checkForUpdate, downloadUpdate, installUpdate } from '../lib/tauri';
 
 // Shared update-check state for the app's single long-lived main window.
 // status: 'idle' | 'checking' | 'up_to_date' | 'available' | 'installing' | 'error'
@@ -25,6 +25,10 @@ export function useUpdateCheck(intervalHours = 6) {
       if (result.status === 'update_available') {
         setVersion(result.version);
         setStatus('available');
+        // Pre-fetch in the background so the eventual install click is
+        // instant — best-effort, install() falls back to downloading itself
+        // if this hasn't finished (or failed) by then.
+        downloadUpdate().catch(() => {});
       } else {
         setStatus('up_to_date');
       }

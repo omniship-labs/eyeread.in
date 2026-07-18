@@ -1,4 +1,4 @@
-import { Play, Mic, MicOff, Timer as TimerIcon } from 'lucide-react';
+import { Download, Play, Mic, MicOff, Timer as TimerIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Slider } from '../components/Slider';
@@ -38,6 +38,7 @@ export function Editor({
   onResetScript,
   onResetLayout,
   onStart,
+  update,
 }) {
   const { t } = useTranslation();
   const overrides = script.settingsOverrides ?? {};
@@ -94,6 +95,13 @@ export function Editor({
           />
 
           <div className="ed-panel">
+            {update?.status === 'available' && (
+              <button type="button" className="ed-update-banner" onClick={update.install}>
+                <Download size={14} />
+                <span>{t('settings.updateAvailable', { version: update.version })}</span>
+                <span className="ed-update-cta">{t('settings.updateInstall')}</span>
+              </button>
+            )}
             <Button block iconLeft={<Play size={16} />} onClick={onStart}>
               {t('editor.startReading')}
             </Button>

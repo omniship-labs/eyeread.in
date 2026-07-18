@@ -40,3 +40,23 @@ export function useReducedMotion(reduceMotion) {
     };
   }, [reduceMotion]);
 }
+
+/**
+ * Reflect the "dyslexic-friendly reading" preference on the document
+ * element. CSS in app.less keys off the `dyslexic-font` class to redefine
+ * `--font-sans` to OpenDyslexic, which cascades into the chrome windows'
+ * body text, buttons, and labels. Headings (`--font-display`) and mono
+ * badges/labels (`--font-mono`) are left alone — swapping those too would
+ * fight the app's type system rather than just aid reading. The prompter's
+ * own roomier letter/word-spacing (ScriptViewer's `--dyslexic` class) is
+ * separate and unaffected by this.
+ */
+export function useDyslexicFont(dyslexicFont) {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('dyslexic-font', !!dyslexicFont);
+    return () => {
+      root.classList.remove('dyslexic-font');
+    };
+  }, [dyslexicFont]);
+}

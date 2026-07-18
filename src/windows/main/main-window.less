@@ -89,6 +89,31 @@
   }
 }
 
+/* ── Keyboard-shortcuts button in titlebar ── */
+.tl-shortcuts {
+  .app-region(no-drag);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
 /* ── Settings gear in titlebar ── */
 .tl-settings {
   .app-region(no-drag);
@@ -683,6 +708,44 @@
   padding: 16px;
 }
 
+.ed-update-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--accent-subtle-border);
+  background: var(--accent-subtle-bg);
+  color: var(--accent-text);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    background: var(--accent-subtle-bg-hover);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  > span:first-of-type {
+    flex: 1;
+  }
+}
+
+.ed-update-cta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
 .ep-label {
   display: flex;
   align-items: center;
@@ -833,13 +896,53 @@
   box-sizing: border-box;
 }
 
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.settings-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+}
+
 .settings-title {
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 28px;
   letter-spacing: -0.02em;
+}
+
+.settings-head-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .set-group {

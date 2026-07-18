@@ -1,12 +1,11 @@
-import { Heart, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Heart, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { openExternal, showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
-import { useShareProtection } from '../hooks/useShareProtection';
-import { ShieldToggle } from '../components/ShieldToggle';
+import { openExternal, showAboutWindow } from '../lib/tauri';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { defaultSettings, OVERRIDABLE_KEYS, UPDATE_CHECK_HOURS_OPTIONS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
@@ -15,6 +14,21 @@ import { requestMicPermission } from '../lib/mic';
 // OmniShip Labs' single fiscal home — same collective the site and
 // .github/FUNDING.yml point at.
 const OC_URL = 'https://opencollective.com/omniship';
+
+// The site's release-history section already pages through the full GitHub
+// Releases list (see site/src/hooks/useLatestReleases.js), so linking there
+// covers every version between what's installed and what's available — a
+// single-release in-app "what's new" view couldn't. Each entry is deep-linked
+// (site/src/pages/Download.jsx gives each <details> an id={`v${version}`}
+// and auto-opens/scrolls to it), so jump straight to the available version
+// instead of just the top of the list.
+const RELEASE_NOTES_URL = 'https://get.eyeread.in/download';
+
+// Which of the two views a user last picked, remembered locally so it
+// sticks across sessions without round-tripping through the settings store
+// (this is a Settings-screen display preference, not a reading setting —
+// the overlay/prompter never needs to know about it).
+const MODE_KEY = 'eyeread.settingsMode';
 
 function getAppVersion() {
   return typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
@@ -35,11 +49,10 @@ function formatTimestamp(ms) {
       });
 }
 
-export function SettingsScreen({ settings, onSettings, update, onCheckPermissions }) {
+export function SettingsScreen({ settings, onSettings, update, onCheckPermissions, onBack }) {
   const { t } = useTranslation();
   const {
     position,
-    hideFromShare,
     reduceMotion,
     highContrast,
     dyslexicFont,
@@ -56,21 +69,15 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
     updateCheckHours = 6,
   } = settings;
 
-  const mode = voice ? 'voice' : 'scroll';
+  const trackingMode = voice ? 'voice' : 'scroll';
   const countFromMins = Math.round((countFrom ?? 300) / 60);
 
-  const { setShielded, consentModal } = useShareProtection(settings, onSettings);
-
-  // Hotkey hint symbols differ per platform (⌘/⌥ on macOS, Ctrl/Alt elsewhere).
-  const modKey = isMacOS ? '⌘' : 'Ctrl';
-  const altKey = isMacOS ? '⌥' : 'Alt';
-
-  // Describe the screen-share state, flagging Linux as best-effort.
-  const shareHint = isLinux
-    ? t('settings.shareLinux')
-    : hideFromShare
-      ? t('settings.shareHidden')
-      : t('settings.shareVisible');
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem(MODE_KEY) || 'simple');
+  const advanced = viewMode === 'advanced';
+  const setMode = (v) => {
+    setViewMode(v);
+    localStorage.setItem(MODE_KEY, v);
+  };
 
   const restoreDefaults = () => {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
@@ -78,11 +85,139 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
 
   return (
     <div className="settings-main">
-      <div className="settings-title">{t('settings.title')}</div>
+      <div className="settings-head">
+        <div className="settings-head-left">
+          <button
+            type="button"
+            className="settings-back"
+            onClick={onBack}
+            aria-label={t('settings.back')}
+          >
+            <ArrowLeft size={16} />
+          </button>
+          <div className="settings-title">{t('settings.title')}</div>
+        </div>
+        <div className="settings-head-controls">
+          <Segmented
+            size="sm"
+            options={[
+              { value: 'simple', label: t('settings.simpleMode') },
+              { value: 'advanced', label: t('settings.advancedMode') },
+            ]}
+            value={viewMode}
+            onChange={setMode}
+          />
+        </div>
+      </div>
 
-      {/* ── Overlay behavior ── */}
+      {/* ── About + Updates ── */}
       <div className="set-group">
-        <div className="set-group-label">{t('settings.overlay')}</div>
+        <div className="set-group-label">{t('settings.about')}</div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>eyeread.in</b>
+            <span>{t('about.orgByline')}</span>
+          </div>
+          <button type="button" className="set-link" onClick={showAboutWindow}>
+            {t('settings.open')}
+          </button>
+        </div>
+        {update && (
+          <>
+            <div className="set-row">
+              <div className="set-info">
+                <b>{t('settings.currentVersion')}</b>
+                <span>
+                  {update.status === 'checking' && t('settings.updateChecking')}
+                  {update.status === 'up_to_date' && t('settings.updateUpToDate')}
+                  {update.status === 'available' &&
+                    t('settings.updateAvailable', { version: update.version })}
+                  {update.status === 'installing' && t('settings.updateInstalling')}
+                  {update.status === 'error' && t('settings.updateError')}
+                  {update.status === 'idle' && `v${getAppVersion()}`}
+                </span>
+                {update.status === 'available' && (
+                  <button
+                    type="button"
+                    className="set-link"
+                    style={{ display: 'block', marginTop: 2 }}
+                    onClick={() => openExternal(`${RELEASE_NOTES_URL}#v${update.version}`)}
+                  >
+                    {t('settings.whatsNew')}
+                  </button>
+                )}
+                {advanced && (update.lastChecked || update.nextCheckAt) && (
+                  <span className="set-mono" style={{ display: 'block', marginTop: 2 }}>
+                    {update.lastChecked &&
+                      t('settings.updateLastChecked', {
+                        time: formatTimestamp(update.lastChecked),
+                      })}
+                    {update.lastChecked && update.nextCheckAt && ' · '}
+                    {update.nextCheckAt &&
+                      t('settings.updateNextCheck', {
+                        time: formatTimestamp(update.nextCheckAt),
+                      })}
+                  </span>
+                )}
+              </div>
+              {update.status === 'available' ? (
+                <Button size="sm" onClick={update.install}>
+                  {t('settings.updateInstall')}
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={update.status === 'checking' || update.status === 'installing'}
+                  onClick={update.check}
+                >
+                  {t('settings.updateCheck')}
+                </Button>
+              )}
+            </div>
+            {advanced && (
+              <div className="set-row">
+                <div className="set-info">
+                  <b>{t('settings.updateCheckFrequency')}</b>
+                  <span>{t('settings.updateCheckFrequencyHint')}</span>
+                </div>
+                <Segmented
+                  size="sm"
+                  options={UPDATE_CHECK_HOURS_OPTIONS.map((h) => ({
+                    value: h,
+                    label:
+                      h === 0
+                        ? t('settings.updateFreqOff')
+                        : t('settings.updateFreqHours', { count: h }),
+                  }))}
+                  value={updateCheckHours}
+                  onChange={(v) => onSettings({ updateCheckHours: v })}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* ── Permissions (advanced: troubleshooting, not day-to-day) ── */}
+      {advanced && (
+        <div className="set-group">
+          <div className="set-group-label">{t('settings.permissions')}</div>
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.voicePermissions')}</b>
+              <span>{t('settings.voicePermissionsHint')}</span>
+            </div>
+            <Button size="sm" variant="secondary" onClick={onCheckPermissions}>
+              {t('settings.checkPermissions')}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Reading defaults ── */}
+      <div className="set-group">
+        <div className="set-group-label">{t('settings.readingDefaults')}</div>
         <div className="set-row">
           <div className="set-info">
             <b>{t('settings.defaultPosition')}</b>
@@ -101,32 +236,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
         </div>
         <div className="set-row">
           <div className="set-info">
-            <b>{t('settings.hideFromShare')}</b>
-            <span>{shareHint}</span>
-          </div>
-          <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
-        </div>
-      </div>
-
-      {/* ── Permissions ── */}
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.permissions')}</div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.voicePermissions')}</b>
-            <span>{t('settings.voicePermissionsHint')}</span>
-          </div>
-          <Button size="sm" variant="secondary" onClick={onCheckPermissions}>
-            {t('settings.checkPermissions')}
-          </Button>
-        </div>
-      </div>
-
-      {/* ── Reading defaults ── */}
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.readingDefaults')}</div>
-        <div className="set-row">
-          <div className="set-info">
             <b>{t('settings.trackingMode')}</b>
             <span>{t('settings.trackingModeHint')}</span>
           </div>
@@ -136,7 +245,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
               { value: 'voice', label: t('reading.voice'), icon: <Mic size={13} /> },
               { value: 'scroll', label: t('reading.scroll'), icon: <TimerIcon size={13} /> },
             ]}
-            value={mode}
+            value={trackingMode}
             onChange={(m) => {
               const on = m === 'voice';
               if (on && voiceAvailable) {
@@ -147,7 +256,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             }}
           />
         </div>
-        {voice && (
+        {advanced && voice && (
           <div className="set-row">
             <div className="set-info">
               <b>{t('settings.keepMicOpen')}</b>
@@ -208,33 +317,37 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           />
           <span className="ep-val">{opacity}%</span>
         </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('reading.glassBlur')}</b>
-            <span>{t('settings.glassBlurHint')}</span>
+        {advanced && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('reading.glassBlur')}</b>
+              <span>{t('settings.glassBlurHint')}</span>
+            </div>
+            <Slider
+              min={0}
+              max={18}
+              value={blur}
+              ariaLabel={t('reading.glassBlur')}
+              onChange={(v) => onSettings({ blur: v })}
+              style={{ width: 140 }}
+            />
+            <span className="ep-val">{blur}px</span>
           </div>
-          <Slider
-            min={0}
-            max={18}
-            value={blur}
-            ariaLabel={t('reading.glassBlur')}
-            onChange={(v) => onSettings({ blur: v })}
-            style={{ width: 140 }}
-          />
-          <span className="ep-val">{blur}px</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('reading.mirrorText')}</b>
-            <span>{t('settings.mirrorTextHint')}</span>
+        )}
+        {advanced && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('reading.mirrorText')}</b>
+              <span>{t('settings.mirrorTextHint')}</span>
+            </div>
+            <Switch
+              size="sm"
+              checked={!!mirror}
+              label={t('reading.mirrorText')}
+              onChange={(v) => onSettings({ mirror: v })}
+            />
           </div>
-          <Switch
-            size="sm"
-            checked={!!mirror}
-            label={t('reading.mirrorText')}
-            onChange={(v) => onSettings({ mirror: v })}
-          />
-        </div>
+        )}
         <div className="set-row">
           <div className="set-info">
             <b>{t('reading.timer')}</b>
@@ -274,15 +387,17 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             </span>
           </div>
         )}
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.restoreDefaults')}</b>
-            <span>{t('settings.restoreDefaultsHint')}</span>
+        {advanced && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.restoreDefaults')}</b>
+              <span>{t('settings.restoreDefaultsHint')}</span>
+            </div>
+            <Button variant="link" onClick={restoreDefaults}>
+              {t('settings.reset')}
+            </Button>
           </div>
-          <Button variant="link" onClick={restoreDefaults}>
-            {t('settings.reset')}
-          </Button>
-        </div>
+        )}
       </div>
 
       {/* ── Language ── */}
@@ -355,57 +470,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
         </div>
       </div>
 
-      {/* ── Hotkeys ── */}
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.hotkeys')}</div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkToggle')}</b>
-            <span>{t('settings.hkToggleHint')}</span>
-          </div>
-          <span className="hotkey">{modKey} + Shift + E</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkInteract')}</b>
-            <span>{t('settings.hkInteractHint')}</span>
-          </div>
-          <span className="hotkey">{altKey} + Shift + E</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkPlayPause')}</b>
-            <span>{t('settings.hkFocusedHint')}</span>
-          </div>
-          <span className="hotkey">Space</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkTextSize')}</b>
-          </div>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <span className="hotkey">{modKey} + +</span>
-            <span className="hotkey">{modKey} + −</span>
-          </span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkScrollSpeed')}</b>
-          </div>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <span className="hotkey">↑</span>
-            <span className="hotkey">↓</span>
-          </span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkHide')}</b>
-            <span>{t('settings.hkFocusedHint')}</span>
-          </div>
-          <span className="hotkey">Esc</span>
-        </div>
-      </div>
-
       {/* ── Support — the OmniShip "line" donation ask: plain voice, no
              urgency, one accent moment on the CTA. ── */}
       <div className="set-group">
@@ -420,85 +484,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           </Button>
         </div>
       </div>
-
-      {update && (
-        <div className="set-group">
-          <div className="set-group-label">{t('settings.updates')}</div>
-          <div className="set-row">
-            <div className="set-info">
-              <b>{t('settings.currentVersion')}</b>
-              <span>
-                {update.status === 'checking' && t('settings.updateChecking')}
-                {update.status === 'up_to_date' && t('settings.updateUpToDate')}
-                {update.status === 'available' &&
-                  t('settings.updateAvailable', { version: update.version })}
-                {update.status === 'installing' && t('settings.updateInstalling')}
-                {update.status === 'error' && t('settings.updateError')}
-                {update.status === 'idle' && `v${getAppVersion()}`}
-              </span>
-              {(update.lastChecked || update.nextCheckAt) && (
-                <span className="set-mono" style={{ display: 'block', marginTop: 2 }}>
-                  {update.lastChecked &&
-                    t('settings.updateLastChecked', {
-                      time: formatTimestamp(update.lastChecked),
-                    })}
-                  {update.lastChecked && update.nextCheckAt && ' · '}
-                  {update.nextCheckAt &&
-                    t('settings.updateNextCheck', {
-                      time: formatTimestamp(update.nextCheckAt),
-                    })}
-                </span>
-              )}
-            </div>
-            {update.status === 'available' ? (
-              <Button size="sm" onClick={update.install}>
-                {t('settings.updateInstall')}
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={update.status === 'checking' || update.status === 'installing'}
-                onClick={update.check}
-              >
-                {t('settings.updateCheck')}
-              </Button>
-            )}
-          </div>
-          <div className="set-row">
-            <div className="set-info">
-              <b>{t('settings.updateCheckFrequency')}</b>
-              <span>{t('settings.updateCheckFrequencyHint')}</span>
-            </div>
-            <Segmented
-              size="sm"
-              options={UPDATE_CHECK_HOURS_OPTIONS.map((h) => ({
-                value: h,
-                label:
-                  h === 0
-                    ? t('settings.updateFreqOff')
-                    : t('settings.updateFreqHours', { count: h }),
-              }))}
-              value={updateCheckHours}
-              onChange={(v) => onSettings({ updateCheckHours: v })}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.about')}</div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>eyeread.in</b>
-            <span>{t('settings.aboutHint')}</span>
-          </div>
-          <button type="button" className="set-link" onClick={showAboutWindow}>
-            {t('settings.open')}
-          </button>
-        </div>
-      </div>
-      {consentModal}
     </div>
   );
 }

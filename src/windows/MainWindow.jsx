@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, Component } from 'react';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Home, Keyboard, Settings as SettingsIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { ShieldToggle } from '../components/ShieldToggle';
+import { ShortcutsModal } from '../components/ShortcutsModal';
 import { LOGO_MARK_DARK, LOGO_MARK_LIGHT } from '../lib/branding';
 
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -77,13 +78,14 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
-import { useUiScale, useReducedMotion } from '../hooks/useA11y';
+import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 
 export function MainWindow() {
   const { t } = useTranslation();
   const logoMark = useSystemLogo();
   const [pane, setPane] = useState('library'); // library | settings
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const { listWidth, handleMouseDown } = useListResize(300);
   const [scripts, setScripts] = useState([]);
   const [selId, setSelId] = useState(null);
@@ -97,9 +99,10 @@ export function MainWindow() {
     scriptsRef.current = scripts;
   });
 
-  // ---- accessibility: UI scale + reduced motion ---------------------------
+  // ---- accessibility: UI scale + reduced motion + dyslexic font -----------
   useUiScale(settings.uiScale);
   useReducedMotion(settings.reduceMotion);
+  useDyslexicFont(settings.dyslexicFont);
 
   // ---- initial load -------------------------------------------------------
   useEffect(() => {
@@ -168,6 +171,13 @@ export function MainWindow() {
   } = usePermissionsGate();
 
   const update = useUpdateCheck(settings.updateCheckHours);
+
+  // The About window is a separate, long-lived webview — it can't share this
+  // hook's state directly, so mirror just the bits it surfaces (status +
+  // version) over an event, same pattern as settings:sync.
+  useEffect(() => {
+    emitTo('about', 'update:sync', { status: update.status, version: update.version });
+  }, [update.status, update.version]);
 
   useEffect(() => {
     let un1, un2, un3, un4;
@@ -296,14 +306,26 @@ export function MainWindow() {
         </div>
         <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
         <button
+          className="tl-shortcuts"
+          onClick={() => setShortcutsOpen(true)}
+          title={t('settings.viewShortcuts')}
+          aria-label={t('settings.viewShortcuts')}
+        >
+          <Keyboard size={15} aria-hidden="true" />
+        </button>
+        <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
-          title={t('app.settings')}
-          aria-label={t('app.settings')}
+          title={pane === 'settings' ? t('library.title') : t('app.settings')}
+          aria-label={pane === 'settings' ? t('library.title') : t('app.settings')}
           aria-pressed={pane === 'settings'}
         >
-          <SettingsIcon size={15} aria-hidden="true" />
-          {update.status === 'available' && (
+          {pane === 'settings' ? (
+            <Home size={15} aria-hidden="true" />
+          ) : (
+            <SettingsIcon size={15} aria-hidden="true" />
+          )}
+          {update.status === 'available' && pane !== 'settings' && (
             <span className="tl-settings-badge" aria-hidden="true" />
           )}
         </button>
@@ -317,6 +339,7 @@ export function MainWindow() {
               onSettings={applySettings}
               update={update}
               onCheckPermissions={openPermissionsModal}
+              onBack={() => setPane('library')}
             />
           </ErrorBoundary>
         ) : (
@@ -382,6 +405,7 @@ export function MainWindow() {
                   }}
                   onBack={null}
                   onStart={() => startReading(sel)}
+                  update={update}
                 />
               ) : (
                 <div className="editor-empty">
@@ -394,6 +418,7 @@ export function MainWindow() {
       </div>
       {consentModal}
       {permissionsModal}
+      {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
     </div>
   );
 }
