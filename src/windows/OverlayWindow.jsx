@@ -507,18 +507,18 @@ export function OverlayWindow() {
               {t('reading.voice')}
             </span>
           )}
-          {effective.voice && voiceAvailable && voiceError === 'mic-busy' && (
+          {effective.voice && voiceAvailable && voiceError === 'mic-issue' && (
             <button
               className="ov-voice ov-voice--retry"
-              title={t('overlay.micBusyHint')}
-              aria-label={t('overlay.micBusyHint')}
+              title={t('overlay.micIssueHint')}
+              aria-label={t('overlay.micIssueHint')}
               onClick={retryVoice}
             >
               <MicOff size={12} />
-              {t('overlay.micBusy')}
+              {t('overlay.micIssue')}
             </button>
           )}
-          {effective.voice && voiceAvailable && voiceError && voiceError !== 'mic-busy' && (
+          {effective.voice && voiceAvailable && voiceError && voiceError !== 'mic-issue' && (
             <button
               className="ov-voice ov-voice--retry"
               title={t('overlay.enableMicHint')}
