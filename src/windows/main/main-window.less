@@ -945,51 +945,6 @@
   gap: 10px;
 }
 
-/* screen-share shield toggle, expanded with a HIDDEN / VISIBLE label —
-   mirrors .ov-shield (overlay.less) but sized for a settings row rather
-   than the overlay's compact glass toolbar. */
-.set-shield {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-out);
-
-  svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-  }
-
-  &.shielded {
-    background: var(--accent-subtle-bg);
-    color: var(--accent-text);
-    border-color: var(--accent-subtle-border);
-    &:hover {
-      background: var(--accent-subtle-bg-hover);
-    }
-  }
-
-  &.exposed {
-    background: var(--exposed-subtle-bg);
-    color: var(--exposed-text);
-    border-color: var(--exposed-subtle-border);
-    &:hover {
-      background: var(--exposed-hover-bg);
-      color: var(--danger);
-    }
-  }
-}
-
 .set-group {
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);

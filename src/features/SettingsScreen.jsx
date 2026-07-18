@@ -5,9 +5,7 @@ import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { openExternal, showAboutWindow, isLinux, shieldActive } from '../lib/tauri';
-import { useShareProtection } from '../hooks/useShareProtection';
-import { ShieldToggle } from '../components/ShieldToggle';
+import { openExternal, showAboutWindow } from '../lib/tauri';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { defaultSettings, OVERRIDABLE_KEYS, UPDATE_CHECK_HOURS_OPTIONS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
@@ -46,7 +44,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
   const { t } = useTranslation();
   const {
     position,
-    hideFromShare,
     reduceMotion,
     highContrast,
     dyslexicFont,
@@ -66,21 +63,12 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
   const trackingMode = voice ? 'voice' : 'scroll';
   const countFromMins = Math.round((countFrom ?? 300) / 60);
 
-  const { setShielded, consentModal } = useShareProtection(settings, onSettings);
-
   const [viewMode, setViewMode] = useState(() => localStorage.getItem(MODE_KEY) || 'simple');
   const advanced = viewMode === 'advanced';
   const setMode = (v) => {
     setViewMode(v);
     localStorage.setItem(MODE_KEY, v);
   };
-
-  // Describe the screen-share state, flagging Linux as best-effort.
-  const shareHint = isLinux
-    ? t('settings.shareLinux')
-    : hideFromShare
-      ? t('settings.shareHidden')
-      : t('settings.shareVisible');
 
   const restoreDefaults = () => {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
@@ -225,18 +213,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             ]}
             value={position}
             onChange={(v) => onSettings({ position: v })}
-          />
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hideFromShare')}</b>
-            <span>{shareHint}</span>
-          </div>
-          <ShieldToggle
-            shielded={shieldActive(settings)}
-            onChange={setShielded}
-            className="set-shield"
-            showLabel
           />
         </div>
         <div className="set-row">
@@ -489,8 +465,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           </Button>
         </div>
       </div>
-
-      {consentModal}
     </div>
   );
 }
