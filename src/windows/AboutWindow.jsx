@@ -5,7 +5,7 @@ import { openExternal, listen, hideAboutWindow, setAboutProtected } from '../lib
 import i18n from '../i18n/index.js';
 import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
-import { useUiScale, useReducedMotion } from '../hooks/useA11y';
+import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import sponsors from '../data/sponsors.json';
 import omnishipMark from '../assets/logos/omniship-mark-beacon.svg';
 import { LOGO_MARK_DARK } from '../lib/branding';
@@ -34,6 +34,7 @@ export function AboutWindow() {
   const [shielded, setShielded] = useState(true);
   const [uiScale, setUiScale] = useState(100);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [dyslexicFont, setDyslexicFont] = useState(false);
   const testers = getTesters();
 
   // ✨ Easter egg on the app icon. Drag to bend the glass, click to toggle the
@@ -53,6 +54,7 @@ export function AboutWindow() {
 
   useUiScale(uiScale);
   useReducedMotion(reduceMotion);
+  useDyslexicFont(dyslexicFont);
 
   // The session-local shield wins once the user has flipped it via the egg.
   const shieldOn = eggShielded ?? shielded;
@@ -112,12 +114,14 @@ export function AboutWindow() {
       setShielded(s.hideFromShare);
       setUiScale(s.uiScale ?? 100);
       setReduceMotion(!!s.reduceMotion);
+      setDyslexicFont(!!s.dyslexicFont);
     });
     let unlisten;
     listen('settings:sync', (p) => {
       if (p?.settings?.hideFromShare !== undefined) setShielded(p.settings.hideFromShare);
       if (p?.settings?.uiScale !== undefined) setUiScale(p.settings.uiScale);
       if (p?.settings?.reduceMotion !== undefined) setReduceMotion(!!p.settings.reduceMotion);
+      if (p?.settings?.dyslexicFont !== undefined) setDyslexicFont(!!p.settings.dyslexicFont);
     }).then((fn) => {
       unlisten = fn;
     });

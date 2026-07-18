@@ -81,6 +81,15 @@ textarea {
   .reduce-motion-rules();
 }
 
+/* ---- Accessibility: dyslexic-friendly font (app chrome) ----
+   Redefines --font-sans so body text, buttons, and labels across the
+   chrome windows pick up OpenDyslexic. Headings (--font-display) and mono
+   badges/labels (--font-mono) stay put. The prompter's own roomier
+   letter/word-spacing (.er-script--dyslexic, below) is separate. */
+html.dyslexic-font {
+  --font-sans: 'OpenDyslexic', 'Hanken Grotesk', system-ui, sans-serif;
+}
+
 /* ---- Switch (.sw-wrap pattern) ----------------------------- */
 .er-switch {
   position: relative;

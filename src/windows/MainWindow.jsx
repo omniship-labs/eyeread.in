@@ -77,7 +77,7 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
-import { useUiScale, useReducedMotion } from '../hooks/useA11y';
+import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 
 export function MainWindow() {
@@ -97,9 +97,10 @@ export function MainWindow() {
     scriptsRef.current = scripts;
   });
 
-  // ---- accessibility: UI scale + reduced motion ---------------------------
+  // ---- accessibility: UI scale + reduced motion + dyslexic font -----------
   useUiScale(settings.uiScale);
   useReducedMotion(settings.reduceMotion);
+  useDyslexicFont(settings.dyslexicFont);
 
   // ---- initial load -------------------------------------------------------
   useEffect(() => {

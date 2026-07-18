@@ -139,7 +139,7 @@
     "aboutHint": "Version, credits, and legal",
     "open": "Open ↗",
     "dyslexicFont": "Dyslexia-friendly reading",
-    "dyslexicFontHint": "OpenDyslexic font with roomier spacing in the prompter",
+    "dyslexicFontHint": "OpenDyslexic font across the app; roomier spacing in the prompter",
     "appTextSize": "App text size",
     "appTextSizeHint": "Scales the whole app interface",
     "scaleSmall": "Small",

@@ -139,7 +139,7 @@
     "aboutHint": "Version, crédits et mentions légales",
     "open": "Ouvrir ↗",
     "dyslexicFont": "Lecture adaptée à la dyslexie",
-    "dyslexicFontHint": "Police OpenDyslexic avec un espacement plus large dans le prompteur",
+    "dyslexicFontHint": "Police OpenDyslexic dans toute l'interface de l'app ; espacement plus large dans le prompteur",
     "appTextSize": "Taille du texte de l'app",
     "appTextSizeHint": "Met à l'échelle toute l'interface de l'app",
     "scaleSmall": "Petit",

@@ -139,7 +139,7 @@
     "aboutHint": "バージョン、クレジット、法的情報",
     "open": "開く ↗",
     "dyslexicFont": "ディスレクシア対応の表示",
-    "dyslexicFontHint": "プロンプターで OpenDyslexic フォントと広めの字間を使用",
+    "dyslexicFontHint": "アプリ全体で OpenDyslexic フォントを使用、プロンプターでは字間も広げます",
     "appTextSize": "アプリの文字サイズ",
     "appTextSizeHint": "アプリ全体の表示を拡大縮小します",
     "scaleSmall": "小",

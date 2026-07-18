@@ -139,7 +139,7 @@
     "aboutHint": "Version, Mitwirkende und Rechtliches",
     "open": "Öffnen ↗",
     "dyslexicFont": "Legasthenie-freundliches Lesen",
-    "dyslexicFontHint": "OpenDyslexic-Schrift mit größeren Abständen im Prompter",
+    "dyslexicFontHint": "OpenDyslexic-Schrift in der ganzen App-Oberfläche; größere Abstände im Prompter",
     "appTextSize": "App-Textgröße",
     "appTextSizeHint": "Skaliert die gesamte App-Oberfläche",
     "scaleSmall": "Klein",

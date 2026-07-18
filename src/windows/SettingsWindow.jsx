@@ -25,7 +25,7 @@ import {
   resetOverlayLayout,
   manualDragProps,
 } from '../lib/tauri';
-import { useUiScale, useReducedMotion } from '../hooks/useA11y';
+import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 
 const sliderFill = (value, min, max) => {
   const pct = ((value - min) / (max - min)) * 100;
@@ -45,6 +45,7 @@ export function SettingsWindow() {
   // Mirror the global accessibility prefs in this standalone window.
   useUiScale(global.uiScale);
   useReducedMotion(global.reduceMotion);
+  useDyslexicFont(global.dyslexicFont);
 
   useEffect(() => {
     fetchSettings().then(setGlobal);

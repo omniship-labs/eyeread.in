@@ -139,7 +139,7 @@
     "aboutHint": "संस्करण, श्रेय और कानूनी",
     "open": "खोलें ↗",
     "dyslexicFont": "डिस्लेक्सिया-अनुकूल पठन",
-    "dyslexicFontHint": "प्रॉम्प्टर में OpenDyslexic फ़ॉन्ट और अधिक स्पेसिंग",
+    "dyslexicFontHint": "पूरे ऐप इंटरफ़ेस में OpenDyslexic फ़ॉन्ट; प्रॉम्प्टर में अधिक स्पेसिंग",
     "appTextSize": "ऐप टेक्स्ट आकार",
     "appTextSizeHint": "पूरे ऐप इंटरफ़ेस को स्केल करता है",
     "scaleSmall": "छोटा",
