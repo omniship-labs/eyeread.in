@@ -518,15 +518,14 @@ export async function openExternal(url) {
 
 /**
  * Check for an available update.
- * Returns: { status: 'up_to_date' | 'update_available', version?: string, notes?: string }
- * `notes` is the release's changelog body, when the update manifest carries one.
+ * Returns: { status: 'up_to_date' | 'update_available', version?: string }
  */
 export async function checkForUpdate() {
   if (!isTauri) return { status: 'up_to_date' };
   const { invoke } = await import('@tauri-apps/api/core');
   const result = await invoke('check_for_update');
-  if (result.status === 'update_available') {
-    return { status: 'update_available', version: result.version, notes: result.notes ?? null };
+  if (result.startsWith('update:')) {
+    return { status: 'update_available', version: result.slice(7) };
   }
   return { status: 'up_to_date' };
 }

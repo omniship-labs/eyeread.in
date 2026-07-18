@@ -120,7 +120,7 @@ function ReleaseHistory({ t, i18n }) {
 
   if (history.loading) {
     return (
-      <section className="section dl-history">
+      <section className="section dl-history" id="history">
         <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
         <p className="dl-status">{t('download.loading')}</p>
       </section>
@@ -129,7 +129,7 @@ function ReleaseHistory({ t, i18n }) {
 
   if (history.error || !history.data?.length) {
     return (
-      <section className="section dl-history">
+      <section className="section dl-history" id="history">
         <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
         <p className="dl-status dl-status-error">
           {t('download.error')}{' '}
@@ -146,7 +146,7 @@ function ReleaseHistory({ t, i18n }) {
   }
 
   return (
-    <section className="section dl-history">
+    <section className="section dl-history" id="history">
       <h2 className="dl-channel-h">{t('download.historyHeading')}</h2>
       <p className="dl-channel-sub">{t('download.historySub')}</p>
       <div className="dl-history-list">

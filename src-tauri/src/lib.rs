@@ -192,31 +192,16 @@ fn show_about_window(app: AppHandle) {
 /// Populated by `download_update`, consumed (and cleared) by `install_update`.
 struct PendingUpdate(Mutex<Option<(Update, Vec<u8>)>>);
 
-/// JSON-serializable result of a check, including the release notes body the
-/// updater manifest carries alongside the version — previously fetched and
-/// discarded; now handed to the frontend so it can show a "What's new" modal.
-#[derive(serde::Serialize)]
-struct UpdateCheckResult {
-    status: &'static str,
-    version: Option<String>,
-    notes: Option<String>,
-}
-
-/// Check for an update and return its status, version, and release notes.
+/// Check for an update and return a human-readable status string to the frontend.
+/// Release notes live on the website's release history (which already pages
+/// through the full GitHub Releases list), not here — see ReleaseNotesModal's
+/// removal for why this doesn't also return the update manifest's `notes`.
 #[tauri::command]
-async fn check_for_update(app: AppHandle) -> Result<UpdateCheckResult, String> {
+async fn check_for_update(app: AppHandle) -> Result<String, String> {
     let updater = app.updater().map_err(|e| e.to_string())?;
     match updater.check().await {
-        Ok(Some(update)) => Ok(UpdateCheckResult {
-            status: "update_available",
-            version: Some(update.version.clone()),
-            notes: update.body.clone(),
-        }),
-        Ok(None) => Ok(UpdateCheckResult {
-            status: "up_to_date",
-            version: None,
-            notes: None,
-        }),
+        Ok(Some(update)) => Ok(format!("update:{}", update.version)),
+        Ok(None) => Ok("up_to_date".to_string()),
         Err(e) => Err(e.to_string()),
     }
 }

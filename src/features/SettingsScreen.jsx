@@ -7,7 +7,6 @@ import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
 import { openExternal, showAboutWindow } from '../lib/tauri';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
-import { ReleaseNotesModal } from '../components/ReleaseNotesModal';
 import { defaultSettings, OVERRIDABLE_KEYS, UPDATE_CHECK_HOURS_OPTIONS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
@@ -15,6 +14,12 @@ import { requestMicPermission } from '../lib/mic';
 // OmniShip Labs' single fiscal home — same collective the site and
 // .github/FUNDING.yml point at.
 const OC_URL = 'https://opencollective.com/omniship';
+
+// The site's release-history section already pages through the full GitHub
+// Releases list (see site/src/hooks/useLatestReleases.js), so linking there
+// covers every version between what's installed and what's available — a
+// single-release in-app "what's new" view couldn't.
+const RELEASE_NOTES_URL = 'https://get.eyeread.in/download#history';
 
 // Which of the two views a user last picked, remembered locally so it
 // sticks across sessions without round-tripping through the settings store
@@ -70,7 +75,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
     setViewMode(v);
     localStorage.setItem(MODE_KEY, v);
   };
-  const [notesOpen, setNotesOpen] = useState(false);
 
   const restoreDefaults = () => {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
@@ -129,12 +133,12 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
                   {update.status === 'error' && t('settings.updateError')}
                   {update.status === 'idle' && `v${getAppVersion()}`}
                 </span>
-                {update.status === 'available' && update.notes && (
+                {update.status === 'available' && (
                   <button
                     type="button"
                     className="set-link"
                     style={{ display: 'block', marginTop: 2 }}
-                    onClick={() => setNotesOpen(true)}
+                    onClick={() => openExternal(RELEASE_NOTES_URL)}
                   >
                     {t('settings.whatsNew')}
                   </button>
@@ -477,15 +481,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           </Button>
         </div>
       </div>
-
-      {notesOpen && update && (
-        <ReleaseNotesModal
-          currentVersion={getAppVersion()}
-          version={update.version}
-          notes={update.notes}
-          onClose={() => setNotesOpen(false)}
-        />
-      )}
     </div>
   );
 }
