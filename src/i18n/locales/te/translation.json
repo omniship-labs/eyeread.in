@@ -132,7 +132,7 @@
     "updateLastChecked": "చివరిసారి తనిఖీ చేసింది {{time}}",
     "updateNextCheck": "తదుపరి తనిఖీ {{time}}",
     "whatsNew": "కొత్తవి",
-    "whatsNewTitle": "v{{version}}లో కొత్తవి",
+    "whatsNewTitle": "v{{current}} → v{{version}} • కొత్తవి",
     "whatsNewEmpty": "ఈ అప్‌డేట్‌కు విడుదల గమనికలు లేవు.",
     "support": "మద్దతు",
     "donateTitle": "eyeread.in AGPL-3.0 కింద ఉచితం",

@@ -132,7 +132,7 @@
     "updateLastChecked": "最終確認: {{time}}",
     "updateNextCheck": "次回確認: {{time}}",
     "whatsNew": "新機能",
-    "whatsNewTitle": "v{{version}} の新機能",
+    "whatsNewTitle": "v{{current}} → v{{version}} • 新機能",
     "whatsNewEmpty": "この更新のリリースノートはありません。",
     "support": "サポート",
     "donateTitle": "eyeread.in は AGPL-3.0 の下で自由に使えます",

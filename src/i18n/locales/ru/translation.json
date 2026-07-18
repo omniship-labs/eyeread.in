@@ -132,7 +132,7 @@
     "updateLastChecked": "Последняя проверка {{time}}",
     "updateNextCheck": "Следующая проверка {{time}}",
     "whatsNew": "Что нового",
-    "whatsNewTitle": "Что нового в v{{version}}",
+    "whatsNewTitle": "v{{current}} → v{{version}} • Что нового",
     "whatsNewEmpty": "Для этого обновления нет заметок о выпуске.",
     "support": "Поддержка",
     "donateTitle": "eyeread.in свободен под лицензией AGPL-3.0",

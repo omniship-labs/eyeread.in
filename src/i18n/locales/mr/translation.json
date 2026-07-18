@@ -132,7 +132,7 @@
     "updateLastChecked": "शेवटचे तपासले {{time}}",
     "updateNextCheck": "पुढील तपासणी {{time}}",
     "whatsNew": "नवीन काय आहे",
-    "whatsNewTitle": "v{{version}} मध्ये नवीन काय आहे",
+    "whatsNewTitle": "v{{current}} → v{{version}} • नवीन काय आहे",
     "whatsNewEmpty": "या अपडेटसाठी कोणत्याही रिलीज नोट्स नाहीत.",
     "support": "पाठिंबा",
     "donateTitle": "eyeread.in AGPL-3.0 अंतर्गत मोफत आहे",

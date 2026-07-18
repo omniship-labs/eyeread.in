@@ -132,7 +132,7 @@
     "updateLastChecked": "Zuletzt geprüft {{time}}",
     "updateNextCheck": "Nächste Prüfung {{time}}",
     "whatsNew": "Neuigkeiten",
-    "whatsNewTitle": "Neuigkeiten in v{{version}}",
+    "whatsNewTitle": "v{{current}} → v{{version}} • Neuigkeiten",
     "whatsNewEmpty": "Keine Versionshinweise für dieses Update.",
     "support": "Unterstützen",
     "donateTitle": "eyeread.in ist frei unter AGPL-3.0",

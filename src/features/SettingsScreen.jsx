@@ -480,6 +480,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
 
       {notesOpen && update && (
         <ReleaseNotesModal
+          currentVersion={getAppVersion()}
           version={update.version}
           notes={update.notes}
           onClose={() => setNotesOpen(false)}

@@ -10,7 +10,7 @@ import './release-notes-modal.less';
  * (previously discarded). Mirrors the ShortcutsModal / PermissionsModal
  * backdrop+card shell.
  */
-export function ReleaseNotesModal({ version, notes, onClose }) {
+export function ReleaseNotesModal({ currentVersion, version, notes, onClose }) {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function ReleaseNotesModal({ version, notes, onClose }) {
             <Sparkles size={18} />
           </span>
           <span className="rnm-title" id="rnm-title">
-            {t('settings.whatsNewTitle', { version })}
+            {t('settings.whatsNewTitle', { current: currentVersion, version })}
           </span>
           <button
             type="button"
