@@ -45,6 +45,7 @@ import { useShareProtection } from '../hooks/useShareProtection';
 import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 import { DICTATION_SETTINGS_URL } from '../lib/speech';
+import { MIC_PRIVACY_SETTINGS_URL } from '../lib/mic';
 
 export function OverlayWindow() {
   const { t } = useTranslation();
@@ -525,17 +526,35 @@ export function OverlayWindow() {
               {t('overlay.micIssue')}
             </button>
           )}
-          {effective.voice && voiceAvailable && voiceError && voiceError !== 'mic-issue' && (
+          {effective.voice && voiceAvailable && voiceError === 'mic-denied-confirmed' && (
             <button
               className="ov-voice ov-voice--retry"
-              title={t('overlay.enableMicHint')}
-              aria-label={t('overlay.enableMicHint')}
-              onClick={retryVoice}
+              title={t('overlay.micDeniedHint')}
+              aria-label={t('overlay.micDeniedHint')}
+              // A retry can't fix a confirmed OS-level denial — send the
+              // user straight to the settings pane, same as the mic-issue
+              // (Dictation) chip above.
+              onClick={() => (isMacOS ? openExternal(MIC_PRIVACY_SETTINGS_URL) : retryVoice())}
             >
               <MicOff size={12} />
-              {t('overlay.enableMic')}
+              {t('overlay.micDenied')}
             </button>
           )}
+          {effective.voice &&
+            voiceAvailable &&
+            voiceError &&
+            voiceError !== 'mic-issue' &&
+            voiceError !== 'mic-denied-confirmed' && (
+              <button
+                className="ov-voice ov-voice--retry"
+                title={t('overlay.enableMicHint')}
+                aria-label={t('overlay.enableMicHint')}
+                onClick={retryVoice}
+              >
+                <MicOff size={12} />
+                {t('overlay.enableMic')}
+              </button>
+            )}
           {effective.voice && playing && !voiceAvailable && (
             <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
               <MicOff size={12} />

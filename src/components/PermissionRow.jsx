@@ -9,7 +9,9 @@ export function PermissionRow({ label, hint, state, stateLabels, onRequest, onOp
     <div className="set-row">
       <div className="set-info">
         <b>{label}</b>
-        <span>{hint}</span>
+        <span>
+          {state === 'denied' && stateLabels.deniedHint ? stateLabels.deniedHint : hint}
+        </span>
       </div>
       {state === 'granted' ? (
         <span className="set-status-ok">{stateLabels.granted}</span>

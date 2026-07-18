@@ -46,12 +46,14 @@ export function PermissionsModal({
     prompt: t('settings.micPrompt'),
     unknown: t('settings.micUnknown'),
     openSettings: t('settings.openSystemSettings'),
+    deniedHint: t('settings.micDeniedHint'),
   };
   const speechLabels = {
     granted: t('settings.speechGranted'),
     denied: t('settings.speechDenied'),
     unknown: t('settings.speechUnknown'),
     openSettings: t('settings.openSystemSettings'),
+    deniedHint: t('settings.speechDeniedHint'),
   };
 
   return (
