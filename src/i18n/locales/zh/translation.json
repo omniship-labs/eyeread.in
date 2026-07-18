@@ -54,6 +54,7 @@
     "advancedMode": "高级",
     "viewShortcuts": "快捷键",
     "close": "关闭",
+    "back": "返回",
     "overlay": "悬浮层",
     "defaultPosition": "默认位置",
     "defaultPositionHint": "悬浮层在屏幕上的锚定位置",

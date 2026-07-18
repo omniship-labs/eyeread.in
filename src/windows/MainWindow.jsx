@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, Component } from 'react';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Home, Settings as SettingsIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { ShieldToggle } from '../components/ShieldToggle';
@@ -298,12 +298,16 @@ export function MainWindow() {
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
-          title={t('app.settings')}
-          aria-label={t('app.settings')}
+          title={pane === 'settings' ? t('library.title') : t('app.settings')}
+          aria-label={pane === 'settings' ? t('library.title') : t('app.settings')}
           aria-pressed={pane === 'settings'}
         >
-          <SettingsIcon size={15} aria-hidden="true" />
-          {update.status === 'available' && (
+          {pane === 'settings' ? (
+            <Home size={15} aria-hidden="true" />
+          ) : (
+            <SettingsIcon size={15} aria-hidden="true" />
+          )}
+          {update.status === 'available' && pane !== 'settings' && (
             <span className="tl-settings-badge" aria-hidden="true" />
           )}
         </button>
@@ -317,6 +321,7 @@ export function MainWindow() {
               onSettings={applySettings}
               update={update}
               onCheckPermissions={openPermissionsModal}
+              onBack={() => setPane('library')}
             />
           </ErrorBoundary>
         ) : (

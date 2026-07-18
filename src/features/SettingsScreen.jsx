@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Keyboard, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { ArrowLeft, Heart, Keyboard, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
@@ -43,7 +43,7 @@ function formatTimestamp(ms) {
       });
 }
 
-export function SettingsScreen({ settings, onSettings, update, onCheckPermissions }) {
+export function SettingsScreen({ settings, onSettings, update, onCheckPermissions, onBack }) {
   const { t } = useTranslation();
   const {
     position,
@@ -91,7 +91,17 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
   return (
     <div className="settings-main">
       <div className="settings-head">
-        <div className="settings-title">{t('settings.title')}</div>
+        <div className="settings-head-left">
+          <button
+            type="button"
+            className="settings-back"
+            onClick={onBack}
+            aria-label={t('settings.back')}
+          >
+            <ArrowLeft size={16} />
+          </button>
+          <div className="settings-title">{t('settings.title')}</div>
+        </div>
         <div className="settings-head-controls">
           <Segmented
             size="sm"
@@ -110,34 +120,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           >
             {t('settings.viewShortcuts')}
           </Button>
-        </div>
-      </div>
-
-      {/* ── Overlay behavior ── */}
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.overlay')}</div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.defaultPosition')}</b>
-            <span>{t('settings.defaultPositionHint')}</span>
-          </div>
-          <Segmented
-            size="sm"
-            options={[
-              { value: 'top', label: t('settings.positionTop') },
-              { value: 'center', label: t('settings.positionCenter') },
-              { value: 'bottom', label: t('settings.positionBottom') },
-            ]}
-            value={position}
-            onChange={(v) => onSettings({ position: v })}
-          />
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hideFromShare')}</b>
-            <span>{shareHint}</span>
-          </div>
-          <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
         </div>
       </div>
 
@@ -160,6 +142,34 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
       {/* ── Reading defaults ── */}
       <div className="set-group">
         <div className="set-group-label">{t('settings.readingDefaults')}</div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.defaultPosition')}</b>
+            <span>{t('settings.defaultPositionHint')}</span>
+          </div>
+          <Segmented
+            size="sm"
+            options={[
+              { value: 'top', label: t('settings.positionTop') },
+              { value: 'center', label: t('settings.positionCenter') },
+              { value: 'bottom', label: t('settings.positionBottom') },
+            ]}
+            value={position}
+            onChange={(v) => onSettings({ position: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.hideFromShare')}</b>
+            <span>{shareHint}</span>
+          </div>
+          <ShieldToggle
+            shielded={shieldActive(settings)}
+            onChange={setShielded}
+            className="set-shield"
+            showLabel
+          />
+        </div>
         <div className="set-row">
           <div className="set-info">
             <b>{t('settings.trackingMode')}</b>

@@ -842,6 +842,32 @@
   margin-bottom: 28px;
 }
 
+.settings-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+}
+
 .settings-title {
   font-family: var(--font-display);
   font-size: 22px;
@@ -854,6 +880,51 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* screen-share shield toggle, expanded with a HIDDEN / VISIBLE label —
+   mirrors .ov-shield (overlay.less) but sized for a settings row rather
+   than the overlay's compact glass toolbar. */
+.set-shield {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &.shielded {
+    background: var(--accent-subtle-bg);
+    color: var(--accent-text);
+    border-color: var(--accent-subtle-border);
+    &:hover {
+      background: var(--accent-subtle-bg-hover);
+    }
+  }
+
+  &.exposed {
+    background: var(--exposed-subtle-bg);
+    color: var(--exposed-text);
+    border-color: var(--exposed-subtle-border);
+    &:hover {
+      background: var(--exposed-hover-bg);
+      color: var(--danger);
+    }
+  }
 }
 
 .set-group {

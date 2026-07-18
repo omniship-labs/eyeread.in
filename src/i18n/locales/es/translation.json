@@ -54,6 +54,7 @@
     "advancedMode": "Avanzado",
     "viewShortcuts": "Atajos de teclado",
     "close": "Cerrar",
+    "back": "Atrás",
     "overlay": "Overlay",
     "defaultPosition": "Posición por defecto",
     "defaultPositionHint": "Dónde se ancla el overlay en la pantalla",

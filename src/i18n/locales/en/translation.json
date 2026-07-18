@@ -54,6 +54,7 @@
     "advancedMode": "Advanced",
     "viewShortcuts": "Shortcuts",
     "close": "Close",
+    "back": "Back",
     "overlay": "Overlay",
     "defaultPosition": "Default position",
     "defaultPositionHint": "Where the overlay anchors on screen",
