@@ -7,6 +7,7 @@ import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
 import { openExternal, showAboutWindow } from '../lib/tauri';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { ReleaseNotesModal } from '../components/ReleaseNotesModal';
 import { defaultSettings, OVERRIDABLE_KEYS, UPDATE_CHECK_HOURS_OPTIONS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
@@ -69,6 +70,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
     setViewMode(v);
     localStorage.setItem(MODE_KEY, v);
   };
+  const [notesOpen, setNotesOpen] = useState(false);
 
   const restoreDefaults = () => {
     onSettings(Object.fromEntries(OVERRIDABLE_KEYS.map((k) => [k, defaultSettings[k]])));
@@ -127,6 +129,16 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
                   {update.status === 'error' && t('settings.updateError')}
                   {update.status === 'idle' && `v${getAppVersion()}`}
                 </span>
+                {update.status === 'available' && update.notes && (
+                  <button
+                    type="button"
+                    className="set-link"
+                    style={{ display: 'block', marginTop: 2 }}
+                    onClick={() => setNotesOpen(true)}
+                  >
+                    {t('settings.whatsNew')}
+                  </button>
+                )}
                 {advanced && (update.lastChecked || update.nextCheckAt) && (
                   <span className="set-mono" style={{ display: 'block', marginTop: 2 }}>
                     {update.lastChecked &&
@@ -465,6 +477,14 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           </Button>
         </div>
       </div>
+
+      {notesOpen && update && (
+        <ReleaseNotesModal
+          version={update.version}
+          notes={update.notes}
+          onClose={() => setNotesOpen(false)}
+        />
+      )}
     </div>
   );
 }

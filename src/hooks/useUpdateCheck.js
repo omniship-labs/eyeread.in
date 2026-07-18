@@ -12,6 +12,7 @@ import { isTauri, checkForUpdate, downloadUpdate, installUpdate } from '../lib/t
 export function useUpdateCheck(intervalHours = 6) {
   const [status, setStatus] = useState('idle');
   const [version, setVersion] = useState(null);
+  const [notes, setNotes] = useState(null);
   const [lastChecked, setLastChecked] = useState(null);
   const [nextCheckAt, setNextCheckAt] = useState(null);
   const inFlight = useRef(false);
@@ -24,6 +25,7 @@ export function useUpdateCheck(intervalHours = 6) {
       const result = await checkForUpdate();
       if (result.status === 'update_available') {
         setVersion(result.version);
+        setNotes(result.notes);
         setStatus('available');
         // Pre-fetch in the background so the eventual install click is
         // instant — best-effort, install() falls back to downloading itself
@@ -75,5 +77,5 @@ export function useUpdateCheck(intervalHours = 6) {
     return () => clearTimeout(t);
   }, [check, intervalHours, lastChecked]);
 
-  return { status, version, lastChecked, nextCheckAt, check, install };
+  return { status, version, notes, lastChecked, nextCheckAt, check, install };
 }
