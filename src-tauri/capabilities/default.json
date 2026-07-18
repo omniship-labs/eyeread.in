@@ -28,7 +28,10 @@
     "global-shortcut:allow-unregister-all",
     "global-shortcut:allow-is-registered",
     "opener:default",
-    "opener:allow-open-url",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "x-apple.systempreferences:*" }]
+    },
     "sql:default",
     "sql:allow-execute",
     "sql:allow-select",
