@@ -129,7 +129,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
         <div className="set-row">
           <div className="set-info">
             <b>eyeread.in</b>
-            <span>{t('settings.aboutHint')}</span>
+            <span>{t('about.orgByline')}</span>
           </div>
           <button type="button" className="set-link" onClick={showAboutWindow}>
             {t('settings.open')}
