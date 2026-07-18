@@ -170,6 +170,13 @@ export function MainWindow() {
 
   const update = useUpdateCheck(settings.updateCheckHours);
 
+  // The About window is a separate, long-lived webview — it can't share this
+  // hook's state directly, so mirror just the bits it surfaces (status +
+  // version) over an event, same pattern as settings:sync.
+  useEffect(() => {
+    emitTo('about', 'update:sync', { status: update.status, version: update.version });
+  }, [update.status, update.version]);
+
   useEffect(() => {
     let un1, un2, un3, un4;
     (async () => {
@@ -388,6 +395,7 @@ export function MainWindow() {
                   }}
                   onBack={null}
                   onStart={() => startReading(sel)}
+                  update={update}
                 />
               ) : (
                 <div className="editor-empty">

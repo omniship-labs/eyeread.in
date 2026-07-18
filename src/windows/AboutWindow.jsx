@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X } from 'lucide-react';
-import { openExternal, listen, hideAboutWindow, setAboutProtected } from '../lib/tauri';
+import { Download, X } from 'lucide-react';
+import {
+  openExternal,
+  listen,
+  hideAboutWindow,
+  setAboutProtected,
+  installUpdate,
+} from '../lib/tauri';
 import i18n from '../i18n/index.js';
 import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
@@ -35,6 +41,7 @@ export function AboutWindow() {
   const [uiScale, setUiScale] = useState(100);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [dyslexicFont, setDyslexicFont] = useState(false);
+  const [update, setUpdate] = useState(null);
   const testers = getTesters();
 
   // ✨ Easter egg on the app icon. Drag to bend the glass, click to toggle the
@@ -128,6 +135,10 @@ export function AboutWindow() {
     listen('locale:changed', (p) => {
       if (p?.lng) i18n.changeLanguage(p.lng);
     });
+    listen('update:sync', (p) => {
+      if (p?.status === 'available') setUpdate(p);
+      else if (p?.status) setUpdate(null);
+    });
     return () => unlisten?.();
   }, []);
 
@@ -165,6 +176,12 @@ export function AboutWindow() {
         />
         <div className="aw-name">eyeread.in</div>
         <div className="aw-version">{getVersion()}</div>
+        {update && (
+          <button type="button" className="aw-update" onClick={() => installUpdate()}>
+            <Download size={11} />
+            {t('settings.updateAvailable', { version: update.version })}
+          </button>
+        )}
         <div className="aw-org">© 2026 OmniShip Labs</div>
         <OtherChannelLink />
       </div>
