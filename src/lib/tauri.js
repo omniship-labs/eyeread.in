@@ -530,7 +530,20 @@ export async function checkForUpdate() {
   return { status: 'up_to_date' };
 }
 
-/** Download, install the update, and restart. */
+/**
+ * Silently download (but don't install) an available update, so a later
+ * installUpdate() call is instant instead of waiting on the download.
+ * Best-effort — errors are the caller's problem to ignore, since
+ * installUpdate() falls back to a full download on its own if this never
+ * completed.
+ */
+export async function downloadUpdate() {
+  if (!isTauri) return;
+  const { invoke } = await import('@tauri-apps/api/core');
+  await invoke('download_update');
+}
+
+/** Install a pending update (instant if downloadUpdate() already ran, otherwise downloads first) and restart. */
 export async function installUpdate() {
   if (!isTauri) return;
   const { invoke } = await import('@tauri-apps/api/core');

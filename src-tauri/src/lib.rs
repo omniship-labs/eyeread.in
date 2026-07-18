@@ -1,9 +1,10 @@
+use std::sync::Mutex;
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},
     AppHandle, Manager, RunEvent, WindowEvent,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
-use tauri_plugin_updater::UpdaterExt;
+use tauri_plugin_updater::{Update, UpdaterExt};
 
 /// Toggle screen-capture invisibility on every app window at once.
 ///
@@ -186,6 +187,11 @@ fn show_about_window(app: AppHandle) {
     }
 }
 
+/// A downloaded-but-not-yet-installed update, cached so a later
+/// `install_update` call can apply it immediately instead of re-downloading.
+/// Populated by `download_update`, consumed (and cleared) by `install_update`.
+struct PendingUpdate(Mutex<Option<(Update, Vec<u8>)>>);
+
 /// Check for an update and return a human-readable status string to the frontend.
 #[tauri::command]
 async fn check_for_update(app: AppHandle) -> Result<String, String> {
@@ -197,9 +203,41 @@ async fn check_for_update(app: AppHandle) -> Result<String, String> {
     }
 }
 
-/// Install a pending update and restart.
+/// Silently download (but don't install) an available update in the
+/// background, once `check_for_update` reports one — so the "Update &
+/// restart" click a user eventually makes doesn't have to wait on the
+/// download first. Best-effort: any failure here just means `install_update`
+/// falls back to its own full download, same as before this existed.
 #[tauri::command]
-async fn install_update(app: AppHandle) -> Result<(), String> {
+async fn download_update(
+    app: AppHandle,
+    pending: tauri::State<'_, PendingUpdate>,
+) -> Result<(), String> {
+    let updater = app.updater().map_err(|e| e.to_string())?;
+    if let Some(update) = updater.check().await.map_err(|e| e.to_string())? {
+        let bytes = update
+            .download(|_, _| {}, || {})
+            .await
+            .map_err(|e| e.to_string())?;
+        *pending.0.lock().unwrap() = Some((update, bytes));
+    }
+    Ok(())
+}
+
+/// Install a pending update and restart. Uses the background-downloaded
+/// bytes from `download_update` when available (instant); otherwise falls
+/// back to a full check + download + install, same as always.
+#[tauri::command]
+async fn install_update(
+    app: AppHandle,
+    pending: tauri::State<'_, PendingUpdate>,
+) -> Result<(), String> {
+    let cached = pending.0.lock().unwrap().take();
+    if let Some((update, bytes)) = cached {
+        update.install(bytes).map_err(|e| e.to_string())?;
+        app.restart();
+    }
+
     let updater = app.updater().map_err(|e| e.to_string())?;
     if let Some(update) = updater.check().await.map_err(|e| e.to_string())? {
         update
@@ -350,8 +388,10 @@ pub fn run() {
                 .add_migrations("sqlite:eyeread.db", migrations)
                 .build(),
         )
+        .manage(PendingUpdate(Mutex::new(None)))
         .invoke_handler(tauri::generate_handler![
             check_for_update,
+            download_update,
             install_update,
             show_about_window,
             set_app_protected,
