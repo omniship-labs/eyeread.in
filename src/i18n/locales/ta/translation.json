@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "அமைப்புகள்",
+    "simpleMode": "எளிமை",
+    "advancedMode": "மேம்பட்ட",
+    "viewShortcuts": "ஹாட்கீகள்",
+    "close": "மூடு",
     "overlay": "ஓவர்லே",
     "defaultPosition": "இயல்புநிலை இடம்",
     "defaultPositionHint": "திரையில் ஓவர்லே எங்கே நிலைகொள்கிறது",

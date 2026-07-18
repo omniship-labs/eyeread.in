@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "設定",
+    "simpleMode": "シンプル",
+    "advancedMode": "詳細",
+    "viewShortcuts": "ホットキー",
+    "close": "閉じる",
     "overlay": "オーバーレイ",
     "defaultPosition": "既定の位置",
     "defaultPositionHint": "オーバーレイが画面上で固定される位置",

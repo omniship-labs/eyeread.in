@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "Ajustes",
+    "simpleMode": "Simple",
+    "advancedMode": "Avanzado",
+    "viewShortcuts": "Atajos de teclado",
+    "close": "Cerrar",
     "overlay": "Overlay",
     "defaultPosition": "Posición por defecto",
     "defaultPositionHint": "Dónde se ancla el overlay en la pantalla",

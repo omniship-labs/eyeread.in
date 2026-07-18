@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "सेटिंग्स",
+    "simpleMode": "सरल",
+    "advancedMode": "उन्नत",
+    "viewShortcuts": "हॉटकी",
+    "close": "बंद करें",
     "overlay": "ओवरले",
     "defaultPosition": "डिफ़ॉल्ट स्थिति",
     "defaultPositionHint": "स्क्रीन पर ओवरले कहाँ टिकता है",

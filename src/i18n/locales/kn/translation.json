@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "simpleMode": "ಸರಳ",
+    "advancedMode": "ಸುಧಾರಿತ",
+    "viewShortcuts": "ಹಾಟ್‌ಕೀಗಳು",
+    "close": "ಮುಚ್ಚಿ",
     "overlay": "ಓವರ್‌ಲೇ",
     "defaultPosition": "ಡೀಫಾಲ್ಟ್ ಸ್ಥಾನ",
     "defaultPositionHint": "ಪರದೆಯ ಮೇಲೆ ಓವರ್‌ಲೇ ಎಲ್ಲಿ ನೆಲೆಗೊಳ್ಳುತ್ತದೆ",

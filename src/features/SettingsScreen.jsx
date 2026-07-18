@@ -1,10 +1,12 @@
-import { Heart, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { useState } from 'react';
+import { Heart, Keyboard, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { openExternal, showAboutWindow, isMacOS, isLinux, shieldActive } from '../lib/tauri';
+import { ShortcutsModal } from '../components/ShortcutsModal';
+import { openExternal, showAboutWindow, isLinux, shieldActive } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { ShieldToggle } from '../components/ShieldToggle';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
@@ -15,6 +17,12 @@ import { requestMicPermission } from '../lib/mic';
 // OmniShip Labs' single fiscal home — same collective the site and
 // .github/FUNDING.yml point at.
 const OC_URL = 'https://opencollective.com/omniship';
+
+// Which of the two views a user last picked, remembered locally so it
+// sticks across sessions without round-tripping through the settings store
+// (this is a Settings-screen display preference, not a reading setting —
+// the overlay/prompter never needs to know about it).
+const MODE_KEY = 'eyeread.settingsMode';
 
 function getAppVersion() {
   return typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
@@ -56,14 +64,18 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
     updateCheckHours = 6,
   } = settings;
 
-  const mode = voice ? 'voice' : 'scroll';
+  const trackingMode = voice ? 'voice' : 'scroll';
   const countFromMins = Math.round((countFrom ?? 300) / 60);
 
   const { setShielded, consentModal } = useShareProtection(settings, onSettings);
 
-  // Hotkey hint symbols differ per platform (⌘/⌥ on macOS, Ctrl/Alt elsewhere).
-  const modKey = isMacOS ? '⌘' : 'Ctrl';
-  const altKey = isMacOS ? '⌥' : 'Alt';
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem(MODE_KEY) || 'simple');
+  const advanced = viewMode === 'advanced';
+  const setMode = (v) => {
+    setViewMode(v);
+    localStorage.setItem(MODE_KEY, v);
+  };
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   // Describe the screen-share state, flagging Linux as best-effort.
   const shareHint = isLinux
@@ -78,7 +90,28 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
 
   return (
     <div className="settings-main">
-      <div className="settings-title">{t('settings.title')}</div>
+      <div className="settings-head">
+        <div className="settings-title">{t('settings.title')}</div>
+        <div className="settings-head-controls">
+          <Segmented
+            size="sm"
+            options={[
+              { value: 'simple', label: t('settings.simpleMode') },
+              { value: 'advanced', label: t('settings.advancedMode') },
+            ]}
+            value={viewMode}
+            onChange={setMode}
+          />
+          <Button
+            size="sm"
+            variant="secondary"
+            iconLeft={<Keyboard size={14} />}
+            onClick={() => setShortcutsOpen(true)}
+          >
+            {t('settings.viewShortcuts')}
+          </Button>
+        </div>
+      </div>
 
       {/* ── Overlay behavior ── */}
       <div className="set-group">
@@ -108,19 +141,21 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
         </div>
       </div>
 
-      {/* ── Permissions ── */}
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.permissions')}</div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.voicePermissions')}</b>
-            <span>{t('settings.voicePermissionsHint')}</span>
+      {/* ── Permissions (advanced: troubleshooting, not day-to-day) ── */}
+      {advanced && (
+        <div className="set-group">
+          <div className="set-group-label">{t('settings.permissions')}</div>
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.voicePermissions')}</b>
+              <span>{t('settings.voicePermissionsHint')}</span>
+            </div>
+            <Button size="sm" variant="secondary" onClick={onCheckPermissions}>
+              {t('settings.checkPermissions')}
+            </Button>
           </div>
-          <Button size="sm" variant="secondary" onClick={onCheckPermissions}>
-            {t('settings.checkPermissions')}
-          </Button>
         </div>
-      </div>
+      )}
 
       {/* ── Reading defaults ── */}
       <div className="set-group">
@@ -136,7 +171,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
               { value: 'voice', label: t('reading.voice'), icon: <Mic size={13} /> },
               { value: 'scroll', label: t('reading.scroll'), icon: <TimerIcon size={13} /> },
             ]}
-            value={mode}
+            value={trackingMode}
             onChange={(m) => {
               const on = m === 'voice';
               if (on && voiceAvailable) {
@@ -147,7 +182,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             }}
           />
         </div>
-        {voice && (
+        {advanced && voice && (
           <div className="set-row">
             <div className="set-info">
               <b>{t('settings.keepMicOpen')}</b>
@@ -208,33 +243,37 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
           />
           <span className="ep-val">{opacity}%</span>
         </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('reading.glassBlur')}</b>
-            <span>{t('settings.glassBlurHint')}</span>
+        {advanced && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('reading.glassBlur')}</b>
+              <span>{t('settings.glassBlurHint')}</span>
+            </div>
+            <Slider
+              min={0}
+              max={18}
+              value={blur}
+              ariaLabel={t('reading.glassBlur')}
+              onChange={(v) => onSettings({ blur: v })}
+              style={{ width: 140 }}
+            />
+            <span className="ep-val">{blur}px</span>
           </div>
-          <Slider
-            min={0}
-            max={18}
-            value={blur}
-            ariaLabel={t('reading.glassBlur')}
-            onChange={(v) => onSettings({ blur: v })}
-            style={{ width: 140 }}
-          />
-          <span className="ep-val">{blur}px</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('reading.mirrorText')}</b>
-            <span>{t('settings.mirrorTextHint')}</span>
+        )}
+        {advanced && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('reading.mirrorText')}</b>
+              <span>{t('settings.mirrorTextHint')}</span>
+            </div>
+            <Switch
+              size="sm"
+              checked={!!mirror}
+              label={t('reading.mirrorText')}
+              onChange={(v) => onSettings({ mirror: v })}
+            />
           </div>
-          <Switch
-            size="sm"
-            checked={!!mirror}
-            label={t('reading.mirrorText')}
-            onChange={(v) => onSettings({ mirror: v })}
-          />
-        </div>
+        )}
         <div className="set-row">
           <div className="set-info">
             <b>{t('reading.timer')}</b>
@@ -274,15 +313,17 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             </span>
           </div>
         )}
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.restoreDefaults')}</b>
-            <span>{t('settings.restoreDefaultsHint')}</span>
+        {advanced && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.restoreDefaults')}</b>
+              <span>{t('settings.restoreDefaultsHint')}</span>
+            </div>
+            <Button variant="link" onClick={restoreDefaults}>
+              {t('settings.reset')}
+            </Button>
           </div>
-          <Button variant="link" onClick={restoreDefaults}>
-            {t('settings.reset')}
-          </Button>
-        </div>
+        )}
       </div>
 
       {/* ── Language ── */}
@@ -355,57 +396,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
         </div>
       </div>
 
-      {/* ── Hotkeys ── */}
-      <div className="set-group">
-        <div className="set-group-label">{t('settings.hotkeys')}</div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkToggle')}</b>
-            <span>{t('settings.hkToggleHint')}</span>
-          </div>
-          <span className="hotkey">{modKey} + Shift + E</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkInteract')}</b>
-            <span>{t('settings.hkInteractHint')}</span>
-          </div>
-          <span className="hotkey">{altKey} + Shift + E</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkPlayPause')}</b>
-            <span>{t('settings.hkFocusedHint')}</span>
-          </div>
-          <span className="hotkey">Space</span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkTextSize')}</b>
-          </div>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <span className="hotkey">{modKey} + +</span>
-            <span className="hotkey">{modKey} + −</span>
-          </span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkScrollSpeed')}</b>
-          </div>
-          <span style={{ display: 'flex', gap: 8 }}>
-            <span className="hotkey">↑</span>
-            <span className="hotkey">↓</span>
-          </span>
-        </div>
-        <div className="set-row">
-          <div className="set-info">
-            <b>{t('settings.hkHide')}</b>
-            <span>{t('settings.hkFocusedHint')}</span>
-          </div>
-          <span className="hotkey">Esc</span>
-        </div>
-      </div>
-
       {/* ── Support — the OmniShip "line" donation ask: plain voice, no
              urgency, one accent moment on the CTA. ── */}
       <div className="set-group">
@@ -465,24 +455,26 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
               </Button>
             )}
           </div>
-          <div className="set-row">
-            <div className="set-info">
-              <b>{t('settings.updateCheckFrequency')}</b>
-              <span>{t('settings.updateCheckFrequencyHint')}</span>
+          {advanced && (
+            <div className="set-row">
+              <div className="set-info">
+                <b>{t('settings.updateCheckFrequency')}</b>
+                <span>{t('settings.updateCheckFrequencyHint')}</span>
+              </div>
+              <Segmented
+                size="sm"
+                options={UPDATE_CHECK_HOURS_OPTIONS.map((h) => ({
+                  value: h,
+                  label:
+                    h === 0
+                      ? t('settings.updateFreqOff')
+                      : t('settings.updateFreqHours', { count: h }),
+                }))}
+                value={updateCheckHours}
+                onChange={(v) => onSettings({ updateCheckHours: v })}
+              />
             </div>
-            <Segmented
-              size="sm"
-              options={UPDATE_CHECK_HOURS_OPTIONS.map((h) => ({
-                value: h,
-                label:
-                  h === 0
-                    ? t('settings.updateFreqOff')
-                    : t('settings.updateFreqHours', { count: h }),
-              }))}
-              value={updateCheckHours}
-              onChange={(v) => onSettings({ updateCheckHours: v })}
-            />
-          </div>
+          )}
         </div>
       )}
 
@@ -499,6 +491,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
         </div>
       </div>
       {consentModal}
+      {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
     </div>
   );
 }

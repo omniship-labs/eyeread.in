@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "ക്രമീകരണങ്ങൾ",
+    "simpleMode": "ലളിതം",
+    "advancedMode": "വിപുലം",
+    "viewShortcuts": "ഹോട്ട്കീകൾ",
+    "close": "അടയ്ക്കുക",
     "overlay": "ഓവർലേ",
     "defaultPosition": "സ്ഥിരസ്ഥാനം",
     "defaultPositionHint": "സ്ക്രീനിൽ ഓവർലേ എവിടെ ഉറയ്ക്കുന്നു",

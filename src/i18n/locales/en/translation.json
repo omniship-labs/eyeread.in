@@ -50,6 +50,10 @@
   },
   "settings": {
     "title": "Settings",
+    "simpleMode": "Simple",
+    "advancedMode": "Advanced",
+    "viewShortcuts": "Shortcuts",
+    "close": "Close",
     "overlay": "Overlay",
     "defaultPosition": "Default position",
     "defaultPositionHint": "Where the overlay anchors on screen",
