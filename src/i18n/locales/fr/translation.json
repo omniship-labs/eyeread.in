@@ -101,6 +101,8 @@
     "speechGranted": "Accordé",
     "speechDenied": "Refusé",
     "speechUnknown": "Accorder l’accès",
+    "dictationAccess": "Dictée système",
+    "dictationAccessHint": "Un réglage système distinct que l’appli ne peut ni détecter ni activer pour vous — le suivi vocal en a besoin même une fois le micro et la reconnaissance vocale ci-dessus accordés",
     "openSystemSettings": "Ouvrir les réglages système",
     "languageGroup": "Langue",
     "languageHint": "Langue de l’interface",

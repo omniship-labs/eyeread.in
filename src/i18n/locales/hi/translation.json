@@ -101,6 +101,8 @@
     "speechGranted": "स्वीकृत",
     "speechDenied": "अस्वीकृत",
     "speechUnknown": "एक्सेस दें",
+    "dictationAccess": "सिस्टम डिक्टेशन",
+    "dictationAccessHint": "एक अलग सिस्टम सेटिंग जिसे ऐप न तो पहचान सकता है, न ही आपके लिए चालू कर सकता है — ऊपर माइक और स्पीच रिकग्निशन की अनुमति मिलने पर भी वॉइस ट्रैकिंग के लिए यह ज़रूरी है",
     "openSystemSettings": "सिस्टम सेटिंग्स खोलें",
     "languageGroup": "भाषा",
     "languageHint": "इंटरफ़ेस भाषा",

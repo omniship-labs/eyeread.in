@@ -21,6 +21,7 @@ import {
   requestSpeechRecognitionPermission,
   getSpeechPermissionState,
   SPEECH_PRIVACY_SETTINGS_URL,
+  DICTATION_SETTINGS_URL,
 } from '../lib/speech';
 
 // OmniShip Labs' single fiscal home — same collective the site and
@@ -162,6 +163,21 @@ export function SettingsScreen({ settings, onSettings, update }) {
           }
           onOpenSettings={() => isMacOS && openExternal(SPEECH_PRIVACY_SETTINGS_URL)}
         />
+        {isMacOS && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.dictationAccess')}</b>
+              <span>{t('settings.dictationAccessHint')}</span>
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => openExternal(DICTATION_SETTINGS_URL)}
+            >
+              {t('settings.openSystemSettings')}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* ── Reading defaults ── */}

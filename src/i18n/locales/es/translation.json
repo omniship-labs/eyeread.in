@@ -101,6 +101,8 @@
     "speechGranted": "Concedido",
     "speechDenied": "Denegado",
     "speechUnknown": "Conceder acceso",
+    "dictationAccess": "Dictado del sistema",
+    "dictationAccessHint": "Un ajuste del sistema aparte que la app no puede detectar ni activar por ti — el seguimiento por voz lo necesita aunque el micro y el reconocimiento de voz de arriba estén concedidos",
     "openSystemSettings": "Abrir Configuración del sistema",
     "languageGroup": "Idioma",
     "languageHint": "Idioma de la interfaz",

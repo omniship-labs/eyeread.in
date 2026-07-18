@@ -39,10 +39,12 @@ import {
   setDockHidden,
   shieldActive,
   showSettingsWindow,
+  openExternal,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
+import { DICTATION_SETTINGS_URL } from '../lib/speech';
 
 export function OverlayWindow() {
   const { t } = useTranslation();
@@ -512,7 +514,12 @@ export function OverlayWindow() {
               className="ov-voice ov-voice--retry"
               title={t('overlay.micIssueHint')}
               aria-label={t('overlay.micIssueHint')}
-              onClick={retryVoice}
+              // A retry can't fix this — Dictation is a plain OS setting, not
+              // something a gesture re-arms — so send the user straight to
+              // where they can actually turn it on. The background retry
+              // loop in useSpeechRecognition keeps trying on its own either
+              // way, so tracking resumes without needing another click here.
+              onClick={() => (isMacOS ? openExternal(DICTATION_SETTINGS_URL) : retryVoice())}
             >
               <MicOff size={12} />
               {t('overlay.micIssue')}

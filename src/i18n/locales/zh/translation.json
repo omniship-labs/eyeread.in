@@ -101,6 +101,8 @@
     "speechGranted": "已授权",
     "speechDenied": "已拒绝",
     "speechUnknown": "授予访问权限",
+    "dictationAccess": "系统听写",
+    "dictationAccessHint": "这是应用无法检测或代为开启的独立系统设置 — 即使上方的麦克风和语音识别权限已授予,语音跟踪仍需要它",
     "openSystemSettings": "打开系统设置",
     "languageGroup": "语言",
     "languageHint": "界面语言",

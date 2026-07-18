@@ -101,6 +101,8 @@
     "speechGranted": "Granted",
     "speechDenied": "Denied",
     "speechUnknown": "Grant access",
+    "dictationAccess": "System Dictation",
+    "dictationAccessHint": "A separate OS setting the app can't detect or turn on for you — voice tracking needs it even once mic and speech recognition above are granted",
     "openSystemSettings": "Open System Settings",
     "languageGroup": "Language",
     "languageHint": "Interface language",

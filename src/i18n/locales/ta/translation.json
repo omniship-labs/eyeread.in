@@ -101,6 +101,8 @@
     "speechGranted": "வழங்கப்பட்டது",
     "speechDenied": "மறுக்கப்பட்டது",
     "speechUnknown": "அணுகலை வழங்கு",
+    "dictationAccess": "கணினி ஆணையிடல் (Dictation)",
+    "dictationAccessHint": "ஆப்பால் கண்டறியவோ இயக்கவோ முடியாத தனி கணினி அமைப்பு — மேலே மைக் மற்றும் பேச்சு அடையாள அணுகல் வழங்கப்பட்டிருந்தாலும் குரல் கண்காணிப்புக்கு இது தேவை",
     "openSystemSettings": "கணினி அமைப்புகளைத் திற",
     "languageGroup": "மொழி",
     "languageHint": "இடைமுக மொழி",

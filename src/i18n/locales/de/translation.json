@@ -101,6 +101,8 @@
     "speechGranted": "Erteilt",
     "speechDenied": "Verweigert",
     "speechUnknown": "Zugriff erlauben",
+    "dictationAccess": "System-Diktat",
+    "dictationAccessHint": "Eine separate Systemeinstellung, die die App nicht erkennen oder für Sie aktivieren kann – die Sprachverfolgung braucht sie, auch wenn Mikrofon und Spracherkennung oben erteilt sind",
     "openSystemSettings": "Systemeinstellungen öffnen",
     "languageGroup": "Sprache",
     "languageHint": "Oberflächensprache",

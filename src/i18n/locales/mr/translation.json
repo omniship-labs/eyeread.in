@@ -101,6 +101,8 @@
     "speechGranted": "मंजूर",
     "speechDenied": "नाकारले",
     "speechUnknown": "प्रवेश द्या",
+    "dictationAccess": "सिस्टम डिक्टेशन",
+    "dictationAccessHint": "अ‍ॅपला ओळखता किंवा तुमच्यासाठी सुरू करता न येणारी वेगळी सिस्टम सेटिंग — वरील माइक आणि स्पीच रेकग्निशनला परवानगी असूनही व्हॉइस ट्रॅकिंगसाठी ती आवश्यक आहे",
     "openSystemSettings": "सिस्टम सेटिंग्ज उघडा",
     "languageGroup": "भाषा",
     "languageHint": "इंटरफेस भाषा",
