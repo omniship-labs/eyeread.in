@@ -89,6 +89,31 @@
   }
 }
 
+/* ── Keyboard-shortcuts button in titlebar ── */
+.tl-shortcuts {
+  .app-region(no-drag);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
 /* ── Settings gear in titlebar ── */
 .tl-settings {
   .app-region(no-drag);

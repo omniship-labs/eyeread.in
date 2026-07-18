@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, Component } from 'react';
-import { Home, Settings as SettingsIcon } from 'lucide-react';
+import { Home, Keyboard, Settings as SettingsIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { ShieldToggle } from '../components/ShieldToggle';
+import { ShortcutsModal } from '../components/ShortcutsModal';
 import { LOGO_MARK_DARK, LOGO_MARK_LIGHT } from '../lib/branding';
 
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -84,6 +85,7 @@ export function MainWindow() {
   const { t } = useTranslation();
   const logoMark = useSystemLogo();
   const [pane, setPane] = useState('library'); // library | settings
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const { listWidth, handleMouseDown } = useListResize(300);
   const [scripts, setScripts] = useState([]);
   const [selId, setSelId] = useState(null);
@@ -304,6 +306,14 @@ export function MainWindow() {
         </div>
         <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
         <button
+          className="tl-shortcuts"
+          onClick={() => setShortcutsOpen(true)}
+          title={t('settings.viewShortcuts')}
+          aria-label={t('settings.viewShortcuts')}
+        >
+          <Keyboard size={15} aria-hidden="true" />
+        </button>
+        <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
           title={pane === 'settings' ? t('library.title') : t('app.settings')}
@@ -408,6 +418,7 @@ export function MainWindow() {
       </div>
       {consentModal}
       {permissionsModal}
+      {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
     </div>
   );
 }

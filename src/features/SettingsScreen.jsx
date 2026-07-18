@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, Heart, Keyboard, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
+import { ArrowLeft, Heart, Mic, Timer as TimerIcon, Hourglass } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
-import { ShortcutsModal } from '../components/ShortcutsModal';
 import { openExternal, showAboutWindow, isLinux, shieldActive } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { ShieldToggle } from '../components/ShieldToggle';
@@ -75,7 +74,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
     setViewMode(v);
     localStorage.setItem(MODE_KEY, v);
   };
-  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   // Describe the screen-share state, flagging Linux as best-effort.
   const shareHint = isLinux
@@ -112,14 +110,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             value={viewMode}
             onChange={setMode}
           />
-          <Button
-            size="sm"
-            variant="secondary"
-            iconLeft={<Keyboard size={14} />}
-            onClick={() => setShortcutsOpen(true)}
-          >
-            {t('settings.viewShortcuts')}
-          </Button>
         </div>
       </div>
 
@@ -501,7 +491,6 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
       </div>
 
       {consentModal}
-      {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
     </div>
   );
 }
