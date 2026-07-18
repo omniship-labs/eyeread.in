@@ -25,8 +25,15 @@
  *   we retry synchronously inside the next pointerdown anywhere in the
  *   window — any drag/click re-arms the mic without a dedicated button.
  *   `retry` stays exposed for an explicit recovery control.
+ * - "not-allowed" is ambiguous, though: it also fires when the OS
+ *   permission is genuinely revoked, which no gesture or retry can fix.
+ *   We escalate to 'mic-denied-confirmed' once we have real evidence of
+ *   that — a live mic-permission reconfirm reporting 'denied', or a second
+ *   consecutive failure after a retry already ran — so callers can offer a
+ *   settings deep-link instead of a dead-end retry chip.
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { getMicPermissionState } from '../lib/mic';
 
 const SR =
   typeof window !== 'undefined'
@@ -57,6 +64,14 @@ const MIN_HEALTHY_SESSION_MS = 1500;
 export function useSpeechRecognition({ enabled, onWords, language }) {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState(null);
+  // Mirrors `error` synchronously (state updates aren't visible inside the
+  // same tick to code reading `error` directly), so onstart/onerror can
+  // check "were we already broken?" without waiting on a render.
+  const errorRef = useRef(null);
+  const updateError = useCallback((next) => {
+    errorRef.current = next;
+    setError(next);
+  }, []);
   const recRef = useRef(null);
   const onWordsRef = useRef(onWords);
   const enabledRef = useRef(enabled);
@@ -84,9 +99,27 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     }
   }, []);
 
+  // Debounces the "unconfirmed error → listening" transition the same way
+  // clearListeningOffTimer debounces "listening → not listening": a session
+  // recovering from a prior error doesn't get to flip the badge on until it
+  // proves it can stay up, so a doomed retry can't paint a false recovery.
+  const healthTimerRef = useRef(null);
+  const clearHealthTimer = useCallback(() => {
+    if (healthTimerRef.current) {
+      clearTimeout(healthTimerRef.current);
+      healthTimerRef.current = null;
+    }
+  }, []);
+
+  // Consecutive "not-allowed" failures since the last successful onstart —
+  // a second failure right after a retry already ran is evidence the
+  // permission is genuinely denied, not just missing a gesture.
+  const deniedStreakRef = useRef(0);
+
   const stopSession = useCallback(() => {
     clearRestartTimer();
     clearListeningOffTimer();
+    clearHealthTimer();
     const rec = recRef.current;
     recRef.current = null;
     if (rec) {
@@ -98,7 +131,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       }
     }
     setListening(false);
-  }, [clearRestartTimer, clearListeningOffTimer]);
+  }, [clearRestartTimer, clearListeningOffTimer, clearHealthTimer]);
 
   const startSessionRef = useRef(null);
   const startSession = useCallback(() => {
@@ -147,19 +180,56 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       fedCount = 0; // results array resets on every (re)start
       sawStart = true;
       startedAt = Date.now();
+      // Reaching onstart at all means SR didn't reject this attempt for
+      // permission reasons — whatever denial streak we were tracking is over.
+      deniedStreakRef.current = 0;
       // Backoff is reset in onend once this session proves it can stay up —
       // resetting it here unconditionally is what let a thrashing session
       // (starts, dies almost instantly) restart at zero delay forever.
       clearListeningOffTimer(); // cancel a pending "off" from the session we replaced
-      setError(null);
-      setListening(true);
+      clearHealthTimer();
+      if (errorRef.current) {
+        // Recovering from a known failure — hold off flipping the badge on
+        // until this session proves it can actually stay up. Clearing the
+        // error immediately (like the plain case below) is what let every
+        // doomed attempt in a thrashing loop flash a false "on" before
+        // dying again.
+        healthTimerRef.current = setTimeout(() => {
+          healthTimerRef.current = null;
+          if (recRef.current === rec) {
+            updateError(null);
+            setListening(true);
+          }
+        }, MIN_HEALTHY_SESSION_MS);
+      } else {
+        updateError(null);
+        setListening(true);
+      }
     };
     rec.onerror = (e) => {
+      clearHealthTimer(); // this attempt just failed — no confirmation coming
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        setError('mic-denied');
+        deniedStreakRef.current += 1;
+        // A second consecutive failure means a retry already ran (gesture
+        // healer or manual) and failed again — that's not "needed a
+        // gesture" anymore, that's a real denial.
+        const confirmed = deniedStreakRef.current >= 2;
+        updateError(confirmed ? 'mic-denied-confirmed' : 'mic-denied');
         // Needs a user gesture — detach so onend does NOT schedule timed
-        // retries that can never succeed. The pointerdown healer takes over.
+        // retries that can never succeed. The pointerdown healer takes over
+        // (and stops itself once we escalate to -confirmed, since it only
+        // arms for the plain 'mic-denied' state).
         if (recRef.current === rec) recRef.current = null;
+        // Mic (unlike speech) has a live permission query — confirm right
+        // away if we can, instead of waiting on a second failed retry.
+        getMicPermissionState().then((state) => {
+          if (
+            state === 'denied' &&
+            (errorRef.current === 'mic-denied' || errorRef.current === 'mic-denied-confirmed')
+          ) {
+            updateError('mic-denied-confirmed');
+          }
+        });
       } else if (e.error === 'audio-capture') {
         // OS couldn't hand us the mic — see the module docstring above for
         // the confirmed cause (system Dictation off). Leave recRef.current
@@ -167,7 +237,8 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
         // background; this only gives the overlay an honest reason to show
         // instead of a silent retry loop. onstart clears it the moment a
         // session actually captures.
-        setError('mic-issue');
+        deniedStreakRef.current = 0;
+        updateError('mic-issue');
       }
     };
     rec.onend = () => {
@@ -216,9 +287,9 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       // Defer off the synchronous throw path so this never sets state within
       // the same tick as the caller's effect (rare: most SR implementations
       // fail via onerror, not a thrown start()).
-      queueMicrotask(() => setError('start-failed'));
+      queueMicrotask(() => updateError('start-failed'));
     }
-  }, [clearListeningOffTimer]);
+  }, [clearListeningOffTimer, clearHealthTimer, updateError]);
   useLayoutEffect(() => {
     startSessionRef.current = startSession;
   });
