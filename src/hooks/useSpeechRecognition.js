@@ -5,8 +5,10 @@
  * never drops words and repeated phrases are never re-fed.
  *
  * Failure handling, by cause:
- * - Transient (session dies without ever starting: network / service
- *   hiccups) → automatic retry with exponential backoff (300ms → 8s).
+ * - Transient (session dies without ever starting, or dies almost instantly
+ *   after starting — thrashing, seen on some MacBooks' mic pipeline) →
+ *   automatic retry with exponential backoff (300ms → 8s), which also caps
+ *   how often the overlay's mic indicator can flicker.
  * - Activation-denied ("not-allowed"): WebKit requires a user gesture in
  *   THIS webview to start SR, so timed retries can never succeed. Instead
  *   we retry synchronously inside the next pointerdown anywhere in the
@@ -31,6 +33,15 @@ const BACKOFF_MAX = 8000;
 // "not listening" transition by this much absorbs a normal restart gap so
 // the overlay's mic indicator doesn't flicker off/on every cycle.
 const LISTENING_OFF_GRACE_MS = 400;
+
+// A session that dies before staying up this long isn't a normal silence
+// timeout (those run many seconds) — it's the mic pipeline thrashing, seen
+// on some MacBooks where a session starts, dies almost immediately, and
+// restarts in a tight loop (~every 500ms, bounded only by real audio
+// hardware setup/teardown time). Only a session that clears this bar counts
+// as "healthy" for backoff-reset purposes, so a thrashing loop backs off
+// instead of hammering the hardware at zero delay forever.
+const MIN_HEALTHY_SESSION_MS = 1500;
 
 export function useSpeechRecognition({ enabled, onWords, language }) {
   const [listening, setListening] = useState(false);
@@ -94,6 +105,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     // re-feed — a revised word is lost, which the matcher's resync absorbs.
     let fedCount = 0;
     let sawStart = false;
+    let startedAt = 0;
 
     rec.onresult = (e) => {
       // Rebuild the session transcript: finalized results + current interim.
@@ -123,7 +135,10 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     rec.onstart = () => {
       fedCount = 0; // results array resets on every (re)start
       sawStart = true;
-      backoffRef.current = BACKOFF_MIN; // healthy session — reset backoff
+      startedAt = Date.now();
+      // Backoff is reset in onend once this session proves it can stay up —
+      // resetting it here unconditionally is what let a thrashing session
+      // (starts, dies almost instantly) restart at zero delay forever.
       clearListeningOffTimer(); // cancel a pending "off" from the session we replaced
       setError(null);
       setListening(true);
@@ -145,22 +160,28 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
         return;
       }
       recRef.current = null;
-      if (sawStart) {
+
+      // Absorb a quick restart without flipping the overlay's mic badge off
+      // and back on — the replacement session's onstart is async, so only
+      // reflect "not listening" if it doesn't arrive within the grace
+      // window.
+      clearListeningOffTimer();
+      listeningOffTimerRef.current = setTimeout(() => {
+        listeningOffTimerRef.current = null;
+        setListening(false);
+      }, LISTENING_OFF_GRACE_MS);
+
+      const healthy = sawStart && Date.now() - startedAt >= MIN_HEALTHY_SESSION_MS;
+      if (healthy) {
         // Normal end of a healthy continuous session (silence timeout etc.)
-        // — restart immediately to keep tracking seamless. The replacement
-        // session's onstart is async, so only flip the indicator to "off"
-        // if it doesn't arrive within the grace window — otherwise every
-        // restart cycle flickers the overlay's mic badge off and back on.
-        clearListeningOffTimer();
-        listeningOffTimerRef.current = setTimeout(() => {
-          listeningOffTimerRef.current = null;
-          setListening(false);
-        }, LISTENING_OFF_GRACE_MS);
+        // — restart immediately to keep tracking seamless.
+        backoffRef.current = BACKOFF_MIN;
         startSessionRef.current();
       } else {
-        // Died before ever starting — transient failure; back off and retry.
-        clearListeningOffTimer();
-        setListening(false);
+        // Either died before ever starting, or started and died almost
+        // instantly — a thrashing pipeline, not a real silence timeout.
+        // Back off before retrying so a bad mic session can't spin at zero
+        // delay forever (that's what produced the rapid on/off flicker).
         backoffRef.current = Math.min(backoffRef.current * 2, BACKOFF_MAX);
         restartTimerRef.current = setTimeout(() => {
           restartTimerRef.current = null;
