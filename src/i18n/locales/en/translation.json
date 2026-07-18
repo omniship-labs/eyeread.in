@@ -140,6 +140,8 @@
     "voiceUnavailable": "Voice tracking unavailable — timed scroll",
     "enableMic": "Enable mic",
     "enableMicHint": "Voice tracking needs one click inside the overlay to start the mic",
+    "micBusy": "Mic busy",
+    "micBusyHint": "Another app (e.g. a video call) has the microphone — voice tracking resumes automatically once it's free",
     "hidden": "HIDDEN",
     "visible": "VISIBLE",
     "close": "Close prompter (⌘⇧E to reopen)",

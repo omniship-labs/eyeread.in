@@ -140,6 +140,8 @@
     "voiceUnavailable": "语音跟踪不可用 — 定时滚动",
     "enableMic": "启用麦克风",
     "enableMicHint": "语音跟踪需要在悬浮窗内点击一次以启动麦克风",
+    "micBusy": "麦克风被占用",
+    "micBusyHint": "其他应用(例如视频通话)正在使用麦克风 — 麦克风释放后语音跟踪会自动恢复",
     "hidden": "已隐藏",
     "visible": "可见",
     "close": "关闭提词器（⌘⇧E 重新打开）",

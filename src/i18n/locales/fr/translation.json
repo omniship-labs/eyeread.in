@@ -140,6 +140,8 @@
     "voiceUnavailable": "Suivi vocal indisponible — défilement chronométré",
     "enableMic": "Activer le micro",
     "enableMicHint": "Un clic dans l’overlay démarre le suivi vocal",
+    "micBusy": "Micro occupé",
+    "micBusyHint": "Une autre appli (par ex. un appel vidéo) utilise le micro — le suivi vocal reprend automatiquement dès qu’il se libère",
     "hidden": "MASQUÉ",
     "visible": "VISIBLE",
     "close": "Fermer le prompteur (⌘⇧E pour rouvrir)",

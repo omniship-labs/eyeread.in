@@ -9,6 +9,15 @@
  *   after starting — thrashing, seen on some MacBooks' mic pipeline) →
  *   automatic retry with exponential backoff (300ms → 8s), which also caps
  *   how often the overlay's mic indicator can flicker.
+ * - Mic busy ("audio-capture"): the OS couldn't hand us the mic, most often
+ *   because a video-call app (Zoom, Meet, Teams…) already holds it —
+ *   expected, since reading along during a call while presenting is the
+ *   whole point of this app. Some Macs' audio drivers arbitrate that shared
+ *   access cleanly and some don't; when they don't, this is what fires,
+ *   repeatedly, for as long as the other app keeps the mic. Surfaced as its
+ *   own error so the overlay can say so instead of just flickering — the
+ *   background retry loop (above) keeps trying so tracking resumes the
+ *   moment the mic frees up, with no user action needed.
  * - Activation-denied ("not-allowed"): WebKit requires a user gesture in
  *   THIS webview to start SR, so timed retries can never succeed. Instead
  *   we retry synchronously inside the next pointerdown anywhere in the
@@ -149,6 +158,13 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
         // Needs a user gesture — detach so onend does NOT schedule timed
         // retries that can never succeed. The pointerdown healer takes over.
         if (recRef.current === rec) recRef.current = null;
+      } else if (e.error === 'audio-capture') {
+        // OS couldn't hand us the mic — typically another app (a video
+        // call) holding it. Leave recRef.current alone so onend's normal
+        // backoff-and-retry still runs in the background; this only gives
+        // the overlay an honest reason to show instead of a silent retry
+        // loop. onstart clears it the moment a session actually captures.
+        setError('mic-busy');
       }
     };
     rec.onend = () => {
