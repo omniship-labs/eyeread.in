@@ -18,8 +18,11 @@ const OC_URL = 'https://opencollective.com/omniship';
 // The site's release-history section already pages through the full GitHub
 // Releases list (see site/src/hooks/useLatestReleases.js), so linking there
 // covers every version between what's installed and what's available — a
-// single-release in-app "what's new" view couldn't.
-const RELEASE_NOTES_URL = 'https://get.eyeread.in/download#history';
+// single-release in-app "what's new" view couldn't. Each entry is deep-linked
+// (site/src/pages/Download.jsx gives each <details> an id={`v${version}`}
+// and auto-opens/scrolls to it), so jump straight to the available version
+// instead of just the top of the list.
+const RELEASE_NOTES_URL = 'https://get.eyeread.in/download';
 
 // Which of the two views a user last picked, remembered locally so it
 // sticks across sessions without round-tripping through the settings store
@@ -138,7 +141,7 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
                     type="button"
                     className="set-link"
                     style={{ display: 'block', marginTop: 2 }}
-                    onClick={() => openExternal(RELEASE_NOTES_URL)}
+                    onClick={() => openExternal(`${RELEASE_NOTES_URL}#v${update.version}`)}
                   >
                     {t('settings.whatsNew')}
                   </button>
