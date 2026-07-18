@@ -103,6 +103,9 @@
     "speechUnknown": "アクセスを許可",
     "dictationAccess": "システムのディクテーション",
     "dictationAccessHint": "アプリでは検出もオンにもできない別のシステム設定です — 上のマイクと音声認識へのアクセスが許可されていても、音声トラッキングにはこれが必要です",
+    "voicePermissions": "音声トラッキングのアクセス",
+    "voicePermissionsHint": "マイク、音声認識、ディクテーション — 音声トラッキングに必要なすべて",
+    "checkPermissions": "権限を確認",
     "openSystemSettings": "システム設定を開く",
     "languageGroup": "言語",
     "languageHint": "インターフェースの言語",
@@ -214,5 +217,11 @@
   },
   "switcher": {
     "label": "言語"
+  },
+  "permissions": {
+    "title": "音声トラッキングを設定",
+    "intro": "音声トラッキングはマイクを通して聞き取りながら、読み進めるのに合わせて追従します。まずいくつかの権限が必要です。",
+    "cancel": "後で",
+    "continue": "続ける"
   }
 }

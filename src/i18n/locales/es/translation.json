@@ -103,6 +103,9 @@
     "speechUnknown": "Conceder acceso",
     "dictationAccess": "Dictado del sistema",
     "dictationAccessHint": "Un ajuste del sistema aparte que la app no puede detectar ni activar por ti — el seguimiento por voz lo necesita aunque el micro y el reconocimiento de voz de arriba estén concedidos",
+    "voicePermissions": "Acceso para el seguimiento por voz",
+    "voicePermissionsHint": "Micrófono, reconocimiento de voz y Dictado — todo lo que necesita el seguimiento por voz",
+    "checkPermissions": "Comprobar permisos",
     "openSystemSettings": "Abrir Configuración del sistema",
     "languageGroup": "Idioma",
     "languageHint": "Idioma de la interfaz",
@@ -214,5 +217,11 @@
   },
   "switcher": {
     "label": "Idioma"
+  },
+  "permissions": {
+    "title": "Configurar el seguimiento por voz",
+    "intro": "El seguimiento por voz te sigue mientras lees, escuchando a través de tu micrófono. Antes necesita un par de permisos rápidos.",
+    "cancel": "Ahora no",
+    "continue": "Continuar"
   }
 }

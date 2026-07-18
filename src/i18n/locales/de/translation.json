@@ -103,6 +103,9 @@
     "speechUnknown": "Zugriff erlauben",
     "dictationAccess": "System-Diktat",
     "dictationAccessHint": "Eine separate Systemeinstellung, die die App nicht erkennen oder für Sie aktivieren kann – die Sprachverfolgung braucht sie, auch wenn Mikrofon und Spracherkennung oben erteilt sind",
+    "voicePermissions": "Zugriff für Sprachverfolgung",
+    "voicePermissionsHint": "Mikrofon, Spracherkennung und Diktat – alles, was die Sprachverfolgung braucht",
+    "checkPermissions": "Berechtigungen prüfen",
     "openSystemSettings": "Systemeinstellungen öffnen",
     "languageGroup": "Sprache",
     "languageHint": "Oberflächensprache",
@@ -214,5 +217,11 @@
   },
   "switcher": {
     "label": "Sprache"
+  },
+  "permissions": {
+    "title": "Sprachverfolgung einrichten",
+    "intro": "Die Sprachverfolgung folgt beim Lesen über dein Mikrofon. Dafür sind zunächst ein paar kurze Berechtigungen nötig.",
+    "cancel": "Jetzt nicht",
+    "continue": "Weiter"
   }
 }

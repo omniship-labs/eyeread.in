@@ -103,6 +103,9 @@
     "speechUnknown": "Accorder l’accès",
     "dictationAccess": "Dictée système",
     "dictationAccessHint": "Un réglage système distinct que l’appli ne peut ni détecter ni activer pour vous — le suivi vocal en a besoin même une fois le micro et la reconnaissance vocale ci-dessus accordés",
+    "voicePermissions": "Accès pour le suivi vocal",
+    "voicePermissionsHint": "Micro, reconnaissance vocale et Dictée — tout ce dont le suivi vocal a besoin",
+    "checkPermissions": "Vérifier les autorisations",
     "openSystemSettings": "Ouvrir les réglages système",
     "languageGroup": "Langue",
     "languageHint": "Langue de l’interface",
@@ -214,5 +217,11 @@
   },
   "switcher": {
     "label": "Langue"
+  },
+  "permissions": {
+    "title": "Configurer le suivi vocal",
+    "intro": "Le suivi vocal vous accompagne pendant la lecture en écoutant via votre micro. Il lui faut d’abord quelques autorisations rapides.",
+    "cancel": "Pas maintenant",
+    "continue": "Continuer"
   }
 }

@@ -103,6 +103,9 @@
     "speechUnknown": "Grant access",
     "dictationAccess": "System Dictation",
     "dictationAccessHint": "A separate OS setting the app can't detect or turn on for you — voice tracking needs it even once mic and speech recognition above are granted",
+    "voicePermissions": "Voice tracking access",
+    "voicePermissionsHint": "Microphone, speech recognition, and Dictation — everything voice tracking needs",
+    "checkPermissions": "Check permissions",
     "openSystemSettings": "Open System Settings",
     "languageGroup": "Language",
     "languageHint": "Interface language",
@@ -214,5 +217,11 @@
   },
   "switcher": {
     "label": "Language"
+  },
+  "permissions": {
+    "title": "Set up voice tracking",
+    "intro": "Voice tracking follows along as you read by listening through your mic. It needs a couple of quick permissions first.",
+    "cancel": "Not now",
+    "continue": "Continue"
   }
 }
