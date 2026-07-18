@@ -101,6 +101,11 @@
     "speechGranted": "Erteilt",
     "speechDenied": "Verweigert",
     "speechUnknown": "Zugriff erlauben",
+    "dictationAccess": "System-Diktat",
+    "dictationAccessHint": "Eine separate Systemeinstellung, die die App nicht erkennen oder für Sie aktivieren kann – die Sprachverfolgung braucht sie, auch wenn Mikrofon und Spracherkennung oben erteilt sind",
+    "voicePermissions": "Zugriff für Sprachverfolgung",
+    "voicePermissionsHint": "Mikrofon, Spracherkennung und Diktat – alles, was die Sprachverfolgung braucht",
+    "checkPermissions": "Berechtigungen prüfen",
     "openSystemSettings": "Systemeinstellungen öffnen",
     "languageGroup": "Sprache",
     "languageHint": "Oberflächensprache",
@@ -140,6 +145,8 @@
     "voiceUnavailable": "Sprachverfolgung nicht verfügbar — zeitgesteuertes Scrollen",
     "enableMic": "Mikro aktivieren",
     "enableMicHint": "Ein Klick im Overlay startet die Spracherkennung",
+    "micIssue": "Mikroproblem",
+    "micIssueHint": "Prüfe, ob unter Systemeinstellungen → Tastatur → Diktat aktiviert ist – das ist unabhängig von der Mikrofonberechtigung und für die Sprachverfolgung nötig. Wird automatisch fortgesetzt, sobald es behoben ist.",
     "hidden": "VERBORGEN",
     "visible": "SICHTBAR",
     "close": "Teleprompter schließen (⌘⇧E zum erneuten Öffnen)",
@@ -210,5 +217,11 @@
   },
   "switcher": {
     "label": "Sprache"
+  },
+  "permissions": {
+    "title": "Sprachverfolgung einrichten",
+    "intro": "Die Sprachverfolgung folgt beim Lesen über dein Mikrofon. Dafür sind zunächst ein paar kurze Berechtigungen nötig.",
+    "cancel": "Jetzt nicht",
+    "continue": "Weiter"
   }
 }

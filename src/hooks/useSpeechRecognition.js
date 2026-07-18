@@ -5,8 +5,21 @@
  * never drops words and repeated phrases are never re-fed.
  *
  * Failure handling, by cause:
- * - Transient (session dies without ever starting: network / service
- *   hiccups) → automatic retry with exponential backoff (300ms → 8s).
+ * - Transient (session dies without ever starting, or dies almost instantly
+ *   after starting — thrashing, seen on some MacBooks' mic pipeline) →
+ *   automatic retry with exponential backoff (300ms → 8s), which also caps
+ *   how often the overlay's mic indicator can flicker.
+ * - Mic capture failure ("audio-capture"): the OS couldn't hand us the mic.
+ *   Confirmed cause on affected MacBooks: System Settings → Keyboard →
+ *   Dictation was off — the Web Speech API rides on the system Dictation
+ *   service, which is a separate OS-level switch from the app's own mic /
+ *   speech-recognition permission prompts, so nothing in this codebase can
+ *   detect or fix it directly. It surfaced as thrashing specifically during
+ *   video calls (Zoom etc.) because reading along while presenting is this
+ *   app's core use case, but Dictation being off — not the call app holding
+ *   the mic — was the actual trigger. Surfaced as its own error so the
+ *   overlay can say so instead of just flickering — the background retry
+ *   loop (above) keeps trying so tracking resumes on its own once fixed.
  * - Activation-denied ("not-allowed"): WebKit requires a user gesture in
  *   THIS webview to start SR, so timed retries can never succeed. Instead
  *   we retry synchronously inside the next pointerdown anywhere in the
@@ -24,6 +37,22 @@ export const srAvailable = !!SR;
 
 const BACKOFF_MIN = 300; // ms
 const BACKOFF_MAX = 8000;
+
+// Continuous SR sessions end and restart on their own (see onend below).
+// The restart is synchronous but the replacement session's onstart is not —
+// its timing is decided by the OS/WebKit and varies by machine. Delaying the
+// "not listening" transition by this much absorbs a normal restart gap so
+// the overlay's mic indicator doesn't flicker off/on every cycle.
+const LISTENING_OFF_GRACE_MS = 400;
+
+// A session that dies before staying up this long isn't a normal silence
+// timeout (those run many seconds) — it's the mic pipeline thrashing, seen
+// on some MacBooks where a session starts, dies almost immediately, and
+// restarts in a tight loop (~every 500ms, bounded only by real audio
+// hardware setup/teardown time). Only a session that clears this bar counts
+// as "healthy" for backoff-reset purposes, so a thrashing loop backs off
+// instead of hammering the hardware at zero delay forever.
+const MIN_HEALTHY_SESSION_MS = 1500;
 
 export function useSpeechRecognition({ enabled, onWords, language }) {
   const [listening, setListening] = useState(false);
@@ -47,8 +76,17 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     }
   }, []);
 
+  const listeningOffTimerRef = useRef(null);
+  const clearListeningOffTimer = useCallback(() => {
+    if (listeningOffTimerRef.current) {
+      clearTimeout(listeningOffTimerRef.current);
+      listeningOffTimerRef.current = null;
+    }
+  }, []);
+
   const stopSession = useCallback(() => {
     clearRestartTimer();
+    clearListeningOffTimer();
     const rec = recRef.current;
     recRef.current = null;
     if (rec) {
@@ -60,7 +98,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       }
     }
     setListening(false);
-  }, [clearRestartTimer]);
+  }, [clearRestartTimer, clearListeningOffTimer]);
 
   const startSessionRef = useRef(null);
   const startSession = useCallback(() => {
@@ -78,6 +116,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     // re-feed — a revised word is lost, which the matcher's resync absorbs.
     let fedCount = 0;
     let sawStart = false;
+    let startedAt = 0;
 
     rec.onresult = (e) => {
       // Rebuild the session transcript: finalized results + current interim.
@@ -107,7 +146,11 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     rec.onstart = () => {
       fedCount = 0; // results array resets on every (re)start
       sawStart = true;
-      backoffRef.current = BACKOFF_MIN; // healthy session — reset backoff
+      startedAt = Date.now();
+      // Backoff is reset in onend once this session proves it can stay up —
+      // resetting it here unconditionally is what let a thrashing session
+      // (starts, dies almost instantly) restart at zero delay forever.
+      clearListeningOffTimer(); // cancel a pending "off" from the session we replaced
       setError(null);
       setListening(true);
     };
@@ -117,18 +160,47 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
         // Needs a user gesture — detach so onend does NOT schedule timed
         // retries that can never succeed. The pointerdown healer takes over.
         if (recRef.current === rec) recRef.current = null;
+      } else if (e.error === 'audio-capture') {
+        // OS couldn't hand us the mic — see the module docstring above for
+        // the confirmed cause (system Dictation off). Leave recRef.current
+        // alone so onend's normal backoff-and-retry still runs in the
+        // background; this only gives the overlay an honest reason to show
+        // instead of a silent retry loop. onstart clears it the moment a
+        // session actually captures.
+        setError('mic-issue');
       }
     };
     rec.onend = () => {
-      setListening(false);
-      if (recRef.current !== rec) return;
+      if (recRef.current !== rec) {
+        // Already detached (e.g. mic-denied) — no restart is coming, so
+        // reflect "not listening" immediately.
+        clearListeningOffTimer();
+        setListening(false);
+        return;
+      }
       recRef.current = null;
-      if (sawStart) {
+
+      // Absorb a quick restart without flipping the overlay's mic badge off
+      // and back on — the replacement session's onstart is async, so only
+      // reflect "not listening" if it doesn't arrive within the grace
+      // window.
+      clearListeningOffTimer();
+      listeningOffTimerRef.current = setTimeout(() => {
+        listeningOffTimerRef.current = null;
+        setListening(false);
+      }, LISTENING_OFF_GRACE_MS);
+
+      const healthy = sawStart && Date.now() - startedAt >= MIN_HEALTHY_SESSION_MS;
+      if (healthy) {
         // Normal end of a healthy continuous session (silence timeout etc.)
         // — restart immediately to keep tracking seamless.
+        backoffRef.current = BACKOFF_MIN;
         startSessionRef.current();
       } else {
-        // Died before ever starting — transient failure; back off and retry.
+        // Either died before ever starting, or started and died almost
+        // instantly — a thrashing pipeline, not a real silence timeout.
+        // Back off before retrying so a bad mic session can't spin at zero
+        // delay forever (that's what produced the rapid on/off flicker).
         backoffRef.current = Math.min(backoffRef.current * 2, BACKOFF_MAX);
         restartTimerRef.current = setTimeout(() => {
           restartTimerRef.current = null;
@@ -146,7 +218,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       // fail via onerror, not a thrown start()).
       queueMicrotask(() => setError('start-failed'));
     }
-  }, []);
+  }, [clearListeningOffTimer]);
   useLayoutEffect(() => {
     startSessionRef.current = startSession;
   });

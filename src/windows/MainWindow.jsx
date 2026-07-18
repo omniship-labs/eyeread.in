@@ -76,6 +76,7 @@ import {
   resetOverlayLayout,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
+import { usePermissionsGate } from '../hooks/usePermissionsGate';
 import { useUiScale, useReducedMotion } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 
@@ -159,6 +160,12 @@ export function MainWindow() {
 
   // Screen-share shield toggle (with the Linux risk-acknowledgement gate).
   const { setShielded, consentModal } = useShareProtection(settings, applySettings);
+  // Voice-tracking mic/speech-recognition/Dictation permissions modal.
+  const {
+    requestGate: requestPermissionsGate,
+    openManually: openPermissionsModal,
+    modal: permissionsModal,
+  } = usePermissionsGate();
 
   const update = useUpdateCheck(settings.updateCheckHours);
 
@@ -208,9 +215,11 @@ export function MainWindow() {
     if (await isOverlayVisible()) {
       await hideOverlay();
     } else if (selRef.current) {
-      await showOverlay(selRef.current, settingsRef.current);
+      requestPermissionsGate(settingsRef.current.voice, () => {
+        showOverlay(selRef.current, settingsRef.current);
+      });
     }
-  }, []);
+  }, [requestPermissionsGate]);
 
   useEffect(() => {
     let cleanup;
@@ -261,9 +270,11 @@ export function MainWindow() {
     if (selId === id) setSelId(scripts.find((s) => s.id !== id)?.id ?? null);
   };
 
-  const startReading = async (script) => {
-    updateScript(script.id, { tag: 'ready' });
-    await showOverlay(script, settingsRef.current);
+  const startReading = (script) => {
+    requestPermissionsGate(settingsRef.current.voice, () => {
+      updateScript(script.id, { tag: 'ready' });
+      showOverlay(script, settingsRef.current);
+    });
   };
 
   return (
@@ -301,7 +312,12 @@ export function MainWindow() {
       <div className="main">
         {pane === 'settings' ? (
           <ErrorBoundary>
-            <SettingsScreen settings={settings} onSettings={applySettings} update={update} />
+            <SettingsScreen
+              settings={settings}
+              onSettings={applySettings}
+              update={update}
+              onCheckPermissions={openPermissionsModal}
+            />
           </ErrorBoundary>
         ) : (
           <>
@@ -377,6 +393,7 @@ export function MainWindow() {
         )}
       </div>
       {consentModal}
+      {permissionsModal}
     </div>
   );
 }

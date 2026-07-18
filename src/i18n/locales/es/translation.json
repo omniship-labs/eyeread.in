@@ -101,6 +101,11 @@
     "speechGranted": "Concedido",
     "speechDenied": "Denegado",
     "speechUnknown": "Conceder acceso",
+    "dictationAccess": "Dictado del sistema",
+    "dictationAccessHint": "Un ajuste del sistema aparte que la app no puede detectar ni activar por ti — el seguimiento por voz lo necesita aunque el micro y el reconocimiento de voz de arriba estén concedidos",
+    "voicePermissions": "Acceso para el seguimiento por voz",
+    "voicePermissionsHint": "Micrófono, reconocimiento de voz y Dictado — todo lo que necesita el seguimiento por voz",
+    "checkPermissions": "Comprobar permisos",
     "openSystemSettings": "Abrir Configuración del sistema",
     "languageGroup": "Idioma",
     "languageHint": "Idioma de la interfaz",
@@ -140,6 +145,8 @@
     "voiceUnavailable": "Seguimiento de voz no disponible — desplazamiento por tiempo",
     "enableMic": "Activar micro",
     "enableMicHint": "Un clic en el overlay inicia el seguimiento por voz",
+    "micIssue": "Problema con el micro",
+    "micIssueHint": "Comprueba que Dictado esté activado en Ajustes del Sistema → Teclado → Dictado — es independiente del permiso del micrófono y necesario para el seguimiento por voz. Se reanuda automáticamente al solucionarlo.",
     "hidden": "OCULTO",
     "visible": "VISIBLE",
     "close": "Cerrar teleprónter (⌘⇧E para reabrir)",
@@ -210,5 +217,11 @@
   },
   "switcher": {
     "label": "Idioma"
+  },
+  "permissions": {
+    "title": "Configurar el seguimiento por voz",
+    "intro": "El seguimiento por voz te sigue mientras lees, escuchando a través de tu micrófono. Antes necesita un par de permisos rápidos.",
+    "cancel": "Ahora no",
+    "continue": "Continuar"
   }
 }

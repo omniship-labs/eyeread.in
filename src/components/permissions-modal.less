@@ -1,0 +1,139 @@
+/* Voice-tracking permissions modal — shown before starting a voice-tracking
+   session when mic and/or speech-recognition access isn't confirmed granted.
+   Structurally mirrors linux-consent.less (same backdrop/card shell), styled
+   as a routine setup step rather than a risk warning. */
+
+@import (reference) '../../design/tokens/mixins.less';
+
+.pm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(6, 6, 9, 0.62);
+  .backdrop-filter(blur(6px) saturate(1.1));
+}
+
+.pm-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface-1, #13131c);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  padding: 22px 22px 18px;
+  color: var(--text-primary, #f2f2f7);
+}
+
+.pm-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.pm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  color: var(--accent-text, #a78bfa);
+  background: var(--accent-subtle-bg, rgba(110, 86, 247, 0.14));
+  border: 1px solid var(--accent-subtle-border, rgba(110, 86, 247, 0.32));
+}
+
+.pm-title {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.pm-intro {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #a8a8ba);
+  margin: 0 0 14px;
+}
+
+.pm-rows {
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+
+  // .set-row (defined in main-window.less, loaded globally in the window
+  // this modal mounts in) styles the two PermissionRow children, but its
+  // 18px horizontal padding assumes a full-bleed settings list — inside the
+  // modal's own 22px card padding that would double up, so strip it here.
+  .set-row {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  // Mirrors the (now horizontally-stripped) .set-row layout for the plain
+  // Dictation entry, which isn't a PermissionRow, so all three rows read as
+  // one consistent list.
+  .pm-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .pm-row-info {
+    flex: 1;
+    b {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary, #f2f2f7);
+      margin-bottom: 2px;
+    }
+    span {
+      font-size: 12.5px;
+      color: var(--text-tertiary, #77778a);
+    }
+  }
+}
+
+.pm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pm-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 9px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.pm-btn-cancel {
+  background: transparent;
+  color: var(--text-secondary, #a8a8ba);
+  border-color: var(--border-default, rgba(255, 255, 255, 0.1));
+  &:hover {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.04));
+    color: var(--text-primary, #f2f2f7);
+  }
+}
+
+.pm-btn-continue {
+  background: var(--accent, #6e56f7);
+  color: var(--text-on-accent, #fff);
+  &:hover {
+    filter: brightness(1.06);
+  }
+}

@@ -101,6 +101,11 @@
     "speechGranted": "已授权",
     "speechDenied": "已拒绝",
     "speechUnknown": "授予访问权限",
+    "dictationAccess": "系统听写",
+    "dictationAccessHint": "这是应用无法检测或代为开启的独立系统设置 — 即使上方的麦克风和语音识别权限已授予,语音跟踪仍需要它",
+    "voicePermissions": "语音跟踪访问权限",
+    "voicePermissionsHint": "麦克风、语音识别和听写 — 语音跟踪所需的一切",
+    "checkPermissions": "检查权限",
     "openSystemSettings": "打开系统设置",
     "languageGroup": "语言",
     "languageHint": "界面语言",
@@ -140,6 +145,8 @@
     "voiceUnavailable": "语音跟踪不可用 — 定时滚动",
     "enableMic": "启用麦克风",
     "enableMicHint": "语音跟踪需要在悬浮窗内点击一次以启动麦克风",
+    "micIssue": "麦克风问题",
+    "micIssueHint": "请检查系统设置 → 键盘 → 听写是否已开启 — 这与麦克风权限是分开的设置,语音跟踪需要它。修复后会自动恢复。",
     "hidden": "已隐藏",
     "visible": "可见",
     "close": "关闭提词器（⌘⇧E 重新打开）",
@@ -210,5 +217,11 @@
   },
   "switcher": {
     "label": "语言"
+  },
+  "permissions": {
+    "title": "设置语音跟踪",
+    "intro": "语音跟踪会在你阅读时通过麦克风聆听并跟随。首先需要几项快速权限。",
+    "cancel": "暂不",
+    "continue": "继续"
   }
 }

@@ -55,3 +55,13 @@ export function getSpeechPermissionState() {
 
 export const SPEECH_PRIVACY_SETTINGS_URL =
   'x-apple.systempreferences:com.apple.preference.security?Privacy_SpeechRecognition';
+
+// System Dictation — a plain user preference, not a TCC permission, so
+// there's no prompt, no Permissions API, and no way to query or set it from
+// here. It's a separate switch from the two above: the Web Speech API rides
+// on the system Dictation service, and voice tracking can fail with no
+// useful error (or thrash — see useSpeechRecognition's 'mic-issue' state)
+// if this is off even when mic + speech-recognition access are both
+// granted. All we can do is deep-link to where a person can turn it on.
+export const DICTATION_SETTINGS_URL =
+  'x-apple.systempreferences:com.apple.preference.keyboard?Dictation';
