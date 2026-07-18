@@ -25,6 +25,13 @@ export const srAvailable = !!SR;
 const BACKOFF_MIN = 300; // ms
 const BACKOFF_MAX = 8000;
 
+// Continuous SR sessions end and restart on their own (see onend below).
+// The restart is synchronous but the replacement session's onstart is not —
+// its timing is decided by the OS/WebKit and varies by machine. Delaying the
+// "not listening" transition by this much absorbs a normal restart gap so
+// the overlay's mic indicator doesn't flicker off/on every cycle.
+const LISTENING_OFF_GRACE_MS = 400;
+
 export function useSpeechRecognition({ enabled, onWords, language }) {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState(null);
@@ -47,8 +54,17 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
     }
   }, []);
 
+  const listeningOffTimerRef = useRef(null);
+  const clearListeningOffTimer = useCallback(() => {
+    if (listeningOffTimerRef.current) {
+      clearTimeout(listeningOffTimerRef.current);
+      listeningOffTimerRef.current = null;
+    }
+  }, []);
+
   const stopSession = useCallback(() => {
     clearRestartTimer();
+    clearListeningOffTimer();
     const rec = recRef.current;
     recRef.current = null;
     if (rec) {
@@ -60,7 +76,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       }
     }
     setListening(false);
-  }, [clearRestartTimer]);
+  }, [clearRestartTimer, clearListeningOffTimer]);
 
   const startSessionRef = useRef(null);
   const startSession = useCallback(() => {
@@ -108,6 +124,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       fedCount = 0; // results array resets on every (re)start
       sawStart = true;
       backoffRef.current = BACKOFF_MIN; // healthy session — reset backoff
+      clearListeningOffTimer(); // cancel a pending "off" from the session we replaced
       setError(null);
       setListening(true);
     };
@@ -120,15 +137,30 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       }
     };
     rec.onend = () => {
-      setListening(false);
-      if (recRef.current !== rec) return;
+      if (recRef.current !== rec) {
+        // Already detached (e.g. mic-denied) — no restart is coming, so
+        // reflect "not listening" immediately.
+        clearListeningOffTimer();
+        setListening(false);
+        return;
+      }
       recRef.current = null;
       if (sawStart) {
         // Normal end of a healthy continuous session (silence timeout etc.)
-        // — restart immediately to keep tracking seamless.
+        // — restart immediately to keep tracking seamless. The replacement
+        // session's onstart is async, so only flip the indicator to "off"
+        // if it doesn't arrive within the grace window — otherwise every
+        // restart cycle flickers the overlay's mic badge off and back on.
+        clearListeningOffTimer();
+        listeningOffTimerRef.current = setTimeout(() => {
+          listeningOffTimerRef.current = null;
+          setListening(false);
+        }, LISTENING_OFF_GRACE_MS);
         startSessionRef.current();
       } else {
         // Died before ever starting — transient failure; back off and retry.
+        clearListeningOffTimer();
+        setListening(false);
         backoffRef.current = Math.min(backoffRef.current * 2, BACKOFF_MAX);
         restartTimerRef.current = setTimeout(() => {
           restartTimerRef.current = null;
@@ -146,7 +178,7 @@ export function useSpeechRecognition({ enabled, onWords, language }) {
       // fail via onerror, not a thrown start()).
       queueMicrotask(() => setError('start-failed'));
     }
-  }, []);
+  }, [clearListeningOffTimer]);
   useLayoutEffect(() => {
     startSessionRef.current = startSession;
   });
