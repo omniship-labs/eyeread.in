@@ -261,6 +261,14 @@
       "start": {
         "title": "Lesen starten",
         "body": "Dies öffnet das schwebende Prompter-Overlay und beginnt, deinem Skript zu folgen."
+      },
+      "shortcuts": {
+        "title": "Tastaturkürzel",
+        "body": "Sieh dir jederzeit alle Hotkeys an — Overlay ein-/ausblenden, Klick-durch, Abspielen/Pausieren und mehr."
+      },
+      "settings": {
+        "title": "App-Einstellungen",
+        "body": "Passe hier Barrierefreiheit, Update-Prüfungen und andere app-weite Einstellungen an."
       }
     },
     "welcomeOverlay": {
@@ -283,6 +291,14 @@
       "passthrough": {
         "title": "Klick-durch-Modus",
         "body": "Lass Klicks direkt durch den Prompter zu dem hindurchgehen, was dahinter liegt, damit du mit der geteilten App interagieren kannst, ohne das Overlay auszublenden. Schalte es hier oder mit ⌥⇧E um."
+      },
+      "grip": {
+        "title": "Bereich verschieben",
+        "body": "Ziehe diesen Griff, um den Prompter irgendwo auf dem Bildschirm neu zu positionieren."
+      },
+      "jump": {
+        "title": "Klicke auf ein Wort, um dorthin zu springen",
+        "body": "Klicke irgendwo im Skript, um deine Leseposition dorthin zu springen — praktisch, wenn du die Stelle verlierst oder vorspulen willst."
       }
     },
     "scriptSettingsEditor": {
@@ -311,6 +327,14 @@
       "timer": {
         "title": "Timer",
         "body": "Schalte direkt aus diesem schwebenden Panel einen Auf- oder Abwärtstimer ein."
+      },
+      "resetAll": {
+        "title": "Auf global zurücksetzen",
+        "body": "Sobald du oben etwas nur für dieses Skript geändert hast, entfernt dies diese Overrides und kehrt zu deinen globalen Standardwerten zurück."
+      },
+      "resetLayout": {
+        "title": "Position des Bereichs zurücksetzen",
+        "body": "Setzt den Prompter auf seine Standardgröße und zentrierte Position zurück, falls du ihn verschoben oder in der Größe geändert hast."
       }
     }
   }

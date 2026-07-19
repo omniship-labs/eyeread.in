@@ -43,6 +43,13 @@ export function SettingsWindow() {
   const [overrides, setOverrides] = useState({});
   const [scriptId, setScriptId] = useState(null);
   const [windowFocused, setWindowFocused] = useState(!isTauri);
+  // True once `global` reflects real persisted data (fetchSettings resolved,
+  // or a settings:context payload arrived) rather than the in-memory
+  // defaultSettings placeholder — same guard as OverlayWindow's
+  // settingsLoaded, and for the same reason: windowFocused defaults to true
+  // in browser-demo mode, so without this useTour's one-shot auto-start
+  // could fire against an empty seenTourSteps before the real value loads.
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   // Mirror the global accessibility prefs in this standalone window.
   useUiScale(global.uiScale);
@@ -50,14 +57,20 @@ export function SettingsWindow() {
   useDyslexicFont(global.dyslexicFont);
 
   useEffect(() => {
-    fetchSettings().then(setGlobal);
+    fetchSettings().then((st) => {
+      setGlobal(st);
+      setSettingsLoaded(true);
+    });
   }, []);
 
   useEffect(() => {
     let unA, unB, unC;
     (async () => {
       unA = await listen('settings:context', (p) => {
-        if (p?.global) setGlobal(p.global);
+        if (p?.global) {
+          setGlobal(p.global);
+          setSettingsLoaded(true);
+        }
         setOverrides(p?.overrides ?? {});
         setScriptId(p?.scriptId ?? null);
       });
@@ -108,9 +121,11 @@ export function SettingsWindow() {
   // active while genuinely focused/visible — this window already hides
   // itself on blur (above), so this mainly guards the moment right after
   // showSettingsWindow() before focus lands, and keeps the tooltip from
-  // rendering underneath a window that's about to disappear.
+  // rendering underneath a window that's about to disappear. Also waits for
+  // settingsLoaded so useTour's one-shot auto-start never fires against the
+  // placeholder defaultSettings before real seenTourSteps data arrives.
   const { tourOverlay } = useTour('settings', global, patchGlobalSettings, {
-    active: windowFocused,
+    active: settingsLoaded && windowFocused,
   });
 
   // ---- mutations -------------------------------------------------------------
@@ -351,10 +366,16 @@ export function SettingsWindow() {
       </div>
 
       <div className="sw-foot">
-        <Button variant="secondary" block disabled={!hasAny} onClick={resetAll}>
+        <Button
+          variant="secondary"
+          block
+          disabled={!hasAny}
+          data-tour="sw-reset-all"
+          onClick={resetAll}
+        >
           {t('prompter.resetAllToGlobal')}
         </Button>
-        <Button variant="ghost" block onClick={resetLayout}>
+        <Button variant="ghost" block data-tour="sw-reset-layout" onClick={resetLayout}>
           {t('prompter.resetLayout')}
         </Button>
       </div>

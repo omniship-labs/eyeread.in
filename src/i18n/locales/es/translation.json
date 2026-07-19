@@ -261,6 +261,14 @@
       "start": {
         "title": "Empezar a leer",
         "body": "Esto abre el overlay flotante del teleprompter y comienza a seguir tu guion."
+      },
+      "shortcuts": {
+        "title": "Atajos de teclado",
+        "body": "Consulta todos los atajos — mostrar/ocultar el overlay, clic a través, reproducir/pausar y más — en cualquier momento desde aquí."
+      },
+      "settings": {
+        "title": "Ajustes de la app",
+        "body": "Ajusta aquí la accesibilidad, las comprobaciones de actualización y otras preferencias de toda la app."
       }
     },
     "welcomeOverlay": {
@@ -283,6 +291,14 @@
       "passthrough": {
         "title": "Modo clic a través",
         "body": "Deja que los clics pasen directamente por el teleprompter hacia lo que hay detrás, para poder interactuar con la app compartida sin ocultar el overlay. Actívalo aquí o con ⌥⇧E."
+      },
+      "grip": {
+        "title": "Mover el panel",
+        "body": "Arrastra este asa para reposicionar el teleprompter en cualquier parte de la pantalla."
+      },
+      "jump": {
+        "title": "Haz clic en una palabra para saltar allí",
+        "body": "Haz clic en cualquier parte del guion para saltar tu posición de lectura — útil si pierdes el sitio o quieres avanzar."
       }
     },
     "scriptSettingsEditor": {
@@ -311,6 +327,14 @@
       "timer": {
         "title": "Temporizador",
         "body": "Activa un temporizador ascendente o descendente directamente desde este panel flotante."
+      },
+      "resetAll": {
+        "title": "Restablecer a global",
+        "body": "En cuanto cambies algo arriba solo para este guion, esto borra esas anulaciones y vuelve a tus valores globales por defecto."
+      },
+      "resetLayout": {
+        "title": "Restablecer la posición del panel",
+        "body": "Devuelve el teleprompter a su tamaño predeterminado y posición centrada, si lo has arrastrado o redimensionado."
       }
     }
   }

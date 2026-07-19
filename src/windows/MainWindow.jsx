@@ -334,6 +334,7 @@ export function MainWindow() {
         />
         <button
           className="tl-shortcuts"
+          data-tour="titlebar-shortcuts"
           onClick={() => setShortcutsOpen(true)}
           title={t('settings.viewShortcuts')}
           aria-label={t('settings.viewShortcuts')}
@@ -342,6 +343,7 @@ export function MainWindow() {
         </button>
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
+          data-tour="titlebar-settings"
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
           title={pane === 'settings' ? t('library.title') : t('app.settings')}
           aria-label={pane === 'settings' ? t('library.title') : t('app.settings')}

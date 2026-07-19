@@ -39,6 +39,20 @@ export const tours = [
         placement: 'bottom',
       },
       {
+        id: 'titlebar-shortcuts',
+        target: '[data-tour="titlebar-shortcuts"]',
+        titleKey: 'tour.welcomeMain.shortcuts.title',
+        bodyKey: 'tour.welcomeMain.shortcuts.body',
+        placement: 'bottom',
+      },
+      {
+        id: 'titlebar-settings',
+        target: '[data-tour="titlebar-settings"]',
+        titleKey: 'tour.welcomeMain.settings.title',
+        bodyKey: 'tour.welcomeMain.settings.body',
+        placement: 'bottom',
+      },
+      {
         id: 'start-reading',
         target: '[data-tour="start-reading"]',
         titleKey: 'tour.welcomeMain.start.title',
@@ -52,10 +66,24 @@ export const tours = [
     window: 'overlay',
     steps: [
       {
+        id: 'ov-grip',
+        target: '[data-tour="ov-grip"]',
+        titleKey: 'tour.welcomeOverlay.grip.title',
+        bodyKey: 'tour.welcomeOverlay.grip.body',
+        placement: 'bottom',
+      },
+      {
         id: 'ov-shield',
         target: '[data-tour="ov-shield"]',
         titleKey: 'tour.welcomeOverlay.shield.title',
         bodyKey: 'tour.welcomeOverlay.shield.body',
+        placement: 'bottom',
+      },
+      {
+        id: 'ov-jump',
+        target: '[data-tour="ov-jump"]',
+        titleKey: 'tour.welcomeOverlay.jump.title',
+        bodyKey: 'tour.welcomeOverlay.jump.body',
         placement: 'bottom',
       },
       {
@@ -144,6 +172,20 @@ export const tours = [
         target: '[data-tour="sw-timer"]',
         titleKey: 'tour.scriptSettingsFloating.timer.title',
         bodyKey: 'tour.scriptSettingsFloating.timer.body',
+        placement: 'top',
+      },
+      {
+        id: 'reset-all',
+        target: '[data-tour="sw-reset-all"]',
+        titleKey: 'tour.scriptSettingsFloating.resetAll.title',
+        bodyKey: 'tour.scriptSettingsFloating.resetAll.body',
+        placement: 'top',
+      },
+      {
+        id: 'reset-layout',
+        target: '[data-tour="sw-reset-layout"]',
+        titleKey: 'tour.scriptSettingsFloating.resetLayout.title',
+        bodyKey: 'tour.scriptSettingsFloating.resetLayout.body',
         placement: 'top',
       },
     ],

@@ -508,6 +508,7 @@ export function OverlayWindow() {
             ref={gripRef}
             className="grip"
             data-tauri-drag-region={!isMacOS || undefined}
+            data-tour="ov-grip"
             title={t('overlay.dragHint')}
             aria-hidden="true"
           >
@@ -609,6 +610,7 @@ export function OverlayWindow() {
             <div
               className="ov-window"
               ref={windowRef}
+              data-tour="ov-jump"
               style={{ height: panelSize.h }}
               role="region"
               aria-label={t('overlay.scriptRegion', {

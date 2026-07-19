@@ -261,6 +261,14 @@
       "start": {
         "title": "Commencer la lecture",
         "body": "Cela ouvre l'overlay flottant du prompteur et commence à suivre votre script."
+      },
+      "shortcuts": {
+        "title": "Raccourcis clavier",
+        "body": "Consultez tous les raccourcis — afficher/masquer l'overlay, clic traversant, lecture/pause et plus — à tout moment depuis ici."
+      },
+      "settings": {
+        "title": "Réglages de l'app",
+        "body": "Ajustez ici l'accessibilité, les vérifications de mise à jour et d'autres préférences globales de l'app."
       }
     },
     "welcomeOverlay": {
@@ -283,6 +291,14 @@
       "passthrough": {
         "title": "Mode clic traversant",
         "body": "Laissez les clics traverser directement le prompteur vers ce qu'il y a derrière, pour interagir avec l'app partagée sans masquer l'overlay. Activez-le ici ou avec ⌥⇧E."
+      },
+      "grip": {
+        "title": "Déplacer le panneau",
+        "body": "Faites glisser cette poignée pour repositionner le prompteur n'importe où à l'écran."
+      },
+      "jump": {
+        "title": "Cliquez sur un mot pour y sauter",
+        "body": "Cliquez n'importe où dans le script pour y déplacer votre position de lecture — pratique si vous perdez le fil ou voulez avancer."
       }
     },
     "scriptSettingsEditor": {
@@ -311,6 +327,14 @@
       "timer": {
         "title": "Minuteur",
         "body": "Activez un chronomètre montant ou descendant directement depuis ce panneau flottant."
+      },
+      "resetAll": {
+        "title": "Réinitialiser au global",
+        "body": "Dès que vous modifiez quelque chose ci-dessus pour ce script uniquement, ceci efface ces remplacements et revient à vos valeurs globales par défaut."
+      },
+      "resetLayout": {
+        "title": "Réinitialiser la position du panneau",
+        "body": "Remet le prompteur à sa taille par défaut et sa position centrée, si vous l'avez déplacé ou redimensionné."
       }
     }
   }
