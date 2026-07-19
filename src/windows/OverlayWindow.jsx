@@ -64,6 +64,13 @@ export function OverlayWindow() {
   // hidden overlay never holds the mic. Demo mode is always "open".
   const [sessionActive, setSessionActive] = useState(!isTauri);
   const loadedRef = useRef(false);
+  // True once `settings` reflects real persisted data (fetchSettings resolved,
+  // or the first overlay:load payload arrived) rather than the in-memory
+  // defaultSettings placeholder. Gates the tour below: without it, on a
+  // demo-mode mount (sessionActive starts true) useTour's one-shot auto-start
+  // could fire against an empty seenTourSteps before the real value loads,
+  // permanently missing its one chance to pick up the correct seen-state.
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   const windowRef = useRef(null);
   const activeWordRef = useRef(null);
@@ -116,7 +123,7 @@ export function OverlayWindow() {
   // already content-protected window, and hides itself the moment those
   // conditions stop holding rather than lingering through a hide/show cycle.
   const { tourOverlay } = useTour('overlay', settings, patchSettings, {
-    active: sessionActive && interactive && !consentModal,
+    active: settingsLoaded && sessionActive && interactive && !consentModal,
   });
 
   // Reduce-motion is a global accessibility preference (never per-script), so
@@ -182,6 +189,10 @@ export function OverlayWindow() {
         setSettings(st);
         setPanelSize(clampSize(st.overlaySize ?? defaultSettings.overlaySize));
       }
+      // Either way, `settings` now reflects real persisted data — even if
+      // overlay:load already replaced it with something fresher, that too
+      // was real data, not the defaultSettings placeholder.
+      setSettingsLoaded(true);
     });
     fetchScripts().then((sc) => {
       if (!loadedRef.current && sc[0]) {
@@ -218,6 +229,7 @@ export function OverlayWindow() {
         loadedRef.current = true;
         if (p?.script) setScript(p.script);
         if (p?.settings) setSettings(p.settings);
+        if (p?.settings) setSettingsLoaded(true); // in case this races ahead of fetchSettings
         const size = p?.script?.overlaySize ?? p?.settings?.overlaySize;
         if (size) setPanelSize(clampSize(size));
         jumpToRef.current(0); // resets active + pointer + cancels any slide
@@ -704,6 +716,7 @@ export function OverlayWindow() {
 
         <div
           className={'ov-resize' + (resizing ? ' dragging' : '')}
+          data-tour="ov-resize"
           onPointerDown={startResize}
           title={t('overlay.resize')}
           aria-hidden="true"

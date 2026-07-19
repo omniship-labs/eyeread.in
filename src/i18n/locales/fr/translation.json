@@ -275,6 +275,10 @@
       "settings": {
         "title": "Réglages du prompteur",
         "body": "Ouvre les mêmes réglages par script que vous pouvez aussi modifier depuis l'Éditeur — taille du texte, vitesse, opacité et plus, ici même pendant la lecture."
+      },
+      "resize": {
+        "title": "Redimensionner le panneau",
+        "body": "Faites glisser ce coin pour agrandir ou réduire le prompteur — la taille est mémorisée pour ce script."
       }
     },
     "scriptSettingsEditor": {

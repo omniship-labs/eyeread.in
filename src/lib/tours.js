@@ -72,6 +72,13 @@ export const tours = [
         bodyKey: 'tour.welcomeOverlay.settings.body',
         placement: 'top',
       },
+      {
+        id: 'ov-resize',
+        target: '[data-tour="ov-resize"]',
+        titleKey: 'tour.welcomeOverlay.resize.title',
+        bodyKey: 'tour.welcomeOverlay.resize.body',
+        placement: 'left',
+      },
     ],
   },
   // Per-script settings, inline in the Editor pane (main window). Runs after

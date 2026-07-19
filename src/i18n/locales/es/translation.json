@@ -275,6 +275,10 @@
       "settings": {
         "title": "Ajustes del teleprompter",
         "body": "Abre los mismos ajustes por guion que también puedes editar desde el Editor — tamaño de texto, velocidad, opacidad y más, aquí mismo mientras lees."
+      },
+      "resize": {
+        "title": "Cambiar el tamaño del panel",
+        "body": "Arrastra esta esquina para hacer el teleprompter más grande o más pequeño — el tamaño se recuerda para este guion."
       }
     },
     "scriptSettingsEditor": {

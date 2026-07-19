@@ -275,6 +275,10 @@
       "settings": {
         "title": "Prompter settings",
         "body": "Opens the same per-script settings you can also edit from the Editor — text size, speed, opacity, and more, right here while you read."
+      },
+      "resize": {
+        "title": "Resize the panel",
+        "body": "Drag this corner to make the prompter bigger or smaller — the size is remembered for this script."
       }
     },
     "scriptSettingsEditor": {

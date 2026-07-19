@@ -275,6 +275,10 @@
       "settings": {
         "title": "Prompter-Einstellungen",
         "body": "Öffnet dieselben skriptspezifischen Einstellungen, die du auch im Editor bearbeiten kannst — Textgröße, Geschwindigkeit, Deckkraft und mehr, direkt hier beim Lesen."
+      },
+      "resize": {
+        "title": "Bereich anpassen",
+        "body": "Ziehe diese Ecke, um den Prompter größer oder kleiner zu machen — die Größe wird für dieses Skript gemerkt."
       }
     },
     "scriptSettingsEditor": {
