@@ -1,0 +1,77 @@
+# Visual regression tests for the app (src/), driven via the browser/web-demo
+# build (see src/lib/tauri.js). Unlike Site E2E's screenshots-for-review-only
+# approach, this does real automated pixel diffing against committed
+# baselines with Playwright's toHaveScreenshot().
+name: App E2E
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'src/**'
+      - 'design/**'
+      - 'tests/app/**'
+      - 'index.html'
+      - 'vite.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'playwright.app.config.js'
+      - '.github/workflows/app-e2e.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'design/**'
+      - 'tests/app/**'
+      - 'index.html'
+      - 'vite.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'playwright.app.config.js'
+      - '.github/workflows/app-e2e.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - run: npm run app:test
+      - name: Upload report + diffs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: app-playwright-artifacts
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore
+      - name: Comment result on PR
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+        with:
+          header: app-e2e-visual-regression
+          message: |
+            ### 🧿 App visual regression — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
+
+            Playwright rendered the browser/web-demo build (main window, overlay popup, Settings,
+            About) in `en` and `de`, and diffed against the committed baselines.
+
+            ${{ job.status != 'success' && '**Diffs found** — see the report/diff images in the artifact below. If the change is intentional, run `npm run app:test:update` locally and commit the updated snapshots.' || '' }}
+
+            <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>

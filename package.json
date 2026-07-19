@@ -21,6 +21,8 @@
     "site:preview": "vite preview --config site/vite.config.js",
     "site:test": "playwright test",
     "site:test:update": "playwright test --update-snapshots",
+    "app:test": "playwright test --config=playwright.app.config.js",
+    "app:test:update": "playwright test --config=playwright.app.config.js --update-snapshots",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

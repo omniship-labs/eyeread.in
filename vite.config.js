@@ -32,6 +32,6 @@ export default defineConfig({
   // are full separate checkouts with their own site/tests/, and configDefaults
   // doesn't already ignore that path since it's not node_modules-like.
   test: {
-    exclude: [...configDefaults.exclude, 'site/tests/**', '.claude/**'],
+    exclude: [...configDefaults.exclude, 'site/tests/**', 'tests/**', '.claude/**'],
   },
 });
