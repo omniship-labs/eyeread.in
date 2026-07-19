@@ -274,13 +274,13 @@
       },
       "settings": {
         "title": "Réglages du prompteur",
-        "body": "Ajustez la taille du texte, la vitesse, l'opacité et plus, pour ce script uniquement."
+        "body": "Ouvre les mêmes réglages par script que vous pouvez aussi modifier depuis l'Éditeur — taille du texte, vitesse, opacité et plus, ici même pendant la lecture."
       }
     },
     "scriptSettingsEditor": {
       "tracking": {
         "title": "Mode de suivi",
-        "body": "Choisissez le suivi vocal, qui suit votre voix, ou une vitesse de défilement fixe — pour ce script uniquement."
+        "body": "Choisissez le suivi vocal, qui suit votre voix, ou une vitesse de défilement fixe — pour ce script uniquement. Vous retrouverez les mêmes réglages depuis l'icône d'engrenage de l'overlay pendant la lecture."
       },
       "appearance": {
         "title": "Apparence",

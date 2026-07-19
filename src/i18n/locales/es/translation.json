@@ -274,13 +274,13 @@
       },
       "settings": {
         "title": "Ajustes del teleprompter",
-        "body": "Ajusta tamaño de texto, velocidad, opacidad y más solo para este guion."
+        "body": "Abre los mismos ajustes por guion que también puedes editar desde el Editor — tamaño de texto, velocidad, opacidad y más, aquí mismo mientras lees."
       }
     },
     "scriptSettingsEditor": {
       "tracking": {
         "title": "Modo de seguimiento",
-        "body": "Elige seguimiento por voz, que sigue tu habla, o una velocidad de desplazamiento fija — solo para este guion."
+        "body": "Elige seguimiento por voz, que sigue tu habla, o una velocidad de desplazamiento fija — solo para este guion. Encontrarás los mismos controles desde el icono de engranaje del overlay mientras lees."
       },
       "appearance": {
         "title": "Aspecto",

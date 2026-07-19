@@ -274,13 +274,13 @@
       },
       "settings": {
         "title": "Prompter-Einstellungen",
-        "body": "Passe Textgröße, Geschwindigkeit, Deckkraft und mehr nur für dieses Skript an."
+        "body": "Öffnet dieselben skriptspezifischen Einstellungen, die du auch im Editor bearbeiten kannst — Textgröße, Geschwindigkeit, Deckkraft und mehr, direkt hier beim Lesen."
       }
     },
     "scriptSettingsEditor": {
       "tracking": {
         "title": "Erfassungsmodus",
-        "body": "Wähle Sprachverfolgung, die deiner Stimme folgt, oder eine feste Scrollgeschwindigkeit — nur für dieses Skript."
+        "body": "Wähle Sprachverfolgung, die deiner Stimme folgt, oder eine feste Scrollgeschwindigkeit — nur für dieses Skript. Dieselben Regler findest du auch über das Zahnrad im Overlay, während du liest."
       },
       "appearance": {
         "title": "Aussehen",

@@ -274,13 +274,13 @@
       },
       "settings": {
         "title": "Prompter settings",
-        "body": "Fine-tune text size, speed, opacity, and more for just this script."
+        "body": "Opens the same per-script settings you can also edit from the Editor — text size, speed, opacity, and more, right here while you read."
       }
     },
     "scriptSettingsEditor": {
       "tracking": {
         "title": "Tracking mode",
-        "body": "Choose voice tracking, which follows your speech, or a steady scroll speed — just for this script."
+        "body": "Choose voice tracking, which follows your speech, or a steady scroll speed — just for this script. You'll find the same controls from the overlay's gear icon while you're reading."
       },
       "appearance": {
         "title": "Look and feel",
