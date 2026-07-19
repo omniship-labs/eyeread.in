@@ -13,7 +13,6 @@
 [![Stable date](https://img.shields.io/github/release-date/omniship-labs/eyeread.in?label=stable%20date)](https://github.com/omniship-labs/eyeread.in/releases/latest)
 
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fget.eyeread.in)](https://get.eyeread.in)
-[![Mozilla Observatory](https://img.shields.io/mozilla-observatory/grade/get.eyeread.in)](https://developer.mozilla.org/en-US/observatory/analyze?host=get.eyeread.in)
 [![W3C Validation](https://img.shields.io/w3c-validation/default?targetUrl=https%3A%2F%2Fget.eyeread.in)](https://validator.w3.org/nu/?doc=https%3A%2F%2Fget.eyeread.in)
 [![GitHub stars](https://img.shields.io/github/stars/omniship-labs/eyeread.in?style=flat)](https://github.com/omniship-labs/eyeread.in/stargazers)
 [![CLA assistant](https://cla-assistant.io/readme/badge/omniship-labs/eyeread.in)](https://cla-assistant.io/omniship-labs/eyeread.in)
