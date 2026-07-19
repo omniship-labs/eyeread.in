@@ -28,10 +28,10 @@
     "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
-    "@fontsource/hanken-grotesk": "^5.2.5",
-    "@fontsource/jetbrains-mono": "^5.2.5",
-    "@fontsource/opendyslexic": "^5.2.5",
-    "@fontsource/space-grotesk": "^5.2.5",
+    "@fontsource/hanken-grotesk": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/opendyslexic": "^5.3.0",
+    "@fontsource/space-grotesk": "^5.3.0",
     "@iconify-icons/mdi": "^1.2.48",
     "@iconify/react": "^6.0.2",
     "@tauri-apps/api": "^2.11.1",
@@ -39,13 +39,13 @@
     "@tauri-apps/plugin-opener": "^2.5.0",
     "@tauri-apps/plugin-os": "^2.0.0",
     "@tauri-apps/plugin-sql": "^2.3.0",
-    "@tauri-apps/plugin-store": "^2.4.0",
+    "@tauri-apps/plugin-store": "^2.4.4",
     "i18next": "^26.3.6",
     "i18next-browser-languagedetector": "^8.2.1",
-    "lucide-react": "^1.24.0",
+    "lucide-react": "^1.25.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.0",
-    "react-i18next": "^17.0.9",
+    "react-i18next": "^17.0.10",
     "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
@@ -58,10 +58,10 @@
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.7.0",
-    "less": "^4.6.7",
+    "less": "^4.7.0",
     "opentype.js": "^2.0.0",
     "prettier": "^3.9.5",
-    "vite": "^8.1.4",
+    "vite": "^8.1.5",
     "vitest": "^4.1.10"
   }
 }
