@@ -31,7 +31,8 @@ export function SettingItem({
     <button
       className="si-origin overridden"
       onClick={() => onRevert(...keys)}
-      title={t('settingItem.useGlobalValue')}
+      aria-label={t('settingItem.useGlobalValue')}
+      data-tip={t('settingItem.useGlobalValue')}
     >
       <Undo2 size={10} />
     </button>

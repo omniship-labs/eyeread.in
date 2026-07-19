@@ -43,6 +43,7 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { useTour } from '../hooks/useTour';
+import { TipLayer } from '../components/TipLayer';
 import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 import { DICTATION_SETTINGS_URL } from '../lib/speech';
@@ -509,7 +510,8 @@ export function OverlayWindow() {
             className="grip"
             data-tauri-drag-region={!isMacOS || undefined}
             data-tour="ov-grip"
-            title={t('overlay.dragHint')}
+            data-tip={t('overlay.dragHint')}
+            data-tip-side="bottom"
             aria-hidden="true"
           >
             <i />
@@ -538,7 +540,8 @@ export function OverlayWindow() {
           {effective.voice && voiceAvailable && voiceError === 'mic-issue' && (
             <button
               className="ov-voice ov-voice--retry"
-              title={t('overlay.micIssueHint')}
+              data-tip={t('overlay.micIssueHint')}
+              data-tip-side="bottom"
               aria-label={t('overlay.micIssueHint')}
               // A retry can't fix this — Dictation is a plain OS setting, not
               // something a gesture re-arms — so send the user straight to
@@ -554,7 +557,8 @@ export function OverlayWindow() {
           {effective.voice && voiceAvailable && voiceError === 'mic-denied-confirmed' && (
             <button
               className="ov-voice ov-voice--retry"
-              title={t('overlay.micDeniedHint')}
+              data-tip={t('overlay.micDeniedHint')}
+              data-tip-side="bottom"
               aria-label={t('overlay.micDeniedHint')}
               // A retry can't fix a confirmed OS-level denial — send the
               // user straight to the settings pane, same as the mic-issue
@@ -572,7 +576,8 @@ export function OverlayWindow() {
             voiceError !== 'mic-denied-confirmed' && (
               <button
                 className="ov-voice ov-voice--retry"
-                title={t('overlay.enableMicHint')}
+                data-tip={t('overlay.enableMicHint')}
+                data-tip-side="bottom"
                 aria-label={t('overlay.enableMicHint')}
                 onClick={retryVoice}
               >
@@ -581,7 +586,12 @@ export function OverlayWindow() {
               </button>
             )}
           {effective.voice && playing && !voiceAvailable && (
-            <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
+            <span
+              className="ov-voice"
+              data-tip={t('overlay.voiceUnavailable')}
+              data-tip-side="bottom"
+              aria-label={t('overlay.voiceUnavailable')}
+            >
               <MicOff size={12} />
             </span>
           )}
@@ -596,7 +606,8 @@ export function OverlayWindow() {
             />
             <button
               className="ic ic-sm"
-              title={t('overlay.close')}
+              data-tip={t('overlay.close')}
+              data-tip-side="bottom"
               aria-label={t('overlay.close')}
               onClick={close}
             >
@@ -639,7 +650,7 @@ export function OverlayWindow() {
         <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
           <button
             className="ic"
-            title={t('overlay.restart')}
+            data-tip={t('overlay.restart')}
             aria-label={t('overlay.restart')}
             onClick={restart}
           >
@@ -647,7 +658,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic"
-            title={t('overlay.back5')}
+            data-tip={t('overlay.back5')}
             aria-label={t('overlay.back5')}
             onClick={skipBack}
           >
@@ -656,7 +667,7 @@ export function OverlayWindow() {
           <button
             className="ic accent"
             data-tour="ov-play"
-            title={playing ? t('overlay.pause') : t('overlay.play')}
+            data-tip={playing ? t('overlay.pause') : t('overlay.play')}
             aria-label={playing ? t('overlay.pause') : t('overlay.play')}
             aria-pressed={playing}
             onClick={() => setPlaying((p) => !p)}
@@ -665,7 +676,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic"
-            title={t('overlay.skip5')}
+            data-tip={t('overlay.skip5')}
             aria-label={t('overlay.skip5')}
             onClick={skip}
           >
@@ -674,7 +685,7 @@ export function OverlayWindow() {
           <span className="sep" />
           <button
             className="ic sizebtn"
-            title={t('overlay.smaller')}
+            data-tip={t('overlay.smaller')}
             aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
@@ -683,7 +694,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic sizebtn"
-            title={t('overlay.larger')}
+            data-tip={t('overlay.larger')}
             aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
@@ -694,7 +705,7 @@ export function OverlayWindow() {
             ref={settingsBtnRef}
             className="ic"
             data-tour="ov-settings"
-            title={t('overlay.prompterSettings')}
+            data-tip={t('overlay.prompterSettings')}
             aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
@@ -704,7 +715,7 @@ export function OverlayWindow() {
             ref={passthruBtnRef}
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
             data-tour="ov-passthru"
-            title={
+            data-tip={
               interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
             }
             aria-label={
@@ -721,7 +732,7 @@ export function OverlayWindow() {
           className={'ov-resize' + (resizing ? ' dragging' : '')}
           data-tour="ov-resize"
           onPointerDown={startResize}
-          title={t('overlay.resize')}
+          data-tip={t('overlay.resize')}
           aria-hidden="true"
         >
           <svg
@@ -737,6 +748,7 @@ export function OverlayWindow() {
       </div>
       {consentModal}
       {tourOverlay}
+      <TipLayer />
     </div>
   );
 }

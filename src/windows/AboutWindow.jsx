@@ -11,6 +11,7 @@ import {
 import i18n from '../i18n/index.js';
 import { fetchSettings } from '../lib/store';
 import { getTesters } from '../lib/credits';
+import { TipLayer } from '../components/TipLayer';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import sponsors from '../data/sponsors.json';
 import omnishipMark from '../assets/logos/omniship-mark-beacon.svg';
@@ -295,7 +296,7 @@ export function AboutWindow() {
       <button
         type="button"
         className="aw-omniship"
-        title="omniship.dev"
+        data-tip="omniship.dev"
         onClick={() => openExternal(OMNISHIP_URL)}
       >
         <img src={omnishipMark} alt="" width={26} height={26} draggable={false} />
@@ -304,6 +305,7 @@ export function AboutWindow() {
           <span className="aw-omniship-tagline">Open Meets New Ideas</span>
         </span>
       </button>
+      <TipLayer />
     </div>
   );
 }

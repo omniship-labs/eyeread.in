@@ -145,7 +145,7 @@ export function Library({
                 <div className="sc-actions">
                   <button
                     className={'sc-act' + (s.pinned ? ' sc-act-active' : '')}
-                    title={s.pinned ? t('library.unpin') : t('library.pin')}
+                    data-tip={s.pinned ? t('library.unpin') : t('library.pin')}
                     aria-label={`${s.pinned ? t('library.unpin') : t('library.pin')}: ${s.title}`}
                     aria-pressed={!!s.pinned}
                     onClick={(e) => {
@@ -157,7 +157,7 @@ export function Library({
                   </button>
                   <button
                     className="sc-act"
-                    title={t('library.delete')}
+                    data-tip={t('library.delete')}
                     aria-label={`${t('library.delete')}: ${s.title}`}
                     onClick={(e) => {
                       e.stopPropagation();

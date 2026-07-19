@@ -81,6 +81,7 @@ import { usePermissionsGate } from '../hooks/usePermissionsGate';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { useTour } from '../hooks/useTour';
+import { TipLayer } from '../components/TipLayer';
 
 export function MainWindow() {
   const { t } = useTranslation();
@@ -336,7 +337,8 @@ export function MainWindow() {
           className="tl-shortcuts"
           data-tour="titlebar-shortcuts"
           onClick={() => setShortcutsOpen(true)}
-          title={t('settings.viewShortcuts')}
+          data-tip={t('settings.viewShortcuts')}
+          data-tip-side="bottom"
           aria-label={t('settings.viewShortcuts')}
         >
           <Keyboard size={15} aria-hidden="true" />
@@ -345,7 +347,8 @@ export function MainWindow() {
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
           data-tour="titlebar-settings"
           onClick={() => setPane((p) => (p === 'settings' ? 'library' : 'settings'))}
-          title={pane === 'settings' ? t('library.title') : t('app.settings')}
+          data-tip={pane === 'settings' ? t('library.title') : t('app.settings')}
+          data-tip-side="bottom"
           aria-label={pane === 'settings' ? t('library.title') : t('app.settings')}
           aria-pressed={pane === 'settings'}
         >
@@ -458,6 +461,7 @@ export function MainWindow() {
       {permissionsModal}
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
       {tourOverlay}
+      <TipLayer />
     </div>
   );
 }

@@ -97,7 +97,7 @@ export const ScriptViewer = React.memo(function ScriptViewer({
             ].join(' ')}
             style={wordStyle}
             onClick={onWordClick ? () => onWordClick(wc) : undefined}
-            title={onWordClick ? 'Read from here' : undefined}
+            data-tip={onWordClick ? 'Read from here' : undefined}
           >
             {tok}
           </span>

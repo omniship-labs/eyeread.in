@@ -21,11 +21,14 @@ export function ShieldToggle({
   ...rest
 }) {
   const { t } = useTranslation();
+  const label = shielded ? t('shield.hiddenTitle') : t('shield.visibleTitle');
   return (
     <button
       className={`${className}${shielded ? ' shielded' : ' exposed'}`}
       onClick={() => onChange(!shielded)}
-      title={shielded ? t('shield.hiddenTitle') : t('shield.visibleTitle')}
+      aria-label={label}
+      data-tip={label}
+      data-tip-side="bottom"
       {...rest}
     >
       {shielded ? <EyeOff size={size} /> : <Eye size={size} />}
