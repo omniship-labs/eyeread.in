@@ -74,6 +74,66 @@ export const tours = [
       },
     ],
   },
+  // Per-script settings, inline in the Editor pane (main window). Runs after
+  // welcome-main-v1 is fully seen — see useTour's "one auto-start per mount"
+  // rule, so this shows up on a later launch rather than immediately
+  // chaining off the first tour.
+  {
+    id: 'welcome-script-settings-editor-v1',
+    window: 'main',
+    steps: [
+      {
+        id: 'tracking',
+        target: '[data-tour="script-tracking"]',
+        titleKey: 'tour.scriptSettingsEditor.tracking.title',
+        bodyKey: 'tour.scriptSettingsEditor.tracking.body',
+        placement: 'left',
+      },
+      {
+        id: 'appearance',
+        target: '[data-tour="script-appearance"]',
+        titleKey: 'tour.scriptSettingsEditor.appearance.title',
+        bodyKey: 'tour.scriptSettingsEditor.appearance.body',
+        placement: 'left',
+      },
+      {
+        id: 'timer',
+        target: '[data-tour="script-timer"]',
+        titleKey: 'tour.scriptSettingsEditor.timer.title',
+        bodyKey: 'tour.scriptSettingsEditor.timer.body',
+        placement: 'left',
+      },
+    ],
+  },
+  // The same per-script settings, in the independent floating Settings
+  // window opened from the overlay's gear icon during a live session.
+  {
+    id: 'welcome-script-settings-floating-v1',
+    window: 'settings',
+    steps: [
+      {
+        id: 'tracking',
+        target: '[data-tour="sw-tracking"]',
+        titleKey: 'tour.scriptSettingsFloating.tracking.title',
+        bodyKey: 'tour.scriptSettingsFloating.tracking.body',
+        placement: 'bottom',
+      },
+      {
+        id: 'appearance',
+        target: '[data-tour="sw-appearance"]',
+        titleKey: 'tour.scriptSettingsFloating.appearance.title',
+        bodyKey: 'tour.scriptSettingsFloating.appearance.body',
+        placement: 'bottom',
+      },
+      {
+        id: 'timer',
+        target: '[data-tour="sw-timer"]',
+        titleKey: 'tour.scriptSettingsFloating.timer.title',
+        bodyKey: 'tour.scriptSettingsFloating.timer.body',
+        placement: 'top',
+      },
+    ],
+  },
 ];
 
 export const toursForWindow = (windowName) => tours.filter((t) => t.window === windowName);

@@ -21,6 +21,7 @@ export function SettingItem({
   onRevert,
   children,
   style,
+  ...rest
 }) {
   const { t } = useTranslation();
   const keys = Array.isArray(rawKeys) ? rawKeys : [rawKeys];
@@ -39,7 +40,7 @@ export function SettingItem({
   );
 
   return (
-    <div className="si-root" style={style}>
+    <div className="si-root" style={style} {...rest}>
       <div className="si-label-row">
         <span className="si-label">{label}</span>
         <span className="si-meta">

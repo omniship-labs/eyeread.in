@@ -276,6 +276,34 @@
         "title": "Prompter-Einstellungen",
         "body": "Passe Textgröße, Geschwindigkeit, Deckkraft und mehr nur für dieses Skript an."
       }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Erfassungsmodus",
+        "body": "Wähle Sprachverfolgung, die deiner Stimme folgt, oder eine feste Scrollgeschwindigkeit — nur für dieses Skript."
+      },
+      "appearance": {
+        "title": "Aussehen",
+        "body": "Textgröße, Deckkraft, Glasunschärfe und Spiegelung — jede überschreibt den globalen Standard nur für dieses Skript."
+      },
+      "timer": {
+        "title": "Timer",
+        "body": "Zeige beim Lesen einen Auf- oder Abwärtstimer mit optionalem Zeithinweis."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Erfassungsmodus",
+        "body": "Wechsle zwischen Sprachverfolgung und fester Scrollgeschwindigkeit, ohne den Prompter zu verlassen."
+      },
+      "appearance": {
+        "title": "Aussehen",
+        "body": "Textgröße, Hervorhebungsbereich, Deckkraft, Unschärfe und Spiegelung — für dieses Skript, live beim Lesen anpassbar."
+      },
+      "timer": {
+        "title": "Timer",
+        "body": "Schalte direkt aus diesem schwebenden Panel einen Auf- oder Abwärtstimer ein."
+      }
     }
   }
 }

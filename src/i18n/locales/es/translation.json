@@ -276,6 +276,34 @@
         "title": "Ajustes del teleprompter",
         "body": "Ajusta tamaño de texto, velocidad, opacidad y más solo para este guion."
       }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Modo de seguimiento",
+        "body": "Elige seguimiento por voz, que sigue tu habla, o una velocidad de desplazamiento fija — solo para este guion."
+      },
+      "appearance": {
+        "title": "Aspecto",
+        "body": "Tamaño de texto, opacidad, desenfoque de cristal y espejo — cada uno anula el valor global solo para este guion."
+      },
+      "timer": {
+        "title": "Temporizador",
+        "body": "Muestra un temporizador ascendente o descendente mientras lees, con una alerta de tiempo opcional."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Modo de seguimiento",
+        "body": "Cambia entre seguimiento por voz y velocidad de desplazamiento fija sin salir del teleprompter."
+      },
+      "appearance": {
+        "title": "Aspecto",
+        "body": "Tamaño de texto, rango de resaltado, opacidad, desenfoque y espejo — ajustados para este guion, en vivo mientras lees."
+      },
+      "timer": {
+        "title": "Temporizador",
+        "body": "Activa un temporizador ascendente o descendente directamente desde este panel flotante."
+      }
     }
   }
 }

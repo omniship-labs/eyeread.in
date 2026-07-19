@@ -276,6 +276,34 @@
         "title": "Prompter settings",
         "body": "Fine-tune text size, speed, opacity, and more for just this script."
       }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Tracking mode",
+        "body": "Choose voice tracking, which follows your speech, or a steady scroll speed — just for this script."
+      },
+      "appearance": {
+        "title": "Look and feel",
+        "body": "Text size, opacity, glass blur, and mirroring — each one overrides the global default only for this script."
+      },
+      "timer": {
+        "title": "Timer",
+        "body": "Show a count-up or countdown timer while you read, with an optional time alert."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Tracking mode",
+        "body": "Switch between voice tracking and a steady scroll speed without leaving the prompter."
+      },
+      "appearance": {
+        "title": "Look and feel",
+        "body": "Text size, highlight range, opacity, blur, and mirroring — tuned for this script, adjustable live while you read."
+      },
+      "timer": {
+        "title": "Timer",
+        "body": "Turn on a count-up or countdown timer, right from this floating panel."
+      }
     }
   }
 }

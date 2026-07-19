@@ -276,6 +276,34 @@
         "title": "Réglages du prompteur",
         "body": "Ajustez la taille du texte, la vitesse, l'opacité et plus, pour ce script uniquement."
       }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Mode de suivi",
+        "body": "Choisissez le suivi vocal, qui suit votre voix, ou une vitesse de défilement fixe — pour ce script uniquement."
+      },
+      "appearance": {
+        "title": "Apparence",
+        "body": "Taille du texte, opacité, flou de verre et effet miroir — chacun ne remplace la valeur globale que pour ce script."
+      },
+      "timer": {
+        "title": "Minuteur",
+        "body": "Affichez un chronomètre montant ou descendant pendant la lecture, avec une alerte de temps optionnelle."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Mode de suivi",
+        "body": "Basculez entre le suivi vocal et une vitesse de défilement fixe sans quitter le prompteur."
+      },
+      "appearance": {
+        "title": "Apparence",
+        "body": "Taille du texte, plage de surbrillance, opacité, flou et effet miroir — ajustés pour ce script, en direct pendant la lecture."
+      },
+      "timer": {
+        "title": "Minuteur",
+        "body": "Activez un chronomètre montant ou descendant directement depuis ce panneau flottant."
+      }
     }
   }
 }
