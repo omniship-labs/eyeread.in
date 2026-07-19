@@ -56,13 +56,14 @@ export function Editor({
   const mode = voice ? 'voice' : 'scroll';
   const countFromMins = Math.round((effective.countFrom ?? 300) / 60);
 
-  const si = (keys, label, value, children) => (
+  const si = (keys, label, value, children, dataTour) => (
     <SettingItem
       keys={keys}
       label={label}
       value={value}
       overrides={overrides}
       onRevert={revert}
+      data-tour={dataTour}
     >
       {children}
     </SettingItem>
@@ -102,7 +103,12 @@ export function Editor({
                 <span className="ed-update-cta">{t('settings.updateInstall')}</span>
               </button>
             )}
-            <Button block iconLeft={<Play size={16} />} onClick={onStart}>
+            <Button
+              block
+              iconLeft={<Play size={16} />}
+              data-tour="start-reading"
+              onClick={onStart}
+            >
               {t('editor.startReading')}
             </Button>
 
@@ -177,7 +183,8 @@ export function Editor({
                       )
                     )}
                   </div>
-                </>
+                </>,
+                'script-tracking'
               )}
 
               {si(
@@ -190,7 +197,8 @@ export function Editor({
                   value={size}
                   ariaLabel={t('reading.textSize')}
                   onChange={(v) => set('size', v)}
-                />
+                />,
+                'script-appearance'
               )}
 
               {si(
@@ -267,7 +275,8 @@ export function Editor({
                       </span>
                     </div>
                   )}
-                </>
+                </>,
+                'script-timer'
               )}
             </div>
 

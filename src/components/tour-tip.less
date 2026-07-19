@@ -1,0 +1,160 @@
+/* Tour tips — dim-and-spotlight coach-mark. Four bands dim everything except
+   a cutout around the current target (so the dimmed areas actually block
+   clicks — a box-shadow spotlight looks the same but isn't interactive,
+   since shadows never hit-test). Sits below the app's real modals
+   (permissions-modal.less etc. use z-index 9000) so if one ever needs to
+   open mid-tour it wins. */
+
+@import (reference) '../../design/tokens/mixins.less';
+
+@tt-z: 8500;
+@tt-dim: rgba(6, 6, 9, 0.6);
+
+.tt-band {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: @tt-z;
+  background: @tt-dim;
+  transition:
+    top 180ms ease,
+    left 180ms ease,
+    width 180ms ease,
+    height 180ms ease;
+}
+.tt-band-top {
+  top: 0;
+}
+.tt-band-bottom {
+  left: 0;
+  width: 100%;
+}
+.tt-band-left,
+.tt-band-right {
+  width: auto;
+}
+.tt-band-left {
+  left: 0;
+}
+.tt-band-right {
+  left: auto;
+}
+
+.tt-ring {
+  position: fixed;
+  z-index: @tt-z;
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--accent, #6e56f7);
+  pointer-events: none;
+  transition:
+    top 180ms ease,
+    left 180ms ease,
+    width 180ms ease,
+    height 180ms ease;
+}
+
+.tt-card {
+  position: fixed;
+  z-index: @tt-z + 1;
+  width: 280px;
+  max-width: calc(100vw - 16px);
+  background: var(--surface-1, #13131c);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  padding: 16px 16px 14px;
+  color: var(--text-primary, #f2f2f7);
+  transition:
+    top 180ms ease,
+    left 180ms ease;
+
+  // Arrow — a rotated square peeking out from the edge the card points from.
+  &::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--surface-1, #13131c);
+    border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
+  }
+}
+
+.tt-arrow-top::before {
+  top: -6px;
+  left: var(--tt-arrow-offset);
+  transform: translateX(-50%) rotate(45deg);
+  border-right: none;
+  border-bottom: none;
+}
+.tt-arrow-bottom::before {
+  bottom: -6px;
+  left: var(--tt-arrow-offset);
+  transform: translateX(-50%) rotate(45deg);
+  border-left: none;
+  border-top: none;
+}
+.tt-arrow-left::before {
+  left: -6px;
+  top: var(--tt-arrow-offset);
+  transform: translateY(-50%) rotate(45deg);
+  border-top: none;
+  border-right: none;
+}
+.tt-arrow-right::before {
+  right: -6px;
+  top: var(--tt-arrow-offset);
+  transform: translateY(-50%) rotate(45deg);
+  border-bottom: none;
+  border-left: none;
+}
+
+.tt-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary, #77778a);
+  cursor: pointer;
+  &:hover {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.06));
+    color: var(--text-primary, #f2f2f7);
+  }
+}
+
+.tt-title {
+  font-size: 14px;
+  font-weight: 650;
+  margin: 0 22px 6px 0;
+}
+
+.tt-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #a8a8ba);
+  margin: 0 0 14px;
+}
+
+.tt-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tt-count {
+  font-size: 11.5px;
+  color: var(--text-tertiary, #77778a);
+  font-variant-numeric: tabular-nums;
+}
+
+.tt-actions {
+  display: flex;
+  gap: 6px;
+}

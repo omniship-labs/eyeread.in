@@ -53,6 +53,7 @@ export function Library({
   return (
     <div
       className="lib"
+      data-tour="library"
       style={width ? { width, minWidth: width, maxWidth: width } : undefined}
     >
       <div className="lib-top">
@@ -68,7 +69,12 @@ export function Library({
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <button className="lib-btn" onClick={onCreate} aria-label={t('library.newScript')}>
+          <button
+            className="lib-btn"
+            data-tour="new-script"
+            onClick={onCreate}
+            aria-label={t('library.newScript')}
+          >
             <Plus size={16} aria-hidden="true" />
             <span className="lib-btn-label">{t('library.newScript')}</span>
           </button>
@@ -139,7 +145,7 @@ export function Library({
                 <div className="sc-actions">
                   <button
                     className={'sc-act' + (s.pinned ? ' sc-act-active' : '')}
-                    title={s.pinned ? t('library.unpin') : t('library.pin')}
+                    data-tip={s.pinned ? t('library.unpin') : t('library.pin')}
                     aria-label={`${s.pinned ? t('library.unpin') : t('library.pin')}: ${s.title}`}
                     aria-pressed={!!s.pinned}
                     onClick={(e) => {
@@ -151,7 +157,7 @@ export function Library({
                   </button>
                   <button
                     className="sc-act"
-                    title={t('library.delete')}
+                    data-tip={t('library.delete')}
                     aria-label={`${t('library.delete')}: ${s.title}`}
                     onClick={(e) => {
                       e.stopPropagation();

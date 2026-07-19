@@ -1,0 +1,29 @@
+/* TipLayer's hover-tooltip bubble. See TipLayer.jsx for why this exists
+   instead of the native `title` attribute. */
+
+.tip-bubble {
+  position: fixed;
+  z-index: 2000;
+  background: var(--surface-1, #13131c);
+  color: var(--text-primary, #f2f2f7);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
+  font: 500 11px var(--font-sans);
+  white-space: nowrap;
+  max-width: 260px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm, 6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  animation: tip-bubble-in 120ms ease;
+}
+
+@keyframes tip-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -33,6 +33,11 @@ export const defaultSettings = {
   dyslexicFont: false, // OpenDyslexic + roomier spacing for the reading text
   uiScale: 100, // app UI zoom, % (affects main / settings / about windows)
   updateCheckHours: 6, // periodic update-check interval, hours; 0 = off
+  // Tour tips seen/dismissed, one entry per step as `${tourId}:${stepId}` —
+  // per-step (not per-tour) so a step added to an already-finished tour
+  // later shows up on its own, without replaying the whole tour. See
+  // src/lib/tours.js and src/hooks/useTour.js.
+  seenTourSteps: [],
 };
 
 // Selectable periodic-check cadences, hours; 0 = off. Single source of truth

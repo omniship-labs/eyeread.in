@@ -148,7 +148,10 @@
     "scaleSmall": "Pequeño",
     "scaleDefault": "Predeterminado",
     "scaleLarge": "Grande",
-    "scaleLarger": "Más grande"
+    "scaleLarger": "Más grande",
+    "replayTour": "Consejos guiados",
+    "replayTourHint": "Repite el recorrido guiado por la pantalla principal",
+    "replayTourCta": "Mostrar consejos de nuevo"
   },
   "overlay": {
     "dragHint": "Arrastra para mover · Esc para ocultar",
@@ -235,5 +238,104 @@
     "intro": "El seguimiento por voz te sigue mientras lees, escuchando a través de tu micrófono. Antes necesita un par de permisos rápidos.",
     "cancel": "Ahora no",
     "continue": "Continuar"
+  },
+  "tour": {
+    "next": "Siguiente",
+    "back": "Atrás",
+    "skip": "Omitir",
+    "done": "Listo",
+    "stepOf": "{{current}} de {{total}}",
+    "welcomeMain": {
+      "library": {
+        "title": "Aquí viven tus guiones",
+        "body": "Cada guion que escribes aparece en esta lista — búscalos, fíjalos y fíltralos desde las pestañas de arriba."
+      },
+      "newScript": {
+        "title": "Crea un nuevo guion",
+        "body": "Haz clic aquí en cualquier momento para escribir un guion nuevo para el teleprompter."
+      },
+      "shield": {
+        "title": "Invisible en pantalla compartida",
+        "body": "Con este escudo activado, eyeread.in queda excluido de grabaciones y pantallas compartidas — solo tú lo ves."
+      },
+      "start": {
+        "title": "Empezar a leer",
+        "body": "Esto abre el overlay flotante del teleprompter y comienza a seguir tu guion."
+      },
+      "shortcuts": {
+        "title": "Atajos de teclado",
+        "body": "Consulta todos los atajos — mostrar/ocultar el overlay, clic a través, reproducir/pausar y más — en cualquier momento desde aquí."
+      },
+      "settings": {
+        "title": "Ajustes de la app",
+        "body": "Ajusta aquí la accesibilidad, las comprobaciones de actualización y otras preferencias de toda la app."
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "Sigue siendo invisible aquí",
+        "body": "El mismo escudo acompaña al teleprompter — actívalo o desactívalo sin salir del overlay."
+      },
+      "play": {
+        "title": "Reproducir / pausar",
+        "body": "Inicia o detén el desplazamiento del teleprompter — el seguimiento por voz se activa automáticamente al hablar."
+      },
+      "settings": {
+        "title": "Ajustes del teleprompter",
+        "body": "Abre los mismos ajustes por guion que también puedes editar desde el Editor — tamaño de texto, velocidad, opacidad y más, aquí mismo mientras lees."
+      },
+      "resize": {
+        "title": "Cambiar el tamaño del panel",
+        "body": "Arrastra esta esquina para hacer el teleprompter más grande o más pequeño — el tamaño se recuerda para este guion."
+      },
+      "passthrough": {
+        "title": "Modo clic a través",
+        "body": "Deja que los clics pasen directamente por el teleprompter hacia lo que hay detrás, para poder interactuar con la app compartida sin ocultar el overlay. Actívalo aquí o con ⌥⇧E."
+      },
+      "grip": {
+        "title": "Mover el panel",
+        "body": "Arrastra este asa para reposicionar el teleprompter en cualquier parte de la pantalla."
+      },
+      "jump": {
+        "title": "Haz clic en una palabra para saltar allí",
+        "body": "Haz clic en cualquier parte del guion para saltar tu posición de lectura — útil si pierdes el sitio o quieres avanzar."
+      }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Modo de seguimiento",
+        "body": "Elige seguimiento por voz, que sigue tu habla, o una velocidad de desplazamiento fija — solo para este guion. Encontrarás los mismos controles desde el icono de engranaje del overlay mientras lees."
+      },
+      "appearance": {
+        "title": "Aspecto",
+        "body": "Tamaño de texto, opacidad, desenfoque de cristal y espejo — cada uno anula el valor global solo para este guion."
+      },
+      "timer": {
+        "title": "Temporizador",
+        "body": "Muestra un temporizador ascendente o descendente mientras lees, con una alerta de tiempo opcional."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Modo de seguimiento",
+        "body": "Cambia entre seguimiento por voz y velocidad de desplazamiento fija sin salir del teleprompter."
+      },
+      "appearance": {
+        "title": "Aspecto",
+        "body": "Tamaño de texto, rango de resaltado, opacidad, desenfoque y espejo — ajustados para este guion, en vivo mientras lees."
+      },
+      "timer": {
+        "title": "Temporizador",
+        "body": "Activa un temporizador ascendente o descendente directamente desde este panel flotante."
+      },
+      "resetAll": {
+        "title": "Restablecer a global",
+        "body": "En cuanto cambies algo arriba solo para este guion, esto borra esas anulaciones y vuelve a tus valores globales por defecto."
+      },
+      "resetLayout": {
+        "title": "Restablecer la posición del panel",
+        "body": "Devuelve el teleprompter a su tamaño predeterminado y posición centrada, si lo has arrastrado o redimensionado."
+      }
+    }
   }
 }

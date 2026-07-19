@@ -42,6 +42,8 @@ import {
   openExternal,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
+import { useTour } from '../hooks/useTour';
+import { TipLayer } from '../components/TipLayer';
 import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 import { DICTATION_SETTINGS_URL } from '../lib/speech';
@@ -63,6 +65,13 @@ export function OverlayWindow() {
   // hidden overlay never holds the mic. Demo mode is always "open".
   const [sessionActive, setSessionActive] = useState(!isTauri);
   const loadedRef = useRef(false);
+  // True once `settings` reflects real persisted data (fetchSettings resolved,
+  // or the first overlay:load payload arrived) rather than the in-memory
+  // defaultSettings placeholder. Gates the tour below: without it, on a
+  // demo-mode mount (sessionActive starts true) useTour's one-shot auto-start
+  // could fire against an empty seenTourSteps before the real value loads,
+  // permanently missing its one chance to pick up the correct seen-state.
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   const windowRef = useRef(null);
   const activeWordRef = useRef(null);
@@ -106,6 +115,17 @@ export function OverlayWindow() {
 
   // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
   const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
+
+  // First-run tour tips for the prompter controls. Only ever active once a
+  // reading session is genuinely showing and interactive (not click-through
+  // "ghost" mode, not while the Linux consent prompt is up) — same
+  // screen-recording-safety reasoning as the main window's tour (see
+  // docs on useTour): a tooltip only ever renders as plain DOM inside this
+  // already content-protected window, and hides itself the moment those
+  // conditions stop holding rather than lingering through a hide/show cycle.
+  const { tourOverlay } = useTour('overlay', settings, patchSettings, {
+    active: settingsLoaded && sessionActive && interactive && !consentModal,
+  });
 
   // Reduce-motion is a global accessibility preference (never per-script), so
   // it tracks the global layer and drives the document-level class.
@@ -170,6 +190,10 @@ export function OverlayWindow() {
         setSettings(st);
         setPanelSize(clampSize(st.overlaySize ?? defaultSettings.overlaySize));
       }
+      // Either way, `settings` now reflects real persisted data — even if
+      // overlay:load already replaced it with something fresher, that too
+      // was real data, not the defaultSettings placeholder.
+      setSettingsLoaded(true);
     });
     fetchScripts().then((sc) => {
       if (!loadedRef.current && sc[0]) {
@@ -206,6 +230,7 @@ export function OverlayWindow() {
         loadedRef.current = true;
         if (p?.script) setScript(p.script);
         if (p?.settings) setSettings(p.settings);
+        if (p?.settings) setSettingsLoaded(true); // in case this races ahead of fetchSettings
         const size = p?.script?.overlaySize ?? p?.settings?.overlaySize;
         if (size) setPanelSize(clampSize(size));
         jumpToRef.current(0); // resets active + pointer + cancels any slide
@@ -484,7 +509,9 @@ export function OverlayWindow() {
             ref={gripRef}
             className="grip"
             data-tauri-drag-region={!isMacOS || undefined}
-            title={t('overlay.dragHint')}
+            data-tour="ov-grip"
+            data-tip={t('overlay.dragHint')}
+            data-tip-side="bottom"
             aria-hidden="true"
           >
             <i />
@@ -513,7 +540,8 @@ export function OverlayWindow() {
           {effective.voice && voiceAvailable && voiceError === 'mic-issue' && (
             <button
               className="ov-voice ov-voice--retry"
-              title={t('overlay.micIssueHint')}
+              data-tip={t('overlay.micIssueHint')}
+              data-tip-side="bottom"
               aria-label={t('overlay.micIssueHint')}
               // A retry can't fix this — Dictation is a plain OS setting, not
               // something a gesture re-arms — so send the user straight to
@@ -529,7 +557,8 @@ export function OverlayWindow() {
           {effective.voice && voiceAvailable && voiceError === 'mic-denied-confirmed' && (
             <button
               className="ov-voice ov-voice--retry"
-              title={t('overlay.micDeniedHint')}
+              data-tip={t('overlay.micDeniedHint')}
+              data-tip-side="bottom"
               aria-label={t('overlay.micDeniedHint')}
               // A retry can't fix a confirmed OS-level denial — send the
               // user straight to the settings pane, same as the mic-issue
@@ -547,7 +576,8 @@ export function OverlayWindow() {
             voiceError !== 'mic-denied-confirmed' && (
               <button
                 className="ov-voice ov-voice--retry"
-                title={t('overlay.enableMicHint')}
+                data-tip={t('overlay.enableMicHint')}
+                data-tip-side="bottom"
                 aria-label={t('overlay.enableMicHint')}
                 onClick={retryVoice}
               >
@@ -556,7 +586,12 @@ export function OverlayWindow() {
               </button>
             )}
           {effective.voice && playing && !voiceAvailable && (
-            <span className="ov-voice" title={t('overlay.voiceUnavailable')}>
+            <span
+              className="ov-voice"
+              data-tip={t('overlay.voiceUnavailable')}
+              data-tip-side="bottom"
+              aria-label={t('overlay.voiceUnavailable')}
+            >
               <MicOff size={12} />
             </span>
           )}
@@ -567,10 +602,12 @@ export function OverlayWindow() {
               size={13}
               showLabel
               onChange={setShielded}
+              data-tour="ov-shield"
             />
             <button
               className="ic ic-sm"
-              title={t('overlay.close')}
+              data-tip={t('overlay.close')}
+              data-tip-side="bottom"
               aria-label={t('overlay.close')}
               onClick={close}
             >
@@ -584,6 +621,7 @@ export function OverlayWindow() {
             <div
               className="ov-window"
               ref={windowRef}
+              data-tour="ov-jump"
               style={{ height: panelSize.h }}
               role="region"
               aria-label={t('overlay.scriptRegion', {
@@ -612,7 +650,7 @@ export function OverlayWindow() {
         <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
           <button
             className="ic"
-            title={t('overlay.restart')}
+            data-tip={t('overlay.restart')}
             aria-label={t('overlay.restart')}
             onClick={restart}
           >
@@ -620,7 +658,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic"
-            title={t('overlay.back5')}
+            data-tip={t('overlay.back5')}
             aria-label={t('overlay.back5')}
             onClick={skipBack}
           >
@@ -628,7 +666,8 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic accent"
-            title={playing ? t('overlay.pause') : t('overlay.play')}
+            data-tour="ov-play"
+            data-tip={playing ? t('overlay.pause') : t('overlay.play')}
             aria-label={playing ? t('overlay.pause') : t('overlay.play')}
             aria-pressed={playing}
             onClick={() => setPlaying((p) => !p)}
@@ -637,7 +676,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic"
-            title={t('overlay.skip5')}
+            data-tip={t('overlay.skip5')}
             aria-label={t('overlay.skip5')}
             onClick={skip}
           >
@@ -646,7 +685,7 @@ export function OverlayWindow() {
           <span className="sep" />
           <button
             className="ic sizebtn"
-            title={t('overlay.smaller')}
+            data-tip={t('overlay.smaller')}
             aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
@@ -655,7 +694,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic sizebtn"
-            title={t('overlay.larger')}
+            data-tip={t('overlay.larger')}
             aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
@@ -665,7 +704,8 @@ export function OverlayWindow() {
           <button
             ref={settingsBtnRef}
             className="ic"
-            title={t('overlay.prompterSettings')}
+            data-tour="ov-settings"
+            data-tip={t('overlay.prompterSettings')}
             aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
@@ -674,7 +714,8 @@ export function OverlayWindow() {
           <button
             ref={passthruBtnRef}
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
-            title={
+            data-tour="ov-passthru"
+            data-tip={
               interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
             }
             aria-label={
@@ -689,15 +730,16 @@ export function OverlayWindow() {
 
         <div
           className={'ov-resize' + (resizing ? ' dragging' : '')}
+          data-tour="ov-resize"
           onPointerDown={startResize}
-          title={t('overlay.resize')}
+          data-tip={t('overlay.resize')}
           aria-hidden="true"
         >
           <svg
             viewBox="0 0 12 12"
             fill="none"
             stroke="currentColor"
-            strokeWidth="1.5"
+            strokeWidth="2.25"
             strokeLinecap="round"
           >
             <path d="M11 5 5 11M11 9l-2 2" />
@@ -705,6 +747,8 @@ export function OverlayWindow() {
         </div>
       </div>
       {consentModal}
+      {tourOverlay}
+      <TipLayer />
     </div>
   );
 }

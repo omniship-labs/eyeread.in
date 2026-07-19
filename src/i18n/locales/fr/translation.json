@@ -148,7 +148,10 @@
     "scaleSmall": "Petit",
     "scaleDefault": "Par défaut",
     "scaleLarge": "Grand",
-    "scaleLarger": "Plus grand"
+    "scaleLarger": "Plus grand",
+    "replayTour": "Visite guidée",
+    "replayTourHint": "Revoir la visite guidée de l'écran principal",
+    "replayTourCta": "Revoir les astuces"
   },
   "overlay": {
     "dragHint": "Glisser pour déplacer · Échap pour masquer",
@@ -235,5 +238,104 @@
     "intro": "Le suivi vocal vous accompagne pendant la lecture en écoutant via votre micro. Il lui faut d’abord quelques autorisations rapides.",
     "cancel": "Pas maintenant",
     "continue": "Continuer"
+  },
+  "tour": {
+    "next": "Suivant",
+    "back": "Précédent",
+    "skip": "Passer",
+    "done": "Terminé",
+    "stepOf": "{{current}} sur {{total}}",
+    "welcomeMain": {
+      "library": {
+        "title": "Vos scripts sont ici",
+        "body": "Chaque script que vous écrivez apparaît dans cette liste — recherchez, épinglez et filtrez-les depuis les onglets ci-dessus."
+      },
+      "newScript": {
+        "title": "Créer un nouveau script",
+        "body": "Cliquez ici à tout moment pour écrire un nouveau script pour le prompteur."
+      },
+      "shield": {
+        "title": "Invisible au partage d’écran",
+        "body": "Quand ce bouclier est actif, eyeread.in est exclu des enregistrements et partages d’écran — personne ne le voit à part vous."
+      },
+      "start": {
+        "title": "Commencer la lecture",
+        "body": "Cela ouvre l'overlay flottant du prompteur et commence à suivre votre script."
+      },
+      "shortcuts": {
+        "title": "Raccourcis clavier",
+        "body": "Consultez tous les raccourcis — afficher/masquer l'overlay, clic traversant, lecture/pause et plus — à tout moment depuis ici."
+      },
+      "settings": {
+        "title": "Réglages de l'app",
+        "body": "Ajustez ici l'accessibilité, les vérifications de mise à jour et d'autres préférences globales de l'app."
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "Toujours invisible ici",
+        "body": "Le même bouclier suit le prompteur — activez-le ou désactivez-le à tout moment sans quitter l'overlay."
+      },
+      "play": {
+        "title": "Lecture / pause",
+        "body": "Démarrez ou arrêtez le défilement du prompteur — le suivi vocal démarre automatiquement quand vous parlez."
+      },
+      "settings": {
+        "title": "Réglages du prompteur",
+        "body": "Ouvre les mêmes réglages par script que vous pouvez aussi modifier depuis l'Éditeur — taille du texte, vitesse, opacité et plus, ici même pendant la lecture."
+      },
+      "resize": {
+        "title": "Redimensionner le panneau",
+        "body": "Faites glisser ce coin pour agrandir ou réduire le prompteur — la taille est mémorisée pour ce script."
+      },
+      "passthrough": {
+        "title": "Mode clic traversant",
+        "body": "Laissez les clics traverser directement le prompteur vers ce qu'il y a derrière, pour interagir avec l'app partagée sans masquer l'overlay. Activez-le ici ou avec ⌥⇧E."
+      },
+      "grip": {
+        "title": "Déplacer le panneau",
+        "body": "Faites glisser cette poignée pour repositionner le prompteur n'importe où à l'écran."
+      },
+      "jump": {
+        "title": "Cliquez sur un mot pour y sauter",
+        "body": "Cliquez n'importe où dans le script pour y déplacer votre position de lecture — pratique si vous perdez le fil ou voulez avancer."
+      }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Mode de suivi",
+        "body": "Choisissez le suivi vocal, qui suit votre voix, ou une vitesse de défilement fixe — pour ce script uniquement. Vous retrouverez les mêmes réglages depuis l'icône d'engrenage de l'overlay pendant la lecture."
+      },
+      "appearance": {
+        "title": "Apparence",
+        "body": "Taille du texte, opacité, flou de verre et effet miroir — chacun ne remplace la valeur globale que pour ce script."
+      },
+      "timer": {
+        "title": "Minuteur",
+        "body": "Affichez un chronomètre montant ou descendant pendant la lecture, avec une alerte de temps optionnelle."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Mode de suivi",
+        "body": "Basculez entre le suivi vocal et une vitesse de défilement fixe sans quitter le prompteur."
+      },
+      "appearance": {
+        "title": "Apparence",
+        "body": "Taille du texte, plage de surbrillance, opacité, flou et effet miroir — ajustés pour ce script, en direct pendant la lecture."
+      },
+      "timer": {
+        "title": "Minuteur",
+        "body": "Activez un chronomètre montant ou descendant directement depuis ce panneau flottant."
+      },
+      "resetAll": {
+        "title": "Réinitialiser au global",
+        "body": "Dès que vous modifiez quelque chose ci-dessus pour ce script uniquement, ceci efface ces remplacements et revient à vos valeurs globales par défaut."
+      },
+      "resetLayout": {
+        "title": "Réinitialiser la position du panneau",
+        "body": "Remet le prompteur à sa taille par défaut et sa position centrée, si vous l'avez déplacé ou redimensionné."
+      }
+    }
   }
 }

@@ -21,6 +21,7 @@ export function SettingItem({
   onRevert,
   children,
   style,
+  ...rest
 }) {
   const { t } = useTranslation();
   const keys = Array.isArray(rawKeys) ? rawKeys : [rawKeys];
@@ -30,7 +31,8 @@ export function SettingItem({
     <button
       className="si-origin overridden"
       onClick={() => onRevert(...keys)}
-      title={t('settingItem.useGlobalValue')}
+      aria-label={t('settingItem.useGlobalValue')}
+      data-tip={t('settingItem.useGlobalValue')}
     >
       <Undo2 size={10} />
     </button>
@@ -39,7 +41,7 @@ export function SettingItem({
   );
 
   return (
-    <div className="si-root" style={style}>
+    <div className="si-root" style={style} {...rest}>
       <div className="si-label-row">
         <span className="si-label">{label}</span>
         <span className="si-meta">

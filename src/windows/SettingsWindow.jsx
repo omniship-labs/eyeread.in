@@ -6,7 +6,7 @@
  * Cascade: script ▸ global ▸ default. State arrives via `settings:context`;
  * per-script edits broadcast over `script:settings`.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Timer as TimerIcon, Hourglass, Mic, MicOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
@@ -15,7 +15,7 @@ import { Segmented } from '../components/Segmented';
 import { SettingItem } from '../components/SettingItem';
 import { requestMicPermission } from '../lib/mic';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
-import { defaultSettings, fetchSettings } from '../lib/store';
+import { defaultSettings, fetchSettings, persistSettings } from '../lib/store';
 import {
   isTauri,
   isMacOS,
@@ -26,6 +26,7 @@ import {
   manualDragProps,
 } from '../lib/tauri';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
+import { useTour } from '../hooks/useTour';
 
 const sliderFill = (value, min, max) => {
   const pct = ((value - min) / (max - min)) * 100;
@@ -41,6 +42,14 @@ export function SettingsWindow() {
   const [global, setGlobal] = useState(defaultSettings);
   const [overrides, setOverrides] = useState({});
   const [scriptId, setScriptId] = useState(null);
+  const [windowFocused, setWindowFocused] = useState(!isTauri);
+  // True once `global` reflects real persisted data (fetchSettings resolved,
+  // or a settings:context payload arrived) rather than the in-memory
+  // defaultSettings placeholder — same guard as OverlayWindow's
+  // settingsLoaded, and for the same reason: windowFocused defaults to true
+  // in browser-demo mode, so without this useTour's one-shot auto-start
+  // could fire against an empty seenTourSteps before the real value loads.
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   // Mirror the global accessibility prefs in this standalone window.
   useUiScale(global.uiScale);
@@ -48,14 +57,20 @@ export function SettingsWindow() {
   useDyslexicFont(global.dyslexicFont);
 
   useEffect(() => {
-    fetchSettings().then(setGlobal);
+    fetchSettings().then((st) => {
+      setGlobal(st);
+      setSettingsLoaded(true);
+    });
   }, []);
 
   useEffect(() => {
     let unA, unB, unC;
     (async () => {
       unA = await listen('settings:context', (p) => {
-        if (p?.global) setGlobal(p.global);
+        if (p?.global) {
+          setGlobal(p.global);
+          setSettingsLoaded(true);
+        }
         setOverrides(p?.overrides ?? {});
         setScriptId(p?.scriptId ?? null);
       });
@@ -78,12 +93,40 @@ export function SettingsWindow() {
     let unlisten;
     (async () => {
       const { getCurrentWindow } = await import('@tauri-apps/api/window');
-      unlisten = await getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+      const win = getCurrentWindow();
+      setWindowFocused(await win.isFocused().catch(() => false));
+      unlisten = await win.onFocusChanged(({ payload: focused }) => {
+        setWindowFocused(focused);
         if (!focused) hideSettingsWindow();
       });
     })();
     return () => unlisten?.();
   }, []);
+
+  // This window has never needed to WRITE the global settings object before
+  // (only per-script overrides) — it's the only patch path here, used solely
+  // to persist tour-tip dismissal (`seenTourSteps`). Mirrors OverlayWindow's
+  // patchSettings: update local state, persist, and tell `main` (the same
+  // one-hop sync the rest of the app already relies on — see its comment).
+  const patchGlobalSettings = useCallback((patch) => {
+    setGlobal((g) => {
+      const next = { ...g, ...patch };
+      persistSettings(next);
+      emitTo('main', 'settings:sync', { settings: next, from: 'settings' });
+      return next;
+    });
+  }, []);
+
+  // First-run tour tips for this window's per-script settings rows. Only
+  // active while genuinely focused/visible — this window already hides
+  // itself on blur (above), so this mainly guards the moment right after
+  // showSettingsWindow() before focus lands, and keeps the tooltip from
+  // rendering underneath a window that's about to disappear. Also waits for
+  // settingsLoaded so useTour's one-shot auto-start never fires against the
+  // placeholder defaultSettings before real seenTourSteps data arrives.
+  const { tourOverlay } = useTour('settings', global, patchGlobalSettings, {
+    active: settingsLoaded && windowFocused,
+  });
 
   // ---- mutations -------------------------------------------------------------
   const broadcast = (next) => {
@@ -128,13 +171,14 @@ export function SettingsWindow() {
   const mode = val('voice') ? 'voice' : 'scroll';
   const countFromMins = Math.round((val('countFrom') ?? 300) / 60);
 
-  const si = (keys, label, value, children) => (
+  const si = (keys, label, value, children, dataTour) => (
     <SettingItem
       keys={keys}
       label={label}
       value={value}
       overrides={overrides}
       onRevert={revert}
+      data-tour={dataTour}
     >
       {children}
     </SettingItem>
@@ -206,7 +250,8 @@ export function SettingsWindow() {
                 )
               )}
             </div>
-          </>
+          </>,
+          'sw-tracking'
         )}
         {si(
           'size',
@@ -221,7 +266,8 @@ export function SettingsWindow() {
             aria-label={t('reading.textSize')}
             onChange={(e) => set('size', +e.target.value)}
             style={sliderFill(val('size'), 22, 46)}
-          />
+          />,
+          'sw-appearance'
         )}
         {si(
           'bellWords',
@@ -314,18 +360,26 @@ export function SettingsWindow() {
                 </span>
               </div>
             )}
-          </>
+          </>,
+          'sw-timer'
         )}
       </div>
 
       <div className="sw-foot">
-        <Button variant="secondary" block disabled={!hasAny} onClick={resetAll}>
+        <Button
+          variant="secondary"
+          block
+          disabled={!hasAny}
+          data-tour="sw-reset-all"
+          onClick={resetAll}
+        >
           {t('prompter.resetAllToGlobal')}
         </Button>
-        <Button variant="ghost" block onClick={resetLayout}>
+        <Button variant="ghost" block data-tour="sw-reset-layout" onClick={resetLayout}>
           {t('prompter.resetLayout')}
         </Button>
       </div>
+      {tourOverlay}
     </div>
   );
 }

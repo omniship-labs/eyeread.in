@@ -49,7 +49,14 @@ function formatTimestamp(ms) {
       });
 }
 
-export function SettingsScreen({ settings, onSettings, update, onCheckPermissions, onBack }) {
+export function SettingsScreen({
+  settings,
+  onSettings,
+  update,
+  onCheckPermissions,
+  onReplayTour,
+  onBack,
+}) {
   const { t } = useTranslation();
   const {
     position,
@@ -122,6 +129,17 @@ export function SettingsScreen({ settings, onSettings, update, onCheckPermission
             {t('settings.open')}
           </button>
         </div>
+        {onReplayTour && (
+          <div className="set-row">
+            <div className="set-info">
+              <b>{t('settings.replayTour')}</b>
+              <span>{t('settings.replayTourHint')}</span>
+            </div>
+            <Button size="sm" variant="secondary" onClick={onReplayTour}>
+              {t('settings.replayTourCta')}
+            </Button>
+          </div>
+        )}
         {update && (
           <>
             <div className="set-row">

@@ -148,7 +148,10 @@
     "scaleSmall": "Klein",
     "scaleDefault": "Standard",
     "scaleLarge": "Groß",
-    "scaleLarger": "Größer"
+    "scaleLarger": "Größer",
+    "replayTour": "Tour-Tipps",
+    "replayTourHint": "Die geführte Einführung in den Hauptbildschirm erneut ansehen",
+    "replayTourCta": "Tipps erneut anzeigen"
   },
   "overlay": {
     "dragHint": "Ziehen zum Verschieben · Esc zum Ausblenden",
@@ -235,5 +238,104 @@
     "intro": "Die Sprachverfolgung folgt beim Lesen über dein Mikrofon. Dafür sind zunächst ein paar kurze Berechtigungen nötig.",
     "cancel": "Jetzt nicht",
     "continue": "Weiter"
+  },
+  "tour": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "skip": "Überspringen",
+    "done": "Fertig",
+    "stepOf": "{{current}} von {{total}}",
+    "welcomeMain": {
+      "library": {
+        "title": "Hier leben deine Skripte",
+        "body": "Jedes Skript, das du schreibst, erscheint in dieser Liste — suche, pinne und filtere sie über die Tabs oben."
+      },
+      "newScript": {
+        "title": "Neues Skript beginnen",
+        "body": "Klicke hier jederzeit, um ein neues Skript für den Prompter zu schreiben."
+      },
+      "shield": {
+        "title": "Unsichtbar bei Bildschirmfreigabe",
+        "body": "Ist dieses Schild aktiv, ist eyeread.in von Bildschirmaufnahmen und -freigaben ausgeschlossen — niemand außer dir sieht es."
+      },
+      "start": {
+        "title": "Lesen starten",
+        "body": "Dies öffnet das schwebende Prompter-Overlay und beginnt, deinem Skript zu folgen."
+      },
+      "shortcuts": {
+        "title": "Tastaturkürzel",
+        "body": "Sieh dir jederzeit alle Hotkeys an — Overlay ein-/ausblenden, Klick-durch, Abspielen/Pausieren und mehr."
+      },
+      "settings": {
+        "title": "App-Einstellungen",
+        "body": "Passe hier Barrierefreiheit, Update-Prüfungen und andere app-weite Einstellungen an."
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "Auch hier unsichtbar",
+        "body": "Dasselbe Schild begleitet den Prompter — schalte es jederzeit um, ohne das Overlay zu verlassen."
+      },
+      "play": {
+        "title": "Abspielen / Pausieren",
+        "body": "Starte oder stoppe den Scroll des Prompters — die Sprachverfolgung setzt automatisch ein, sobald du sprichst."
+      },
+      "settings": {
+        "title": "Prompter-Einstellungen",
+        "body": "Öffnet dieselben skriptspezifischen Einstellungen, die du auch im Editor bearbeiten kannst — Textgröße, Geschwindigkeit, Deckkraft und mehr, direkt hier beim Lesen."
+      },
+      "resize": {
+        "title": "Bereich anpassen",
+        "body": "Ziehe diese Ecke, um den Prompter größer oder kleiner zu machen — die Größe wird für dieses Skript gemerkt."
+      },
+      "passthrough": {
+        "title": "Klick-durch-Modus",
+        "body": "Lass Klicks direkt durch den Prompter zu dem hindurchgehen, was dahinter liegt, damit du mit der geteilten App interagieren kannst, ohne das Overlay auszublenden. Schalte es hier oder mit ⌥⇧E um."
+      },
+      "grip": {
+        "title": "Bereich verschieben",
+        "body": "Ziehe diesen Griff, um den Prompter irgendwo auf dem Bildschirm neu zu positionieren."
+      },
+      "jump": {
+        "title": "Klicke auf ein Wort, um dorthin zu springen",
+        "body": "Klicke irgendwo im Skript, um deine Leseposition dorthin zu springen — praktisch, wenn du die Stelle verlierst oder vorspulen willst."
+      }
+    },
+    "scriptSettingsEditor": {
+      "tracking": {
+        "title": "Erfassungsmodus",
+        "body": "Wähle Sprachverfolgung, die deiner Stimme folgt, oder eine feste Scrollgeschwindigkeit — nur für dieses Skript. Dieselben Regler findest du auch über das Zahnrad im Overlay, während du liest."
+      },
+      "appearance": {
+        "title": "Aussehen",
+        "body": "Textgröße, Deckkraft, Glasunschärfe und Spiegelung — jede überschreibt den globalen Standard nur für dieses Skript."
+      },
+      "timer": {
+        "title": "Timer",
+        "body": "Zeige beim Lesen einen Auf- oder Abwärtstimer mit optionalem Zeithinweis."
+      }
+    },
+    "scriptSettingsFloating": {
+      "tracking": {
+        "title": "Erfassungsmodus",
+        "body": "Wechsle zwischen Sprachverfolgung und fester Scrollgeschwindigkeit, ohne den Prompter zu verlassen."
+      },
+      "appearance": {
+        "title": "Aussehen",
+        "body": "Textgröße, Hervorhebungsbereich, Deckkraft, Unschärfe und Spiegelung — für dieses Skript, live beim Lesen anpassbar."
+      },
+      "timer": {
+        "title": "Timer",
+        "body": "Schalte direkt aus diesem schwebenden Panel einen Auf- oder Abwärtstimer ein."
+      },
+      "resetAll": {
+        "title": "Auf global zurücksetzen",
+        "body": "Sobald du oben etwas nur für dieses Skript geändert hast, entfernt dies diese Overrides und kehrt zu deinen globalen Standardwerten zurück."
+      },
+      "resetLayout": {
+        "title": "Position des Bereichs zurücksetzen",
+        "body": "Setzt den Prompter auf seine Standardgröße und zentrierte Position zurück, falls du ihn verschoben oder in der Größe geändert hast."
+      }
+    }
   }
 }
