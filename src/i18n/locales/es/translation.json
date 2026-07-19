@@ -148,7 +148,10 @@
     "scaleSmall": "Pequeño",
     "scaleDefault": "Predeterminado",
     "scaleLarge": "Grande",
-    "scaleLarger": "Más grande"
+    "scaleLarger": "Más grande",
+    "replayTour": "Consejos guiados",
+    "replayTourHint": "Repite el recorrido guiado por la pantalla principal",
+    "replayTourCta": "Mostrar consejos de nuevo"
   },
   "overlay": {
     "dragHint": "Arrastra para mover · Esc para ocultar",
@@ -235,5 +238,44 @@
     "intro": "El seguimiento por voz te sigue mientras lees, escuchando a través de tu micrófono. Antes necesita un par de permisos rápidos.",
     "cancel": "Ahora no",
     "continue": "Continuar"
+  },
+  "tour": {
+    "next": "Siguiente",
+    "back": "Atrás",
+    "skip": "Omitir",
+    "done": "Listo",
+    "stepOf": "{{current}} de {{total}}",
+    "welcomeMain": {
+      "library": {
+        "title": "Aquí viven tus guiones",
+        "body": "Cada guion que escribes aparece en esta lista — búscalos, fíjalos y fíltralos desde las pestañas de arriba."
+      },
+      "newScript": {
+        "title": "Crea un nuevo guion",
+        "body": "Haz clic aquí en cualquier momento para escribir un guion nuevo para el teleprompter."
+      },
+      "shield": {
+        "title": "Invisible en pantalla compartida",
+        "body": "Con este escudo activado, eyeread.in queda excluido de grabaciones y pantallas compartidas — solo tú lo ves."
+      },
+      "start": {
+        "title": "Empezar a leer",
+        "body": "Esto abre el overlay flotante del teleprompter y comienza a seguir tu guion."
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "Sigue siendo invisible aquí",
+        "body": "El mismo escudo acompaña al teleprompter — actívalo o desactívalo sin salir del overlay."
+      },
+      "play": {
+        "title": "Reproducir / pausar",
+        "body": "Inicia o detén el desplazamiento del teleprompter — el seguimiento por voz se activa automáticamente al hablar."
+      },
+      "settings": {
+        "title": "Ajustes del teleprompter",
+        "body": "Ajusta tamaño de texto, velocidad, opacidad y más solo para este guion."
+      }
+    }
   }
 }

@@ -148,7 +148,10 @@
     "scaleSmall": "小",
     "scaleDefault": "默认",
     "scaleLarge": "大",
-    "scaleLarger": "更大"
+    "scaleLarger": "更大",
+    "replayTour": "新手引导",
+    "replayTourHint": "重新播放主界面的引导教程",
+    "replayTourCta": "再次显示提示"
   },
   "overlay": {
     "dragHint": "拖动以移动 · Esc 隐藏",
@@ -235,5 +238,44 @@
     "intro": "语音跟踪会在你阅读时通过麦克风聆听并跟随。首先需要几项快速权限。",
     "cancel": "暂不",
     "continue": "继续"
+  },
+  "tour": {
+    "next": "下一步",
+    "back": "上一步",
+    "skip": "跳过",
+    "done": "完成",
+    "stepOf": "第 {{current}} 步，共 {{total}} 步",
+    "welcomeMain": {
+      "library": {
+        "title": "你的脚本都在这里",
+        "body": "你写的每个脚本都会出现在这个列表中——通过上方的标签页搜索、置顶和筛选它们。"
+      },
+      "newScript": {
+        "title": "新建脚本",
+        "body": "随时点击这里，为提词器写一个新脚本。"
+      },
+      "shield": {
+        "title": "屏幕共享时隐身",
+        "body": "开启此盾牌后，eyeread.in 会从屏幕录制和共享中被排除——只有你能看到它。"
+      },
+      "start": {
+        "title": "开始阅读",
+        "body": "这会打开浮动的提词器悬浮层，并开始跟随你的脚本。"
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "这里同样隐身",
+        "body": "同一个盾牌也作用于提词器——无需离开悬浮层即可随时切换。"
+      },
+      "play": {
+        "title": "播放 / 暂停",
+        "body": "开始或停止提词器滚动——你一开口说话，语音跟随就会自动启动。"
+      },
+      "settings": {
+        "title": "提词器设置",
+        "body": "仅针对此脚本调整文字大小、速度、透明度等。"
+      }
+    }
   }
 }

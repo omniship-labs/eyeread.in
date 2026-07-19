@@ -148,7 +148,10 @@
     "scaleSmall": "Petit",
     "scaleDefault": "Par défaut",
     "scaleLarge": "Grand",
-    "scaleLarger": "Plus grand"
+    "scaleLarger": "Plus grand",
+    "replayTour": "Visite guidée",
+    "replayTourHint": "Revoir la visite guidée de l'écran principal",
+    "replayTourCta": "Revoir les astuces"
   },
   "overlay": {
     "dragHint": "Glisser pour déplacer · Échap pour masquer",
@@ -235,5 +238,44 @@
     "intro": "Le suivi vocal vous accompagne pendant la lecture en écoutant via votre micro. Il lui faut d’abord quelques autorisations rapides.",
     "cancel": "Pas maintenant",
     "continue": "Continuer"
+  },
+  "tour": {
+    "next": "Suivant",
+    "back": "Précédent",
+    "skip": "Passer",
+    "done": "Terminé",
+    "stepOf": "{{current}} sur {{total}}",
+    "welcomeMain": {
+      "library": {
+        "title": "Vos scripts sont ici",
+        "body": "Chaque script que vous écrivez apparaît dans cette liste — recherchez, épinglez et filtrez-les depuis les onglets ci-dessus."
+      },
+      "newScript": {
+        "title": "Créer un nouveau script",
+        "body": "Cliquez ici à tout moment pour écrire un nouveau script pour le prompteur."
+      },
+      "shield": {
+        "title": "Invisible au partage d’écran",
+        "body": "Quand ce bouclier est actif, eyeread.in est exclu des enregistrements et partages d’écran — personne ne le voit à part vous."
+      },
+      "start": {
+        "title": "Commencer la lecture",
+        "body": "Cela ouvre l'overlay flottant du prompteur et commence à suivre votre script."
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "Toujours invisible ici",
+        "body": "Le même bouclier suit le prompteur — activez-le ou désactivez-le à tout moment sans quitter l'overlay."
+      },
+      "play": {
+        "title": "Lecture / pause",
+        "body": "Démarrez ou arrêtez le défilement du prompteur — le suivi vocal démarre automatiquement quand vous parlez."
+      },
+      "settings": {
+        "title": "Réglages du prompteur",
+        "body": "Ajustez la taille du texte, la vitesse, l'opacité et plus, pour ce script uniquement."
+      }
+    }
   }
 }

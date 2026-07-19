@@ -102,7 +102,12 @@ export function Editor({
                 <span className="ed-update-cta">{t('settings.updateInstall')}</span>
               </button>
             )}
-            <Button block iconLeft={<Play size={16} />} onClick={onStart}>
+            <Button
+              block
+              iconLeft={<Play size={16} />}
+              data-tour="start-reading"
+              onClick={onStart}
+            >
               {t('editor.startReading')}
             </Button>
 

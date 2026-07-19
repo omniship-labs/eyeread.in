@@ -148,7 +148,10 @@
     "scaleSmall": "Small",
     "scaleDefault": "Default",
     "scaleLarge": "Large",
-    "scaleLarger": "Larger"
+    "scaleLarger": "Larger",
+    "replayTour": "Tour tips",
+    "replayTourHint": "Replay the guided walkthrough of the main screen",
+    "replayTourCta": "Show tips again"
   },
   "overlay": {
     "dragHint": "Drag to move · Esc to hide",
@@ -235,5 +238,44 @@
     "intro": "Voice tracking follows along as you read by listening through your mic. It needs a couple of quick permissions first.",
     "cancel": "Not now",
     "continue": "Continue"
+  },
+  "tour": {
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip",
+    "done": "Done",
+    "stepOf": "{{current}} of {{total}}",
+    "welcomeMain": {
+      "library": {
+        "title": "Your scripts live here",
+        "body": "Every script you write shows up in this list — search, pin, and filter them from the tabs above."
+      },
+      "newScript": {
+        "title": "Start a new script",
+        "body": "Click here any time to write a fresh script for the prompter."
+      },
+      "shield": {
+        "title": "Invisible to screen-share",
+        "body": "When this shield is on, eyeread.in is excluded from screen recordings and shares — nobody sees it but you."
+      },
+      "start": {
+        "title": "Start reading",
+        "body": "This opens the floating prompter overlay and begins following along with your script."
+      }
+    },
+    "welcomeOverlay": {
+      "shield": {
+        "title": "Still invisible here",
+        "body": "The same shield follows the prompter — toggle it any time without leaving the overlay."
+      },
+      "play": {
+        "title": "Play / pause",
+        "body": "Start or stop the prompter's scroll — voice tracking picks up automatically when you speak."
+      },
+      "settings": {
+        "title": "Prompter settings",
+        "body": "Fine-tune text size, speed, opacity, and more for just this script."
+      }
+    }
   }
 }

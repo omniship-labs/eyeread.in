@@ -42,6 +42,7 @@ import {
   openExternal,
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
+import { useTour } from '../hooks/useTour';
 import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 import { DICTATION_SETTINGS_URL } from '../lib/speech';
@@ -106,6 +107,17 @@ export function OverlayWindow() {
 
   // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
   const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
+
+  // First-run tour tips for the prompter controls. Only ever active once a
+  // reading session is genuinely showing and interactive (not click-through
+  // "ghost" mode, not while the Linux consent prompt is up) — same
+  // screen-recording-safety reasoning as the main window's tour (see
+  // docs on useTour): a tooltip only ever renders as plain DOM inside this
+  // already content-protected window, and hides itself the moment those
+  // conditions stop holding rather than lingering through a hide/show cycle.
+  const { tourOverlay } = useTour('overlay', settings, patchSettings, {
+    active: sessionActive && interactive && !consentModal,
+  });
 
   // Reduce-motion is a global accessibility preference (never per-script), so
   // it tracks the global layer and drives the document-level class.
@@ -567,6 +579,7 @@ export function OverlayWindow() {
               size={13}
               showLabel
               onChange={setShielded}
+              data-tour="ov-shield"
             />
             <button
               className="ic ic-sm"
@@ -628,6 +641,7 @@ export function OverlayWindow() {
           </button>
           <button
             className="ic accent"
+            data-tour="ov-play"
             title={playing ? t('overlay.pause') : t('overlay.play')}
             aria-label={playing ? t('overlay.pause') : t('overlay.play')}
             aria-pressed={playing}
@@ -665,6 +679,7 @@ export function OverlayWindow() {
           <button
             ref={settingsBtnRef}
             className="ic"
+            data-tour="ov-settings"
             title={t('overlay.prompterSettings')}
             aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
@@ -705,6 +720,7 @@ export function OverlayWindow() {
         </div>
       </div>
       {consentModal}
+      {tourOverlay}
     </div>
   );
 }

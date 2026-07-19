@@ -80,12 +80,14 @@ import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
+import { useTour } from '../hooks/useTour';
 
 export function MainWindow() {
   const { t } = useTranslation();
   const logoMark = useSystemLogo();
   const [pane, setPane] = useState('library'); // library | settings
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [windowFocused, setWindowFocused] = useState(true);
   const { listWidth, handleMouseDown } = useListResize(300);
   const [scripts, setScripts] = useState([]);
   const [selId, setSelId] = useState(null);
@@ -133,6 +135,19 @@ export function MainWindow() {
     };
   }, []);
 
+  // ---- window focus (gates tour-tip auto-start/visibility, see useTour) ---
+  useEffect(() => {
+    if (!isTauri) return undefined;
+    let unlisten;
+    (async () => {
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      const win = getCurrentWindow();
+      setWindowFocused(await win.isFocused().catch(() => true));
+      unlisten = await win.onFocusChanged(({ payload: focused }) => setWindowFocused(focused));
+    })();
+    return () => unlisten?.();
+  }, []);
+
   // ---- persistence (debounced) --------------------------------------------
   useEffect(() => {
     if (!ready) return undefined;
@@ -169,6 +184,14 @@ export function MainWindow() {
     openManually: openPermissionsModal,
     modal: permissionsModal,
   } = usePermissionsGate();
+
+  // First-run tour tips. Paused (not discarded — the hook preserves its
+  // step position) while the window is unfocused/minimized, or while a
+  // real modal is open — screen-recording safety and avoiding overlapping
+  // dismissible surfaces, respectively (see docs on useTour).
+  const { tourOverlay, replayTour } = useTour('main', settings, applySettings, {
+    active: ready && windowFocused && !consentModal && !permissionsModal,
+  });
 
   const update = useUpdateCheck(settings.updateCheckHours);
 
@@ -304,7 +327,11 @@ export function MainWindow() {
             eyeread<span className="titlebar-wordmark-in">.in</span>
           </span>
         </div>
-        <ShieldToggle shielded={shieldActive(settings)} onChange={setShielded} />
+        <ShieldToggle
+          shielded={shieldActive(settings)}
+          onChange={setShielded}
+          data-tour="shield-toggle"
+        />
         <button
           className="tl-shortcuts"
           onClick={() => setShortcutsOpen(true)}
@@ -339,6 +366,15 @@ export function MainWindow() {
               onSettings={applySettings}
               update={update}
               onCheckPermissions={openPermissionsModal}
+              onReplayTour={() => {
+                // The tour's steps target Library/Editor elements, which
+                // aren't mounted while the Settings pane is showing — switch
+                // back first so TourTip actually finds its targets instead
+                // of silently timing out through every step (see TourTip's
+                // missing-target fallback).
+                setPane('library');
+                replayTour('welcome-main-v1');
+              }}
               onBack={() => setPane('library')}
             />
           </ErrorBoundary>
@@ -419,6 +455,7 @@ export function MainWindow() {
       {consentModal}
       {permissionsModal}
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
+      {tourOverlay}
     </div>
   );
 }
