@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- favicon is set from the design brand mark in main.jsx -->
 
+    <!--
+      GitHub Pages serves this site with no way to set custom HTTP response
+      headers, so X-Frame-Options / X-Content-Type-Options / HSTS tuning /
+      Permissions-Policy can't be set at all here — those need a CDN in
+      front of Pages. CSP and Referrer-Policy are the two security headers
+      browsers also honor via <meta>, so they're set here instead.
+      Origins allowed: 'self' (bundled assets — fonts/images are all local,
+      nothing loads from a font/script CDN), api.github.com (release notes
+      on the Download page), opencollective.com + images.opencollective.com
+      (live sponsor/backer list and avatars). style-src needs unsafe-inline
+      for a couple of components' dynamic inline styles (slider position,
+      avatar size vars) — script-src has no such exception.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.opencollective.com; font-src 'self'; connect-src 'self' https://api.github.com https://opencollective.com https://images.opencollective.com; object-src 'none'; base-uri 'none'; form-action 'self'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <title>eyeread.in — Look at the lens.</title>
     <meta
       name="description"

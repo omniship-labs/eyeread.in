@@ -1,0 +1,17 @@
+/* ============================================================
+   eyeread.in site — font custom properties (self-hosted).
+   Mirrors src/styles/fonts.less: same variables as
+   design/tokens/fonts.less, but the faces load from bundled
+   @fontsource woff2 files (imported in site/src/main.jsx)
+   instead of the Google Fonts CDN. No third-party request at
+   runtime — keeps the site's CSP free of a font-CDN allowance.
+   ============================================================ */
+
+:root {
+  --font-display: 'Space Grotesk', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* The script-reading face — same readable sans, just the role it plays */
+  --font-prompt: 'Hanken Grotesk', system-ui, sans-serif;
+}
