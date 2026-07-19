@@ -14,7 +14,8 @@
         "minHeight": 620,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
-        "backgroundColor": "#0a0a0f"
+        "backgroundColor": "#0a0a0f",
+        "contentProtected": true
       },
       {
         "label": "settings",
@@ -31,7 +32,8 @@
         "visible": false,
         "skipTaskbar": true,
         "alwaysOnTop": true,
-        "focus": true
+        "focus": true,
+        "contentProtected": true
       },
       {
         "label": "about",
@@ -48,7 +50,8 @@
         "visible": false,
         "skipTaskbar": true,
         "alwaysOnTop": true,
-        "center": true
+        "center": true,
+        "contentProtected": true
       },
       {
         "label": "overlay",
