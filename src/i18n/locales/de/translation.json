@@ -279,6 +279,10 @@
       "resize": {
         "title": "Bereich anpassen",
         "body": "Ziehe diese Ecke, um den Prompter größer oder kleiner zu machen — die Größe wird für dieses Skript gemerkt."
+      },
+      "passthrough": {
+        "title": "Klick-durch-Modus",
+        "body": "Lass Klicks direkt durch den Prompter zu dem hindurchgehen, was dahinter liegt, damit du mit der geteilten App interagieren kannst, ohne das Overlay auszublenden. Schalte es hier oder mit ⌥⇧E um."
       }
     },
     "scriptSettingsEditor": {

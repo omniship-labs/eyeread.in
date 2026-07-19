@@ -701,6 +701,7 @@ export function OverlayWindow() {
           <button
             ref={passthruBtnRef}
             className={'ic ov-passthru' + (interactive ? '' : ' on')}
+            data-tour="ov-passthru"
             title={
               interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
             }

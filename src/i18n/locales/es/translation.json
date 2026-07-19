@@ -279,6 +279,10 @@
       "resize": {
         "title": "Cambiar el tamaño del panel",
         "body": "Arrastra esta esquina para hacer el teleprompter más grande o más pequeño — el tamaño se recuerda para este guion."
+      },
+      "passthrough": {
+        "title": "Modo clic a través",
+        "body": "Deja que los clics pasen directamente por el teleprompter hacia lo que hay detrás, para poder interactuar con la app compartida sin ocultar el overlay. Actívalo aquí o con ⌥⇧E."
       }
     },
     "scriptSettingsEditor": {

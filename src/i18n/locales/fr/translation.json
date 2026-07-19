@@ -279,6 +279,10 @@
       "resize": {
         "title": "Redimensionner le panneau",
         "body": "Faites glisser ce coin pour agrandir ou réduire le prompteur — la taille est mémorisée pour ce script."
+      },
+      "passthrough": {
+        "title": "Mode clic traversant",
+        "body": "Laissez les clics traverser directement le prompteur vers ce qu'il y a derrière, pour interagir avec l'app partagée sans masquer l'overlay. Activez-le ici ou avec ⌥⇧E."
       }
     },
     "scriptSettingsEditor": {

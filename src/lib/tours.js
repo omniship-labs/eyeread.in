@@ -79,6 +79,13 @@ export const tours = [
         bodyKey: 'tour.welcomeOverlay.resize.body',
         placement: 'left',
       },
+      {
+        id: 'ov-passthru',
+        target: '[data-tour="ov-passthru"]',
+        titleKey: 'tour.welcomeOverlay.passthrough.title',
+        bodyKey: 'tour.welcomeOverlay.passthrough.body',
+        placement: 'top',
+      },
     ],
   },
   // Per-script settings, inline in the Editor pane (main window). Runs after

@@ -279,6 +279,10 @@
       "resize": {
         "title": "Resize the panel",
         "body": "Drag this corner to make the prompter bigger or smaller — the size is remembered for this script."
+      },
+      "passthrough": {
+        "title": "Click-through mode",
+        "body": "Let clicks pass straight through the prompter to whatever's behind it, so you can interact with the shared app without hiding the overlay. Toggle it here or with ⌥⇧E."
       }
     },
     "scriptSettingsEditor": {
