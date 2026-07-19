@@ -11,6 +11,7 @@ import {
   Mic,
   MicOff,
   X,
+  CircleArrowOutDownRight,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n/index.js';
@@ -735,15 +736,7 @@ export function OverlayWindow() {
           data-tip={t('overlay.resize')}
           aria-hidden="true"
         >
-          <svg
-            viewBox="0 0 12 12"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.25"
-            strokeLinecap="round"
-          >
-            <path d="M11 5 5 11M11 9l-2 2" />
-          </svg>
+          <CircleArrowOutDownRight strokeWidth={2.25} />
         </div>
       </div>
       {consentModal}
