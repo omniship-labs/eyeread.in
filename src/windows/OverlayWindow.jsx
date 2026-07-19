@@ -739,7 +739,7 @@ export function OverlayWindow() {
             viewBox="0 0 12 12"
             fill="none"
             stroke="currentColor"
-            strokeWidth="1.5"
+            strokeWidth="2.25"
             strokeLinecap="round"
           >
             <path d="M11 5 5 11M11 9l-2 2" />
