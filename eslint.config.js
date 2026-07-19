@@ -30,6 +30,49 @@ export default [
     },
   },
   {
+    // Privacy guard: the App frontend (src/) promises in PRIVACY.md that it
+    // never sends data anywhere. The only outbound traffic allowed is the
+    // Rust-side updater, reached via `invoke()`, not these browser network
+    // APIs — so ban them here to keep that guarantee enforced, not just
+    // documented. The marketing site (site/) is a separate surface with no
+    // such promise and is exempt.
+    files: ['src/**/*.{js,jsx}'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'fetch',
+          message:
+            'src/ (the App) must not make network calls — see PRIVACY.md. If this is genuinely needed, it requires a privacy policy update and explicit review.',
+        },
+        {
+          name: 'XMLHttpRequest',
+          message:
+            'src/ (the App) must not make network calls — see PRIVACY.md. If this is genuinely needed, it requires a privacy policy update and explicit review.',
+        },
+        {
+          name: 'WebSocket',
+          message:
+            'src/ (the App) must not make network calls — see PRIVACY.md. If this is genuinely needed, it requires a privacy policy update and explicit review.',
+        },
+        {
+          name: 'EventSource',
+          message:
+            'src/ (the App) must not make network calls — see PRIVACY.md. If this is genuinely needed, it requires a privacy policy update and explicit review.',
+        },
+      ],
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'navigator',
+          property: 'sendBeacon',
+          message:
+            'src/ (the App) must not make network calls — see PRIVACY.md. If this is genuinely needed, it requires a privacy policy update and explicit review.',
+        },
+      ],
+    },
+  },
+  {
     files: [
       'vite.config.js',
       'eslint.config.js',
