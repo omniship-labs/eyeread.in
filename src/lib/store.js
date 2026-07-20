@@ -31,6 +31,7 @@ export const defaultSettings = {
   reduceMotion: false, // disable scroll easing + UI animations everywhere
   highContrast: false, // boost text contrast in overlay
   dyslexicFont: false, // OpenDyslexic + roomier spacing for the reading text
+  showIconLabels: false, // force icon+text labels on icon-only buttons everywhere
   uiScale: 100, // app UI zoom, % (affects main / settings / about windows)
   updateCheckHours: 6, // periodic update-check interval, hours; 0 = off
   // Tour tips seen/dismissed, one entry per step as `${tourId}:${stepId}` —

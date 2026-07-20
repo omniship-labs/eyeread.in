@@ -16,6 +16,10 @@
   width: 100%;
   z-index: @tt-z;
   background: @tt-dim;
+  // Overrides the ov-tour-catch measurement wrapper's pointer-events: none
+  // (see OverlayWindow.jsx) — an inherited property, so without this the
+  // bands (and .tt-card below) would stop intercepting/receiving clicks.
+  pointer-events: auto;
   transition:
     top 180ms ease,
     left 180ms ease,
@@ -64,6 +68,8 @@
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
   padding: 16px 16px 14px;
   color: var(--text-primary, #f2f2f7);
+  // Same inherited-pointer-events override as .tt-band above.
+  pointer-events: auto;
   transition:
     top 180ms ease,
     left 180ms ease;

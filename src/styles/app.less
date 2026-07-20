@@ -403,11 +403,13 @@ html.dyslexic-font {
 
   &.overridden {
     padding: 0 6px;
+    gap: 4px;
     border-radius: var(--radius-pill);
     color: var(--accent-text);
     background: var(--accent-subtle-bg);
     border: 1px solid var(--accent-subtle-border);
     cursor: pointer;
+    white-space: nowrap;
     transition: background var(--dur-fast) var(--ease-out);
 
     &:hover {
@@ -416,6 +418,7 @@ html.dyslexic-font {
     svg {
       width: 10px;
       height: 10px;
+      flex-shrink: 0;
     }
   }
 }

@@ -63,6 +63,7 @@ export function SettingsScreen({
     reduceMotion,
     highContrast,
     dyslexicFont,
+    showIconLabels,
     uiScale = 100,
     voice,
     keepMicOpen,
@@ -467,6 +468,18 @@ export function SettingsScreen({
             checked={!!dyslexicFont}
             label={t('settings.dyslexicFont')}
             onChange={(v) => onSettings({ dyslexicFont: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.showIconLabels')}</b>
+            <span>{t('settings.showIconLabelsHint')}</span>
+          </div>
+          <Switch
+            size="sm"
+            checked={!!showIconLabels}
+            label={t('settings.showIconLabels')}
+            onChange={(v) => onSettings({ showIconLabels: v })}
           />
         </div>
         <div className="set-row">

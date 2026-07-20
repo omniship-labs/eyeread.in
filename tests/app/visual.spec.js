@@ -94,6 +94,22 @@ test.describe('main window', () => {
     await expect(page.locator('.lib-search-row')).toHaveScreenshot('lib-search-row.png');
   });
 
+  test('library, narrow panel', async ({ context, page }) => {
+    // useListResize's saved width (src/hooks/useListResize.js) — 270px sits
+    // in what used to be a dead zone: above the @container lib breakpoint
+    // that hides .lib-btn-label (previously 260px), so "New script" still
+    // rendered, but below the width the row's content actually needs, so it
+    // clipped mid-word with no ellipsis. Raised to 280px specifically so
+    // this width now falls on the icon-only side instead.
+    await context.addInitScript(() => {
+      localStorage.setItem('eyeread:list-width', '270');
+    });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
+    await expect(page.locator('.lib-search-row')).toHaveScreenshot('lib-search-row-narrow.png');
+  });
+
   test('settings pane', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -113,6 +129,21 @@ test.describe('main window', () => {
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
     await expect(page).toHaveScreenshot('main-dyslexic-font.png');
+  });
+
+  test('show icon labels', async ({ context, page }) => {
+    // Accessibility setting (src/lib/store.js's showIconLabels) that forces
+    // text labels next to every icon-only control — titlebar shield/
+    // shortcuts/settings here, the overlay toolbar/passthru in the overlay
+    // suite below. Caught real bugs during development: the titlebar shield
+    // button's icon collapsing to 0-width when its width didn't expand to
+    // fit the label, and the overlay's tour tip becoming fully unclickable
+    // from an inherited pointer-events: none on its measurement wrapper.
+    await seedSettings(context, { showIconLabels: true });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
+    await expect(page.locator('.titlebar')).toHaveScreenshot('main-titlebar-icon-labels.png');
   });
 
   test('ui scale 130%', async ({ context, page }) => {
@@ -175,6 +206,15 @@ test.describe('overlay', () => {
     await seedSettings(context, { highContrast: true });
     const overlay = await openOverlay(page);
     await expect(overlay).toHaveScreenshot('overlay-high-contrast.png');
+  });
+
+  test('show icon labels', async ({ context, page }) => {
+    // See the main-window "show icon labels" test — this is the overlay
+    // side: shield/close in the head row, restart/back/play/skip/text-size/
+    // settings/click-through in the foot toolbar, all normally icon-only.
+    await seedSettings(context, { showIconLabels: true });
+    const overlay = await openOverlay(page);
+    await expect(overlay).toHaveScreenshot('overlay-icon-labels.png');
   });
 });
 

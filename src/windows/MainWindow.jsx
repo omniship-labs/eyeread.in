@@ -81,6 +81,7 @@ import { usePermissionsGate } from '../hooks/usePermissionsGate';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { useTour } from '../hooks/useTour';
+import { toursForWindow, tourStepKey } from '../lib/tours';
 import { TipLayer } from '../components/TipLayer';
 
 export function MainWindow() {
@@ -89,7 +90,7 @@ export function MainWindow() {
   const [pane, setPane] = useState('library'); // library | settings
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [windowFocused, setWindowFocused] = useState(true);
-  const { listWidth, handleMouseDown } = useListResize(300);
+  const { listWidth, handleMouseDown } = useListResize(320);
   const [scripts, setScripts] = useState([]);
   const [selId, setSelId] = useState(null);
   const [settings, setSettings] = useState(defaultSettings);
@@ -331,6 +332,7 @@ export function MainWindow() {
         <ShieldToggle
           shielded={shieldActive(settings)}
           onChange={setShielded}
+          showLabel={!!settings.showIconLabels}
           data-tour="shield-toggle"
         />
         <button
@@ -342,6 +344,9 @@ export function MainWindow() {
           aria-label={t('settings.viewShortcuts')}
         >
           <Keyboard size={15} aria-hidden="true" />
+          {settings.showIconLabels && (
+            <span className="tl-label">{t('settings.viewShortcuts')}</span>
+          )}
         </button>
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
@@ -356,6 +361,11 @@ export function MainWindow() {
             <Home size={15} aria-hidden="true" />
           ) : (
             <SettingsIcon size={15} aria-hidden="true" />
+          )}
+          {settings.showIconLabels && (
+            <span className="tl-label">
+              {pane === 'settings' ? t('library.title') : t('app.settings')}
+            </span>
           )}
           {update.status === 'available' && pane !== 'settings' && (
             <span className="tl-settings-badge" aria-hidden="true" />
@@ -379,6 +389,18 @@ export function MainWindow() {
                 // missing-target fallback).
                 setPane('library');
                 replayTour('welcome-main-v1');
+                // Also let the overlay's own tour show again: clear its
+                // seen-state (so it auto-starts next time the overlay opens)
+                // and, if the overlay is already open, replay it right now.
+                const overlayStepKeys = toursForWindow('overlay').flatMap((t) =>
+                  t.steps.map((s) => tourStepKey(t.id, s.id))
+                );
+                applySettings({
+                  seenTourSteps: (settingsRef.current.seenTourSteps || []).filter(
+                    (k) => !overlayStepKeys.includes(k)
+                  ),
+                });
+                emitTo('overlay', 'tour:replay', { tourId: 'welcome-overlay-v1' });
               }}
               onBack={() => setPane('library')}
             />

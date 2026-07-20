@@ -371,6 +371,18 @@
     }
   }
 
+  /* "Show icon labels" accessibility setting — force text alongside the icon */
+  &.ic-labeled {
+    width: auto;
+    padding: 0 10px;
+    gap: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .ov-ic-label {
+    display: inline;
+  }
+
   /* screen-share shield button — shows HIDDEN / VISIBLE label */
   &.ov-shield {
     width: auto;
@@ -408,7 +420,6 @@
 
   /* click-through toggle button */
   &.ov-passthru {
-    margin-left: auto;
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.06em;
@@ -418,6 +429,13 @@
     width: auto;
     padding: 0 8px;
     height: 26px;
+    gap: 4px;
+
+    .ov-ic-label {
+      font-family: var(--font-sans);
+      text-transform: none;
+      letter-spacing: normal;
+    }
 
     &:hover {
       color: var(--text-primary);
@@ -527,4 +545,16 @@
   margin-top: 18px;
   max-width: 600px;
   line-height: 1.5;
+}
+
+/* Wraps a running tour tip so its bounding rect (used by useClickThrough's
+   region check) covers wherever the card/bands actually render — which can
+   land outside .overlay-panel entirely for steps targeting elements near
+   the panel's edge (e.g. the resize handle). No transform/filter here: those
+   would make this the containing block for the tour tip's fixed-position
+   children and break their viewport-relative positioning. */
+.ov-tour-catch {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
 }

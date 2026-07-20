@@ -76,6 +76,7 @@ export function OverlayWindow() {
   const windowRef = useRef(null);
   const activeWordRef = useRef(null);
   const panelRef = useRef(null);
+  const tourTipRef = useRef(null);
   const gripRef = useRef(null);
   // in-flight manual drag state (macOS); null when not dragging
   const headDragRef = useRef(null);
@@ -123,7 +124,7 @@ export function OverlayWindow() {
   // docs on useTour): a tooltip only ever renders as plain DOM inside this
   // already content-protected window, and hides itself the moment those
   // conditions stop holding rather than lingering through a hide/show cycle.
-  const { tourOverlay } = useTour('overlay', settings, patchSettings, {
+  const { tourOverlay, replayTour } = useTour('overlay', settings, patchSettings, {
     active: settingsLoaded && sessionActive && interactive && !consentModal,
   });
 
@@ -158,7 +159,18 @@ export function OverlayWindow() {
   );
 
   // ---- interaction modes -----------------------------------------------------
-  useClickThrough(interactive ? [panelRef] : [gripRef, passthruBtnRef], true, interactive);
+  // A running tour's card is positioned relative to whatever target step it's
+  // pointing at (see tourPosition.js) and can land outside the panel's own
+  // bounds entirely — e.g. a step targeting the resize handle pushes the
+  // card past the panel's corner, into the window's reserved chrome space.
+  // Without tourTipRef in the catching region there, the OS window is
+  // click-through exactly where the tour's Next/Skip buttons render, so
+  // clicking them falls through to whatever's behind the overlay instead.
+  useClickThrough(
+    interactive ? [panelRef, ...(tourOverlay ? [tourTipRef] : [])] : [gripRef, passthruBtnRef],
+    true,
+    `${interactive}:${!!tourOverlay}`
+  );
 
   useEffect(() => {
     if (!isTauri) {
@@ -224,7 +236,7 @@ export function OverlayWindow() {
 
   // ---- cross-window events ---------------------------------------------------
   useEffect(() => {
-    let un1, un2, un3, un4, un5;
+    let un1, un2, un3, un4, un5, un6;
     (async () => {
       un1 = await listen('overlay:load', (p) => {
         loadedRef.current = true;
@@ -263,6 +275,12 @@ export function OverlayWindow() {
         setPanelSize(clampSize(defaultSettings.overlaySize));
         setScript((prev) => (prev ? { ...prev, overlayPos: null, overlaySize: null } : prev));
       });
+      // "Show tips again" in the main window's Settings — replay this
+      // window's own tour immediately if it's already open (its seen-state
+      // was also cleared, so it'll auto-start next open regardless).
+      un6 = await listen('tour:replay', (p) => {
+        if (p?.tourId) replayTour(p.tourId);
+      });
     })();
     return () => {
       un1?.();
@@ -270,8 +288,9 @@ export function OverlayWindow() {
       un3?.();
       un4?.();
       un5?.();
+      un6?.();
     };
-  }, [setPanelSize, sendSettingsContext]);
+  }, [setPanelSize, sendSettingsContext, replayTour]);
 
   // ---- glass backdrop refresh --------------------------------------------------
   // WebKit renders the panel's backdrop-filter from a snapshot of what's behind
@@ -605,13 +624,34 @@ export function OverlayWindow() {
               data-tour="ov-shield"
             />
             <button
-              className="ic ic-sm"
+              ref={passthruBtnRef}
+              className={'ic ov-passthru' + (interactive ? '' : ' on')}
+              data-tour="ov-passthru"
+              data-tip={
+                interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+              }
+              aria-label={
+                interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+              }
+              aria-pressed={!interactive}
+              onClick={() => setInteractive((i) => !i)}
+            >
+              {settings.showIconLabels && (
+                <span className="ov-ic-label">{t('overlay.clickThrough')}</span>
+              )}
+              {interactive ? '⌥⇧E' : '⌥⇧E·on'}
+            </button>
+            <button
+              className={'ic ic-sm' + (settings.showIconLabels ? ' ic-labeled' : '')}
               data-tip={t('overlay.close')}
               data-tip-side="bottom"
               aria-label={t('overlay.close')}
               onClick={close}
             >
               <X />
+              {settings.showIconLabels && (
+                <span className="ov-ic-label">{t('overlay.close')}</span>
+              )}
             </button>
           </span>
         </div>
@@ -649,23 +689,29 @@ export function OverlayWindow() {
 
         <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
           <button
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.restart')}
             aria-label={t('overlay.restart')}
             onClick={restart}
           >
             <RotateCcw />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.restart')}</span>
+            )}
           </button>
           <button
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.back5')}
             aria-label={t('overlay.back5')}
             onClick={skipBack}
           >
             <ChevronLeft />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.back5')}</span>
+            )}
           </button>
           <button
-            className="ic accent"
+            className={'ic accent' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tour="ov-play"
             data-tip={playing ? t('overlay.pause') : t('overlay.play')}
             aria-label={playing ? t('overlay.pause') : t('overlay.play')}
@@ -673,58 +719,60 @@ export function OverlayWindow() {
             onClick={() => setPlaying((p) => !p)}
           >
             {playing ? <Pause /> : <Play />}
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">
+                {playing ? t('overlay.pause') : t('overlay.play')}
+              </span>
+            )}
           </button>
           <button
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.skip5')}
             aria-label={t('overlay.skip5')}
             onClick={skip}
           >
             <ChevronsRight />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.skip5')}</span>
+            )}
           </button>
           <span className="sep" />
           <button
-            className="ic sizebtn"
+            className={'ic sizebtn' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.smaller')}
             aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >
             A
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.smaller')}</span>
+            )}
           </button>
           <button
-            className="ic sizebtn"
+            className={'ic sizebtn' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.larger')}
             aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >
             A
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.larger')}</span>
+            )}
           </button>
           <button
             ref={settingsBtnRef}
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tour="ov-settings"
             data-tip={t('overlay.prompterSettings')}
             aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
             <SettingsIcon />
-          </button>
-          <button
-            ref={passthruBtnRef}
-            className={'ic ov-passthru' + (interactive ? '' : ' on')}
-            data-tour="ov-passthru"
-            data-tip={
-              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
-            }
-            aria-label={
-              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
-            }
-            aria-pressed={!interactive}
-            onClick={() => setInteractive((i) => !i)}
-          >
-            {interactive ? '⌥⇧E' : '⌥⇧E·on'}
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.prompterSettings')}</span>
+            )}
           </button>
         </div>
 
@@ -747,7 +795,11 @@ export function OverlayWindow() {
         </div>
       </div>
       {consentModal}
-      {tourOverlay}
+      {tourOverlay && (
+        <div ref={tourTipRef} className="ov-tour-catch">
+          {tourOverlay}
+        </div>
+      )}
       <TipLayer />
     </div>
   );

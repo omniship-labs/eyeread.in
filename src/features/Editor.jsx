@@ -63,6 +63,7 @@ export function Editor({
       value={value}
       overrides={overrides}
       onRevert={revert}
+      showLabel={settings.showIconLabels}
       data-tour={dataTour}
     >
       {children}
@@ -206,7 +207,7 @@ export function Editor({
                 t('reading.overlayOpacity'),
                 `${opacity}%`,
                 <Slider
-                  min={10}
+                  min={0}
                   max={100}
                   value={opacity}
                   ariaLabel={t('reading.overlayOpacity')}
