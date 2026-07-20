@@ -1,7 +1,19 @@
-# Playwright responsiveness tests for the marketing site (site/).
-# Scoped to site-related paths so the Chromium download + browser run only
-# happens on PRs/pushes that can actually affect the rendered page — Rust-app
-# or unrelated changes skip it.
+# Responsiveness / visual checks for the marketing site (site/). Same
+# capture(matrix base/head) → compare pattern as App E2E (app-e2e.yml) —
+# see that workflow's doc comment for the general shape and why the diffing
+# happens out-of-process via scripts/compare-screenshots.mjs instead of a
+# live toHaveScreenshot() comparison.
+#
+# One difference from the app suite: site/tests/ mixes screenshot capture
+# (responsive.spec.js's "captures a full-page screenshot" case) with
+# unrelated functional assertions (scroll width, CTA position, the lang
+# switcher, docs.spec.js, os-download-btn.spec.js). Re-running those against
+# the base commit would waste time and could fail the capture job for
+# reasons that have nothing to do with a visual regression, so the base leg
+# only ever runs the screenshot-only command; the head leg runs the full
+# suite, which both captures screenshots and enforces the functional
+# assertions for real (a functional failure fails that leg's own check, kept
+# separate from the compare job's visual-diff comment below).
 name: Site E2E
 
 on:
@@ -10,6 +22,8 @@ on:
     paths:
       - 'site/**'
       - 'design/**'
+      - 'scripts/compare-screenshots.mjs'
+      - '.github/actions/capture-playwright-screenshots/**'
       - 'package.json'
       - 'package-lock.json'
       - 'playwright.config.js'
@@ -18,6 +32,8 @@ on:
     paths:
       - 'site/**'
       - 'design/**'
+      - 'scripts/compare-screenshots.mjs'
+      - '.github/actions/capture-playwright-screenshots/**'
       - 'package.json'
       - 'package-lock.json'
       - 'playwright.config.js'
@@ -32,9 +48,60 @@ permissions:
   pull-requests: write
 
 jobs:
-  e2e:
+  capture:
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [base, head]
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    steps:
+      # fetch-depth: 0 — the base variant's ref (resolved below) needs to be
+      # reachable for .github/actions/capture-playwright-screenshots' own
+      # checkout step, which a shallow clone won't guarantee.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      # head always resolves to the commit under test. base resolves to the
+      # PR's base commit (or the previous commit, for a push) — a brand-new
+      # branch's first push (or a force-push with no prior history) has no
+      # real "before" commit, so there's nothing to diff against.
+      - name: Resolve ref to capture
+        id: resolve
+        run: |
+          if [ "${{ matrix.variant }}" = "head" ]; then
+            echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              SHA="${{ github.event.pull_request.base.sha }}"
+            else
+              SHA="${{ github.event.before }}"
+            fi
+            if [ "$SHA" = "0000000000000000000000000000000000000000" ]; then
+              SHA=""
+            fi
+            echo "ref=$SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/capture-playwright-screenshots
+        with:
+          ref: ${{ steps.resolve.outputs.ref }}
+          artifact-name: site-e2e-screenshots-${{ matrix.variant }}
+          test-command: ${{ matrix.variant == 'head' && 'npm run site:test' || 'npm run site:test:screenshots' }}
+          screenshots-path: site/tests/screenshots
+          cache-key-prefix: site-e2e-screenshots-v1
+          config-file: playwright.config.js
+          tests-dir: site/tests
+
+  compare:
+    needs: [capture]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # to push diff images below — read-only everywhere else
+      pull-requests: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -42,66 +109,106 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
-      - run: npm run site:test
-      - name: Upload screenshots & report
-        id: artifact
+      - name: Download base screenshots
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true # no baseline (see capture-playwright-screenshots' empty-ref guard)
+        with:
+          name: site-e2e-screenshots-base
+          path: __baseline__
+      - name: Download head screenshots
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: site-e2e-screenshots-head
+          path: __head__
+
+      # Diff images the PR comment links/embeds live in a dedicated branch —
+      # raw.githubusercontent.com URLs render inline in GitHub markdown with
+      # no third-party image host needed. Scoped per PR + run so concurrent
+      # or re-triggered runs never collide. Safe to compute this URL before
+      # anything's actually pushed there (below): nothing reads it until the
+      # PR comment is posted, the very last step in this job.
+      - name: Resolve diff image destination
+        id: images
+        run: |
+          DEST="pr-${{ github.event.pull_request.number || format('push-{0}', github.run_id) }}/${{ github.run_id }}"
+          echo "dest=$DEST" >> "$GITHUB_OUTPUT"
+          echo "base-url=https://raw.githubusercontent.com/${{ github.repository }}/site-e2e-diffs/$DEST" >> "$GITHUB_OUTPUT"
+
+      - name: Compare
+        id: compare
+        run: |
+          node scripts/compare-screenshots.mjs __baseline__ __head__ __diff__ \
+            "${{ steps.images.outputs.base-url }}"
+
+      # Best-effort: a fork PR's default token is read-only here (GitHub
+      # denies contents: write to pull_request-triggered runs from forks,
+      # regardless of what this workflow declares), so this step just fails
+      # quietly for those and the comment falls back to text-only details —
+      # the pass/fail result itself never depends on this succeeding.
+      - name: Publish diff images
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          if [ -z "$(ls -A __diff__/images 2>/dev/null)" ]; then
+            echo "No diff images to publish."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin site-e2e-diffs 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/site-e2e-diffs; then
+            git worktree add -B site-e2e-diffs __diffs_branch__ origin/site-e2e-diffs
+          else
+            git worktree add --detach __diffs_branch__
+            (cd __diffs_branch__ && git checkout --orphan site-e2e-diffs && git rm -rf . > /dev/null)
+          fi
+          mkdir -p "__diffs_branch__/${{ steps.images.outputs.dest }}"
+          cp __diff__/images/*.png "__diffs_branch__/${{ steps.images.outputs.dest }}/"
+          cd __diffs_branch__
+          git add "${{ steps.images.outputs.dest }}"
+          git commit -m "Diff images for run ${{ github.run_id }}"
+          # A concurrent run on another PR may have pushed to this branch
+          # between our fetch and now — rebase and retry a couple of times
+          # rather than failing outright over an unrelated subdirectory.
+          for _ in 1 2 3; do
+            git push origin HEAD:site-e2e-diffs && break
+            git fetch origin site-e2e-diffs
+            git rebase origin/site-e2e-diffs
+          done
+
+      - name: Build PR comment
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p __diff__
+          {
+            echo "### 📸 Site visual regression — $([ '${{ steps.compare.outcome }}' = 'success' ] && echo '✅ passed' || echo '❌ failed')"
+            echo
+            echo "Compared the home page at desktop / tablet / mobile viewports — head commit vs. a"
+            echo "baseline captured from the base commit, both rendered in this same workflow run on"
+            echo "identical hardware/Chromium. Functional assertions (scroll width, CTA position, lang"
+            echo "switcher, per-OS download CTA) run separately as part of the head capture — see the"
+            echo "\`capture (head)\` check above for those."
+            echo
+            cat __diff__/summary.md 2>/dev/null || echo "_No summary produced — see the job log._"
+            if grep -q '🆕' __diff__/summary.md 2>/dev/null; then
+              echo
+              echo "New screenshots (🆕 above) aren't failures — there's no prior run to compare a"
+              echo "brand-new test case against. They become the baseline for every future run."
+            fi
+            echo
+            echo "<sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>"
+          } > __diff__/pr-comment.md
+      - name: Upload diff images + summary
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: playwright-artifacts
-          path: |
-            site/tests/screenshots/
-            playwright-report/
+          name: site-e2e-diff
+          path: __diff__
           retention-days: 14
           if-no-files-found: ignore
-      - name: Upload desktop screenshot
-        id: artifact_desktop
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: screenshot-desktop
-          path: site/tests/screenshots/home-desktop.png
-          retention-days: 14
-          if-no-files-found: ignore
-      - name: Upload tablet screenshot
-        id: artifact_tablet
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: screenshot-tablet
-          path: site/tests/screenshots/home-tablet.png
-          retention-days: 14
-          if-no-files-found: ignore
-      - name: Upload mobile screenshot
-        id: artifact_mobile
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: screenshot-mobile
-          path: site/tests/screenshots/home-mobile.png
-          retention-days: 14
-          if-no-files-found: ignore
-      # Sticky comment (created once, updated on each run) linking to the
-      # downloadable screenshots + report. PR-only; fork PRs get a read-only
-      # token so this is best-effort there.
-      - name: Comment screenshot link on PR
+      - name: Comment result on PR
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
         uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           header: site-e2e-screenshots
-          message: |
-            ### 📸 Site responsiveness screenshots — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
-
-            Playwright captured full-page screenshots at **desktop / tablet / mobile** viewports.
-
-            | Viewport | Direct download |
-            |----------|----------------|
-            | Desktop (1280×800) | [⬇️ home-desktop.png](${{ steps.artifact_desktop.outputs.artifact-url }}) |
-            | Tablet (768×1024) | [⬇️ home-tablet.png](${{ steps.artifact_tablet.outputs.artifact-url }}) |
-            | Mobile (390×844) | [⬇️ home-mobile.png](${{ steps.artifact_mobile.outputs.artifact-url }}) |
-
-            **[⬇️ Download all screenshots & HTML report](${{ steps.artifact.outputs.artifact-url }})** (zip)
-
-            <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>
+          path: __diff__/pr-comment.md

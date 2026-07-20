@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * compare-app-screenshots.mjs
+ * compare-screenshots.mjs
  *
- * Diffs two directories of already-captured PNGs (matched by filename) — the
- * app visual-regression suite's base-commit and head-commit screenshot sets,
- * each produced by its own CI job (see .github/workflows/app-e2e.yml). This
- * exists because Playwright's toHaveScreenshot() always captures fresh at
- * assertion time; it has no built-in way to compare two PNGs that already
- * exist on disk from separate runs.
+ * Diffs two directories of already-captured PNGs (matched by filename) — a
+ * base-commit and head-commit screenshot set, each produced by its own CI
+ * job. Shared by app-e2e.yml (tests/app/visual.spec.js) and site-e2e.yml
+ * (site/tests/responsive.spec.js). This exists because neither Playwright's
+ * toHaveScreenshot() nor a plain page.screenshot() has a built-in way to
+ * compare two PNGs that already exist on disk from separate runs — they only
+ * ever capture fresh at assertion time.
  *
- * Usage: node scripts/compare-app-screenshots.mjs <baselineDir> <headDir> <outDir> [imageBaseUrl]
+ * Usage: node scripts/compare-screenshots.mjs <baselineDir> <headDir> <outDir> [imageBaseUrl]
  *
  * A file present in headDir but not baselineDir (a screenshot this PR adds)
  * is reported as NEW, not a failure — there is nothing to compare it
@@ -19,10 +20,10 @@
  *
  * For each FAIL, the expected/actual/diff PNGs are written to
  * <outDir>/images/. `imageBaseUrl`, if given, is the URL prefix those files
- * will be reachable at once published (see app-e2e.yml's "Publish diff
- * images" step) — the PR comment embeds/links them from there. It's safe to
- * reference a URL before the images are actually pushed: nothing reads it
- * until the PR comment is posted, by which point they exist.
+ * will be reachable at once published (see the caller workflow's "Publish
+ * diff images" step) — the PR comment embeds/links them from there. It's
+ * safe to reference a URL before the images are actually pushed: nothing
+ * reads it until the PR comment is posted, by which point they exist.
  */
 import { readdir, readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -34,7 +35,7 @@ import { MAX_DIFF_PIXEL_RATIO } from '../tests/app/screenshot-diff-tolerance.mjs
 const [, , baselineDir, headDir, outDir, imageBaseUrl] = process.argv;
 if (!headDir || !outDir) {
   console.error(
-    'Usage: node scripts/compare-app-screenshots.mjs <baselineDir> <headDir> <outDir> [imageBaseUrl]'
+    'Usage: node scripts/compare-screenshots.mjs <baselineDir> <headDir> <outDir> [imageBaseUrl]'
   );
   process.exit(2);
 }

@@ -1,17 +1,17 @@
 # Visual regression tests for the app (src/), driven via the browser/web-demo
-# build (see src/lib/tauri.js). Unlike Site E2E's screenshots-for-review-only
-# approach, this does real automated pixel diffing — but against a baseline
-# generated in CI, not a committed one (see playwright.app.config.js's doc
-# comment for why: a baseline rendered on a different machine/Chromium build
-# is a source of false failures, not a safety net).
+# build (see src/lib/tauri.js). Diffs against a baseline generated in CI, not
+# a committed one (see playwright.app.config.js's doc comment for why: a
+# baseline rendered on a different machine/Chromium build is a source of
+# false failures, not a safety net). Site E2E (site-e2e.yml) does the
+# equivalent for the marketing site.
 #
 # One `capture` job, matrixed over base/head (same pattern as build-app.yml's
 # platform matrix): each matrix run resolves which commit it's responsible
-# for, then hands off to .github/actions/capture-app-screenshots (the actual
-# checkout/cache/install/render/upload work) — no comparison happening yet.
-# `compare` (needs: [capture]) downloads both matrix runs' artifacts and
-# diffs them with scripts/compare-app-screenshots.mjs (plain Node, no
-# browser needed).
+# for, then hands off to .github/actions/capture-playwright-screenshots (the
+# actual checkout/cache/install/render/upload work, shared with
+# site-e2e.yml) — no comparison happening yet. `compare` (needs: [capture])
+# downloads both matrix runs' artifacts and diffs them with
+# scripts/compare-screenshots.mjs (plain Node, no browser needed).
 name: App E2E
 
 on:
@@ -21,7 +21,8 @@ on:
       - 'src/**'
       - 'design/**'
       - 'tests/app/**'
-      - 'scripts/compare-app-screenshots.mjs'
+      - 'scripts/compare-screenshots.mjs'
+      - '.github/actions/capture-playwright-screenshots/**'
       - 'index.html'
       - 'vite.config.js'
       - 'package.json'
@@ -33,7 +34,8 @@ on:
       - 'src/**'
       - 'design/**'
       - 'tests/app/**'
-      - 'scripts/compare-app-screenshots.mjs'
+      - 'scripts/compare-screenshots.mjs'
+      - '.github/actions/capture-playwright-screenshots/**'
       - 'index.html'
       - 'vite.config.js'
       - 'package.json'
@@ -59,8 +61,8 @@ jobs:
     timeout-minutes: 15
     steps:
       # fetch-depth: 0 — the base variant's ref (resolved below) needs to be
-      # reachable for .github/actions/capture-app-screenshots' own checkout
-      # step, which a shallow clone won't guarantee.
+      # reachable for .github/actions/capture-playwright-screenshots' own
+      # checkout step, which a shallow clone won't guarantee.
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
@@ -86,10 +88,15 @@ jobs:
             echo "ref=$SHA" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: ./.github/actions/capture-app-screenshots
+      - uses: ./.github/actions/capture-playwright-screenshots
         with:
           ref: ${{ steps.resolve.outputs.ref }}
           artifact-name: app-e2e-screenshots-${{ matrix.variant }}
+          test-command: npm run app:test:update
+          screenshots-path: tests/app/visual.spec.js-snapshots
+          cache-key-prefix: app-e2e-screenshots-v1
+          config-file: playwright.app.config.js
+          tests-dir: tests/app
 
   compare:
     needs: [capture]
@@ -108,7 +115,7 @@ jobs:
       - run: npm ci
       - name: Download base screenshots
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        continue-on-error: true # no baseline (see capture-app-screenshots' empty-ref guard)
+        continue-on-error: true # no baseline (see capture-playwright-screenshots' empty-ref guard)
         with:
           name: app-e2e-screenshots-base
           path: __baseline__
@@ -134,7 +141,7 @@ jobs:
       - name: Compare
         id: compare
         run: |
-          node scripts/compare-app-screenshots.mjs __baseline__ __head__ __diff__ \
+          node scripts/compare-screenshots.mjs __baseline__ __head__ __diff__ \
             "${{ steps.images.outputs.base-url }}"
 
       # Best-effort: a fork PR's default token is read-only here (GitHub

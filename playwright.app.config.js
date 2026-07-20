@@ -2,10 +2,10 @@ import { defineConfig } from '@playwright/test';
 import { MAX_DIFF_PIXEL_RATIO } from './tests/app/screenshot-diff-tolerance.mjs';
 
 /**
- * Playwright config for the APP (src/) — visual regression, unlike
+ * Playwright config for the APP (src/) — visual regression. Unlike
  * playwright.config.js (the marketing site's responsiveness checks, which
- * only capture artifacts for human review). This one uses toHaveScreenshot()
- * for real automated pixel diffing.
+ * capture plain page.screenshot()s), this one uses toHaveScreenshot() for
+ * real automated pixel diffing.
  *
  * No baseline snapshots are committed to the repo — a Chromium build
  * downloaded on one machine doesn't reliably render pixel-identical to one
@@ -19,7 +19,7 @@ import { MAX_DIFF_PIXEL_RATIO } from './tests/app/screenshot-diff-tolerance.mjs'
  * previous commit, for a push), once against the commit under test — each
  * just capturing screenshots (`--update-snapshots`) with no comparison
  * happening yet. A third job then diffs the two resulting screenshot sets
- * with scripts/compare-app-screenshots.mjs, which shares this file's
+ * with scripts/compare-screenshots.mjs, which shares this file's
  * tolerance (MAX_DIFF_PIXEL_RATIO) so both paths agree on what counts as a
  * real change. Playwright's own toHaveScreenshot() can't do this cross-job
  * comparison itself — it always captures fresh at assertion time, it can't
