@@ -546,3 +546,15 @@
   max-width: 600px;
   line-height: 1.5;
 }
+
+/* Wraps a running tour tip so its bounding rect (used by useClickThrough's
+   region check) covers wherever the card/bands actually render — which can
+   land outside .overlay-panel entirely for steps targeting elements near
+   the panel's edge (e.g. the resize handle). No transform/filter here: those
+   would make this the containing block for the tour tip's fixed-position
+   children and break their viewport-relative positioning. */
+.ov-tour-catch {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}

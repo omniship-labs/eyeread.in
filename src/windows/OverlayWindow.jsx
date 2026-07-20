@@ -76,6 +76,7 @@ export function OverlayWindow() {
   const windowRef = useRef(null);
   const activeWordRef = useRef(null);
   const panelRef = useRef(null);
+  const tourTipRef = useRef(null);
   const gripRef = useRef(null);
   // in-flight manual drag state (macOS); null when not dragging
   const headDragRef = useRef(null);
@@ -158,7 +159,18 @@ export function OverlayWindow() {
   );
 
   // ---- interaction modes -----------------------------------------------------
-  useClickThrough(interactive ? [panelRef] : [gripRef, passthruBtnRef], true, interactive);
+  // A running tour's card is positioned relative to whatever target step it's
+  // pointing at (see tourPosition.js) and can land outside the panel's own
+  // bounds entirely — e.g. a step targeting the resize handle pushes the
+  // card past the panel's corner, into the window's reserved chrome space.
+  // Without tourTipRef in the catching region there, the OS window is
+  // click-through exactly where the tour's Next/Skip buttons render, so
+  // clicking them falls through to whatever's behind the overlay instead.
+  useClickThrough(
+    interactive ? [panelRef, ...(tourOverlay ? [tourTipRef] : [])] : [gripRef, passthruBtnRef],
+    true,
+    `${interactive}:${!!tourOverlay}`
+  );
 
   useEffect(() => {
     if (!isTauri) {
@@ -783,7 +795,11 @@ export function OverlayWindow() {
         </div>
       </div>
       {consentModal}
-      {tourOverlay}
+      {tourOverlay && (
+        <div ref={tourTipRef} className="ov-tour-catch">
+          {tourOverlay}
+        </div>
+      )}
       <TipLayer />
     </div>
   );
