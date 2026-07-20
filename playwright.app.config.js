@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { MAX_DIFF_PIXEL_RATIO } from './tests/app/screenshot-diff-tolerance.mjs';
 
 /**
  * Playwright config for the APP (src/) — visual regression, unlike
@@ -11,12 +12,22 @@ import { defineConfig } from '@playwright/test';
  * downloaded on another (font hinting, subpixel AA, GPU vs. software
  * rendering all drift across versions/platforms), so a baseline generated
  * anywhere other than the CI runner that will diff against it is a source of
- * false failures, not a safety net. Instead, .github/workflows/app-e2e.yml
- * generates the baseline itself, in the same job, by running this suite
- * against the PR's base commit (or the previous commit, for a push) before
- * running it again against the commit under test — both on identical
- * hardware and an identical Chromium build. Locally, there's nothing to
- * diff against until you run `npm run app:test:update` yourself first.
+ * false failures, not a safety net.
+ *
+ * Instead, .github/workflows/app-e2e.yml runs THIS config twice, in two
+ * independent, parallel jobs — once against the PR's base commit (or the
+ * previous commit, for a push), once against the commit under test — each
+ * just capturing screenshots (`--update-snapshots`) with no comparison
+ * happening yet. A third job then diffs the two resulting screenshot sets
+ * with scripts/compare-app-screenshots.mjs, which shares this file's
+ * tolerance (MAX_DIFF_PIXEL_RATIO) so both paths agree on what counts as a
+ * real change. Playwright's own toHaveScreenshot() can't do this cross-job
+ * comparison itself — it always captures fresh at assertion time, it can't
+ * diff two already-existing PNGs from separate runs.
+ *
+ * Locally, there's nothing to diff against until you run
+ * `npm run app:test:update` yourself first — that still goes through
+ * Playwright's normal toHaveScreenshot() compare-on-repeat-run flow.
  *
  * Playwright can't drive the native Tauri window directly, so this drives
  * the plain-browser "web demo" build instead — `npm run dev` on Tauri's
@@ -44,8 +55,9 @@ export default defineConfig({
       // (observed: ~0.006% drift on a language-selector's text label with
       // zero tolerance configured). A real UI change (moved, resized,
       // recolored, or removed element) affects far more of the image than
-      // this, so it still gets caught.
-      maxDiffPixelRatio: 0.005,
+      // this, so it still gets caught. Shared with the CI compare script —
+      // see MAX_DIFF_PIXEL_RATIO's own doc comment.
+      maxDiffPixelRatio: MAX_DIFF_PIXEL_RATIO,
     },
   },
   use: {

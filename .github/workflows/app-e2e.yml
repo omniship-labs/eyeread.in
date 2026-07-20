@@ -1,12 +1,18 @@
 # Visual regression tests for the app (src/), driven via the browser/web-demo
 # build (see src/lib/tauri.js). Unlike Site E2E's screenshots-for-review-only
 # approach, this does real automated pixel diffing — but against a baseline
-# generated in THIS job, not a committed one (see playwright.app.config.js's
-# doc comment for why: a baseline rendered on a different machine/Chromium
-# build is a source of false failures, not a safety net). The base commit
-# (PR base, or the previous commit for a push) is checked out into a sibling
-# git worktree, its suite run once to produce a fresh baseline, then the
-# commit under test is diffed against that.
+# generated in CI, not a committed one (see playwright.app.config.js's doc
+# comment for why: a baseline rendered on a different machine/Chromium build
+# is a source of false failures, not a safety net).
+#
+# Three jobs:
+#   capture-base — captures screenshots from the PR's base commit (or the
+#     previous commit, for a push). Cached per base commit SHA, since the
+#     base rarely changes across re-pushes to the same PR.
+#   capture-head — captures screenshots from the commit under test. Runs in
+#     parallel with capture-base (independent, so no reason to serialize).
+#   compare — downloads both screenshot sets and diffs them with
+#     scripts/compare-app-screenshots.mjs (plain Node, no browser needed).
 name: App E2E
 
 on:
@@ -16,6 +22,7 @@ on:
       - 'src/**'
       - 'design/**'
       - 'tests/app/**'
+      - 'scripts/compare-app-screenshots.mjs'
       - 'index.html'
       - 'vite.config.js'
       - 'package.json'
@@ -27,6 +34,7 @@ on:
       - 'src/**'
       - 'design/**'
       - 'tests/app/**'
+      - 'scripts/compare-app-screenshots.mjs'
       - 'index.html'
       - 'vite.config.js'
       - 'package.json'
@@ -43,76 +51,177 @@ permissions:
   pull-requests: write
 
 jobs:
-  e2e:
+  capture-base:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
+      - name: Resolve base commit
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            SHA="${{ github.event.before }}"
+          fi
+          # A brand-new branch's first push (or a force-push with no prior
+          # history) has no real "before" commit — nothing to diff against.
+          if [ -z "$SHA" ] || [ "$SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "has_base=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_base=true" >> "$GITHUB_OUTPUT"
+            echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        if: steps.resolve.outputs.has_base == 'true'
         with:
-          # Full history: the base commit (below) needs to be reachable for
-          # `git worktree add`, and a shallow clone may not have it.
-          fetch-depth: 0
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+          ref: ${{ steps.resolve.outputs.sha }}
+
+      # Keyed on the base commit's own SHA — a re-push to the same PR (its
+      # base commit unchanged) hits this on every subsequent run, skipping
+      # straight to the upload step below with no rebuild at all.
+      - name: Cache baseline screenshots for this base commit
+        if: steps.resolve.outputs.has_base == 'true'
+        id: cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: tests/app/visual.spec.js-snapshots
+          key: app-e2e-baseline-v1-${{ steps.resolve.outputs.sha }}
+
+      - if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
 
-      - name: Resolve base/head commits
-        id: refs
+      - name: Check the suite exists at this base commit
+        if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true'
+        id: has_suite
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          if [ -f playwright.app.config.js ] && [ -d tests/app ]; then
+            echo "value=true" >> "$GITHUB_OUTPUT"
           else
-            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - run: npm ci
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
-
-      - name: Generate baseline from the base commit
-        id: baseline
-        run: |
-          set -e
-          BASE_SHA="${{ steps.refs.outputs.base }}"
-          # A brand-new branch's first push (or a force-push with no prior
-          # history) has no real "before" commit — nothing to diff against.
-          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            echo "No base commit to compare against — skipping baseline generation."
-            echo "has_base=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          git worktree add /tmp/app-e2e-base "$BASE_SHA"
-          cd /tmp/app-e2e-base
-          if [ ! -f playwright.app.config.js ] || [ ! -d tests/app ]; then
             # This suite doesn't exist yet at the base commit (true today —
-            # it hasn't merged to main). Nothing to regenerate against; the
-            # comparison step below will just establish everything as new.
-            echo "App E2E suite doesn't exist at the base commit — skipping baseline generation."
-            echo "has_base=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            # it hasn't reached main). Nothing to capture; the compare job
+            # will just treat every head screenshot as new.
+            echo "This suite doesn't exist at the base commit — skipping capture."
+            echo "value=false" >> "$GITHUB_OUTPUT"
           fi
-          npm ci
-          npx playwright install --with-deps chromium
-          npm run app:test:update
-          echo "has_base=true" >> "$GITHUB_OUTPUT"
 
-      - name: Seed baseline snapshots from the base commit's run
-        if: steps.baseline.outputs.has_base == 'true'
+      - name: Install deps
+        if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+        run: npm ci
+
+      - name: Install Playwright OS dependencies
+        if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Cache Playwright browser binary
+        if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+        id: pw-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Download Playwright browser
+        if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true' && steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Capture screenshots from the base commit
+        if: steps.resolve.outputs.has_base == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+        run: npm run app:test:update
+
+      - name: Upload baseline screenshots
+        if: steps.resolve.outputs.has_base == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: app-e2e-baseline-screenshots
+          path: tests/app/visual.spec.js-snapshots
+          retention-days: 14
+          if-no-files-found: ignore
+
+  capture-head:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright OS dependencies
+        run: npx playwright install-deps chromium
+      - name: Cache Playwright browser binary
+        id: pw-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Download Playwright browser
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+      - name: Capture screenshots from the commit under test
+        run: npm run app:test:update
+      - name: Upload head screenshots
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: app-e2e-head-screenshots
+          path: tests/app/visual.spec.js-snapshots
+          retention-days: 14
+
+  compare:
+    needs: [capture-base, capture-head]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Download baseline screenshots
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true # no baseline (see capture-base's "has_base" guard)
+        with:
+          name: app-e2e-baseline-screenshots
+          path: __baseline__
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: app-e2e-head-screenshots
+          path: __head__
+      - name: Compare
+        id: compare
+        run: node scripts/compare-app-screenshots.mjs __baseline__ __head__ __diff__
+      - name: Build PR comment
+        if: ${{ !cancelled() }}
         run: |
-          rm -rf tests/app/visual.spec.js-snapshots
-          cp -r /tmp/app-e2e-base/tests/app/visual.spec.js-snapshots tests/app/visual.spec.js-snapshots
-
-      - name: Compare against the base-commit baseline
-        run: npm run app:test:ci
-      - name: Upload report + diffs
+          mkdir -p __diff__
+          {
+            echo "### 🧿 App visual regression — $([ '${{ steps.compare.outcome }}' = 'success' ] && echo '✅ passed' || echo '❌ failed')"
+            echo
+            echo "Compared the main window (3 sizes), overlay popup, Settings, About, and a11y-setting"
+            echo "variations, in \`en\`/\`de\` — head commit vs. a baseline captured from the base commit,"
+            echo "both rendered in this same workflow run on identical hardware/Chromium."
+            echo
+            cat __diff__/summary.md 2>/dev/null || echo "_No summary produced — see the job log._"
+            if grep -q '🆕' __diff__/summary.md 2>/dev/null; then
+              echo
+              echo "New screenshots (🆕 above) aren't failures — there's no prior run to compare a"
+              echo "brand-new test case against. They become the baseline for every future run."
+            fi
+            echo
+            echo "<sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>"
+          } > __diff__/pr-comment.md
+      - name: Upload diff images + summary
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: app-playwright-artifacts
-          path: |
-            test-results/
-            playwright-report/
+          name: app-e2e-diff
+          path: __diff__
           retention-days: 14
           if-no-files-found: ignore
       - name: Comment result on PR
@@ -120,14 +229,4 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           header: app-e2e-visual-regression
-          message: |
-            ### 🧿 App visual regression — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
-
-            Playwright rendered the browser/web-demo build (main window at 3 sizes, overlay popup,
-            Settings, About, plus dyslexic font/high contrast/UI scale variations) in `en` and `de`,
-            and diffed against a baseline generated from this PR's base commit — in this same job,
-            on identical hardware and Chromium build, so there's no cross-machine rendering drift.
-
-            ${{ job.status != 'success' && '**Diffs found** — see the report/diff images in the artifact below. If the change is intentional, no action needed here: the next run against the updated base will pick it up automatically (no committed snapshots to update).' || '' }}
-
-            <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>
+          path: __diff__/pr-comment.md

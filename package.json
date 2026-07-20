@@ -23,7 +23,7 @@
     "site:test:update": "playwright test --update-snapshots",
     "app:test": "playwright test --config=playwright.app.config.js",
     "app:test:update": "playwright test --config=playwright.app.config.js --update-snapshots",
-    "app:test:ci": "playwright test --config=playwright.app.config.js --update-snapshots=missing",
+    "app:test:compare": "node scripts/compare-app-screenshots.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
@@ -63,6 +63,8 @@
     "globals": "^17.7.0",
     "less": "^4.7.0",
     "opentype.js": "^2.0.0",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.9.5",
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
