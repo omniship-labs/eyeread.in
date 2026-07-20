@@ -96,6 +96,9 @@ jobs:
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write # to push diff images below — read-only everywhere else
+      pull-requests: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -114,9 +117,62 @@ jobs:
         with:
           name: app-e2e-screenshots-head
           path: __head__
+
+      # Diff images the PR comment links/embeds live in a dedicated branch —
+      # raw.githubusercontent.com URLs render inline in GitHub markdown with
+      # no third-party image host needed. Scoped per PR + run so concurrent
+      # or re-triggered runs never collide. Safe to compute this URL before
+      # anything's actually pushed there (below): nothing reads it until the
+      # PR comment is posted, the very last step in this job.
+      - name: Resolve diff image destination
+        id: images
+        run: |
+          DEST="pr-${{ github.event.pull_request.number || format('push-{0}', github.run_id) }}/${{ github.run_id }}"
+          echo "dest=$DEST" >> "$GITHUB_OUTPUT"
+          echo "base-url=https://raw.githubusercontent.com/${{ github.repository }}/app-e2e-diffs/$DEST" >> "$GITHUB_OUTPUT"
+
       - name: Compare
         id: compare
-        run: node scripts/compare-app-screenshots.mjs __baseline__ __head__ __diff__
+        run: |
+          node scripts/compare-app-screenshots.mjs __baseline__ __head__ __diff__ \
+            "${{ steps.images.outputs.base-url }}"
+
+      # Best-effort: a fork PR's default token is read-only here (GitHub
+      # denies contents: write to pull_request-triggered runs from forks,
+      # regardless of what this workflow declares), so this step just fails
+      # quietly for those and the comment falls back to text-only details —
+      # the pass/fail result itself never depends on this succeeding.
+      - name: Publish diff images
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          if [ -z "$(ls -A __diff__/images 2>/dev/null)" ]; then
+            echo "No diff images to publish."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin app-e2e-diffs 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/app-e2e-diffs; then
+            git worktree add -B app-e2e-diffs __diffs_branch__ origin/app-e2e-diffs
+          else
+            git worktree add --detach __diffs_branch__
+            (cd __diffs_branch__ && git checkout --orphan app-e2e-diffs && git rm -rf . > /dev/null)
+          fi
+          mkdir -p "__diffs_branch__/${{ steps.images.outputs.dest }}"
+          cp __diff__/images/*.png "__diffs_branch__/${{ steps.images.outputs.dest }}/"
+          cd __diffs_branch__
+          git add "${{ steps.images.outputs.dest }}"
+          git commit -m "Diff images for run ${{ github.run_id }}"
+          # A concurrent run on another PR may have pushed to this branch
+          # between our fetch and now — rebase and retry a couple of times
+          # rather than failing outright over an unrelated subdirectory.
+          for _ in 1 2 3; do
+            git push origin HEAD:app-e2e-diffs && break
+            git fetch origin app-e2e-diffs
+            git rebase origin/app-e2e-diffs
+          done
+
       - name: Build PR comment
         if: ${{ !cancelled() }}
         run: |

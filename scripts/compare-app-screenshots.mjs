@@ -9,25 +9,32 @@
  * assertion time; it has no built-in way to compare two PNGs that already
  * exist on disk from separate runs.
  *
- * Usage: node scripts/compare-app-screenshots.mjs <baselineDir> <headDir> <outDir>
+ * Usage: node scripts/compare-app-screenshots.mjs <baselineDir> <headDir> <outDir> [imageBaseUrl]
  *
  * A file present in headDir but not baselineDir (a screenshot this PR adds)
  * is reported as NEW, not a failure — there is nothing to compare it
  * against yet. Likewise a file only in baselineDir is REMOVED, not a
  * failure. Only files present in both, whose pixel diff exceeds
  * MAX_DIFF_PIXEL_RATIO, count as a FAIL. Exits non-zero iff any FAIL.
+ *
+ * For each FAIL, the expected/actual/diff PNGs are written to
+ * <outDir>/images/. `imageBaseUrl`, if given, is the URL prefix those files
+ * will be reachable at once published (see app-e2e.yml's "Publish diff
+ * images" step) — the PR comment embeds/links them from there. It's safe to
+ * reference a URL before the images are actually pushed: nothing reads it
+ * until the PR comment is posted, by which point they exist.
  */
-import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readdir, readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import { MAX_DIFF_PIXEL_RATIO } from '../tests/app/screenshot-diff-tolerance.mjs';
 
-const [, , baselineDir, headDir, outDir] = process.argv;
+const [, , baselineDir, headDir, outDir, imageBaseUrl] = process.argv;
 if (!headDir || !outDir) {
   console.error(
-    'Usage: node scripts/compare-app-screenshots.mjs <baselineDir> <headDir> <outDir>'
+    'Usage: node scripts/compare-app-screenshots.mjs <baselineDir> <headDir> <outDir> [imageBaseUrl]'
   );
   process.exit(2);
 }
@@ -52,7 +59,9 @@ function table(rows) {
 // table, then tucks everything that matched behind a <details> fold —
 // unchanged screenshots outnumber the rest by a lot on a normal run, and
 // nobody needs to scroll past dozens of "unchanged" rows to find the one
-// that failed.
+// that failed. Failed entries additionally get their diff image embedded
+// directly below the table (not collapsed — real failures should be rare,
+// so there's no long list to hide them behind).
 function buildMarkdown({ fails, news, removed, passes }) {
   const parts = [
     `**${passes.length} unchanged · ${fails.length} failed · ${news.length} new · ${removed.length} removed**`,
@@ -60,7 +69,13 @@ function buildMarkdown({ fails, news, removed, passes }) {
   ];
 
   const attention = [
-    ...fails.map((r) => ({ icon: '❌', name: r.name, detail: r.detail })),
+    ...fails.map((r) => {
+      if (!imageBaseUrl) return { icon: '❌', name: r.name, detail: r.detail };
+      const links = [`[expected](${imageBaseUrl}/${r.name}-expected.png)`];
+      links.push(`[actual](${imageBaseUrl}/${r.name}-actual.png)`);
+      if (r.hasDiffImage) links.push(`[diff](${imageBaseUrl}/${r.name}-diff.png)`);
+      return { icon: '❌', name: r.name, detail: `${r.detail} — ${links.join(' · ')}` };
+    }),
     ...news.map((r) => ({
       icon: '🆕',
       name: r.name,
@@ -69,6 +84,14 @@ function buildMarkdown({ fails, news, removed, passes }) {
     ...removed.map((r) => ({ icon: '🗑️', name: r.name, detail: 'no longer produced' })),
   ];
   parts.push(attention.length > 0 ? table(attention) : '_Nothing changed._');
+
+  const failsWithDiffImage = fails.filter((r) => r.hasDiffImage);
+  if (failsWithDiffImage.length > 0 && imageBaseUrl) {
+    parts.push('', '**Diffs:**');
+    for (const r of failsWithDiffImage) {
+      parts.push('', `\`${r.name}\``, `![diff](${imageBaseUrl}/${r.name}-diff.png)`);
+    }
+  }
 
   if (passes.length > 0) {
     const plural = passes.length === 1 ? '' : 's';
@@ -89,7 +112,8 @@ function buildMarkdown({ fails, news, removed, passes }) {
 async function main() {
   const baselineNames = new Set(await pngNames(baselineDir));
   const headNames = new Set(await pngNames(headDir));
-  await mkdir(outDir, { recursive: true });
+  const imagesDir = join(outDir, 'images');
+  await mkdir(imagesDir, { recursive: true });
 
   const results = [];
 
@@ -98,14 +122,22 @@ async function main() {
       results.push({ name, status: 'new' });
       continue;
     }
-    const a = await readPng(join(baselineDir, name));
-    const b = await readPng(join(headDir, name));
+    const baselinePath = join(baselineDir, name);
+    const headPath = join(headDir, name);
+    const a = await readPng(baselinePath);
+    const b = await readPng(headPath);
     if (a.width !== b.width || a.height !== b.height) {
+      // No pixel diff possible between mismatched dimensions — pixelmatch
+      // requires identical width/height. expected/actual are still saved
+      // side by side so the size change is at least visible.
       results.push({
         name,
         status: 'fail',
         detail: `size changed ${a.width}×${a.height} → ${b.width}×${b.height}`,
+        hasDiffImage: false,
       });
+      await copyFile(baselinePath, join(imagesDir, `${name}-expected.png`));
+      await copyFile(headPath, join(imagesDir, `${name}-actual.png`));
       continue;
     }
     const diff = new PNG({ width: a.width, height: a.height });
@@ -114,13 +146,14 @@ async function main() {
     });
     const ratio = diffPixels / (a.width * a.height);
     if (ratio > MAX_DIFF_PIXEL_RATIO) {
-      const diffPath = join(outDir, name.replace(/\.png$/, '-diff.png'));
-      await writeFile(diffPath, PNG.sync.write(diff));
+      await writeFile(join(imagesDir, `${name}-diff.png`), PNG.sync.write(diff));
+      await copyFile(baselinePath, join(imagesDir, `${name}-expected.png`));
+      await copyFile(headPath, join(imagesDir, `${name}-actual.png`));
       results.push({
         name,
         status: 'fail',
         detail: `${diffPixels} px differ (${(ratio * 100).toFixed(2)}%, tolerance ${(MAX_DIFF_PIXEL_RATIO * 100).toFixed(2)}%)`,
-        diffPath,
+        hasDiffImage: true,
       });
     } else {
       results.push({ name, status: 'pass' });
