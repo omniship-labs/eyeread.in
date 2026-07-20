@@ -305,7 +305,7 @@
 }
 
 .lib {
-  width: 300px;
+  width: 320px;
   flex: 1;
   flex-shrink: 0;
   border-right: 1px solid var(--border-subtle);
@@ -317,8 +317,13 @@
   container-name: lib;
 }
 
-/* Hide button label when panel is too narrow, show icon only */
-@container lib (max-width: 260px) {
+/* Hide button label when panel is too narrow, show icon only.
+   260px used to be the cutoff, but the label's actual content (search
+   placeholder + full "New script" text) doesn't comfortably fit until
+   ~275px — anything between clipped mid-transition instead of cleanly
+   switching to icon-only. 280px gives that a few px of margin while
+   staying safely below the 300px default panel width. */
+@container lib (max-width: 280px) {
   .lib-btn-label {
     display: none;
   }
@@ -402,6 +407,16 @@
     font-family: var(--font-sans);
     font-size: 14px;
     flex: 1;
+    // A ch-based floor (scales with font-size, unlike a hardcoded px value)
+    // so short-to-mid-length locale strings (English, Spanish, Russian, …)
+    // fit without truncating at the panel's default width. Longer ones
+    // (French, Tamil, Kannada, …) still gracefully ellipsize below this —
+    // no fixed width can fit every locale's placeholder without either
+    // wasting space for short strings or crowding out the button for all.
+    min-width: 14ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   svg {

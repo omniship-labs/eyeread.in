@@ -90,7 +90,7 @@ export function MainWindow() {
   const [pane, setPane] = useState('library'); // library | settings
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [windowFocused, setWindowFocused] = useState(true);
-  const { listWidth, handleMouseDown } = useListResize(300);
+  const { listWidth, handleMouseDown } = useListResize(320);
   const [scripts, setScripts] = useState([]);
   const [selId, setSelId] = useState(null);
   const [settings, setSettings] = useState(defaultSettings);

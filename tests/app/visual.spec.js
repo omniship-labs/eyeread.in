@@ -94,6 +94,22 @@ test.describe('main window', () => {
     await expect(page.locator('.lib-search-row')).toHaveScreenshot('lib-search-row.png');
   });
 
+  test('library, narrow panel', async ({ context, page }) => {
+    // useListResize's saved width (src/hooks/useListResize.js) — 270px sits
+    // in what used to be a dead zone: above the @container lib breakpoint
+    // that hides .lib-btn-label (previously 260px), so "New script" still
+    // rendered, but below the width the row's content actually needs, so it
+    // clipped mid-word with no ellipsis. Raised to 280px specifically so
+    // this width now falls on the icon-only side instead.
+    await context.addInitScript(() => {
+      localStorage.setItem('eyeread:list-width', '270');
+    });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
+    await expect(page.locator('.lib-search-row')).toHaveScreenshot('lib-search-row-narrow.png');
+  });
+
   test('settings pane', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
