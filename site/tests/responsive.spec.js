@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { mockExternalData } from './mock-external-data.mjs';
 
 // Full-page screenshots land here (git-ignored) so they can be eyeballed or
 // uploaded as CI artifacts. One file per viewport, named after the project.
 const SHOTS = resolve(dirname(fileURLToPath(import.meta.url)), 'screenshots');
 
 test.beforeEach(async ({ page }) => {
+  await mockExternalData(page);
   await page.goto('/');
   // Fonts/images settle before we measure or shoot.
   await page.waitForLoadState('networkidle');

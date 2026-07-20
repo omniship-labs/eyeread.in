@@ -1,45 +1,49 @@
-# Responsiveness / visual checks for the marketing site (site/). Same
-# capture(matrix base/head) → compare pattern as App E2E (app-e2e.yml) —
-# see that workflow's doc comment for the general shape and why the diffing
-# happens out-of-process via scripts/compare-screenshots.mjs instead of a
-# live toHaveScreenshot() comparison.
+# Visual regression tests for the app (src/), driven via the browser/web-demo
+# build (see src/lib/tauri.js). Diffs against a baseline generated in CI, not
+# a committed one (see playwright.app.config.js's doc comment for why: a
+# baseline rendered on a different machine/Chromium build is a source of
+# false failures, not a safety net). Site E2E (site-e2e.yml) does the
+# equivalent for the marketing site.
 #
-# One difference from the app suite: site/tests/ mixes screenshot capture
-# (responsive.spec.js's "captures a full-page screenshot" case) with
-# unrelated functional assertions (scroll width, CTA position, the lang
-# switcher, docs.spec.js, os-download-btn.spec.js). Re-running those against
-# the base commit would waste time and could fail the capture job for
-# reasons that have nothing to do with a visual regression, so the base leg
-# only ever runs the screenshot-only command; the head leg runs the full
-# suite, which both captures screenshots and enforces the functional
-# assertions for real (a functional failure fails that leg's own check, kept
-# separate from the compare job's visual-diff comment below).
-name: Site E2E
+# One `capture` job, matrixed over base/head (same pattern as build-app.yml's
+# platform matrix): each matrix run resolves which commit it's responsible
+# for, then hands off to .github/actions/capture-playwright-screenshots (the
+# actual checkout/cache/install/render/upload work, shared with
+# site-e2e.yml) — no comparison happening yet. `compare` (needs: [capture])
+# downloads both matrix runs' artifacts and diffs them with
+# scripts/compare-screenshots.mjs (plain Node, no browser needed).
+name: App E2E
 
 on:
   push:
     branches: [main, dev]
     paths:
-      - 'site/**'
+      - 'src/**'
       - 'design/**'
+      - 'tests/app/**'
       - 'scripts/compare-screenshots.mjs'
-      - 'tests/app/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
+      - 'site/tests/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
       - '.github/actions/capture-playwright-screenshots/**'
+      - 'index.html'
+      - 'vite.config.js'
       - 'package.json'
       - 'package-lock.json'
-      - 'playwright.config.js'
-      - '.github/workflows/site-e2e.yml'
+      - 'playwright.app.config.js'
+      - '.github/workflows/app-e2e.yml'
   pull_request:
     paths:
-      - 'site/**'
+      - 'src/**'
       - 'design/**'
+      - 'tests/app/**'
       - 'scripts/compare-screenshots.mjs'
-      - 'tests/app/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
+      - 'site/tests/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
       - '.github/actions/capture-playwright-screenshots/**'
+      - 'index.html'
+      - 'vite.config.js'
       - 'package.json'
       - 'package-lock.json'
-      - 'playwright.config.js'
-      - '.github/workflows/site-e2e.yml'
+      - 'playwright.app.config.js'
+      - '.github/workflows/app-e2e.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -90,17 +94,16 @@ jobs:
         id: capture
         with:
           ref: ${{ steps.resolve.outputs.ref }}
-          artifact-name: site-e2e-screenshots-${{ matrix.variant }}
-          # Direct `npx playwright` invocations, not `npm run <script>` — the
-          # base leg checks out an old ref, and a script that only exists in
-          # this PR's package.json (like site:test:screenshots, added
-          # alongside this workflow) would 404 there. Playwright's CLI needs
-          # no package.json cooperation to run.
-          test-command: ${{ matrix.variant == 'head' && 'npx playwright test' || 'npx playwright test site/tests/responsive.spec.js -g "captures a full-page screenshot"' }}
-          screenshots-path: site/tests/screenshots
-          cache-key-prefix: site-e2e-screenshots-v1
-          config-file: playwright.config.js
-          tests-dir: site/tests
+          artifact-name: app-e2e-screenshots-${{ matrix.variant }}
+          # Direct `npx playwright`, not `npm run app:test:update` — the base
+          # leg checks out an old ref, and a script that only exists in a
+          # later commit's package.json would 404 there (see site-e2e.yml's
+          # equivalent comment, which hit exactly this).
+          test-command: npx playwright test --config=playwright.app.config.js --update-snapshots
+          screenshots-path: tests/app/visual.spec.js-snapshots
+          cache-key-prefix: app-e2e-screenshots-v1
+          config-file: playwright.app.config.js
+          tests-dir: tests/app
 
       # Only head's report is worth linking from the PR comment below (base's
       # is the same suite against old code, rarely interesting). Handed to
@@ -115,7 +118,7 @@ jobs:
         if: matrix.variant == 'head' && steps.capture.outputs.report-url != ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: site-e2e-report-url
+          name: app-e2e-report-url
           path: report-url.txt
           retention-days: 1
 
@@ -138,18 +141,18 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         continue-on-error: true # no baseline (see capture-playwright-screenshots' empty-ref guard)
         with:
-          name: site-e2e-screenshots-base
+          name: app-e2e-screenshots-base
           path: __baseline__
       - name: Download head screenshots
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: site-e2e-screenshots-head
+          name: app-e2e-screenshots-head
           path: __head__
       - name: Download head's report URL
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         continue-on-error: true # not uploaded when there's no report to link (see capture's own guard)
         with:
-          name: site-e2e-report-url
+          name: app-e2e-report-url
           path: __report_url__
 
       # Diff images the PR comment links/embeds live in a dedicated branch —
@@ -163,7 +166,7 @@ jobs:
         run: |
           DEST="pr-${{ github.event.pull_request.number || format('push-{0}', github.run_id) }}/${{ github.run_id }}"
           echo "dest=$DEST" >> "$GITHUB_OUTPUT"
-          echo "base-url=https://raw.githubusercontent.com/${{ github.repository }}/site-e2e-diffs/$DEST" >> "$GITHUB_OUTPUT"
+          echo "base-url=https://raw.githubusercontent.com/${{ github.repository }}/app-e2e-diffs/$DEST" >> "$GITHUB_OUTPUT"
 
       - name: Compare
         id: compare
@@ -186,12 +189,12 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin site-e2e-diffs 2>/dev/null || true
-          if git show-ref --verify --quiet refs/remotes/origin/site-e2e-diffs; then
-            git worktree add -B site-e2e-diffs __diffs_branch__ origin/site-e2e-diffs
+          git fetch origin app-e2e-diffs 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/app-e2e-diffs; then
+            git worktree add -B app-e2e-diffs __diffs_branch__ origin/app-e2e-diffs
           else
             git worktree add --detach __diffs_branch__
-            (cd __diffs_branch__ && git checkout --orphan site-e2e-diffs && git rm -rf . > /dev/null)
+            (cd __diffs_branch__ && git checkout --orphan app-e2e-diffs && git rm -rf . > /dev/null)
           fi
           mkdir -p "__diffs_branch__/${{ steps.images.outputs.dest }}"
           cp __diff__/images/*.png "__diffs_branch__/${{ steps.images.outputs.dest }}/"
@@ -202,9 +205,9 @@ jobs:
           # between our fetch and now — rebase and retry a couple of times
           # rather than failing outright over an unrelated subdirectory.
           for _ in 1 2 3; do
-            git push origin HEAD:site-e2e-diffs && break
-            git fetch origin site-e2e-diffs
-            git rebase origin/site-e2e-diffs
+            git push origin HEAD:app-e2e-diffs && break
+            git fetch origin app-e2e-diffs
+            git rebase origin/app-e2e-diffs
           done
 
       - name: Build PR comment
@@ -212,13 +215,11 @@ jobs:
         run: |
           mkdir -p __diff__
           {
-            echo "### 📸 Site visual regression — $([ '${{ steps.compare.outcome }}' = 'success' ] && echo '✅ passed' || echo '❌ failed')"
+            echo "### 🧿 App visual regression — $([ '${{ steps.compare.outcome }}' = 'success' ] && echo '✅ passed' || echo '❌ failed')"
             echo
-            echo "Compared the home page at desktop / tablet / mobile viewports — head commit vs. a"
-            echo "baseline captured from the base commit, both rendered in this same workflow run on"
-            echo "identical hardware/Chromium. Functional assertions (scroll width, CTA position, lang"
-            echo "switcher, per-OS download CTA) run separately as part of the head capture — see the"
-            echo "\`capture (head)\` check above for those."
+            echo "Compared the main window (3 sizes), overlay popup, Settings, About, and a11y-setting"
+            echo "variations, in \`en\`/\`de\` — head commit vs. a baseline captured from the base commit,"
+            echo "both rendered in this same workflow run on identical hardware/Chromium."
             echo
             cat __diff__/summary.md 2>/dev/null || echo "_No summary produced — see the job log._"
             if grep -q '🆕' __diff__/summary.md 2>/dev/null; then
@@ -238,7 +239,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: site-e2e-diff
+          name: app-e2e-diff
           path: __diff__
           retention-days: 14
           if-no-files-found: ignore
@@ -246,5 +247,5 @@ jobs:
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
         uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
-          header: site-e2e-screenshots
+          header: app-e2e-visual-regression
           path: __diff__/pr-comment.md

@@ -77,6 +77,7 @@ export default [
       'vite.config.js',
       'eslint.config.js',
       'playwright.config.js',
+      'playwright.app.config.js',
       'scripts/**/*.mjs',
       'site/vite.config.js',
       'site/scripts/**/*.mjs',
@@ -86,7 +87,7 @@ export default [
   {
     // Playwright specs run in Node but their page.evaluate() callbacks
     // reference browser globals (document, window).
-    files: ['site/tests/**/*.{js,mjs}'],
+    files: ['site/tests/**/*.{js,mjs}', 'tests/app/**/*.{js,mjs}'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ];

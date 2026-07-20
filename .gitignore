@@ -24,6 +24,11 @@ site/tests/screenshots/
 test-results/
 playwright-report/
 
+# App visual regression baselines are generated fresh in CI (see
+# playwright.app.config.js's doc comment + .github/workflows/app-e2e.yml) —
+# never committed, so a locally-generated one never drifts from CI's.
+tests/app/visual.spec.js-snapshots/
+
 # pre-commit hook's captured test output (.githooks/pre-commit) — JUnit XML
 # + raw log, read only on failure, never meant to be committed.
 .githooks/last-run/

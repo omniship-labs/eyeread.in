@@ -4,9 +4,17 @@ import { defineConfig } from '@playwright/test';
  * Playwright config for the marketing site (site/).
  *
  * These are responsiveness / visual checks: every project renders the same
- * pages at a different viewport, captures a full-page screenshot, and asserts
- * the layout never overflows horizontally — the class of bug that pushed the
- * download CTA off-screen on phones.
+ * pages at a different viewport, captures a full-page screenshot (plain
+ * page.screenshot(), no toHaveScreenshot() — the layout has no baseline
+ * committed to compare against locally), and asserts the layout never
+ * overflows horizontally — the class of bug that pushed the download CTA
+ * off-screen on phones.
+ *
+ * In CI, .github/workflows/site-e2e.yml diffs the resulting screenshots
+ * against a same-run capture of the PR's base commit — see that workflow's
+ * doc comment (and playwright.app.config.js's, which does the equivalent for
+ * the app) for why the diffing happens out-of-process instead of via
+ * toHaveScreenshot() directly.
  *
  * The browser binary is downloaded from cdn.playwright.dev; in sandboxed
  * environments that host must be on the network egress allowlist, and

@@ -1,0 +1,165 @@
+name: Capture Playwright screenshots
+description: >-
+  Checks out the given ref and runs a Playwright screenshot-capturing command
+  against it, uploading the resulting screenshots (and Playwright's own HTML
+  report) as artifacts. Shared by app-e2e.yml and site-e2e.yml — each passes
+  its own test command, output path, and suite-detection paths. One matrix
+  leg of the caller's capture job — called once for the base commit, once for
+  the head commit. Results are cached per ref, so re-running against a commit
+  that's already been captured (a re-push with the same base, or a re-run
+  with no new commits) skips straight to uploading with no rebuild.
+
+inputs:
+  ref:
+    description: >-
+      Commit SHA to capture screenshots from. Leave empty to skip entirely —
+      e.g. a PR/push with no real "before" commit to diff against.
+    required: false
+    default: ''
+  artifact-name:
+    description: Name to upload the screenshots artifact under.
+    required: true
+  test-command:
+    description: >-
+      Shell command that renders the suite and writes screenshots to
+      screenshots-path (e.g. `npm run app:test:update`). Callers vary this
+      per matrix leg when a suite mixes screenshot capture with unrelated
+      functional assertions — site-e2e.yml runs a screenshot-only command on
+      the base leg (there's no reason to validate an old commit's unrelated
+      functional behavior) and the full suite on head.
+    required: true
+  screenshots-path:
+    description: Directory test-command writes screenshots to — cached and uploaded.
+    required: true
+  cache-key-prefix:
+    description: Cache key prefix, unique per caller so app/site screenshot caches don't collide.
+    required: true
+  config-file:
+    description: Playwright config file that must exist at ref for the suite to be runnable.
+    required: true
+  tests-dir:
+    description: Test directory that must exist at ref for the suite to be runnable.
+    required: true
+
+outputs:
+  report-url:
+    description: >-
+      The uploaded Playwright report's artifact URL, for callers that want to
+      link it (e.g. from a PR comment). Empty when ref is empty, the suite
+      doesn't exist at ref, or the cache hit skipped capture entirely — no
+      report was generated any of those times.
+    value: ${{ steps.upload_report.outputs.artifact-url }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      if: inputs.ref != ''
+      with:
+        ref: ${{ inputs.ref }}
+
+    # Keyed on the exact commit — a re-push to the same PR (base commit
+    # unchanged) or a re-run with no new commits hits this every time,
+    # skipping straight to the upload step below.
+    - name: Cache screenshots for this commit
+      if: inputs.ref != ''
+      id: cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ${{ inputs.screenshots-path }}
+        key: ${{ inputs.cache-key-prefix }}-${{ inputs.ref }}
+
+    - if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true'
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: 24
+        cache: npm
+
+    - name: Check the suite exists at this commit
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true'
+      id: has_suite
+      shell: bash
+      run: |
+        if [ -f "${{ inputs.config-file }}" ] && [ -d "${{ inputs.tests-dir }}" ]; then
+          echo "value=true" >> "$GITHUB_OUTPUT"
+        else
+          # True today for both suites' base leg — false only for a commit
+          # that predates the suite existing at all. Nothing to capture; the
+          # compare job just treats every head screenshot as new in that case.
+          echo "This suite doesn't exist at this commit — skipping capture."
+          echo "value=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Install deps
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      shell: bash
+      run: npm ci
+
+    - name: Install Playwright OS dependencies
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      shell: bash
+      run: npx playwright install-deps chromium
+
+    # Shared across callers (app/site) — both pin the same @playwright/test
+    # version via one package-lock.json, so the same Chromium download
+    # serves either suite's capture.
+    - name: Cache Playwright browser binary
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      id: pw-cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+    - name: Download Playwright browser
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true' && steps.pw-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npx playwright install chromium
+
+    - name: Capture screenshots
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      shell: bash
+      run: ${{ inputs.test-command }}
+
+    - name: Upload screenshots
+      if: inputs.ref != ''
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.screenshots-path }}
+        retention-days: 14
+        if-no-files-found: ignore
+
+    # Whichever caller's config is in play, CI always sets the html reporter
+    # on (see playwright.app.config.js / playwright.config.js), so
+    # "Capture screenshots" above already generates one — it was just never
+    # kept before. Useful for a genuine test failure (crashed step, timeout,
+    # missing selector, or — for site's head leg — a real functional
+    # assertion failure), not a visual diff — that's what the compare job's
+    # own PR-comment images are for. Nothing to upload on a cache hit or a
+    # skipped capture (no report was generated this run either way) —
+    # if-no-files-found handles both quietly.
+    - name: Upload Playwright report
+      if: inputs.ref != ''
+      id: upload_report
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}-report
+        path: playwright-report
+        retention-days: 14
+        if-no-files-found: ignore
+
+    # The checkout step above force-checks-out whatever ref this leg was
+    # given — for `base`, that's often a commit that predates this action
+    # existing at all, so it has no
+    # .github/actions/capture-playwright-screenshots/ on disk. GitHub
+    # Actions re-reads action.yml from disk for the automatic post-job hooks
+    # the cache steps above register (to save the cache on a miss), which
+    # then fails with "Can't find 'action.yml'" since this action deleted
+    # its own definition out from under itself. Restore it before finishing,
+    # from whatever ref actually triggered this workflow run (which does
+    # have it — it's the one running right now).
+    - name: Restore this action's own files for post-job hooks
+      if: inputs.ref != ''
+      shell: bash
+      run: git checkout ${{ github.sha }} -- .github/actions

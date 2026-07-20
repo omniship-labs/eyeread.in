@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { mockExternalData } from './mock-external-data.mjs';
 
 /**
  * End-to-end coverage for the developer docs (/docs) and its react-router
@@ -9,6 +12,12 @@ import { test, expect } from '@playwright/test';
  * The webServer (see playwright.config.js) is the Vite dev server, whose SPA
  * fallback serves index.html for nested paths, so deep links boot the router.
  */
+const SHOTS = resolve(dirname(fileURLToPath(import.meta.url)), 'screenshots');
+
+test.beforeEach(async ({ page }) => {
+  await mockExternalData(page);
+});
+
 test.describe('developer docs', () => {
   test('deep-loads a docs page directly', async ({ page }) => {
     await page.goto('/docs/architecture/');
@@ -67,5 +76,22 @@ test.describe('developer docs', () => {
     // Home is rendered (no docs sidebar; the download CTA is back).
     await expect(page.locator('.docs-nav')).toHaveCount(0);
     await expect(page.locator('nav .btn-accent')).toBeVisible();
+  });
+
+  // Screenshots only, once each — the docs section had zero visual coverage
+  // before this. Desktop-only: prose-heavy pages don't need a per-viewport
+  // diff surface the way the app/hero layouts do.
+  test('captures a full-page screenshot of the docs index', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'screenshot captured once, at desktop only');
+    await page.goto('/docs/');
+    await page.waitForLoadState('networkidle');
+    await page.screenshot({ path: resolve(SHOTS, 'docs-index.png'), fullPage: true });
+  });
+
+  test('captures a full-page screenshot of an article page', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'screenshot captured once, at desktop only');
+    await page.goto('/docs/architecture/');
+    await page.waitForLoadState('networkidle');
+    await page.screenshot({ path: resolve(SHOTS, 'docs-architecture.png'), fullPage: true });
   });
 });
