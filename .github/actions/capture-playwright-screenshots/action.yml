@@ -41,6 +41,15 @@ inputs:
     description: Test directory that must exist at ref for the suite to be runnable.
     required: true
 
+outputs:
+  report-url:
+    description: >-
+      The uploaded Playwright report's artifact URL, for callers that want to
+      link it (e.g. from a PR comment). Empty when ref is empty, the suite
+      doesn't exist at ref, or the cache hit skipped capture entirely — no
+      report was generated any of those times.
+    value: ${{ steps.upload_report.outputs.artifact-url }}
+
 runs:
   using: composite
   steps:
@@ -132,6 +141,7 @@ runs:
     # if-no-files-found handles both quietly.
     - name: Upload Playwright report
       if: inputs.ref != ''
+      id: upload_report
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: ${{ inputs.artifact-name }}-report
