@@ -42,6 +42,50 @@ async function readPng(path) {
   return PNG.sync.read(await readFile(path));
 }
 
+function table(rows) {
+  const header = '| | Screenshot | Detail |\n| --- | --- | --- |';
+  const body = rows.map((r) => `| ${r.icon} | \`${r.name}\` | ${r.detail} |`).join('\n');
+  return `${header}\n${body}`;
+}
+
+// The PR comment leads with what needs a look (fail/new/removed) as a
+// table, then tucks everything that matched behind a <details> fold —
+// unchanged screenshots outnumber the rest by a lot on a normal run, and
+// nobody needs to scroll past dozens of "unchanged" rows to find the one
+// that failed.
+function buildMarkdown({ fails, news, removed, passes }) {
+  const parts = [
+    `**${passes.length} unchanged · ${fails.length} failed · ${news.length} new · ${removed.length} removed**`,
+    '',
+  ];
+
+  const attention = [
+    ...fails.map((r) => ({ icon: '❌', name: r.name, detail: r.detail })),
+    ...news.map((r) => ({
+      icon: '🆕',
+      name: r.name,
+      detail: 'first run for this screenshot — nothing to compare against yet',
+    })),
+    ...removed.map((r) => ({ icon: '🗑️', name: r.name, detail: 'no longer produced' })),
+  ];
+  parts.push(attention.length > 0 ? table(attention) : '_Nothing changed._');
+
+  if (passes.length > 0) {
+    const plural = passes.length === 1 ? '' : 's';
+    parts.push(
+      '',
+      `<details>`,
+      `<summary>${passes.length} unchanged screenshot${plural}</summary>`,
+      '',
+      table(passes.map((r) => ({ icon: '✅', name: r.name, detail: 'unchanged' }))),
+      '',
+      `</details>`
+    );
+  }
+
+  return parts.join('\n');
+}
+
 async function main() {
   const baselineNames = new Set(await pngNames(baselineDir));
   const headNames = new Set(await pngNames(headDir));
@@ -102,18 +146,10 @@ async function main() {
   console.log(lines.join('\n'));
 
   await writeFile(join(outDir, 'summary.json'), JSON.stringify(results, null, 2));
-
-  const md = [
-    `**${passes.length} unchanged · ${fails.length} failed · ${news.length} new · ${removed.length} removed**`,
-    '',
-    ...fails.map((r) => `- ❌ \`${r.name}\` — ${r.detail}`),
-    ...news.map(
-      (r) =>
-        `- 🆕 \`${r.name}\` (first run for this screenshot — nothing to compare against yet)`
-    ),
-    ...removed.map((r) => `- 🗑️ \`${r.name}\` (no longer produced)`),
-  ].join('\n');
-  await writeFile(join(outDir, 'summary.md'), md + '\n');
+  await writeFile(
+    join(outDir, 'summary.md'),
+    buildMarkdown({ fails, news, removed, passes }) + '\n'
+  );
 
   process.exit(fails.length > 0 ? 1 : 0);
 }
