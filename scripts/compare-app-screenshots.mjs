@@ -49,22 +49,54 @@ async function readPng(path) {
   return PNG.sync.read(await readFile(path));
 }
 
-function table(rows) {
-  const header = '| | Screenshot | Detail |\n| --- | --- | --- |';
-  const body = rows.map((r) => `| ${r.icon} | \`${r.name}\` | ${r.detail} |`).join('\n');
+// GitHub's markdown tables render raw HTML in cells, which plain
+// ![](url) syntax can't do anything useful with here — that would embed
+// the image at full native size (a screenshot is up to 1600×1000) and blow
+// out every row. An <img width> tag gives an actual thumbnail, wrapped in
+// a link to the full-size original.
+const THUMB_WIDTH = 200;
+function thumbnail(url) {
+  return `<a href="${url}"><img src="${url}" width="${THUMB_WIDTH}"></a>`;
+}
+
+function table(rows, { showPreview = false } = {}) {
+  const header = showPreview
+    ? '| | Screenshot | Preview | Detail |\n| --- | --- | --- | --- |'
+    : '| | Screenshot | Detail |\n| --- | --- | --- |';
+  const body = rows
+    .map((r) => {
+      const cells = [r.icon, `\`${r.name}\``];
+      if (showPreview) cells.push(r.previewUrl ? thumbnail(r.previewUrl) : '—');
+      cells.push(r.detail);
+      return `| ${cells.join(' | ')} |`;
+    })
+    .join('\n');
   return `${header}\n${body}`;
 }
 
-// The PR comment leads with what needs a look (fail/new/removed) as a
-// table, then tucks everything that matched behind a <details> fold —
-// unchanged screenshots outnumber the rest by a lot on a normal run, and
-// nobody needs to scroll past dozens of "unchanged" rows to find the one
-// that failed. Failed entries additionally get their diff image embedded
-// directly below the table (not collapsed — real failures should be rare,
-// unlike new/unchanged, so there's no long list to hide them behind). New
-// and removed entries link to a preview of the actual/former screenshot —
-// there's no diff to show (nothing to compare against), but a bare
-// filename with no visual isn't enough to review a new baseline by.
+// What a row's thumbnail (and its detail-column links) should point at —
+// the diff for a real mismatch (falls back to the actual/head screenshot
+// when there's no diff to show, e.g. a size change), the head screenshot
+// for a new entry, the baseline's for a removed one. null when there's no
+// image at all (imageBaseUrl unset, or an unchanged entry — those were
+// never saved, see main()).
+function previewUrl(r) {
+  if (!imageBaseUrl) return null;
+  if (r.status === 'fail') {
+    return `${imageBaseUrl}/${r.name}-${r.hasDiffImage ? 'diff' : 'actual'}.png`;
+  }
+  if (r.status === 'new') return `${imageBaseUrl}/${r.name}-actual.png`;
+  if (r.status === 'removed') return `${imageBaseUrl}/${r.name}-expected.png`;
+  return null;
+}
+
+// The PR comment leads with a one-line count, then the fail/new/removed
+// table — each row's own thumbnail right there, no separate image section
+// to scroll to — folded behind a <details> like the unchanged section
+// below, EXCEPT it opens automatically the moment there's an actual
+// failure: a clean run (only new/removed, or nothing at all) shouldn't
+// dump a wall of thumbnails into the comment by default, but a real
+// regression should never be one click away from being missed.
 function buildMarkdown({ fails, news, removed, passes }) {
   const parts = [
     `**${passes.length} unchanged · ${fails.length} failed · ${news.length} new · ${removed.length} removed**`,
@@ -73,56 +105,41 @@ function buildMarkdown({ fails, news, removed, passes }) {
 
   const attention = [
     ...fails.map((r) => {
-      if (!imageBaseUrl) return { icon: '❌', name: r.name, detail: r.detail };
-      const links = [`[expected](${imageBaseUrl}/${r.name}-expected.png)`];
-      links.push(`[actual](${imageBaseUrl}/${r.name}-actual.png)`);
-      if (r.hasDiffImage) links.push(`[diff](${imageBaseUrl}/${r.name}-diff.png)`);
-      return { icon: '❌', name: r.name, detail: `${r.detail} — ${links.join(' · ')}` };
+      const detail = imageBaseUrl
+        ? `${r.detail} — [expected](${imageBaseUrl}/${r.name}-expected.png) · [actual](${imageBaseUrl}/${r.name}-actual.png)${r.hasDiffImage ? ` · [diff](${imageBaseUrl}/${r.name}-diff.png)` : ''}`
+        : r.detail;
+      return { icon: '❌', name: r.name, detail, previewUrl: previewUrl(r) };
     }),
     ...news.map((r) => ({
       icon: '🆕',
       name: r.name,
-      detail: imageBaseUrl
-        ? `first run for this screenshot — [preview](${imageBaseUrl}/${r.name}-actual.png)`
-        : 'first run for this screenshot — nothing to compare against yet',
+      detail: 'first run for this screenshot',
+      previewUrl: previewUrl(r),
     })),
     ...removed.map((r) => ({
       icon: '🗑️',
       name: r.name,
-      detail: imageBaseUrl
-        ? `no longer produced — [last seen](${imageBaseUrl}/${r.name}-expected.png)`
-        : 'no longer produced',
+      detail: 'no longer produced',
+      previewUrl: previewUrl(r),
     })),
   ];
-  parts.push(attention.length > 0 ? table(attention) : '_Nothing changed._');
-
-  const failsWithDiffImage = fails.filter((r) => r.hasDiffImage);
-  if (failsWithDiffImage.length > 0 && imageBaseUrl) {
-    parts.push('', '**Diffs:**');
-    for (const r of failsWithDiffImage) {
-      parts.push('', `\`${r.name}\``, `![diff](${imageBaseUrl}/${r.name}-diff.png)`);
-    }
-  }
-
-  if ((news.length > 0 || removed.length > 0) && imageBaseUrl) {
-    const count = news.length + removed.length;
-    const plural = count === 1 ? '' : 's';
+  if (attention.length > 0) {
+    const plural = attention.length === 1 ? '' : 's';
+    const summary =
+      fails.length > 0
+        ? `${fails.length} failed, ${attention.length} row${plural} total — click to collapse`
+        : `${attention.length} row${plural} (no failures) — click to expand`;
     parts.push(
       '',
-      `<details>`,
-      `<summary>${count} new/removed screenshot${plural} — previews</summary>`
+      `<details${fails.length > 0 ? ' open' : ''}>`,
+      `<summary>${summary}</summary>`,
+      '',
+      table(attention, { showPreview: !!imageBaseUrl }),
+      '',
+      `</details>`
     );
-    for (const r of news) {
-      parts.push('', `🆕 \`${r.name}\``, `![preview](${imageBaseUrl}/${r.name}-actual.png)`);
-    }
-    for (const r of removed) {
-      parts.push(
-        '',
-        `🗑️ \`${r.name}\` (last seen)`,
-        `![preview](${imageBaseUrl}/${r.name}-expected.png)`
-      );
-    }
-    parts.push('', `</details>`);
+  } else {
+    parts.push('_Nothing changed._');
   }
 
   if (passes.length > 0) {
