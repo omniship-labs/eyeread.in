@@ -1,7 +1,12 @@
 # Visual regression tests for the app (src/), driven via the browser/web-demo
 # build (see src/lib/tauri.js). Unlike Site E2E's screenshots-for-review-only
-# approach, this does real automated pixel diffing against committed
-# baselines with Playwright's toHaveScreenshot().
+# approach, this does real automated pixel diffing — but against a baseline
+# generated in THIS job, not a committed one (see playwright.app.config.js's
+# doc comment for why: a baseline rendered on a different machine/Chromium
+# build is a source of false failures, not a safety net). The base commit
+# (PR base, or the previous commit for a push) is checked out into a sibling
+# git worktree, its suite run once to produce a fresh baseline, then the
+# commit under test is diffed against that.
 name: App E2E
 
 on:
@@ -40,17 +45,66 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # Full history: the base commit (below) needs to be reachable for
+          # `git worktree add`, and a shallow clone may not have it.
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
+
+      - name: Resolve base/head commits
+        id: refs
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - run: npm ci
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
-      - run: npm run app:test
+
+      - name: Generate baseline from the base commit
+        id: baseline
+        run: |
+          set -e
+          BASE_SHA="${{ steps.refs.outputs.base }}"
+          # A brand-new branch's first push (or a force-push with no prior
+          # history) has no real "before" commit — nothing to diff against.
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "No base commit to compare against — skipping baseline generation."
+            echo "has_base=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git worktree add /tmp/app-e2e-base "$BASE_SHA"
+          cd /tmp/app-e2e-base
+          if [ ! -f playwright.app.config.js ] || [ ! -d tests/app ]; then
+            # This suite doesn't exist yet at the base commit (true today —
+            # it hasn't merged to main). Nothing to regenerate against; the
+            # comparison step below will just establish everything as new.
+            echo "App E2E suite doesn't exist at the base commit — skipping baseline generation."
+            echo "has_base=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run app:test:update
+          echo "has_base=true" >> "$GITHUB_OUTPUT"
+
+      - name: Seed baseline snapshots from the base commit's run
+        if: steps.baseline.outputs.has_base == 'true'
+        run: |
+          rm -rf tests/app/visual.spec.js-snapshots
+          cp -r /tmp/app-e2e-base/tests/app/visual.spec.js-snapshots tests/app/visual.spec.js-snapshots
+
+      - name: Compare against the base-commit baseline
+        run: npm run app:test:ci
       - name: Upload report + diffs
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -69,9 +123,11 @@ jobs:
           message: |
             ### 🧿 App visual regression — ${{ job.status == 'success' && '✅ passed' || '❌ failed' }}
 
-            Playwright rendered the browser/web-demo build (main window, overlay popup, Settings,
-            About) in `en` and `de`, and diffed against the committed baselines.
+            Playwright rendered the browser/web-demo build (main window at 3 sizes, overlay popup,
+            Settings, About, plus dyslexic font/high contrast/UI scale variations) in `en` and `de`,
+            and diffed against a baseline generated from this PR's base commit — in this same job,
+            on identical hardware and Chromium build, so there's no cross-machine rendering drift.
 
-            ${{ job.status != 'success' && '**Diffs found** — see the report/diff images in the artifact below. If the change is intentional, run `npm run app:test:update` locally and commit the updated snapshots.' || '' }}
+            ${{ job.status != 'success' && '**Diffs found** — see the report/diff images in the artifact below. If the change is intentional, no action needed here: the next run against the updated base will pick it up automatically (no committed snapshots to update).' || '' }}
 
             <sub>[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · commit ${{ github.sha }}</sub>

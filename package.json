@@ -23,6 +23,7 @@
     "site:test:update": "playwright test --update-snapshots",
     "app:test": "playwright test --config=playwright.app.config.js",
     "app:test:update": "playwright test --config=playwright.app.config.js --update-snapshots",
+    "app:test:ci": "playwright test --config=playwright.app.config.js --update-snapshots=missing",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

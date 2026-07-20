@@ -128,6 +128,29 @@ test.describe('main window', () => {
     await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
     await expect(page).toHaveScreenshot('main-ui-scale-130.png');
   });
+
+  test('minimum window size', async ({ page }) => {
+    // src-tauri/tauri.conf.json's minWidth/minHeight for the "main" window —
+    // the smallest a user can actually resize it to. Catches cramped-layout
+    // bugs (overlapping controls, clipped labels) the roomy default can't.
+    await page.setViewportSize({ width: 940, height: 620 });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
+    await expect(page).toHaveScreenshot('main-min-size.png');
+  });
+
+  test('large window size', async ({ page }) => {
+    // No maxWidth/maxHeight is set in tauri.conf.json, so this checks the
+    // other direction — a generously stretched window, where fixed-width
+    // panels (Library sidebar, the reading-defaults card) should stay put
+    // rather than looking sparse or misaligned against the extra space.
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
+    await expect(page).toHaveScreenshot('main-large-size.png');
+  });
 });
 
 test.describe('overlay', () => {
