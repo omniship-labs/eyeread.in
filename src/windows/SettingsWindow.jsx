@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Timer as TimerIcon, Hourglass, Mic, MicOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/Button';
+import { Slider } from '../components/Slider';
 import { Switch } from '../components/Switch';
 import { Segmented } from '../components/Segmented';
 import { SettingItem } from '../components/SettingItem';
@@ -27,13 +28,6 @@ import {
 } from '../lib/tauri';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useTour } from '../hooks/useTour';
-
-const sliderFill = (value, min, max) => {
-  const pct = ((value - min) / (max - min)) * 100;
-  return {
-    background: `linear-gradient(90deg, var(--accent) ${pct}%, var(--surface-3) ${pct}%)`,
-  };
-};
 
 export function SettingsWindow() {
   const { t } = useTranslation();
@@ -238,15 +232,12 @@ export function SettingsWindow() {
                   'speed',
                   t('reading.scrollSpeed'),
                   `${val('speed')} wpm`,
-                  <input
-                    type="range"
-                    className="er-slider"
+                  <Slider
                     min={80}
                     max={220}
                     value={val('speed')}
-                    aria-label={t('reading.scrollSpeed')}
-                    onChange={(e) => set('speed', +e.target.value)}
-                    style={sliderFill(val('speed'), 80, 220)}
+                    ariaLabel={t('reading.scrollSpeed')}
+                    onChange={(v) => set('speed', v)}
                   />
                 )
               )}
@@ -258,15 +249,12 @@ export function SettingsWindow() {
           'size',
           t('reading.textSize'),
           `${val('size')}px`,
-          <input
-            type="range"
-            className="er-slider"
+          <Slider
             min={22}
             max={46}
             value={val('size')}
-            aria-label={t('reading.textSize')}
-            onChange={(e) => set('size', +e.target.value)}
-            style={sliderFill(val('size'), 22, 46)}
+            ariaLabel={t('reading.textSize')}
+            onChange={(v) => set('size', v)}
           />,
           'sw-appearance'
         )}
@@ -274,45 +262,36 @@ export function SettingsWindow() {
           'bellWords',
           t('reading.highlightAhead'),
           `${val('bellWords')}`,
-          <input
-            type="range"
-            className="er-slider"
+          <Slider
             min={3}
             max={30}
             value={val('bellWords')}
-            aria-label={t('reading.highlightAhead')}
-            onChange={(e) => set('bellWords', +e.target.value)}
-            style={sliderFill(val('bellWords'), 3, 30)}
+            ariaLabel={t('reading.highlightAhead')}
+            onChange={(v) => set('bellWords', v)}
           />
         )}
         {si(
           'opacity',
           t('reading.overlayOpacity'),
           `${val('opacity')}%`,
-          <input
-            type="range"
-            className="er-slider"
+          <Slider
             min={0}
             max={100}
             value={val('opacity')}
-            aria-label={t('reading.overlayOpacity')}
-            onChange={(e) => set('opacity', +e.target.value)}
-            style={sliderFill(val('opacity'), 10, 100)}
+            ariaLabel={t('reading.overlayOpacity')}
+            onChange={(v) => set('opacity', v)}
           />
         )}
         {si(
           'blur',
           t('reading.glassBlur'),
           `${val('blur')}px`,
-          <input
-            type="range"
-            className="er-slider"
+          <Slider
             min={0}
             max={18}
             value={val('blur')}
-            aria-label={t('reading.glassBlur')}
-            onChange={(e) => set('blur', +e.target.value)}
-            style={sliderFill(val('blur'), 0, 18)}
+            ariaLabel={t('reading.glassBlur')}
+            onChange={(v) => set('blur', v)}
           />
         )}
         {si(
