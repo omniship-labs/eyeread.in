@@ -95,3 +95,17 @@ runs:
         path: tests/app/visual.spec.js-snapshots
         retention-days: 14
         if-no-files-found: ignore
+
+    # The checkout step above force-checks-out whatever ref this leg was
+    # given — for `base`, that's often a commit that predates this action
+    # existing at all, so it has no .github/actions/capture-app-screenshots/
+    # on disk. GitHub Actions re-reads action.yml from disk for the
+    # automatic post-job hooks the cache steps above register (to save the
+    # cache on a miss), which then fails with "Can't find 'action.yml'"
+    # since this action deleted its own definition out from under itself.
+    # Restore it before finishing, from whatever ref actually triggered this
+    # workflow run (which does have it — it's the one running right now).
+    - name: Restore this action's own files for post-job hooks
+      if: inputs.ref != ''
+      shell: bash
+      run: git checkout ${{ github.sha }} -- .github/actions
