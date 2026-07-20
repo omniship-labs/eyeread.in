@@ -193,8 +193,7 @@
 
 /* "Show icon labels" accessibility setting — force text alongside titlebar icons */
 .tl-shortcuts,
-.tl-settings,
-.tl-shield {
+.tl-settings {
   .tl-label {
     display: inline;
   }
@@ -205,6 +204,16 @@
     font-size: 11px;
     white-space: nowrap;
   }
+}
+
+/* ShieldToggle always renders its label as .ov-shield-label (shared with the
+   overlay toolbar's own styling), not .tl-label — match that class here too. */
+.tl-shield:has(.ov-shield-label) {
+  width: auto;
+  padding: 0 8px;
+  gap: 6px;
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 /* SOS morse: ···−−−··· on background + border only, icon stays visible */
