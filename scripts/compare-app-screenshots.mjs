@@ -61,7 +61,10 @@ function table(rows) {
 // nobody needs to scroll past dozens of "unchanged" rows to find the one
 // that failed. Failed entries additionally get their diff image embedded
 // directly below the table (not collapsed — real failures should be rare,
-// so there's no long list to hide them behind).
+// unlike new/unchanged, so there's no long list to hide them behind). New
+// and removed entries link to a preview of the actual/former screenshot —
+// there's no diff to show (nothing to compare against), but a bare
+// filename with no visual isn't enough to review a new baseline by.
 function buildMarkdown({ fails, news, removed, passes }) {
   const parts = [
     `**${passes.length} unchanged · ${fails.length} failed · ${news.length} new · ${removed.length} removed**`,
@@ -79,9 +82,17 @@ function buildMarkdown({ fails, news, removed, passes }) {
     ...news.map((r) => ({
       icon: '🆕',
       name: r.name,
-      detail: 'first run for this screenshot — nothing to compare against yet',
+      detail: imageBaseUrl
+        ? `first run for this screenshot — [preview](${imageBaseUrl}/${r.name}-actual.png)`
+        : 'first run for this screenshot — nothing to compare against yet',
     })),
-    ...removed.map((r) => ({ icon: '🗑️', name: r.name, detail: 'no longer produced' })),
+    ...removed.map((r) => ({
+      icon: '🗑️',
+      name: r.name,
+      detail: imageBaseUrl
+        ? `no longer produced — [last seen](${imageBaseUrl}/${r.name}-expected.png)`
+        : 'no longer produced',
+    })),
   ];
   parts.push(attention.length > 0 ? table(attention) : '_Nothing changed._');
 
@@ -91,6 +102,27 @@ function buildMarkdown({ fails, news, removed, passes }) {
     for (const r of failsWithDiffImage) {
       parts.push('', `\`${r.name}\``, `![diff](${imageBaseUrl}/${r.name}-diff.png)`);
     }
+  }
+
+  if ((news.length > 0 || removed.length > 0) && imageBaseUrl) {
+    const count = news.length + removed.length;
+    const plural = count === 1 ? '' : 's';
+    parts.push(
+      '',
+      `<details>`,
+      `<summary>${count} new/removed screenshot${plural} — previews</summary>`
+    );
+    for (const r of news) {
+      parts.push('', `🆕 \`${r.name}\``, `![preview](${imageBaseUrl}/${r.name}-actual.png)`);
+    }
+    for (const r of removed) {
+      parts.push(
+        '',
+        `🗑️ \`${r.name}\` (last seen)`,
+        `![preview](${imageBaseUrl}/${r.name}-expected.png)`
+      );
+    }
+    parts.push('', `</details>`);
   }
 
   if (passes.length > 0) {
@@ -119,6 +151,7 @@ async function main() {
 
   for (const name of [...headNames].sort()) {
     if (!baselineNames.has(name)) {
+      await copyFile(join(headDir, name), join(imagesDir, `${name}-actual.png`));
       results.push({ name, status: 'new' });
       continue;
     }
@@ -161,7 +194,10 @@ async function main() {
   }
 
   for (const name of [...baselineNames].sort()) {
-    if (!headNames.has(name)) results.push({ name, status: 'removed' });
+    if (!headNames.has(name)) {
+      await copyFile(join(baselineDir, name), join(imagesDir, `${name}-expected.png`));
+      results.push({ name, status: 'removed' });
+    }
   }
 
   const fails = results.filter((r) => r.status === 'fail');
