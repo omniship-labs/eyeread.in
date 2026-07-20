@@ -131,6 +131,21 @@ test.describe('main window', () => {
     await expect(page).toHaveScreenshot('main-dyslexic-font.png');
   });
 
+  test('show icon labels', async ({ context, page }) => {
+    // Accessibility setting (src/lib/store.js's showIconLabels) that forces
+    // text labels next to every icon-only control — titlebar shield/
+    // shortcuts/settings here, the overlay toolbar/passthru in the overlay
+    // suite below. Caught real bugs during development: the titlebar shield
+    // button's icon collapsing to 0-width when its width didn't expand to
+    // fit the label, and the overlay's tour tip becoming fully unclickable
+    // from an inherited pointer-events: none on its measurement wrapper.
+    await seedSettings(context, { showIconLabels: true });
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('.ed-title')).toHaveValue('Q3 All-Hands');
+    await expect(page.locator('.titlebar')).toHaveScreenshot('main-titlebar-icon-labels.png');
+  });
+
   test('ui scale 130%', async ({ context, page }) => {
     // useUiScale applies CSS `zoom` to the document element (main/settings/
     // about only — the overlay opts out, see its doc comment), so a fixed
@@ -191,6 +206,15 @@ test.describe('overlay', () => {
     await seedSettings(context, { highContrast: true });
     const overlay = await openOverlay(page);
     await expect(overlay).toHaveScreenshot('overlay-high-contrast.png');
+  });
+
+  test('show icon labels', async ({ context, page }) => {
+    // See the main-window "show icon labels" test — this is the overlay
+    // side: shield/close in the head row, restart/back/play/skip/text-size/
+    // settings/click-through in the foot toolbar, all normally icon-only.
+    await seedSettings(context, { showIconLabels: true });
+    const overlay = await openOverlay(page);
+    await expect(overlay).toHaveScreenshot('overlay-icon-labels.png');
   });
 });
 
