@@ -2,11 +2,11 @@ name: Capture app E2E screenshots
 description: >-
   Checks out the given ref and renders the app visual-regression suite
   (tests/app/visual.spec.js) against it, uploading the resulting screenshots
-  as an artifact. One matrix leg of app-e2e.yml's capture job — called once
-  for the base commit, once for the head commit. Results are cached per ref,
-  so re-running against a commit that's already been captured (a re-push
-  with the same base, or a re-run with no new commits) skips straight to
-  uploading with no rebuild.
+  (and Playwright's own HTML report) as artifacts. One matrix leg of
+  app-e2e.yml's capture job — called once for the base commit, once for the
+  head commit. Results are cached per ref, so re-running against a commit
+  that's already been captured (a re-push with the same base, or a re-run
+  with no new commits) skips straight to uploading with no rebuild.
 
 inputs:
   ref:
@@ -93,6 +93,24 @@ runs:
       with:
         name: ${{ inputs.artifact-name }}
         path: tests/app/visual.spec.js-snapshots
+        retention-days: 14
+        if-no-files-found: ignore
+
+    # playwright.app.config.js turns on the html reporter whenever CI is
+    # set (which GitHub Actions always does), so "Capture screenshots"
+    # above already generates one — it was just never kept before. Useful
+    # for a genuine test failure (crashed step, timeout, missing selector),
+    # not a visual diff — those never fail this run at all, since it's in
+    # --update-snapshots mode; that's what the compare job's own PR-comment
+    # images are for. Nothing to upload on a cache hit or a skipped capture
+    # (no report was generated this run either way) — if-no-files-found
+    # handles both quietly.
+    - name: Upload Playwright report
+      if: inputs.ref != ''
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}-report
+        path: playwright-report
         retention-days: 14
         if-no-files-found: ignore
 
