@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
  *   onRevert  — called with (...keys) when the user clicks the undo badge
  *   children  — the control (Slider, Switch, Segmented, …) rendered below the label
  *   style     — optional style on the root element
+ *   showLabel — force a text label beside the undo icon (Show icon labels setting)
  */
 export function SettingItem({
   keys: rawKeys,
@@ -21,6 +22,7 @@ export function SettingItem({
   onRevert,
   children,
   style,
+  showLabel,
   ...rest
 }) {
   const { t } = useTranslation();
@@ -35,6 +37,7 @@ export function SettingItem({
       data-tip={t('settingItem.useGlobalValue')}
     >
       <Undo2 size={10} />
+      {showLabel && <span>{t('settingItem.global')}</span>}
     </button>
   ) : (
     <span className="si-origin inherited">{t('settingItem.global')}</span>

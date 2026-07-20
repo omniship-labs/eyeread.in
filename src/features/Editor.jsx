@@ -63,6 +63,7 @@ export function Editor({
       value={value}
       overrides={overrides}
       onRevert={revert}
+      showLabel={settings.showIconLabels}
       data-tour={dataTour}
     >
       {children}

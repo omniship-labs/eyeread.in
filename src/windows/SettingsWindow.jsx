@@ -178,6 +178,7 @@ export function SettingsWindow() {
       value={value}
       overrides={overrides}
       onRevert={revert}
+      showLabel={global.showIconLabels}
       data-tour={dataTour}
     >
       {children}
