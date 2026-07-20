@@ -331,6 +331,7 @@ export function MainWindow() {
         <ShieldToggle
           shielded={shieldActive(settings)}
           onChange={setShielded}
+          showLabel={!!settings.showIconLabels}
           data-tour="shield-toggle"
         />
         <button
@@ -342,6 +343,9 @@ export function MainWindow() {
           aria-label={t('settings.viewShortcuts')}
         >
           <Keyboard size={15} aria-hidden="true" />
+          {settings.showIconLabels && (
+            <span className="tl-label">{t('settings.viewShortcuts')}</span>
+          )}
         </button>
         <button
           className={'tl-settings' + (pane === 'settings' ? ' active' : '')}
@@ -356,6 +360,11 @@ export function MainWindow() {
             <Home size={15} aria-hidden="true" />
           ) : (
             <SettingsIcon size={15} aria-hidden="true" />
+          )}
+          {settings.showIconLabels && (
+            <span className="tl-label">
+              {pane === 'settings' ? t('library.title') : t('app.settings')}
+            </span>
           )}
           {update.status === 'available' && pane !== 'settings' && (
             <span className="tl-settings-badge" aria-hidden="true" />

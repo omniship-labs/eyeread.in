@@ -84,6 +84,8 @@
     "reduceMotionHint": "禁用悬浮层中的缓动和平滑滚动动画",
     "highContrast": "高对比度",
     "highContrastHint": "更强的文字阴影，便于在复杂背景上阅读",
+    "showIconLabels": "显示图标标签",
+    "showIconLabelsHint": "始终在图标按钮旁显示文字标签，适用于所有位置",
     "hotkeys": "快捷键",
     "hkToggle": "显示 / 隐藏悬浮层",
     "hkToggleHint": "切换提词器 — 全系统生效",

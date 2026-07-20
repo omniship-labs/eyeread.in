@@ -191,6 +191,22 @@
   }
 }
 
+/* "Show icon labels" accessibility setting — force text alongside titlebar icons */
+.tl-shortcuts,
+.tl-settings,
+.tl-shield {
+  .tl-label {
+    display: inline;
+  }
+  &:has(.tl-label) {
+    width: auto;
+    padding: 0 8px;
+    gap: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+}
+
 /* SOS morse: ···−−−··· on background + border only, icon stays visible */
 @keyframes sos-blink {
   0%,

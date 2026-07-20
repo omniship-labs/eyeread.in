@@ -605,13 +605,16 @@ export function OverlayWindow() {
               data-tour="ov-shield"
             />
             <button
-              className="ic ic-sm"
+              className={'ic ic-sm' + (settings.showIconLabels ? ' ic-labeled' : '')}
               data-tip={t('overlay.close')}
               data-tip-side="bottom"
               aria-label={t('overlay.close')}
               onClick={close}
             >
               <X />
+              {settings.showIconLabels && (
+                <span className="ov-ic-label">{t('overlay.close')}</span>
+              )}
             </button>
           </span>
         </div>
@@ -649,23 +652,29 @@ export function OverlayWindow() {
 
         <div className="ov-foot" role="toolbar" aria-label={t('overlay.controls')}>
           <button
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.restart')}
             aria-label={t('overlay.restart')}
             onClick={restart}
           >
             <RotateCcw />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.restart')}</span>
+            )}
           </button>
           <button
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.back5')}
             aria-label={t('overlay.back5')}
             onClick={skipBack}
           >
             <ChevronLeft />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.back5')}</span>
+            )}
           </button>
           <button
-            className="ic accent"
+            className={'ic accent' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tour="ov-play"
             data-tip={playing ? t('overlay.pause') : t('overlay.play')}
             aria-label={playing ? t('overlay.pause') : t('overlay.play')}
@@ -673,43 +682,60 @@ export function OverlayWindow() {
             onClick={() => setPlaying((p) => !p)}
           >
             {playing ? <Pause /> : <Play />}
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">
+                {playing ? t('overlay.pause') : t('overlay.play')}
+              </span>
+            )}
           </button>
           <button
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.skip5')}
             aria-label={t('overlay.skip5')}
             onClick={skip}
           >
             <ChevronsRight />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.skip5')}</span>
+            )}
           </button>
           <span className="sep" />
           <button
-            className="ic sizebtn"
+            className={'ic sizebtn' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.smaller')}
             aria-label={t('overlay.smaller')}
             style={{ fontSize: 13 }}
             onClick={() => patchScriptOverride({ size: Math.max(22, effective.size - 3) })}
           >
             A
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.smaller')}</span>
+            )}
           </button>
           <button
-            className="ic sizebtn"
+            className={'ic sizebtn' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tip={t('overlay.larger')}
             aria-label={t('overlay.larger')}
             style={{ fontSize: 18 }}
             onClick={() => patchScriptOverride({ size: Math.min(46, effective.size + 3) })}
           >
             A
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.larger')}</span>
+            )}
           </button>
           <button
             ref={settingsBtnRef}
-            className="ic"
+            className={'ic' + (settings.showIconLabels ? ' ic-labeled' : '')}
             data-tour="ov-settings"
             data-tip={t('overlay.prompterSettings')}
             aria-label={t('overlay.prompterSettings')}
             onClick={openSettings}
           >
             <SettingsIcon />
+            {settings.showIconLabels && (
+              <span className="ov-ic-label">{t('overlay.prompterSettings')}</span>
+            )}
           </button>
           <button
             ref={passthruBtnRef}

@@ -84,6 +84,8 @@
     "reduceMotionHint": "Deaktiviert Übergänge und sanftes Scrollen im Overlay",
     "highContrast": "Hoher Kontrast",
     "highContrastHint": "Stärkerer Textschatten für bessere Lesbarkeit auf komplexen Hintergründen",
+    "showIconLabels": "Symbolbeschriftungen anzeigen",
+    "showIconLabelsHint": "Textbeschriftungen neben Symbol-Schaltflächen immer anzeigen, überall",
     "hotkeys": "Tastenkürzel",
     "hkToggle": "Overlay ein-/ausblenden",
     "hkToggleHint": "Teleprompter umschalten — systemweit",

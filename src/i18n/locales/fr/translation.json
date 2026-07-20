@@ -84,6 +84,8 @@
     "reduceMotionHint": "Désactive les transitions et le défilement fluide dans l’overlay",
     "highContrast": "Contraste élevé",
     "highContrastHint": "Ombre de texte renforcée pour la lisibilité sur des fonds complexes",
+    "showIconLabels": "Afficher les libellés des icônes",
+    "showIconLabelsHint": "Toujours afficher les libellés textuels à côté des boutons d'icônes, partout",
     "hotkeys": "Raccourcis",
     "hkToggle": "Afficher / masquer l’overlay",
     "hkToggleHint": "Basculer le prompteur — fonctionne à l’échelle du système",
