@@ -207,12 +207,16 @@
 }
 
 /* ShieldToggle always renders its label as .ov-shield-label (shared with the
-   overlay toolbar's own styling), not .tl-label — match that class here too. */
+   overlay toolbar's own styling), not .tl-label — match that class here too,
+   with the same mono/uppercase treatment the overlay's own shield uses. */
 .tl-shield:has(.ov-shield-label) {
   width: auto;
-  padding: 0 8px;
-  gap: 6px;
-  font-size: 11px;
+  padding: 0 7px;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
