@@ -23,6 +23,7 @@ on:
       - 'site/**'
       - 'design/**'
       - 'scripts/compare-screenshots.mjs'
+      - 'tests/app/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
       - '.github/actions/capture-playwright-screenshots/**'
       - 'package.json'
       - 'package-lock.json'
@@ -33,6 +34,7 @@ on:
       - 'site/**'
       - 'design/**'
       - 'scripts/compare-screenshots.mjs'
+      - 'tests/app/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
       - '.github/actions/capture-playwright-screenshots/**'
       - 'package.json'
       - 'package-lock.json'

@@ -22,6 +22,7 @@ on:
       - 'design/**'
       - 'tests/app/**'
       - 'scripts/compare-screenshots.mjs'
+      - 'site/tests/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
       - '.github/actions/capture-playwright-screenshots/**'
       - 'index.html'
       - 'vite.config.js'
@@ -35,6 +36,7 @@ on:
       - 'design/**'
       - 'tests/app/**'
       - 'scripts/compare-screenshots.mjs'
+      - 'site/tests/screenshot-descriptions.mjs' # compare-screenshots.mjs imports it unconditionally
       - '.github/actions/capture-playwright-screenshots/**'
       - 'index.html'
       - 'vite.config.js'

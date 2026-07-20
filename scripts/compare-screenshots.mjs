@@ -31,6 +31,13 @@ import { join } from 'node:path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import { MAX_DIFF_PIXEL_RATIO } from '../tests/app/screenshot-diff-tolerance.mjs';
+import { APP_SCREENSHOT_DESCRIPTIONS } from '../tests/app/screenshot-descriptions.mjs';
+import { SITE_SCREENSHOT_DESCRIPTIONS } from '../site/tests/screenshot-descriptions.mjs';
+
+const SCREENSHOT_DESCRIPTIONS = {
+  ...APP_SCREENSHOT_DESCRIPTIONS,
+  ...SITE_SCREENSHOT_DESCRIPTIONS,
+};
 
 const [, , baselineDir, headDir, outDir, imageBaseUrl] = process.argv;
 if (!headDir || !outDir) {
@@ -60,13 +67,39 @@ function thumbnail(url) {
   return `<a href="${url}"><img src="${url}" width="${THUMB_WIDTH}"></a>`;
 }
 
+// Strips the -{locale}/-{project} and -{platform} suffixes Playwright (app)
+// or the test itself (site) appends after the base name, so the remainder
+// can be looked up in SCREENSHOT_DESCRIPTIONS — e.g. `about-de-linux` ->
+// `about`, `home-desktop` -> `home`. Only ever strips known, fixed tokens
+// (the current locale/project/platform values used across both suites), so
+// it can't silently mis-strip an unrelated screenshot name.
+const KNOWN_SUFFIXES = ['linux', 'macos', 'windows', 'en', 'de', 'desktop', 'tablet', 'mobile'];
+const PLATFORM_SUFFIXES = new Set(['linux', 'macos', 'windows']);
+function describeScreenshot(pngName) {
+  let base = pngName.replace(/\.png$/, '');
+  const tags = [];
+  for (;;) {
+    const suffix = KNOWN_SUFFIXES.find((s) => base.endsWith(`-${s}`));
+    if (!suffix) break;
+    base = base.slice(0, -(suffix.length + 1));
+    if (!PLATFORM_SUFFIXES.has(suffix)) tags.unshift(suffix);
+  }
+  const description = SCREENSHOT_DESCRIPTIONS[base];
+  if (!description) return null; // unrecognized — caller falls back to the raw filename
+  return tags.length ? `${description} (${tags.join(', ')})` : description;
+}
+
 function table(rows, { showPreview = false } = {}) {
   const header = showPreview
     ? '| | Screenshot | Preview | Detail |\n| --- | --- | --- | --- |'
     : '| | Screenshot | Detail |\n| --- | --- | --- |';
   const body = rows
     .map((r) => {
-      const cells = [r.icon, `\`${r.name}\``];
+      const description = describeScreenshot(r.name);
+      const screenshotCell = description
+        ? `${description}<br><sub><code>${r.name}</code></sub>`
+        : `\`${r.name}\``;
+      const cells = [r.icon, screenshotCell];
       if (showPreview) cells.push(r.previewUrl ? thumbnail(r.previewUrl) : '—');
       cells.push(r.detail);
       return `| ${cells.join(' | ')} |`;
