@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { mockExternalData } from './mock-external-data.mjs';
+
+const SHOTS = resolve(dirname(fileURLToPath(import.meta.url)), 'screenshots');
 
 // Real UA strings for each OS branch.
 const UA = {
@@ -25,6 +30,7 @@ for (const { os, heroText, linux } of cases) {
     test.use({ userAgent: UA[os] });
 
     test.beforeEach(async ({ page }) => {
+      await mockExternalData(page);
       await page.goto('/');
       await page.waitForLoadState('networkidle');
     });
@@ -63,6 +69,22 @@ for (const { os, heroText, linux } of cases) {
       expect(box).not.toBeNull();
       expect(box.x).toBeGreaterThanOrEqual(0);
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+    });
+
+    // Screenshot, once per OS — the home page's OS-detected hero variant
+    // (Linux uniquely renders a compatibility warning banner) had zero
+    // visual coverage before this; the plain responsive.spec.js capture
+    // only ever exercises whichever OS the CI runner reports as (always
+    // Linux). Desktop-only: the hero variation itself is what's under test,
+    // not per-viewport layout (already covered by responsive.spec.js).
+    test('captures a full-page screenshot of the hero for this OS', async ({
+      page,
+    }, testInfo) => {
+      test.skip(
+        testInfo.project.name !== 'desktop',
+        'screenshot captured once, at desktop only'
+      );
+      await page.screenshot({ path: resolve(SHOTS, `hero-${os}.png`), fullPage: true });
     });
   });
 }

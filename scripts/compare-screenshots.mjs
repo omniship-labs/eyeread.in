@@ -72,11 +72,16 @@ function thumbnail(url) {
 // can be looked up in SCREENSHOT_DESCRIPTIONS — e.g. `about-de-linux` ->
 // `about`, `home-desktop` -> `home`. Only ever strips known, fixed tokens
 // (the current locale/project/platform values used across both suites), so
-// it can't silently mis-strip an unrelated screenshot name.
+// it can't silently mis-strip an unrelated screenshot name — checked only
+// after an exact match on the full name fails, so a name that happens to
+// end in one of these tokens on purpose (e.g. `hero-macos`, its own direct
+// key) isn't stripped down to something no longer in the map.
 const KNOWN_SUFFIXES = ['linux', 'macos', 'windows', 'en', 'de', 'desktop', 'tablet', 'mobile'];
 const PLATFORM_SUFFIXES = new Set(['linux', 'macos', 'windows']);
 function describeScreenshot(pngName) {
   let base = pngName.replace(/\.png$/, '');
+  if (SCREENSHOT_DESCRIPTIONS[base]) return SCREENSHOT_DESCRIPTIONS[base];
+
   const tags = [];
   for (;;) {
     const suffix = KNOWN_SUFFIXES.find((s) => base.endsWith(`-${s}`));
