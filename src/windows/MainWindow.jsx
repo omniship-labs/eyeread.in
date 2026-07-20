@@ -81,6 +81,7 @@ import { usePermissionsGate } from '../hooks/usePermissionsGate';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { useTour } from '../hooks/useTour';
+import { toursForWindow, tourStepKey } from '../lib/tours';
 import { TipLayer } from '../components/TipLayer';
 
 export function MainWindow() {
@@ -388,6 +389,18 @@ export function MainWindow() {
                 // missing-target fallback).
                 setPane('library');
                 replayTour('welcome-main-v1');
+                // Also let the overlay's own tour show again: clear its
+                // seen-state (so it auto-starts next time the overlay opens)
+                // and, if the overlay is already open, replay it right now.
+                const overlayStepKeys = toursForWindow('overlay').flatMap((t) =>
+                  t.steps.map((s) => tourStepKey(t.id, s.id))
+                );
+                applySettings({
+                  seenTourSteps: (settingsRef.current.seenTourSteps || []).filter(
+                    (k) => !overlayStepKeys.includes(k)
+                  ),
+                });
+                emitTo('overlay', 'tour:replay', { tourId: 'welcome-overlay-v1' });
               }}
               onBack={() => setPane('library')}
             />

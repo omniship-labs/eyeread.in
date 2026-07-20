@@ -123,7 +123,7 @@ export function OverlayWindow() {
   // docs on useTour): a tooltip only ever renders as plain DOM inside this
   // already content-protected window, and hides itself the moment those
   // conditions stop holding rather than lingering through a hide/show cycle.
-  const { tourOverlay } = useTour('overlay', settings, patchSettings, {
+  const { tourOverlay, replayTour } = useTour('overlay', settings, patchSettings, {
     active: settingsLoaded && sessionActive && interactive && !consentModal,
   });
 
@@ -224,7 +224,7 @@ export function OverlayWindow() {
 
   // ---- cross-window events ---------------------------------------------------
   useEffect(() => {
-    let un1, un2, un3, un4, un5;
+    let un1, un2, un3, un4, un5, un6;
     (async () => {
       un1 = await listen('overlay:load', (p) => {
         loadedRef.current = true;
@@ -263,6 +263,12 @@ export function OverlayWindow() {
         setPanelSize(clampSize(defaultSettings.overlaySize));
         setScript((prev) => (prev ? { ...prev, overlayPos: null, overlaySize: null } : prev));
       });
+      // "Show tips again" in the main window's Settings — replay this
+      // window's own tour immediately if it's already open (its seen-state
+      // was also cleared, so it'll auto-start next open regardless).
+      un6 = await listen('tour:replay', (p) => {
+        if (p?.tourId) replayTour(p.tourId);
+      });
     })();
     return () => {
       un1?.();
@@ -270,8 +276,9 @@ export function OverlayWindow() {
       un3?.();
       un4?.();
       un5?.();
+      un6?.();
     };
-  }, [setPanelSize, sendSettingsContext]);
+  }, [setPanelSize, sendSettingsContext, replayTour]);
 
   // ---- glass backdrop refresh --------------------------------------------------
   // WebKit renders the panel's backdrop-filter from a snapshot of what's behind
