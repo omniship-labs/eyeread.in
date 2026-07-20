@@ -6,10 +6,12 @@
 # is a source of false failures, not a safety net).
 #
 # One `capture` job, matrixed over base/head (same pattern as build-app.yml's
-# platform matrix) — each matrix run just renders its own commit's
-# screenshots, no comparison happening yet. `compare` (needs: [capture])
-# downloads both matrix runs' artifacts and diffs them with
-# scripts/compare-app-screenshots.mjs (plain Node, no browser needed).
+# platform matrix): each matrix run resolves which commit it's responsible
+# for, then hands off to .github/actions/capture-app-screenshots (the actual
+# checkout/cache/install/render/upload work) — no comparison happening yet.
+# `compare` (needs: [capture]) downloads both matrix runs' artifacts and
+# diffs them with scripts/compare-app-screenshots.mjs (plain Node, no
+# browser needed).
 name: App E2E
 
 on:
@@ -56,6 +58,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # fetch-depth: 0 — the base variant's ref (resolved below) needs to be
+      # reachable for .github/actions/capture-app-screenshots' own checkout
+      # step, which a shallow clone won't guarantee.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
       # head always resolves to the commit under test. base resolves to the
       # PR's base commit (or the previous commit, for a push) — a brand-new
       # branch's first push (or a force-push with no prior history) has no
@@ -65,90 +74,22 @@ jobs:
         run: |
           if [ "${{ matrix.variant }}" = "head" ]; then
             echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
-            echo "has_ref=true" >> "$GITHUB_OUTPUT"
           else
             if [ "${{ github.event_name }}" = "pull_request" ]; then
               SHA="${{ github.event.pull_request.base.sha }}"
             else
               SHA="${{ github.event.before }}"
             fi
-            if [ -z "$SHA" ] || [ "$SHA" = "0000000000000000000000000000000000000000" ]; then
-              echo "has_ref=false" >> "$GITHUB_OUTPUT"
-            else
-              echo "ref=$SHA" >> "$GITHUB_OUTPUT"
-              echo "has_ref=true" >> "$GITHUB_OUTPUT"
+            if [ "$SHA" = "0000000000000000000000000000000000000000" ]; then
+              SHA=""
             fi
+            echo "ref=$SHA" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        if: steps.resolve.outputs.has_ref == 'true'
+      - uses: ./.github/actions/capture-app-screenshots
         with:
           ref: ${{ steps.resolve.outputs.ref }}
-
-      # Keyed on the exact commit — a re-push to the same PR (base commit
-      # unchanged) or a re-run with no new commits hits this on every
-      # subsequent run, skipping straight to the upload step below with no
-      # rebuild at all.
-      - name: Cache screenshots for this commit
-        if: steps.resolve.outputs.has_ref == 'true'
-        id: cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: tests/app/visual.spec.js-snapshots
-          key: app-e2e-screenshots-v1-${{ steps.resolve.outputs.ref }}
-
-      - if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Check the suite exists at this commit
-        if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true'
-        id: has_suite
-        run: |
-          if [ -f playwright.app.config.js ] && [ -d tests/app ]; then
-            echo "value=true" >> "$GITHUB_OUTPUT"
-          else
-            # Only ever false for the base variant — true today, since this
-            # suite hasn't reached main yet. Nothing to capture; the compare
-            # job just treats every head screenshot as new in that case.
-            echo "This suite doesn't exist at this commit — skipping capture."
-            echo "value=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Install deps
-        if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
-        run: npm ci
-
-      - name: Install Playwright OS dependencies
-        if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
-        run: npx playwright install-deps chromium
-
-      - name: Cache Playwright browser binary
-        if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
-        id: pw-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Download Playwright browser
-        if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true' && steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium
-
-      - name: Capture screenshots
-        if: steps.resolve.outputs.has_ref == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
-        run: npm run app:test:update
-
-      - name: Upload screenshots
-        if: steps.resolve.outputs.has_ref == 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: app-e2e-screenshots-${{ matrix.variant }}
-          path: tests/app/visual.spec.js-snapshots
-          retention-days: 14
-          if-no-files-found: ignore
+          artifact-name: app-e2e-screenshots-${{ matrix.variant }}
 
   compare:
     needs: [capture]
@@ -164,7 +105,7 @@ jobs:
       - run: npm ci
       - name: Download base screenshots
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        continue-on-error: true # no baseline (see capture's "has_ref" guard)
+        continue-on-error: true # no baseline (see capture-app-screenshots' empty-ref guard)
         with:
           name: app-e2e-screenshots-base
           path: __baseline__

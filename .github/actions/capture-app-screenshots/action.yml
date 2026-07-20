@@ -1,0 +1,97 @@
+name: Capture app E2E screenshots
+description: >-
+  Checks out the given ref and renders the app visual-regression suite
+  (tests/app/visual.spec.js) against it, uploading the resulting screenshots
+  as an artifact. One matrix leg of app-e2e.yml's capture job — called once
+  for the base commit, once for the head commit. Results are cached per ref,
+  so re-running against a commit that's already been captured (a re-push
+  with the same base, or a re-run with no new commits) skips straight to
+  uploading with no rebuild.
+
+inputs:
+  ref:
+    description: >-
+      Commit SHA to capture screenshots from. Leave empty to skip entirely —
+      e.g. a PR/push with no real "before" commit to diff against.
+    required: false
+    default: ''
+  artifact-name:
+    description: Name to upload the screenshots artifact under.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      if: inputs.ref != ''
+      with:
+        ref: ${{ inputs.ref }}
+
+    # Keyed on the exact commit — a re-push to the same PR (base commit
+    # unchanged) or a re-run with no new commits hits this every time,
+    # skipping straight to the upload step below.
+    - name: Cache screenshots for this commit
+      if: inputs.ref != ''
+      id: cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: tests/app/visual.spec.js-snapshots
+        key: app-e2e-screenshots-v1-${{ inputs.ref }}
+
+    - if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true'
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: 24
+        cache: npm
+
+    - name: Check the suite exists at this commit
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true'
+      id: has_suite
+      shell: bash
+      run: |
+        if [ -f playwright.app.config.js ] && [ -d tests/app ]; then
+          echo "value=true" >> "$GITHUB_OUTPUT"
+        else
+          # Only ever false for the base variant — true today, since this
+          # suite hasn't reached main yet. Nothing to capture; the compare
+          # job just treats every head screenshot as new in that case.
+          echo "This suite doesn't exist at this commit — skipping capture."
+          echo "value=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Install deps
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      shell: bash
+      run: npm ci
+
+    - name: Install Playwright OS dependencies
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      shell: bash
+      run: npx playwright install-deps chromium
+
+    - name: Cache Playwright browser binary
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      id: pw-cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+    - name: Download Playwright browser
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true' && steps.pw-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npx playwright install chromium
+
+    - name: Capture screenshots
+      if: inputs.ref != '' && steps.cache.outputs.cache-hit != 'true' && steps.has_suite.outputs.value == 'true'
+      shell: bash
+      run: npm run app:test:update
+
+    - name: Upload screenshots
+      if: inputs.ref != ''
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: tests/app/visual.spec.js-snapshots
+        retention-days: 14
+        if-no-files-found: ignore
