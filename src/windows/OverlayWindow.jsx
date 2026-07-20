@@ -605,6 +605,24 @@ export function OverlayWindow() {
               data-tour="ov-shield"
             />
             <button
+              ref={passthruBtnRef}
+              className={'ic ov-passthru' + (interactive ? '' : ' on')}
+              data-tour="ov-passthru"
+              data-tip={
+                interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+              }
+              aria-label={
+                interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
+              }
+              aria-pressed={!interactive}
+              onClick={() => setInteractive((i) => !i)}
+            >
+              {settings.showIconLabels && (
+                <span className="ov-ic-label">{t('overlay.clickThrough')}</span>
+              )}
+              {interactive ? '⌥⇧E' : '⌥⇧E·on'}
+            </button>
+            <button
               className={'ic ic-sm' + (settings.showIconLabels ? ' ic-labeled' : '')}
               data-tip={t('overlay.close')}
               data-tip-side="bottom"
@@ -736,21 +754,6 @@ export function OverlayWindow() {
             {settings.showIconLabels && (
               <span className="ov-ic-label">{t('overlay.prompterSettings')}</span>
             )}
-          </button>
-          <button
-            ref={passthruBtnRef}
-            className={'ic ov-passthru' + (interactive ? '' : ' on')}
-            data-tour="ov-passthru"
-            data-tip={
-              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
-            }
-            aria-label={
-              interactive ? t('overlay.enableClickThrough') : t('overlay.disableClickThrough')
-            }
-            aria-pressed={!interactive}
-            onClick={() => setInteractive((i) => !i)}
-          >
-            {interactive ? '⌥⇧E' : '⌥⇧E·on'}
           </button>
         </div>
 

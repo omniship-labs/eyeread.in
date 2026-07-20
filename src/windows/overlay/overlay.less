@@ -420,7 +420,6 @@
 
   /* click-through toggle button */
   &.ov-passthru {
-    margin-left: auto;
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.06em;
@@ -430,6 +429,13 @@
     width: auto;
     padding: 0 8px;
     height: 26px;
+    gap: 4px;
+
+    .ov-ic-label {
+      font-family: var(--font-sans);
+      text-transform: none;
+      letter-spacing: normal;
+    }
 
     &:hover {
       color: var(--text-primary);
