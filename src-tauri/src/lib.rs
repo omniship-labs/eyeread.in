@@ -202,7 +202,10 @@ async fn check_for_update(app: AppHandle) -> Result<String, String> {
     match updater.check().await {
         Ok(Some(update)) => Ok(format!("update:{}", update.version)),
         Ok(None) => Ok("up_to_date".to_string()),
-        Err(e) => Err(e.to_string()),
+        Err(e) => {
+            eprintln!("[updater] check_for_update: check() failed: {e}");
+            Err(e.to_string())
+        }
     }
 }
 
@@ -217,11 +220,17 @@ async fn download_update(
     pending: tauri::State<'_, PendingUpdate>,
 ) -> Result<(), String> {
     let updater = app.updater().map_err(|e| e.to_string())?;
-    if let Some(update) = updater.check().await.map_err(|e| e.to_string())? {
+    if let Some(update) = updater.check().await.map_err(|e| {
+        eprintln!("[updater] download_update: check() failed: {e}");
+        e.to_string()
+    })? {
         let bytes = update
             .download(|_, _| {}, || {})
             .await
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| {
+                eprintln!("[updater] download_update: download() failed: {e}");
+                e.to_string()
+            })?;
         *pending.0.lock().unwrap() = Some((update, bytes));
     }
     Ok(())
@@ -237,16 +246,25 @@ async fn install_update(
 ) -> Result<(), String> {
     let cached = pending.0.lock().unwrap().take();
     if let Some((update, bytes)) = cached {
-        update.install(bytes).map_err(|e| e.to_string())?;
+        update.install(bytes).map_err(|e| {
+            eprintln!("[updater] install_update: install() of cached download failed: {e}");
+            e.to_string()
+        })?;
         app.restart();
     }
 
     let updater = app.updater().map_err(|e| e.to_string())?;
-    if let Some(update) = updater.check().await.map_err(|e| e.to_string())? {
+    if let Some(update) = updater.check().await.map_err(|e| {
+        eprintln!("[updater] install_update: check() failed: {e}");
+        e.to_string()
+    })? {
         update
             .download_and_install(|_, _| {}, || {})
             .await
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| {
+                eprintln!("[updater] install_update: download_and_install() failed: {e}");
+                e.to_string()
+            })?;
         app.restart();
     }
     Ok(())

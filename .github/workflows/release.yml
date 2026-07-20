@@ -93,7 +93,12 @@ jobs:
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           REPO="https://github.com/${{ github.repository }}/releases/download/v${VERSION}"
 
-          ARM_SIG=$(cat artifacts/stable-aarch64-apple-darwin/macos/*.app.tar.gz.sig)
+          # macOS updater artifact — unlike the other platforms, Tauri's
+          # bundler names this unversioned (e.g. `eyeread.in.app.tar.gz`),
+          # so discover the exact name rather than hardcoding a guessed one.
+          ARM_DIR=artifacts/stable-aarch64-apple-darwin/macos
+          ARM_APP=$(basename "$(ls "$ARM_DIR"/*.app.tar.gz)")
+          ARM_SIG=$(cat "$ARM_DIR"/*.app.tar.gz.sig)
 
           # Windows NSIS updater artifacts — discover the exact installer names
           # (the arch token in `*_x64-setup.exe` / `*_arm64-setup.exe` is set by
@@ -119,7 +124,7 @@ jobs:
             "pub_date": "$DATE",
             "platforms": {
               "darwin-aarch64": {
-                "url": "$REPO/eyeread.in_${VERSION}_aarch64.app.tar.gz",
+                "url": "$REPO/${ARM_APP}",
                 "signature": "$ARM_SIG"
               },
               "windows-x86_64": {

@@ -28,11 +28,12 @@ export function useUpdateCheck(intervalHours = 6) {
         // Pre-fetch in the background so the eventual install click is
         // instant — best-effort, install() falls back to downloading itself
         // if this hasn't finished (or failed) by then.
-        downloadUpdate().catch(() => {});
+        downloadUpdate().catch((e) => console.error('[updater] downloadUpdate failed:', e));
       } else {
         setStatus('up_to_date');
       }
-    } catch {
+    } catch (e) {
+      console.error('[updater] check failed:', e);
       setStatus('error');
     } finally {
       inFlight.current = false;
@@ -45,7 +46,8 @@ export function useUpdateCheck(intervalHours = 6) {
     setStatus('installing');
     try {
       await installUpdate(); // restarts the app on success
-    } catch {
+    } catch (e) {
+      console.error('[updater] install failed:', e);
       setStatus('error');
     }
   }, []);
