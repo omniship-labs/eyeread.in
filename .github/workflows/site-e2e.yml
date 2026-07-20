@@ -88,7 +88,12 @@ jobs:
         with:
           ref: ${{ steps.resolve.outputs.ref }}
           artifact-name: site-e2e-screenshots-${{ matrix.variant }}
-          test-command: ${{ matrix.variant == 'head' && 'npm run site:test' || 'npm run site:test:screenshots' }}
+          # Direct `npx playwright` invocations, not `npm run <script>` — the
+          # base leg checks out an old ref, and a script that only exists in
+          # this PR's package.json (like site:test:screenshots, added
+          # alongside this workflow) would 404 there. Playwright's CLI needs
+          # no package.json cooperation to run.
+          test-command: ${{ matrix.variant == 'head' && 'npx playwright test' || 'npx playwright test site/tests/responsive.spec.js -g "captures a full-page screenshot"' }}
           screenshots-path: site/tests/screenshots
           cache-key-prefix: site-e2e-screenshots-v1
           config-file: playwright.config.js

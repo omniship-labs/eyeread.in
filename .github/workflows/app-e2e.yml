@@ -92,7 +92,11 @@ jobs:
         with:
           ref: ${{ steps.resolve.outputs.ref }}
           artifact-name: app-e2e-screenshots-${{ matrix.variant }}
-          test-command: npm run app:test:update
+          # Direct `npx playwright`, not `npm run app:test:update` — the base
+          # leg checks out an old ref, and a script that only exists in a
+          # later commit's package.json would 404 there (see site-e2e.yml's
+          # equivalent comment, which hit exactly this).
+          test-command: npx playwright test --config=playwright.app.config.js --update-snapshots
           screenshots-path: tests/app/visual.spec.js-snapshots
           cache-key-prefix: app-e2e-screenshots-v1
           config-file: playwright.app.config.js
