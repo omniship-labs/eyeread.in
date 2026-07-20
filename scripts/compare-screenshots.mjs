@@ -18,12 +18,15 @@
  * failure. Only files present in both, whose pixel diff exceeds
  * MAX_DIFF_PIXEL_RATIO, count as a FAIL. Exits non-zero iff any FAIL.
  *
- * For each FAIL, the expected/actual/diff PNGs are written to
- * <outDir>/images/. `imageBaseUrl`, if given, is the URL prefix those files
- * will be reachable at once published (see the caller workflow's "Publish
- * diff images" step) — the PR comment embeds/links them from there. It's
- * safe to reference a URL before the images are actually pushed: nothing
- * reads it until the PR comment is posted, by which point they exist.
+ * Every screenshot's relevant PNG(s) — expected/actual/diff for a FAIL, just
+ * actual for NEW/PASS, just expected for REMOVED — are written to
+ * <outDir>/images/, so the PR comment can show a thumbnail for every row,
+ * not just the ones that changed. `imageBaseUrl`, if given, is the URL
+ * prefix those files will be reachable at once published (see the caller
+ * workflow's "Publish diff images" step) — the PR comment embeds/links them
+ * from there. It's safe to reference a URL before the images are actually
+ * pushed: nothing reads it until the PR comment is posted, by which point
+ * they exist.
  */
 import { readdir, readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -116,15 +119,14 @@ function table(rows, { showPreview = false } = {}) {
 // What a row's thumbnail (and its detail-column links) should point at —
 // the diff for a real mismatch (falls back to the actual/head screenshot
 // when there's no diff to show, e.g. a size change), the head screenshot
-// for a new entry, the baseline's for a removed one. null when there's no
-// image at all (imageBaseUrl unset, or an unchanged entry — those were
-// never saved, see main()).
+// for a new or unchanged entry, the baseline's for a removed one. null only
+// when imageBaseUrl itself is unset (no image host to link to at all).
 function previewUrl(r) {
   if (!imageBaseUrl) return null;
   if (r.status === 'fail') {
     return `${imageBaseUrl}/${r.name}-${r.hasDiffImage ? 'diff' : 'actual'}.png`;
   }
-  if (r.status === 'new') return `${imageBaseUrl}/${r.name}-actual.png`;
+  if (r.status === 'new' || r.status === 'pass') return `${imageBaseUrl}/${r.name}-actual.png`;
   if (r.status === 'removed') return `${imageBaseUrl}/${r.name}-expected.png`;
   return null;
 }
@@ -188,7 +190,15 @@ function buildMarkdown({ fails, news, removed, passes }) {
       `<details>`,
       `<summary>${passes.length} unchanged screenshot${plural}</summary>`,
       '',
-      table(passes.map((r) => ({ icon: '✅', name: r.name, detail: 'unchanged' }))),
+      table(
+        passes.map((r) => ({
+          icon: '✅',
+          name: r.name,
+          detail: 'unchanged',
+          previewUrl: previewUrl(r),
+        })),
+        { showPreview: !!imageBaseUrl }
+      ),
       '',
       `</details>`
     );
@@ -245,6 +255,11 @@ async function main() {
         hasDiffImage: true,
       });
     } else {
+      // Saved even though nothing changed — the unchanged table shows a
+      // collapsed thumbnail per row too, not just a checkmark, so
+      // reviewers can spot-check what's actually being asserted without
+      // downloading the artifact.
+      await copyFile(headPath, join(imagesDir, `${name}-actual.png`));
       results.push({ name, status: 'pass' });
     }
   }
