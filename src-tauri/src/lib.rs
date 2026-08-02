@@ -224,13 +224,10 @@ async fn download_update(
         eprintln!("[updater] download_update: check() failed: {e}");
         e.to_string()
     })? {
-        let bytes = update
-            .download(|_, _| {}, || {})
-            .await
-            .map_err(|e| {
-                eprintln!("[updater] download_update: download() failed: {e}");
-                e.to_string()
-            })?;
+        let bytes = update.download(|_, _| {}, || {}).await.map_err(|e| {
+            eprintln!("[updater] download_update: download() failed: {e}");
+            e.to_string()
+        })?;
         *pending.0.lock().unwrap() = Some((update, bytes));
     }
     Ok(())
