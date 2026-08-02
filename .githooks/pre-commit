@@ -4,19 +4,50 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 npm run lint || exit 1
 
 # Format staged JS/JSX files with prettier and re-stage them
-STAGED=$(git diff --cached --name-only | grep -E '\.(js|jsx)$')
-if [ -n "$STAGED" ]; then
-  echo "$STAGED" | xargs npx prettier --write
-  echo "$STAGED" | xargs git add
+STAGED_JS=$(git diff --cached --name-only | grep -E '\.(js|jsx)$')
+if [ -n "$STAGED_JS" ]; then
+  echo "$STAGED_JS" | xargs npx prettier --write
+  echo "$STAGED_JS" | xargs git add
+fi
+
+mkdir -p .githooks/last-run
+if ! npm run build > .githooks/last-run/build.log 2>&1; then
+  echo "Build failed — see .githooks/last-run/build.log"
+  cat .githooks/last-run/build.log
+  exit 1
 fi
 
 # Full test suite, JUnit XML (industry-standard test report format) + raw
 # log written to .githooks/last-run/ — gitignored, and only worth reading
 # when this step fails. A passing run stays quiet instead of dumping the
 # whole suite into every commit's terminal output.
-mkdir -p .githooks/last-run
 if ! npx vitest run --reporter=junit --outputFile=.githooks/last-run/junit.xml \
   > .githooks/last-run/output.log 2>&1; then
   echo "Tests failed — see .githooks/last-run/junit.xml or .githooks/last-run/output.log"
   exit 1
+fi
+
+# Rust checks — same fmt/clippy pair as CI's `rust` job — only when a staged
+# change touches src-tauri, so a docs/JS-only commit doesn't need the Rust
+# toolchain or pay clippy's compile time. This is what CI's rust job would
+# have caught before a bad commit ever reached main (see the CI job's own
+# `cargo fmt --check` step, which this mirrors with an in-place `cargo fmt`).
+if git diff --cached --name-only | grep -q '^src-tauri/'; then
+  if ! command -v cargo >/dev/null 2>&1; then
+    echo "Staged changes touch src-tauri/ but cargo is not on PATH — install the Rust toolchain to commit here." >&2
+    exit 1
+  fi
+
+  STAGED_RS=$(git diff --cached --name-only | grep -E '^src-tauri/.*\.rs$')
+  if [ -n "$STAGED_RS" ]; then
+    cargo fmt --manifest-path src-tauri/Cargo.toml -- $STAGED_RS || exit 1
+    echo "$STAGED_RS" | xargs git add
+  fi
+
+  if ! cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings \
+    > .githooks/last-run/clippy.log 2>&1; then
+    echo "Clippy failed — see .githooks/last-run/clippy.log"
+    cat .githooks/last-run/clippy.log
+    exit 1
+  fi
 fi
