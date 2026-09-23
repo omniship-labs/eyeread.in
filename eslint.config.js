@@ -81,6 +81,7 @@ export default [
       'scripts/**/*.mjs',
       'site/vite.config.js',
       'site/scripts/**/*.mjs',
+      'docs/examples/**/*.mjs',
     ],
     languageOptions: { globals: { ...globals.node } },
   },

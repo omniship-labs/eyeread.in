@@ -78,6 +78,7 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
+import { useExtensionHost } from '../hooks/useExtensionHost';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { useTour } from '../hooks/useTour';
@@ -312,6 +313,9 @@ export function MainWindow() {
     });
   };
 
+  // Local extension API: pairing prompt + calls routed to this window.
+  const { pairingModal } = useExtensionHost({ setScripts, startReading });
+
   return (
     <div className={'app-shell' + (shieldActive(settings) ? ' shielded' : ' exposed')}>
       {/* Titlebar — only the inner span is the drag region, not the whole bar */}
@@ -481,6 +485,7 @@ export function MainWindow() {
       </div>
       {consentModal}
       {permissionsModal}
+      {pairingModal}
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
       {tourOverlay}
       <TipLayer enabled={settings.showTooltips !== false} />

@@ -342,5 +342,33 @@
         "body": "Remet le prompteur à sa taille par défaut et sa position centrée, si vous l'avez déplacé ou redimensionné."
       }
     }
+  },
+  "extensions": {
+    "title": "Extensions",
+    "enable": "Autoriser les extensions",
+    "enableHint": "Permet aux applications de cet ordinateur de se connecter à eyeread.in via une API locale (127.0.0.1:{{port}}). Désactivé par défaut ; chaque application doit être approuvée.",
+    "errorPortInUse": "Le port {{port}} est déjà utilisé par une autre application : les extensions ne peuvent pas se connecter.",
+    "errorStart": "Impossible de démarrer l’API des extensions.",
+    "none": "Aucune extension connectée pour l’instant.",
+    "revoke": "Révoquer",
+    "docs": "Créer une extension",
+    "docsHint": "La référence de l’API et des exemples pour les développeurs.",
+    "docsCta": "Ouvrir la doc",
+    "pairTitle": "« {{name}} » souhaite se connecter",
+    "pairIntro": "Une application de cet ordinateur demande à utiliser eyeread.in. N’autorisez que les applications de confiance. Vous pouvez révoquer l’accès à tout moment dans Réglages → Extensions.",
+    "allow": "Autoriser",
+    "deny": "Refuser",
+    "scopes": {
+      "scriptsWrite": "Ajouter des scripts",
+      "prompterLoad": "Charger dans le prompteur",
+      "prompterControl": "Contrôler la lecture",
+      "prompterEvents": "Voir la progression"
+    },
+    "scopeHints": {
+      "scriptsWrite": "Ajoute de nouveaux scripts à votre bibliothèque.",
+      "prompterLoad": "Ouvre un texte dans le prompteur et lance une session de lecture.",
+      "prompterControl": "Lecture, pause, recommencer, aller à un mot ou fermer le prompteur.",
+      "prompterEvents": "Le titre du script en cours et votre position pendant la lecture."
+    }
   }
 }

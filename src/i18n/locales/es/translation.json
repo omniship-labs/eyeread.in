@@ -342,5 +342,33 @@
         "body": "Devuelve el teleprompter a su tamaño predeterminado y posición centrada, si lo has arrastrado o redimensionado."
       }
     }
+  },
+  "extensions": {
+    "title": "Extensiones",
+    "enable": "Permitir extensiones",
+    "enableHint": "Permite que las apps de este ordenador se conecten a eyeread.in mediante una API local (127.0.0.1:{{port}}). Desactivado por defecto; cada app necesita tu aprobación.",
+    "errorPortInUse": "Otra app ya está usando el puerto {{port}}, así que las extensiones no pueden conectarse.",
+    "errorStart": "No se pudo iniciar la API de extensiones.",
+    "none": "Aún no hay extensiones conectadas.",
+    "revoke": "Revocar",
+    "docs": "Crear una extensión",
+    "docsHint": "La referencia de la API y ejemplos para desarrolladores.",
+    "docsCta": "Abrir docs",
+    "pairTitle": "«{{name}}» quiere conectarse",
+    "pairIntro": "Una app de este ordenador quiere usar eyeread.in. Permite solo apps de confianza. Puedes revocar el acceso en cualquier momento en Ajustes → Extensiones.",
+    "allow": "Permitir",
+    "deny": "Denegar",
+    "scopes": {
+      "scriptsWrite": "Añadir guiones",
+      "prompterLoad": "Cargar en el teleprompter",
+      "prompterControl": "Controlar la reproducción",
+      "prompterEvents": "Ver el progreso de lectura"
+    },
+    "scopeHints": {
+      "scriptsWrite": "Añade guiones nuevos a tu biblioteca.",
+      "prompterLoad": "Abre texto en el teleprompter e inicia una sesión de lectura.",
+      "prompterControl": "Reproducir, pausar, reiniciar, saltar a una palabra o cerrar el teleprompter.",
+      "prompterEvents": "El título del guion actual y tu posición en él mientras lees."
+    }
   }
 }

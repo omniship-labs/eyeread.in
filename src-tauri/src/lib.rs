@@ -1,3 +1,5 @@
+mod extensions;
+
 use std::sync::Mutex;
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},
@@ -415,8 +417,17 @@ pub fn run() {
             set_app_protected,
             set_dock_hidden,
             attach_window_to_all_spaces,
+            extensions::extensions_status,
+            extensions::extensions_set_enabled,
+            extensions::extensions_revoke,
+            extensions::extensions_resolve_pairing,
+            extensions::extensions_rpc_result,
+            extensions::extensions_prompter_state,
         ])
-        .setup(|_app| Ok(()))
+        .setup(|app| {
+            extensions::init(app.handle());
+            Ok(())
+        })
         .build(tauri::generate_context!())
         .expect("error while building eyeread.in")
         .run(|app_handle, event| {

@@ -342,5 +342,33 @@
         "body": "如果你拖动或调整过提词器大小，这会将其恢复为默认大小和居中位置。"
       }
     }
+  },
+  "extensions": {
+    "title": "扩展",
+    "enable": "允许扩展",
+    "enableHint": "允许本机上的应用通过本地 API（127.0.0.1:{{port}}）连接 eyeread.in。默认关闭；每个应用都需要你批准。",
+    "errorPortInUse": "端口 {{port}} 已被其他应用占用，扩展无法连接。",
+    "errorStart": "无法启动扩展 API。",
+    "none": "尚未连接任何扩展。",
+    "revoke": "撤销",
+    "docs": "开发扩展",
+    "docsHint": "面向开发者的 API 参考和示例。",
+    "docsCta": "打开文档",
+    "pairTitle": "“{{name}}”请求连接",
+    "pairIntro": "本机上的一个应用请求使用 eyeread.in。只允许你信任的应用。你可以随时在“设置 → 扩展”中撤销访问权限。",
+    "allow": "允许",
+    "deny": "拒绝",
+    "scopes": {
+      "scriptsWrite": "添加稿件",
+      "prompterLoad": "载入提词器",
+      "prompterControl": "控制播放",
+      "prompterEvents": "查看阅读进度"
+    },
+    "scopeHints": {
+      "scriptsWrite": "向你的稿件库添加新稿件。",
+      "prompterLoad": "在提词器中打开文本并开始阅读。",
+      "prompterControl": "播放、暂停、重新开始、跳到某个词或关闭提词器。",
+      "prompterEvents": "阅读时当前稿件的标题以及你读到的位置。"
+    }
   }
 }

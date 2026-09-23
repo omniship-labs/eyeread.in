@@ -7,6 +7,7 @@ import { Slider } from '../components/Slider';
 import { Segmented } from '../components/Segmented';
 import { openExternal, showAboutWindow } from '../lib/tauri';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { ExtensionsSettings } from './ExtensionsSettings';
 import { defaultSettings, OVERRIDABLE_KEYS, UPDATE_CHECK_HOURS_OPTIONS } from '../lib/store';
 import { voiceAvailable } from '../hooks/useVoiceTracking';
 import { requestMicPermission } from '../lib/mic';
@@ -234,6 +235,9 @@ export function SettingsScreen({
           </div>
         </div>
       )}
+
+      {/* ── Extensions (advanced: local API for other apps; off by default) ── */}
+      {advanced && <ExtensionsSettings />}
 
       {/* ── Reading defaults ── */}
       <div className="set-group">

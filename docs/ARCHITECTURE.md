@@ -24,6 +24,12 @@ scrolling at the configured wpm where speech recognition is unavailable (e.g. Li
 WebKitGTK). On macOS, WebKit requires a click inside the overlay before the mic can
 start — the app retries automatically on your first interaction.
 
+**Extensions.** Other apps on the same machine can add scripts, load them into the prompter,
+control playback and follow reading progress through an opt-in, loopback-only HTTP API
+(`src-tauri/src/extensions/`). Each extension is approved by the user, gets a scoped token, and
+can be revoked in Settings; calls execute through the same window code paths as the UI. See
+[EXTENSIONS.md](EXTENSIONS.md).
+
 **Hotkeys.**
 
 | Shortcut  | Action                             |

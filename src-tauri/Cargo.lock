@@ -1135,11 +1135,13 @@ dependencies = [
 name = "eyeread-in"
 version = "0.0.0"
 dependencies = [
+ "getrandom 0.2.17",
  "objc2",
  "objc2-app-kit",
  "objc2-foundation",
  "serde",
  "serde_json",
+ "sha2",
  "tauri",
  "tauri-build",
  "tauri-plugin-global-shortcut",
