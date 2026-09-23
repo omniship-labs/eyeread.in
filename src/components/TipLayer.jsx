@@ -2,7 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { computeTooltipPosition } from '../lib/tourPosition';
 import './tip-layer.less';
 
-const SHOW_DELAY_MS = 700;
+const SHOW_DELAY_MS = 1000;
 
 /**
  * TipLayer — one delegated hover-tooltip renderer per window, driven by
