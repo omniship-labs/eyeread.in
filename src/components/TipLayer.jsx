@@ -20,9 +20,9 @@ const SHOW_DELAY_MS = 1000;
  * the UI.
  *
  * Deliberately NOT a per-element wrapper component: with 20+ tooltip
- * sites across toolbars, one delegated listener plus a single positioned bubble is far
- * cheaper than one hover state + one absolutely-positioned node per
- * trigger. It also matters here specifically because several triggers sit
+ * sites across toolbars, one delegated listener plus a single positioned
+ * bubble is far cheaper than one hover state + one absolutely-positioned
+ * node per trigger. It also matters here specifically because several triggers sit
  * inside `overflow: hidden` containers (e.g. .ov-head) — a `position:
  * fixed` node rendered THERE would still get clipped by that ancestor;
  * mounting the bubble at the window root sidesteps that entirely.
@@ -34,13 +34,13 @@ const SHOW_DELAY_MS = 1000;
  *     while shown, and Escape dismisses it without moving the
  *     pointer/focus — native `title` supports Escape too, so this isn't
  *     optional parity, it's matching what was there before.
+ *   - `pointer-events: none` means the bubble never needs to be
+ *     "hoverable" itself — there's nothing interactive inside it.
  *
  * Restraint: tips wait SHOW_DELAY_MS, only show on focus when it's
  * keyboard focus (:focus-visible), never show mid-drag, dismiss on click
  * (and stay quiet on that trigger until the pointer leaves), and dismiss
  * on scroll.
- *   - `pointer-events: none` means the bubble never needs to be
- *     "hoverable" itself — there's nothing interactive inside it.
  */
 export function TipLayer() {
   const [tip, setTip] = useState(null); // { label, rect, side, el } | null
