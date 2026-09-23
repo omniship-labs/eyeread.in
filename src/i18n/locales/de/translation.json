@@ -86,6 +86,8 @@
     "highContrastHint": "Stärkerer Textschatten für bessere Lesbarkeit auf komplexen Hintergründen",
     "showIconLabels": "Symbolbeschriftungen anzeigen",
     "showIconLabelsHint": "Textbeschriftungen neben Symbol-Schaltflächen immer anzeigen, überall",
+    "showTooltips": "Tooltips anzeigen",
+    "showTooltipsHint": "Einen Hinweis anzeigen, wenn du über eine Symbol-Schaltfläche fährst oder sie mit der Tabulatortaste erreichst",
     "hotkeys": "Tastenkürzel",
     "hkToggle": "Overlay ein-/ausblenden",
     "hkToggleHint": "Teleprompter umschalten — systemweit",

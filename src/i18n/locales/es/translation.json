@@ -86,6 +86,8 @@
     "highContrastHint": "Sombra de texto más fuerte para legibilidad sobre fondos complejos",
     "showIconLabels": "Mostrar etiquetas de iconos",
     "showIconLabelsHint": "Mostrar siempre etiquetas de texto junto a los botones de icono, en todas partes",
+    "showTooltips": "Mostrar información sobre herramientas",
+    "showTooltipsHint": "Mostrar una pista al pasar el cursor o tabular a un botón de icono",
     "hotkeys": "Atajos de teclado",
     "hkToggle": "Mostrar / ocultar overlay",
     "hkToggleHint": "Alternar el teleprónter — funciona en todo el sistema",

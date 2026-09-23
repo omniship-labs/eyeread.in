@@ -483,7 +483,7 @@ export function MainWindow() {
       {permissionsModal}
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
       {tourOverlay}
-      <TipLayer />
+      <TipLayer enabled={settings.showTooltips !== false} />
     </div>
   );
 }

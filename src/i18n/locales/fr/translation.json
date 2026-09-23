@@ -86,6 +86,8 @@
     "highContrastHint": "Ombre de texte renforcée pour la lisibilité sur des fonds complexes",
     "showIconLabels": "Afficher les libellés des icônes",
     "showIconLabelsHint": "Toujours afficher les libellés textuels à côté des boutons d'icônes, partout",
+    "showTooltips": "Afficher les info-bulles",
+    "showTooltipsHint": "Afficher une indication au survol ou au focus clavier d'un bouton d'icône",
     "hotkeys": "Raccourcis",
     "hkToggle": "Afficher / masquer l’overlay",
     "hkToggleHint": "Basculer le prompteur — fonctionne à l’échelle du système",

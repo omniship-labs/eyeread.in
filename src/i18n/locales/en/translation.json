@@ -86,6 +86,8 @@
     "highContrastHint": "Stronger text shadow for legibility over complex backgrounds",
     "showIconLabels": "Show icon labels",
     "showIconLabelsHint": "Always show text labels next to icon buttons, everywhere",
+    "showTooltips": "Show tooltips",
+    "showTooltipsHint": "Show a hint when you hover over or tab to an icon button",
     "hotkeys": "Hotkeys",
     "hkToggle": "Show / hide overlay",
     "hkToggleHint": "Toggle the prompter — works system-wide",

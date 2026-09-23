@@ -64,6 +64,7 @@ export function SettingsScreen({
     highContrast,
     dyslexicFont,
     showIconLabels,
+    showTooltips = true,
     uiScale = 100,
     voice,
     keepMicOpen,
@@ -480,6 +481,18 @@ export function SettingsScreen({
             checked={!!showIconLabels}
             label={t('settings.showIconLabels')}
             onChange={(v) => onSettings({ showIconLabels: v })}
+          />
+        </div>
+        <div className="set-row">
+          <div className="set-info">
+            <b>{t('settings.showTooltips')}</b>
+            <span>{t('settings.showTooltipsHint')}</span>
+          </div>
+          <Switch
+            size="sm"
+            checked={!!showTooltips}
+            label={t('settings.showTooltips')}
+            onChange={(v) => onSettings({ showTooltips: v })}
           />
         </div>
         <div className="set-row">

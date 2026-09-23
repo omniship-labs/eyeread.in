@@ -42,6 +42,7 @@ export function AboutWindow() {
   const [uiScale, setUiScale] = useState(100);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [dyslexicFont, setDyslexicFont] = useState(false);
+  const [showTooltips, setShowTooltips] = useState(true);
   const [update, setUpdate] = useState(null);
   const testers = getTesters();
 
@@ -123,6 +124,7 @@ export function AboutWindow() {
       setUiScale(s.uiScale ?? 100);
       setReduceMotion(!!s.reduceMotion);
       setDyslexicFont(!!s.dyslexicFont);
+      setShowTooltips(s.showTooltips !== false);
     });
     let unlisten;
     listen('settings:sync', (p) => {
@@ -130,6 +132,7 @@ export function AboutWindow() {
       if (p?.settings?.uiScale !== undefined) setUiScale(p.settings.uiScale);
       if (p?.settings?.reduceMotion !== undefined) setReduceMotion(!!p.settings.reduceMotion);
       if (p?.settings?.dyslexicFont !== undefined) setDyslexicFont(!!p.settings.dyslexicFont);
+      if (p?.settings?.showTooltips !== undefined) setShowTooltips(!!p.settings.showTooltips);
     }).then((fn) => {
       unlisten = fn;
     });
@@ -305,7 +308,7 @@ export function AboutWindow() {
           <span className="aw-omniship-tagline">Open Meets New Ideas</span>
         </span>
       </button>
-      <TipLayer />
+      <TipLayer enabled={showTooltips} />
     </div>
   );
 }

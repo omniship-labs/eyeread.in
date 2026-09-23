@@ -800,7 +800,7 @@ export function OverlayWindow() {
           {tourOverlay}
         </div>
       )}
-      <TipLayer />
+      <TipLayer enabled={settings.showTooltips !== false} />
     </div>
   );
 }

@@ -86,6 +86,8 @@
     "highContrastHint": "更强的文字阴影，便于在复杂背景上阅读",
     "showIconLabels": "显示图标标签",
     "showIconLabelsHint": "始终在图标按钮旁显示文字标签，适用于所有位置",
+    "showTooltips": "显示工具提示",
+    "showTooltipsHint": "悬停或按 Tab 键移到图标按钮时显示提示",
     "hotkeys": "快捷键",
     "hkToggle": "显示 / 隐藏悬浮层",
     "hkToggleHint": "切换提词器 — 全系统生效",
