@@ -70,26 +70,29 @@ fn read_pack(path: &Path) -> Result<Vec<archive::Entry>, String> {
     entries.map_err(|e| e.to_string())
 }
 
-/// Everything that touches the secret key happens here. It returns only
-/// fixed messages, so nothing derived from the key can reach the terminal.
+/// Everything that touches the secret key happens here. Every error is a
+/// fixed message built in a match arm (never mapped from a key-derived
+/// Result), so nothing derived from the key can reach the terminal.
 mod keyed {
     use eyeread_lib::pack_signing::{archive, signature, signer, validate};
     use std::path::Path;
 
+    const KEY_UNUSABLE: &str =
+        "secret key: couldn't load it (check the file, and the password if it has one)";
+
     /// An unencrypted key is used as is; an encrypted one prompts for its password.
-    fn load(key_file: &Path) -> Result<minisign::SecretKey, &'static str> {
-        let text =
-            std::fs::read_to_string(key_file).map_err(|_| "secret key: couldn't read the file")?;
-        let key_box = || {
-            minisign::SecretKeyBox::from_string(&text)
-                .map_err(|_| "secret key: not a minisign secret key file")
-        };
-        match key_box()?.into_unencrypted_secret_key() {
-            Ok(sk) => Ok(sk),
-            Err(_) => key_box()?
-                .into_secret_key(None)
-                .map_err(|_| "secret key: wrong password, or the key is damaged"),
+    fn load(key_file: &Path) -> Option<minisign::SecretKey> {
+        let text = std::fs::read_to_string(key_file).ok()?;
+        if let Some(sk) = minisign::SecretKeyBox::from_string(&text)
+            .ok()
+            .and_then(|b| b.into_unencrypted_secret_key().ok())
+        {
+            return Some(sk);
         }
+        minisign::SecretKeyBox::from_string(&text)
+            .ok()?
+            .into_secret_key(None)
+            .ok()
     }
 
     /// Sign a revocation list and write `<list>.minisig`, checked against
@@ -101,13 +104,22 @@ mod keyed {
         json: &[u8],
         out: &Path,
     ) -> Result<(), &'static str> {
-        let sk = load(key_file)?;
-        let sig = signer::sign_revocations(json, &sk, pk).map_err(|_| "signing failed")?;
+        let Some(sk) = load(key_file) else {
+            return Err(KEY_UNUSABLE);
+        };
+        let Ok(sig) = signer::sign_revocations(json, &sk, pk) else {
+            return Err("signing failed");
+        };
         if let Some(keys) = keyring {
-            signature::RevocationList::load(&String::from_utf8_lossy(json), &sig, keys)
-                .map_err(|_| "the signed list doesn't verify with --public-key")?;
+            if signature::RevocationList::load(&String::from_utf8_lossy(json), &sig, keys).is_err()
+            {
+                return Err("the signed list doesn't verify with --public-key");
+            }
         }
-        std::fs::write(out, sig).map_err(|_| "couldn't write the signature file")
+        if std::fs::write(out, sig).is_err() {
+            return Err("couldn't write the signature file");
+        }
+        Ok(())
     }
 
     /// Sign a validated pack, check the result like the installer (and with
@@ -120,13 +132,18 @@ mod keyed {
         app_version: &semver::Version,
         out: &Path,
     ) -> Result<(), &'static str> {
-        let sk = load(key_file)?;
-        let signed =
-            signer::sign_pack(entries, &sk, pk, app_version).map_err(|_| "signing failed")?;
-        let bundle = archive::read_zip(&signed)
+        let Some(sk) = load(key_file) else {
+            return Err(KEY_UNUSABLE);
+        };
+        let Ok(signed) = signer::sign_pack(entries, &sk, pk, app_version) else {
+            return Err("signing failed");
+        };
+        let checked = archive::read_zip(&signed)
             .ok()
-            .and_then(|e| validate::validate_entries(e, app_version).ok())
-            .ok_or("the signed pack doesn't pass the installer's checks")?;
+            .and_then(|e| validate::validate_entries(e, app_version).ok());
+        let Some(bundle) = checked else {
+            return Err("the signed pack doesn't pass the installer's checks");
+        };
         if let Some(keys) = keyring {
             let verified =
                 signature::check_bundle(&bundle, keys, &signature::RevocationList::default())
@@ -135,7 +152,10 @@ mod keyed {
                 return Err("the signed pack doesn't verify with --public-key");
             }
         }
-        std::fs::write(out, signed).map_err(|_| "couldn't write the signed pack")
+        if std::fs::write(out, signed).is_err() {
+            return Err("couldn't write the signed pack");
+        }
+        Ok(())
     }
 }
 
