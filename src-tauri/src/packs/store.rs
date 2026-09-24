@@ -14,6 +14,7 @@ use super::error::{
 };
 use super::files_list::FilesList;
 use super::manifest::Manifest;
+use super::signature::RevocationList;
 use super::validate::{ValidatedBundle, ValidatedPack};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -30,6 +31,8 @@ pub enum PackStatus {
     Ok,
     /// Files changed after install. Disabled until approved again.
     Tampered,
+    /// On eyeread.in's revocation list. Disabled for good.
+    Revoked,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -47,6 +50,9 @@ pub struct InstalledPack {
     /// Top-level packs whose bundles contain this pack.
     pub used_by: BTreeSet<String>,
     pub status: PackStatus,
+    /// ✓ Verified by eyeread.in: it and everything it includes are signed.
+    #[serde(default)]
+    pub verified: bool,
     /// Why the pack is disabled, when it isn't `Ok`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status_reason: Option<String>,
@@ -219,9 +225,14 @@ impl PackStore {
         self.plan(bundle).map(|_| ())
     }
 
-    /// Install a validated pack and the packs it includes. Returns the ids
-    /// written or updated.
-    pub fn install(&mut self, bundle: &ValidatedBundle) -> PackResult<Vec<String>> {
+    /// Install a validated pack and the packs it includes. `verified` holds
+    /// the ids that get the Verified badge (see `signature::check_bundle`).
+    /// Returns the ids written or updated.
+    pub fn install(
+        &mut self,
+        bundle: &ValidatedBundle,
+        verified: &BTreeSet<String>,
+    ) -> PackResult<Vec<String>> {
         let plan = self.plan(bundle)?;
         let top_id = bundle.top.manifest.id.clone();
 
@@ -266,6 +277,7 @@ impl PackStore {
                 top_level: previous.is_some_and(|p| p.top_level) || *id == top_id,
                 used_by: previous.map(|p| p.used_by.clone()).unwrap_or_default(),
                 status: PackStatus::Ok,
+                verified: verified.contains(id),
                 status_reason: None,
                 installed_at: if *write {
                     now_ms()
@@ -400,6 +412,26 @@ impl PackStore {
         Ok(())
     }
 
+    /// Disable every installed pack on the revocation list. Returns their ids.
+    pub fn apply_revocations(&mut self, list: &RevocationList) -> PackResult<Vec<String>> {
+        let mut revoked = Vec::new();
+        for pack in self.registry.packs.values_mut() {
+            if let Some(r) = list.find(&pack.pack_hash) {
+                if pack.status != PackStatus::Revoked {
+                    pack.status = PackStatus::Revoked;
+                    pack.status_reason = Some(r.reason.clone());
+                    pack.enabled = false;
+                    pack.verified = false;
+                    revoked.push(pack.id.clone());
+                }
+            }
+        }
+        if !revoked.is_empty() {
+            self.save()?;
+        }
+        Ok(revoked)
+    }
+
     /// Run the launch check on every enabled pack. Returns the ids that were
     /// disabled because their files changed.
     pub fn verify_all(&mut self) -> Vec<String> {
@@ -470,6 +502,10 @@ pub(crate) mod tests {
         validate_entries(entries, &semver::Version::new(1, 0, 0)).unwrap()
     }
 
+    pub(crate) fn none() -> BTreeSet<String> {
+        BTreeSet::new()
+    }
+
     fn store() -> (tempfile::TempDir, PackStore) {
         let dir = tempfile::tempdir().unwrap();
         let store = PackStore::open(dir.path().join("packs")).unwrap();
@@ -480,7 +516,7 @@ pub(crate) mod tests {
     fn installs_and_lists() {
         let (_dir, mut store) = store();
         let changed = store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         assert_eq!(changed, vec!["com.example.a"]);
         let a = store.get("com.example.a").unwrap();
@@ -496,16 +532,22 @@ pub(crate) mod tests {
     fn shared_packs_are_installed_once_and_reference_counted() {
         let (_dir, mut store) = store();
         store
-            .install(&bundle(
-                ("com.example.one", "1.0.0"),
-                &[("com.example.shared", "1.0.0")],
-            ))
+            .install(
+                &bundle(
+                    ("com.example.one", "1.0.0"),
+                    &[("com.example.shared", "1.0.0")],
+                ),
+                &none(),
+            )
             .unwrap();
         let changed = store
-            .install(&bundle(
-                ("com.example.two", "1.0.0"),
-                &[("com.example.shared", "1.0.0")],
-            ))
+            .install(
+                &bundle(
+                    ("com.example.two", "1.0.0"),
+                    &[("com.example.shared", "1.0.0")],
+                ),
+                &none(),
+            )
             .unwrap();
         assert_eq!(
             changed,
@@ -534,10 +576,10 @@ pub(crate) mod tests {
     fn included_packs_cant_be_uninstalled_alone() {
         let (_dir, mut store) = store();
         store
-            .install(&bundle(
-                ("com.example.b", "1.0.0"),
-                &[("com.example.p", "1.0.0")],
-            ))
+            .install(
+                &bundle(("com.example.b", "1.0.0"), &[("com.example.p", "1.0.0")]),
+                &none(),
+            )
             .unwrap();
         assert_eq!(
             store.uninstall("com.example.p").unwrap_err().code,
@@ -549,28 +591,31 @@ pub(crate) mod tests {
     fn same_version_with_different_files_conflicts() {
         let (_dir, mut store) = store();
         store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         let other = validate_entries(
             pack_entries("com.example.a", "1.0.0", &[], "// changed\n"),
             &semver::Version::new(1, 0, 0),
         )
         .unwrap();
-        assert_eq!(store.install(&other).unwrap_err().code, INSTALL_CONFLICT);
+        assert_eq!(
+            store.install(&other, &none()).unwrap_err().code,
+            INSTALL_CONFLICT
+        );
     }
 
     #[test]
     fn upgrade_replaces_the_old_version_and_drops_unused_includes() {
         let (_dir, mut store) = store();
         store
-            .install(&bundle(
-                ("com.example.b", "1.0.0"),
-                &[("com.example.x", "1.0.0")],
-            ))
+            .install(
+                &bundle(("com.example.b", "1.0.0"), &[("com.example.x", "1.0.0")]),
+                &none(),
+            )
             .unwrap();
         store.set_enabled("com.example.b", false).unwrap();
         store
-            .install(&bundle(("com.example.b", "2.0.0"), &[]))
+            .install(&bundle(("com.example.b", "2.0.0"), &[]), &none())
             .unwrap();
         let b = store.get("com.example.b").unwrap();
         assert_eq!(b.version, "2.0.0");
@@ -584,16 +629,22 @@ pub(crate) mod tests {
     fn a_pinned_include_blocks_a_conflicting_version() {
         let (_dir, mut store) = store();
         store
-            .install(&bundle(
-                ("com.example.one", "1.0.0"),
-                &[("com.example.lib", "1.0.0")],
-            ))
+            .install(
+                &bundle(
+                    ("com.example.one", "1.0.0"),
+                    &[("com.example.lib", "1.0.0")],
+                ),
+                &none(),
+            )
             .unwrap();
         let err = store
-            .install(&bundle(
-                ("com.example.two", "1.0.0"),
-                &[("com.example.lib", "2.0.0")],
-            ))
+            .install(
+                &bundle(
+                    ("com.example.two", "1.0.0"),
+                    &[("com.example.lib", "2.0.0")],
+                ),
+                &none(),
+            )
             .unwrap_err();
         assert_eq!(err.code, INSTALL_CONFLICT);
         assert!(store.get("com.example.two").is_none());
@@ -603,7 +654,7 @@ pub(crate) mod tests {
     fn tampering_disables_the_pack_after_restart() {
         let (dir, mut store) = store();
         store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         let file = store.pack_dir("com.example.a", "1.0.0").join("main.js");
         fs::write(&file, "fetch('https://evil.example')\n").unwrap();
@@ -628,7 +679,7 @@ pub(crate) mod tests {
         let mut store = PackStore::open(dir.path().join("packs")).unwrap();
         assert!(store.get("com.example.a").unwrap().needs_approval());
         store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         assert!(store.verify("com.example.a").is_ok());
         assert!(store.get("com.example.a").unwrap().enabled);
@@ -638,7 +689,7 @@ pub(crate) mod tests {
     fn extra_and_missing_files_count_as_tampering() {
         let (_dir, mut store) = store();
         store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         let dir = store.pack_dir("com.example.a", "1.0.0");
         fs::write(dir.join("extra.js"), "// sneaky\n").unwrap();
@@ -649,7 +700,7 @@ pub(crate) mod tests {
 
         let (_d2, mut store) = self::store();
         store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         fs::remove_file(store.pack_dir("com.example.a", "1.0.0").join("LICENSE")).unwrap();
         assert_eq!(
@@ -662,7 +713,7 @@ pub(crate) mod tests {
     fn open_removes_interrupted_installs() {
         let (dir, mut store) = store();
         store
-            .install(&bundle(("com.example.a", "1.0.0"), &[]))
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
             .unwrap();
         let root = dir.path().join("packs");
         fs::create_dir_all(root.join(".staging/abc/com.example.z")).unwrap();

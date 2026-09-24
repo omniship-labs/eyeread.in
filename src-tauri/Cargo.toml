@@ -5,6 +5,16 @@ description = "eyeread.in — invisible teleprompter"
 authors = ["OmniShip"]
 license = "AGPL-3.0"
 edition = "2021"
+default-run = "eyeread-in"
+
+[features]
+# OmniShip's sign-pack tool (src/bin/sign-pack.rs). Never enabled for app builds.
+pack-signing = ["dep:minisign"]
+
+[[bin]]
+name = "sign-pack"
+path = "src/bin/sign-pack.rs"
+required-features = ["pack-signing"]
 
 [lib]
 name = "eyeread_lib"
@@ -33,6 +43,8 @@ zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2
 semver = "1.0.28"
 regex = "1.13.1"
 jsonschema = { version = "0.57.0", default-features = false }
+minisign-verify = "0.2"
+minisign = { version = "0.9", optional = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
@@ -40,4 +52,6 @@ objc2-app-kit = { version = "0.3", features = ["NSWindow", "NSResponder", "NSPan
 objc2-foundation = "0.3"
 
 [dev-dependencies]
+minisign = "0.9"
 tempfile = "3.27.0"
+

@@ -28,6 +28,8 @@ pub struct ValidatedPack {
     /// The file list computed from `entries` (the canonical `files.json`).
     pub files: FilesList,
     pub pack_hash: String,
+    /// `files.json` exactly as shipped, if it was: the bytes a signature covers.
+    pub shipped_files_json: Option<Vec<u8>>,
     /// `files.json.minisig`, if shipped.
     pub signature: Option<Vec<u8>>,
 }
@@ -112,8 +114,9 @@ fn validate_pack(
     }
 
     let files = FilesList::compute(&manifest.id, &manifest.version, &entries);
-    if let Some(shipped) = find(&entries, FILES_JSON) {
-        let shipped = FilesList::parse(&shipped.bytes, &manifest.id, &manifest.version)?;
+    let shipped_files_json = find(&entries, FILES_JSON).map(|e| e.bytes.clone());
+    if let Some(bytes) = &shipped_files_json {
+        let shipped = FilesList::parse(bytes, &manifest.id, &manifest.version)?;
         shipped.compare(&files, folder)?;
     }
     let signature = find(&entries, SIGNATURE_FILE).map(|e| e.bytes.clone());
@@ -122,6 +125,7 @@ fn validate_pack(
         files,
         manifest,
         entries,
+        shipped_files_json,
         signature,
     })
 }

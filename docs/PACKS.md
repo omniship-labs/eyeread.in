@@ -10,6 +10,42 @@ permissions:
   to the app over a local HTTP API on `127.0.0.1`. No third-party code runs
   inside eyeread.in. This page documents that API.
 
+## Verified packs (maintainers)
+
+A pack gets the ✓ **Verified by eyeread.in** badge when OmniShip signs it after
+review. The format is in [`spec/packs/FORMAT.md`](../spec/packs/FORMAT.md#signature-filesjsonminisig);
+the verifier is `src-tauri/src/packs/signature.rs`.
+
+- **Keys.** Two minisign keys, main and an offline backup. Only their public
+  halves go in the app (`TRUSTED_KEYS` in `signature.rs`); the private keys
+  never go in this repo or CI. Until the keys exist, both entries are empty and
+  every pack installs as Community.
+- **Signing** a reviewed pack, on the machine that holds the key:
+
+  ```bash
+  cd src-tauri
+  cargo run --features pack-signing --bin sign-pack -- \
+    --secret-key <key> --public-key <key.pub> <reviewed pack.zip or folder> <signed.zip>
+  ```
+
+  It validates the pack exactly like the installer, writes each pack's
+  canonical `files.json`, signs it (and every pack a bundle includes), and
+  checks the result with `--public-key` before writing `signed.zip`. Every
+  version is signed separately.
+
+- **Revoking** a pack: add its pack hash (printed by `sign-pack`, or shown in
+  the review) with a reason to `src-tauri/src/packs/revoked.json`, then sign
+  the list:
+
+  ```bash
+  cargo run --features pack-signing --bin sign-pack -- \
+    --secret-key <key> --public-key <key.pub> --revocations src/packs/revoked.json
+  ```
+
+  The list ships with the next app update: matching packs are blocked at
+  install, and disabled at launch with the reason shown. A unit test fails if
+  the shipped list is neither empty nor correctly signed.
+
 ## Connected apps
 
 Other apps on the same computer can add scripts, open them in the prompter,

@@ -8,6 +8,7 @@
 use super::error::{PackError, PackResult, INSTALL_CHANGED};
 use super::files_list::sha256_hex;
 use super::manifest::{Author, Manifest, PERMISSIONS};
+use super::signature::{self, BundleVerification, Keyring, RevocationList, Verification};
 use super::store::{InstalledPack, PackStatus, PackStore};
 use super::validate::{self, ValidatedBundle, ValidatedPack};
 use serde::Serialize;
@@ -66,8 +67,10 @@ pub struct PackSummary {
     pub permissions: Vec<PermissionSummary>,
     pub settings: usize,
     pub includes: Vec<String>,
-    /// A signature file is present. Whether it verifies is #121's check.
-    pub signed: bool,
+    /// This pack's own signature check.
+    pub verification: Verification,
+    /// ✓ Verified by eyeread.in: it and everything it includes verify.
+    pub verified: bool,
     pub installed: Option<InstalledInfo>,
 }
 
@@ -104,6 +107,7 @@ pub struct PackListItem {
     pub used_by: BTreeSet<String>,
     pub status: PackStatus,
     pub status_reason: Option<String>,
+    pub verified: bool,
     pub installed_at: u64,
 }
 
@@ -118,6 +122,7 @@ impl From<InstalledPack> for PackListItem {
             used_by: p.used_by,
             status: p.status,
             status_reason: p.status_reason,
+            verified: p.verified,
             installed_at: p.installed_at,
         }
     }
@@ -132,7 +137,7 @@ pub fn bundle_hash(bundle: &ValidatedBundle) -> String {
     sha256_hex(lines.as_bytes())
 }
 
-fn summarize(pack: &ValidatedPack, store: &PackStore) -> PackSummary {
+fn summarize(pack: &ValidatedPack, store: &PackStore, checks: &BundleVerification) -> PackSummary {
     let m = &pack.manifest;
     PackSummary {
         id: m.id.clone(),
@@ -151,7 +156,8 @@ fn summarize(pack: &ValidatedPack, store: &PackStore) -> PackSummary {
             .collect(),
         settings: m.settings.len(),
         includes: m.includes.iter().map(|i| i.id.clone()).collect(),
-        signed: pack.signature.is_some(),
+        verification: checks.packs[&m.id].clone(),
+        verified: checks.is_verified(&m.id),
         installed: store.get(&m.id).map(|i| InstalledInfo {
             version: i.version.clone(),
             same_files: i.pack_hash == pack.pack_hash,
@@ -188,6 +194,11 @@ pub fn init(app: &AppHandle) {
     let store = match app.path().app_data_dir() {
         Ok(dir) => match PackStore::open(dir.join("packs")) {
             Ok(mut store) => {
+                match store.apply_revocations(RevocationList::embedded()) {
+                    Ok(ids) if !ids.is_empty() => eprintln!("[packs] revoked: {}", ids.join(", ")),
+                    Err(e) => eprintln!("[packs] {e}"),
+                    _ => {}
+                }
                 let disabled = store.verify_all();
                 if !disabled.is_empty() {
                     eprintln!(
@@ -216,18 +227,25 @@ pub fn init(app: &AppHandle) {
 
 type PacksState<'a> = State<'a, Arc<Packs>>;
 
+/// Validate a pack file and run the signature and revocation step.
+fn check(packs: &Packs, path: String) -> PackResult<(ValidatedBundle, BundleVerification)> {
+    let bundle = validate::validate_zip_file(&PathBuf::from(path), &packs.app_version)?;
+    let checks = signature::check_bundle(&bundle, Keyring::embedded(), RevocationList::embedded())?;
+    Ok((bundle, checks))
+}
+
 #[tauri::command]
 pub fn packs_inspect(packs: PacksState<'_>, path: String) -> PackResult<InspectResult> {
-    let bundle = validate::validate_zip_file(&PathBuf::from(path), &packs.app_version)?;
+    let (bundle, checks) = check(&packs, path)?;
     let guard = packs.store()?;
     let store = guard.as_ref().expect("checked in store()");
     Ok(InspectResult {
         bundle_hash: bundle_hash(&bundle),
-        pack: summarize(&bundle.top, store),
+        pack: summarize(&bundle.top, store, &checks),
         included: bundle
             .included
             .iter()
-            .map(|p| summarize(p, store))
+            .map(|p| summarize(p, store, &checks))
             .collect(),
         permissions: combine_permissions(&bundle),
         conflict: store.check_install(&bundle).err(),
@@ -240,7 +258,7 @@ pub fn packs_install(
     path: String,
     bundle_hash: String,
 ) -> PackResult<Vec<PackListItem>> {
-    let bundle = validate::validate_zip_file(&PathBuf::from(path), &packs.app_version)?;
+    let (bundle, checks) = check(&packs, path)?;
     if self::bundle_hash(&bundle) != bundle_hash {
         return Err(PackError::install(
             INSTALL_CHANGED,
@@ -250,7 +268,12 @@ pub fn packs_install(
     let list = {
         let mut guard = packs.store()?;
         let store = guard.as_mut().expect("checked in store()");
-        store.install(&bundle)?;
+        let verified: BTreeSet<String> = bundle
+            .all()
+            .map(|p| p.manifest.id.clone())
+            .filter(|id| checks.is_verified(id))
+            .collect();
+        store.install(&bundle, &verified)?;
         store.list()
     };
     packs.emit_changed();

@@ -1,5 +1,11 @@
 mod packs;
 
+/// For OmniShip's `sign-pack` tool (`src/bin/sign-pack.rs`) only.
+#[cfg(feature = "pack-signing")]
+pub mod pack_signing {
+    pub use crate::packs::{archive, signature, signer, validate};
+}
+
 use std::sync::Mutex;
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem, Submenu},

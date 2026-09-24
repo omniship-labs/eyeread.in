@@ -10,5 +10,10 @@ pub mod files_list;
 #[cfg(test)]
 mod fixture_tests;
 pub mod manifest;
+pub mod signature;
+#[cfg(test)]
+mod signature_tests;
+#[cfg(any(test, feature = "pack-signing"))]
+pub mod signer;
 pub mod store;
 pub mod validate;

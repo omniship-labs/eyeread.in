@@ -71,7 +71,7 @@ fn every_fixture_installs_or_fails_as_the_spec_expects() {
             (None, Ok(bundle)) => {
                 // Valid: it must also install cleanly, each fixture in its own store.
                 let mut store = PackStore::open(tmp.path().join(name)).unwrap();
-                if let Err(e) = store.install(&bundle) {
+                if let Err(e) = store.install(&bundle, &super::store::tests::none()) {
                     failures.push(format!("{name}: valid but install failed: {e}"));
                     continue;
                 }
@@ -119,7 +119,9 @@ fn bundle_fixture_installs_every_included_pack() {
 
     let tmp = tempfile::tempdir().unwrap();
     let mut store = PackStore::open(tmp.path()).unwrap();
-    store.install(&bundle).unwrap();
+    store
+        .install(&bundle, &super::store::tests::none())
+        .unwrap();
     let a = store.get("com.example.a").unwrap();
     assert!(!a.top_level && a.used_by.contains("com.example.bundle"));
     assert_eq!(
