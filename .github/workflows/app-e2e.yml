@@ -243,10 +243,7 @@ jobs:
           path: __diff__
           retention-days: 14
           if-no-files-found: ignore
-      - name: Comment result on PR
-        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
-        continue-on-error: true
-        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
-        with:
-          header: app-e2e-visual-regression
-          path: __diff__/pr-comment.md
+      # Note: Posting the comment is deferred to post-app-e2e-comment.yml,
+      # which is triggered via workflow_run and runs on the base branch where
+      # the token has full permissions (unlike pull_request events from forks).
+      # This allows the comment to be posted even on fork PRs.

@@ -1,0 +1,43 @@
+# Post the app E2E test comment on PRs with full permissions.
+#
+# The app-e2e.yml workflow runs on pull_request events, where fork PRs get
+# a read-only token (GitHub denies contents: write and pull-requests: write
+# to pull_request-triggered runs from forks, regardless of declared
+# permissions, as a security measure).
+#
+# This workflow is triggered via workflow_run, which runs on the base branch
+# with full permissions. It downloads the comment artifact from the app-e2e
+# run and posts it to the PR, enabling commenting on fork PRs.
+name: Post App E2E Comment
+
+on:
+  workflow_run:
+    workflows: [App E2E]
+    types: [completed]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  post-comment:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download comment artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          name: app-e2e-diff
+          path: __diff__
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Post comment
+        if: hashFiles('__diff__/pr-comment.md') != ''
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+        with:
+          header: app-e2e-visual-regression
+          path: __diff__/pr-comment.md
+          # Use the PR number from the original workflow run's event
+          number: ${{ github.event.workflow_run.pull_requests[0].number }}
