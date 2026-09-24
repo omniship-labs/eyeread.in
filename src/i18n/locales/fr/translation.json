@@ -365,13 +365,15 @@
       "scriptsWrite": "Ajouter des scripts",
       "prompterLoad": "Charger dans le prompteur",
       "prompterControl": "Contrôler la lecture",
-      "prompterEvents": "Voir la progression"
+      "prompterEvents": "Voir la progression",
+      "filesImport": "Importer un fichier"
     },
     "permissionHints": {
       "scriptsWrite": "Ajoute de nouveaux scripts à votre bibliothèque.",
       "prompterLoad": "Ouvre un texte dans le prompteur et lance une session de lecture.",
       "prompterControl": "Lecture, pause, recommencer, aller à un mot ou fermer le prompteur.",
-      "prompterEvents": "Le titre du script en cours et votre position pendant la lecture."
+      "prompterEvents": "Le titre du script en cours et votre position pendant la lecture.",
+      "filesImport": "Vous demande de choisir un fichier avec le sélecteur de l’app et ne reçoit que ce fichier."
     },
     "sourceLabel": "De {{name}}",
     "attribution": {
@@ -386,6 +388,71 @@
       "body": "Choisissez un fichier à donner à ce pack. Il ne reçoit que le nom et le contenu de ce fichier, jamais son emplacement ni quoi que ce soit d’autre sur votre ordinateur.",
       "choose": "Choisir un fichier…",
       "cancel": "Annuler"
+    },
+    "installTitle": "Installer un pack",
+    "installButton": "Installer un pack…",
+    "dropHint": "Choisissez un fichier de pack (.zip) ou déposez-le n’importe où sur cette fenêtre.",
+    "none": "Aucun pack installé pour l’instant.",
+    "rowMeta": "{{version}} · par {{author}}",
+    "toggle": "Activer ou désactiver {{name}}",
+    "internetOn": "L’accès à internet est activé",
+    "badge": {
+      "verified": "Vérifié",
+      "community": "Communauté",
+      "dev": "Dev"
+    },
+    "status": {
+      "tampered": "Désactivé : ses fichiers ont changé après l’installation ({{reason}}). Réinstallez-le pour l’approuver à nouveau.",
+      "revoked": "Bloqué par eyeread.in : {{reason}}",
+      "crashed": "Arrêté après des plantages répétés : {{reason}}"
+    },
+    "install": {
+      "checking": "Vérification du pack…",
+      "title": "Installer « {{name}} » ?",
+      "byline": "{{version}} · par {{author}}",
+      "reinstall": "Cette version est déjà installée. La réinstaller approuve ses fichiers.",
+      "update": "Met à jour {{from}} vers {{to}}. Les nouvelles autorisations sont désactivées au départ.",
+      "includes": "Installe aussi :",
+      "permissions": "Ce qu’il peut demander (tout est désactivé jusqu’à ce que vous l’activiez) :",
+      "noPermissions": "Il ne demande aucune autorisation.",
+      "sites": "Internet : {{sites}}",
+      "permissionsNote": "Après l’installation, vous choisissez les autorisations à accorder et si chacune peut utiliser internet.",
+      "license": "Licence : {{license}}",
+      "verified": "Vérifié par eyeread.in : cette version a été examinée et signée.",
+      "unsignedTitle": "Non vérifié",
+      "unsignedBody": "eyeread.in n’a pas examiné ce pack. Il s’exécute dans un bac à sable et ne peut faire que ce que vous autorisez, mais n’installez que des packs de personnes de confiance. eyeread.in n’est pas responsable de ce que font les packs de la communauté.",
+      "understand": "Je comprends les risques",
+      "install": "Installer",
+      "deny": "Ne pas installer",
+      "failed": "Ce pack ne peut pas être installé."
+    },
+    "screen": {
+      "back": "Tous les packs",
+      "meta": "{{version}} · par {{author}} · {{license}}",
+      "includedBy": "Fait partie de : {{names}}",
+      "update": "Mettre à jour…",
+      "reinstall": "Réinstaller…",
+      "uninstall": "Désinstaller",
+      "uninstallConfirm": "Désinstaller {{name}} et ses réglages ?",
+      "cancel": "Annuler",
+      "permissions": "Autorisations",
+      "permissionsHint": "Autorisation",
+      "allow": "Autoriser",
+      "internet": "Internet",
+      "allowLabel": "Autoriser : {{permission}}",
+      "internetLabel": "Internet pour : {{permission}}",
+      "noInternet": "—",
+      "noPermissions": "Ce pack ne demande aucune autorisation.",
+      "settings": "Réglages",
+      "network": "Journal réseau",
+      "networkHint": "Chaque requête internet de ce pack, de la plus récente à la plus ancienne. Le contenu des requêtes et des réponses n’est jamais enregistré.",
+      "networkEmpty": "Aucune requête pour l’instant.",
+      "networkClear": "Effacer",
+      "logTime": "Heure",
+      "logPermission": "Autorisation",
+      "logRequest": "Requête",
+      "logResult": "Résultat",
+      "logBytes": "Octets"
     }
   }
 }

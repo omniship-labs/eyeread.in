@@ -159,6 +159,13 @@ impl PackStore {
             .map_err(|e| PackError::io("Couldn't save installed packs", e))
     }
 
+    /// Where a pack picked in the app (not dropped from disk) is kept while
+    /// the user reviews it. Cleared at every start, like any folder the
+    /// registry doesn't know.
+    pub fn incoming_dir(&self) -> PathBuf {
+        self.root.join(".incoming")
+    }
+
     pub fn pack_dir(&self, id: &str, version: &str) -> PathBuf {
         self.root.join(id).join(version)
     }

@@ -365,13 +365,15 @@
       "scriptsWrite": "添加稿件",
       "prompterLoad": "载入提词器",
       "prompterControl": "控制播放",
-      "prompterEvents": "查看阅读进度"
+      "prompterEvents": "查看阅读进度",
+      "filesImport": "导入文件"
     },
     "permissionHints": {
       "scriptsWrite": "向你的稿件库添加新稿件。",
       "prompterLoad": "在提词器中打开文本并开始阅读。",
       "prompterControl": "播放、暂停、重新开始、跳到某个词或关闭提词器。",
-      "prompterEvents": "阅读时当前稿件的标题以及你读到的位置。"
+      "prompterEvents": "阅读时当前稿件的标题以及你读到的位置。",
+      "filesImport": "请你用应用自带的选择器挑一个文件，并且只拿到这个文件。"
     },
     "sourceLabel": "来自 {{name}}",
     "attribution": {
@@ -386,6 +388,71 @@
       "body": "请选择一个文件交给这个功能包。它只会收到该文件的名称和内容，不会知道文件的位置，也拿不到你电脑上的其他任何东西。",
       "choose": "选择文件…",
       "cancel": "取消"
+    },
+    "installTitle": "安装功能包",
+    "installButton": "安装功能包…",
+    "dropHint": "选择一个功能包文件（.zip），或把它拖到这个窗口的任意位置。",
+    "none": "尚未安装任何功能包。",
+    "rowMeta": "{{version}} · {{author}}",
+    "toggle": "开启或关闭 {{name}}",
+    "internetOn": "已开启联网",
+    "badge": {
+      "verified": "已验证",
+      "community": "社区",
+      "dev": "Dev"
+    },
+    "status": {
+      "tampered": "已关闭：安装后其文件被改动（{{reason}}）。重新安装即可再次批准。",
+      "revoked": "已被 eyeread.in 封禁：{{reason}}",
+      "crashed": "多次崩溃后已停止：{{reason}}"
+    },
+    "install": {
+      "checking": "正在检查功能包…",
+      "title": "安装“{{name}}”？",
+      "byline": "{{version}} · {{author}}",
+      "reinstall": "此版本已安装。再次安装即表示重新批准其文件。",
+      "update": "将 {{from}} 更新到 {{to}}。新权限默认关闭。",
+      "includes": "同时安装：",
+      "permissions": "它可能请求做的事（在你开启前全部关闭）：",
+      "noPermissions": "它不请求任何权限。",
+      "sites": "联网：{{sites}}",
+      "permissionsNote": "安装后，由你决定允许哪些权限，以及每项权限能否联网。",
+      "license": "许可证：{{license}}",
+      "verified": "已由 eyeread.in 验证：此版本已经过审核并签名。",
+      "unsignedTitle": "未验证",
+      "unsignedBody": "eyeread.in 尚未审核此功能包。它在沙盒中运行，只能做你允许的事，但请只安装你信任的人提供的功能包。eyeread.in 不对社区功能包的行为负责。",
+      "understand": "我了解风险",
+      "install": "安装",
+      "deny": "不安装",
+      "failed": "无法安装此功能包。"
+    },
+    "screen": {
+      "back": "全部功能包",
+      "meta": "{{version}} · {{author}} · {{license}}",
+      "includedBy": "属于：{{names}}",
+      "update": "更新…",
+      "reinstall": "重新安装…",
+      "uninstall": "卸载",
+      "uninstallConfirm": "卸载 {{name}} 及其设置？",
+      "cancel": "取消",
+      "permissions": "权限",
+      "permissionsHint": "权限",
+      "allow": "允许",
+      "internet": "联网",
+      "allowLabel": "允许：{{permission}}",
+      "internetLabel": "联网：{{permission}}",
+      "noInternet": "—",
+      "noPermissions": "此功能包不请求任何权限。",
+      "settings": "设置",
+      "network": "网络日志",
+      "networkHint": "此功能包的每一次联网请求，最新的在前。从不记录请求和响应的内容。",
+      "networkEmpty": "还没有请求。",
+      "networkClear": "清除",
+      "logTime": "时间",
+      "logPermission": "权限",
+      "logRequest": "请求",
+      "logResult": "结果",
+      "logBytes": "字节"
     }
   }
 }

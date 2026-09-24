@@ -236,8 +236,8 @@ export function SettingsScreen({
         </div>
       )}
 
-      {/* ── Packs (advanced: Connected apps, the local API; off by default) ── */}
-      {advanced && <PacksSettings />}
+      {/* ── Packs (Connected apps, the local API, only in the advanced view) ── */}
+      <PacksSettings advanced={advanced} />
 
       {/* ── Reading defaults ── */}
       <div className="set-group">

@@ -365,13 +365,15 @@
       "scriptsWrite": "Skripte hinzufügen",
       "prompterLoad": "In den Prompter laden",
       "prompterControl": "Wiedergabe steuern",
-      "prompterEvents": "Lesefortschritt sehen"
+      "prompterEvents": "Lesefortschritt sehen",
+      "filesImport": "Eine Datei importieren"
     },
     "permissionHints": {
       "scriptsWrite": "Fügt deiner Bibliothek neue Skripte hinzu.",
       "prompterLoad": "Öffnet Text im Prompter und startet eine Lesesitzung.",
       "prompterControl": "Abspielen, pausieren, neu starten, zu einem Wort springen oder den Prompter schließen.",
-      "prompterEvents": "Titel des aktuellen Skripts und deine Position darin, während du liest."
+      "prompterEvents": "Titel des aktuellen Skripts und deine Position darin, während du liest.",
+      "filesImport": "Bittet dich, mit der Dateiauswahl der App eine Datei zu wählen, und erhält nur diese Datei."
     },
     "sourceLabel": "Von {{name}}",
     "attribution": {
@@ -386,6 +388,71 @@
       "body": "Wähle eine Datei für dieses Pack aus. Es erhält nur den Namen und Inhalt dieser Datei – nie ihren Speicherort oder sonst etwas auf deinem Computer.",
       "choose": "Datei auswählen…",
       "cancel": "Abbrechen"
+    },
+    "installTitle": "Ein Pack installieren",
+    "installButton": "Pack installieren…",
+    "dropHint": "Wähle eine Pack-Datei (.zip) aus oder zieh sie irgendwo auf dieses Fenster.",
+    "none": "Noch keine Packs installiert.",
+    "rowMeta": "{{version}} · von {{author}}",
+    "toggle": "{{name}} ein- oder ausschalten",
+    "internetOn": "Internetzugriff ist an",
+    "badge": {
+      "verified": "Geprüft",
+      "community": "Community",
+      "dev": "Dev"
+    },
+    "status": {
+      "tampered": "Aus: Seine Dateien wurden nach der Installation geändert ({{reason}}). Installiere es neu, um es wieder freizugeben.",
+      "revoked": "Von eyeread.in gesperrt: {{reason}}",
+      "crashed": "Nach wiederholten Abstürzen gestoppt: {{reason}}"
+    },
+    "install": {
+      "checking": "Pack wird geprüft…",
+      "title": "„{{name}}“ installieren?",
+      "byline": "{{version}} · von {{author}}",
+      "reinstall": "Diese Version ist bereits installiert. Eine erneute Installation gibt ihre Dateien wieder frei.",
+      "update": "Aktualisiert {{from}} auf {{to}}. Neue Berechtigungen sind zunächst aus.",
+      "includes": "Installiert außerdem:",
+      "permissions": "Was es anfragen kann (alles aus, bis du es einschaltest):",
+      "noPermissions": "Es fragt keine Berechtigungen an.",
+      "sites": "Internet: {{sites}}",
+      "permissionsNote": "Nach der Installation wählst du, welche Berechtigungen du erlaubst und ob sie das Internet nutzen dürfen.",
+      "license": "Lizenz: {{license}}",
+      "verified": "Von eyeread.in geprüft: Diese Version wurde begutachtet und signiert.",
+      "unsignedTitle": "Nicht geprüft",
+      "unsignedBody": "eyeread.in hat dieses Pack nicht begutachtet. Es läuft in einer Sandbox und kann nur, was du erlaubst – installiere Packs aber nur von Leuten, denen du vertraust. eyeread.in ist nicht verantwortlich für das, was Community-Packs tun.",
+      "understand": "Ich verstehe die Risiken",
+      "install": "Installieren",
+      "deny": "Nicht installieren",
+      "failed": "Dieses Pack kann nicht installiert werden."
+    },
+    "screen": {
+      "back": "Alle Packs",
+      "meta": "{{version}} · von {{author}} · {{license}}",
+      "includedBy": "Teil von: {{names}}",
+      "update": "Aktualisieren…",
+      "reinstall": "Neu installieren…",
+      "uninstall": "Deinstallieren",
+      "uninstallConfirm": "{{name}} und seine Einstellungen deinstallieren?",
+      "cancel": "Abbrechen",
+      "permissions": "Berechtigungen",
+      "permissionsHint": "Berechtigung",
+      "allow": "Erlauben",
+      "internet": "Internet",
+      "allowLabel": "Erlauben: {{permission}}",
+      "internetLabel": "Internet für: {{permission}}",
+      "noInternet": "—",
+      "noPermissions": "Dieses Pack fragt keine Berechtigungen an.",
+      "settings": "Einstellungen",
+      "network": "Netzwerkprotokoll",
+      "networkHint": "Jede Internetanfrage dieses Packs, neueste zuerst. Inhalte von Anfragen und Antworten werden nie gespeichert.",
+      "networkEmpty": "Noch keine Anfragen.",
+      "networkClear": "Leeren",
+      "logTime": "Zeit",
+      "logPermission": "Berechtigung",
+      "logRequest": "Anfrage",
+      "logResult": "Ergebnis",
+      "logBytes": "Bytes"
     }
   }
 }

@@ -365,13 +365,15 @@
       "scriptsWrite": "Añadir guiones",
       "prompterLoad": "Cargar en el teleprompter",
       "prompterControl": "Controlar la reproducción",
-      "prompterEvents": "Ver el progreso de lectura"
+      "prompterEvents": "Ver el progreso de lectura",
+      "filesImport": "Importar un archivo"
     },
     "permissionHints": {
       "scriptsWrite": "Añade guiones nuevos a tu biblioteca.",
       "prompterLoad": "Abre texto en el teleprompter e inicia una sesión de lectura.",
       "prompterControl": "Reproducir, pausar, reiniciar, saltar a una palabra o cerrar el teleprompter.",
-      "prompterEvents": "El título del guion actual y tu posición en él mientras lees."
+      "prompterEvents": "El título del guion actual y tu posición en él mientras lees.",
+      "filesImport": "Te pide elegir un archivo con el selector de la app y solo recibe ese archivo."
     },
     "sourceLabel": "De {{name}}",
     "attribution": {
@@ -386,6 +388,71 @@
       "body": "Elige un archivo para este pack. Solo recibe el nombre y el contenido de ese archivo, nunca su ubicación ni nada más de tu ordenador.",
       "choose": "Elegir archivo…",
       "cancel": "Cancelar"
+    },
+    "installTitle": "Instalar un pack",
+    "installButton": "Instalar pack…",
+    "dropHint": "Elige un archivo de pack (.zip) o suéltalo en cualquier parte de esta ventana.",
+    "none": "Aún no hay packs instalados.",
+    "rowMeta": "{{version}} · de {{author}}",
+    "toggle": "Activar o desactivar {{name}}",
+    "internetOn": "El acceso a internet está activado",
+    "badge": {
+      "verified": "Verificado",
+      "community": "Comunidad",
+      "dev": "Dev"
+    },
+    "status": {
+      "tampered": "Desactivado: sus archivos cambiaron tras instalarlo ({{reason}}). Reinstálalo para aprobarlo de nuevo.",
+      "revoked": "Bloqueado por eyeread.in: {{reason}}",
+      "crashed": "Detenido tras fallar varias veces: {{reason}}"
+    },
+    "install": {
+      "checking": "Comprobando el pack…",
+      "title": "¿Instalar «{{name}}»?",
+      "byline": "{{version}} · de {{author}}",
+      "reinstall": "Esta versión ya está instalada. Instalarla de nuevo aprueba sus archivos.",
+      "update": "Actualiza {{from}} a {{to}}. Los permisos nuevos empiezan desactivados.",
+      "includes": "También instala:",
+      "permissions": "Lo que puede pedir hacer (todo desactivado hasta que lo actives):",
+      "noPermissions": "No pide ningún permiso.",
+      "sites": "Internet: {{sites}}",
+      "permissionsNote": "Después de instalarlo eliges qué permisos permitir y si cada uno puede usar internet.",
+      "license": "Licencia: {{license}}",
+      "verified": "Verificado por eyeread.in: esta versión se revisó y firmó.",
+      "unsignedTitle": "Sin verificar",
+      "unsignedBody": "eyeread.in no ha revisado este pack. Se ejecuta aislado y solo puede hacer lo que permitas, pero instala packs solo de personas en las que confíes. eyeread.in no se hace responsable de lo que hagan los packs de la comunidad.",
+      "understand": "Entiendo los riesgos",
+      "install": "Instalar",
+      "deny": "No instalar",
+      "failed": "Este pack no se puede instalar."
+    },
+    "screen": {
+      "back": "Todos los packs",
+      "meta": "{{version}} · de {{author}} · {{license}}",
+      "includedBy": "Forma parte de: {{names}}",
+      "update": "Actualizar…",
+      "reinstall": "Reinstalar…",
+      "uninstall": "Desinstalar",
+      "uninstallConfirm": "¿Desinstalar {{name}} y sus ajustes?",
+      "cancel": "Cancelar",
+      "permissions": "Permisos",
+      "permissionsHint": "Permiso",
+      "allow": "Permitir",
+      "internet": "Internet",
+      "allowLabel": "Permitir: {{permission}}",
+      "internetLabel": "Internet para: {{permission}}",
+      "noInternet": "—",
+      "noPermissions": "Este pack no pide ningún permiso.",
+      "settings": "Ajustes",
+      "network": "Registro de red",
+      "networkHint": "Cada petición a internet de este pack, de la más reciente a la más antigua. Nunca se guarda el contenido de peticiones ni respuestas.",
+      "networkEmpty": "Aún no hay peticiones.",
+      "networkClear": "Borrar",
+      "logTime": "Hora",
+      "logPermission": "Permiso",
+      "logRequest": "Petición",
+      "logResult": "Resultado",
+      "logBytes": "Bytes"
     }
   }
 }

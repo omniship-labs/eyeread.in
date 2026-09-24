@@ -436,6 +436,7 @@ pub fn run() {
             packs::connected_apps::packs_apps_revoke,
             packs::connected_apps::packs_apps_resolve_pairing,
             packs::commands::packs_inspect,
+            packs::commands::packs_inspect_bytes,
             packs::commands::packs_install,
             packs::commands::packs_uninstall,
             packs::commands::packs_list,

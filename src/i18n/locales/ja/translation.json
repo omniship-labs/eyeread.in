@@ -365,13 +365,15 @@
       "scriptsWrite": "原稿を追加",
       "prompterLoad": "プロンプターに読み込む",
       "prompterControl": "再生を操作",
-      "prompterEvents": "読み上げの進み具合を見る"
+      "prompterEvents": "読み上げの進み具合を見る",
+      "filesImport": "ファイルを読み込む"
     },
     "permissionHints": {
       "scriptsWrite": "ライブラリに新しい原稿を追加します。",
       "prompterLoad": "テキストをプロンプターで開き、読み上げを開始します。",
       "prompterControl": "再生、一時停止、最初から、指定した語へ移動、プロンプターを閉じる。",
-      "prompterEvents": "読んでいる間の現在の原稿のタイトルと読み進めた位置。"
+      "prompterEvents": "読んでいる間の現在の原稿のタイトルと読み進めた位置。",
+      "filesImport": "アプリのファイル選択でファイルを 1 つ選ぶよう求め、そのファイルだけを受け取ります。"
     },
     "sourceLabel": "{{name}} から",
     "attribution": {
@@ -386,6 +388,71 @@
       "body": "このパックに渡すファイルを 1 つ選んでください。パックが受け取るのはそのファイルの名前と内容だけで、保存場所やコンピューター上の他のものは渡されません。",
       "choose": "ファイルを選択…",
       "cancel": "キャンセル"
+    },
+    "installTitle": "パックをインストール",
+    "installButton": "パックをインストール…",
+    "dropHint": "パックファイル（.zip）を選ぶか、このウィンドウのどこかにドロップしてください。",
+    "none": "インストール済みのパックはまだありません。",
+    "rowMeta": "{{version}} · {{author}}",
+    "toggle": "{{name}} のオン/オフ",
+    "internetOn": "インターネット接続がオン",
+    "badge": {
+      "verified": "検証済み",
+      "community": "コミュニティ",
+      "dev": "Dev"
+    },
+    "status": {
+      "tampered": "オフ：インストール後にファイルが変更されました（{{reason}}）。再インストールすると再承認されます。",
+      "revoked": "eyeread.in によりブロック：{{reason}}",
+      "crashed": "クラッシュが続いたため停止：{{reason}}"
+    },
+    "install": {
+      "checking": "パックを確認しています…",
+      "title": "「{{name}}」をインストールしますか？",
+      "byline": "{{version}} · {{author}}",
+      "reinstall": "このバージョンはインストール済みです。再インストールするとファイルが再承認されます。",
+      "update": "{{from}} から {{to}} に更新します。新しい権限は最初オフです。",
+      "includes": "あわせてインストールされるもの：",
+      "permissions": "求める可能性のある操作（オンにするまですべてオフ）：",
+      "noPermissions": "権限を求めません。",
+      "sites": "インターネット：{{sites}}",
+      "permissionsNote": "インストール後に、どの権限を許可するか、それぞれがインターネットを使えるかを選べます。",
+      "license": "ライセンス：{{license}}",
+      "verified": "eyeread.in による検証済み：このバージョンはレビューされ、署名されています。",
+      "unsignedTitle": "未検証",
+      "unsignedBody": "eyeread.in はこのパックをレビューしていません。サンドボックスで動作し、許可したことしかできませんが、信頼できる人のパックだけをインストールしてください。コミュニティパックの動作について eyeread.in は責任を負いません。",
+      "understand": "リスクを理解しました",
+      "install": "インストール",
+      "deny": "インストールしない",
+      "failed": "このパックはインストールできません。"
+    },
+    "screen": {
+      "back": "すべてのパック",
+      "meta": "{{version}} · {{author}} · {{license}}",
+      "includedBy": "含まれるパック：{{names}}",
+      "update": "更新…",
+      "reinstall": "再インストール…",
+      "uninstall": "アンインストール",
+      "uninstallConfirm": "{{name}} と設定をアンインストールしますか？",
+      "cancel": "キャンセル",
+      "permissions": "権限",
+      "permissionsHint": "権限",
+      "allow": "許可",
+      "internet": "インターネット",
+      "allowLabel": "許可：{{permission}}",
+      "internetLabel": "インターネット：{{permission}}",
+      "noInternet": "—",
+      "noPermissions": "このパックは権限を求めません。",
+      "settings": "設定",
+      "network": "ネットワークログ",
+      "networkHint": "このパックのインターネット通信を新しい順に表示します。リクエストとレスポンスの内容は記録されません。",
+      "networkEmpty": "まだ通信はありません。",
+      "networkClear": "消去",
+      "logTime": "時刻",
+      "logPermission": "権限",
+      "logRequest": "リクエスト",
+      "logResult": "結果",
+      "logBytes": "バイト"
     }
   }
 }

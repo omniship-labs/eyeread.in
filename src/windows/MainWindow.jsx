@@ -79,6 +79,7 @@ import {
 import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
 import { usePacksHost } from '../hooks/usePacksHost';
+import { usePackInstaller } from '../hooks/usePackInstaller';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { useTour } from '../hooks/useTour';
@@ -315,6 +316,8 @@ export function MainWindow() {
 
   // Packs / Connected apps: pairing prompt + calls routed to this window.
   const { pairingModal, importModal } = usePacksHost({ setScripts, startReading });
+  // Packs: drop a .zip on the window, or "Install pack…" in Settings.
+  const { installModal } = usePackInstaller();
 
   return (
     <div className={'app-shell' + (shieldActive(settings) ? ' shielded' : ' exposed')}>
@@ -487,6 +490,7 @@ export function MainWindow() {
       {permissionsModal}
       {pairingModal}
       {importModal}
+      {installModal}
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
       {tourOverlay}
       <TipLayer enabled={settings.showTooltips !== false} />

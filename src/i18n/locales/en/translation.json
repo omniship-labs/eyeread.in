@@ -365,13 +365,15 @@
       "scriptsWrite": "Add scripts",
       "prompterLoad": "Load into the prompter",
       "prompterControl": "Control playback",
-      "prompterEvents": "See reading progress"
+      "prompterEvents": "See reading progress",
+      "filesImport": "Import a file"
     },
     "permissionHints": {
       "scriptsWrite": "Adds new scripts to your library.",
       "prompterLoad": "Opens text in the prompter and starts a reading session.",
       "prompterControl": "Play, pause, restart, jump to a word, or close the prompter.",
-      "prompterEvents": "The current script's title and your position in it, as you read."
+      "prompterEvents": "The current script's title and your position in it, as you read.",
+      "filesImport": "Asks you to pick a file with the app’s own picker, and receives only that file."
     },
     "sourceLabel": "From {{name}}",
     "attribution": {
@@ -386,6 +388,71 @@
       "body": "Choose one file to give this pack. It gets only that file’s name and contents, never where it is or anything else on your computer.",
       "choose": "Choose file…",
       "cancel": "Cancel"
+    },
+    "installTitle": "Install a pack",
+    "installButton": "Install pack…",
+    "dropHint": "Choose a pack file (.zip), or drop one anywhere on this window.",
+    "none": "No packs installed yet.",
+    "rowMeta": "{{version}} · by {{author}}",
+    "toggle": "{{name}} on or off",
+    "internetOn": "Internet access is on",
+    "badge": {
+      "verified": "Verified",
+      "community": "Community",
+      "dev": "Dev"
+    },
+    "status": {
+      "tampered": "Off: its files changed after install ({{reason}}). Reinstall it to approve it again.",
+      "revoked": "Blocked by eyeread.in: {{reason}}",
+      "crashed": "Stopped after repeated crashes: {{reason}}"
+    },
+    "install": {
+      "checking": "Checking the pack…",
+      "title": "Install “{{name}}”?",
+      "byline": "{{version}} · by {{author}}",
+      "reinstall": "This version is already installed. Installing it again approves its files.",
+      "update": "Updates {{from}} to {{to}}. New permissions start off.",
+      "includes": "Also installs:",
+      "permissions": "What it can ask to do (all off until you turn it on):",
+      "noPermissions": "It doesn’t ask for any permissions.",
+      "sites": "Internet: {{sites}}",
+      "permissionsNote": "After installing, you choose which permissions to allow, and whether each can use the internet.",
+      "license": "License: {{license}}",
+      "verified": "Verified by eyeread.in: this version was reviewed and signed.",
+      "unsignedTitle": "Not verified",
+      "unsignedBody": "eyeread.in hasn’t reviewed this pack. It runs in a sandbox and can only do what you allow, but install packs only from people you trust. eyeread.in isn’t responsible for what community packs do.",
+      "understand": "I understand the risks",
+      "install": "Install",
+      "deny": "Don’t install",
+      "failed": "This pack can’t be installed."
+    },
+    "screen": {
+      "back": "All packs",
+      "meta": "{{version}} · by {{author}} · {{license}}",
+      "includedBy": "Part of: {{names}}",
+      "update": "Update…",
+      "reinstall": "Reinstall…",
+      "uninstall": "Uninstall",
+      "uninstallConfirm": "Uninstall {{name}} and its settings?",
+      "cancel": "Cancel",
+      "permissions": "Permissions",
+      "permissionsHint": "Permission",
+      "allow": "Allow",
+      "internet": "Internet",
+      "allowLabel": "Allow: {{permission}}",
+      "internetLabel": "Internet for: {{permission}}",
+      "noInternet": "—",
+      "noPermissions": "This pack doesn’t ask for any permissions.",
+      "settings": "Settings",
+      "network": "Network log",
+      "networkHint": "Every internet request this pack made, newest first. Request and response contents are never recorded.",
+      "networkEmpty": "No requests yet.",
+      "networkClear": "Clear",
+      "logTime": "Time",
+      "logPermission": "Permission",
+      "logRequest": "Request",
+      "logResult": "Result",
+      "logBytes": "Bytes"
     }
   }
 }

@@ -90,6 +90,8 @@ pub struct CombinedPermission {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InspectResult {
+    /// The file to pass to `packs_install`.
+    pub path: String,
     pub bundle_hash: String,
     pub pack: PackSummary,
     pub included: Vec<PackSummary>,
@@ -265,10 +267,11 @@ fn check(packs: &Packs, path: String) -> PackResult<(ValidatedBundle, BundleVeri
 
 #[tauri::command]
 pub fn packs_inspect(packs: PacksState<'_>, path: String) -> PackResult<InspectResult> {
-    let (bundle, checks) = check(&packs, path)?;
+    let (bundle, checks) = check(&packs, path.clone())?;
     let guard = packs.store()?;
     let store = guard.as_ref().expect("checked in store()");
     Ok(InspectResult {
+        path,
         bundle_hash: bundle_hash(&bundle),
         pack: summarize(&bundle.top, store, &checks),
         included: bundle
@@ -501,4 +504,32 @@ pub fn packs_settings_set(
         .broker
         .set_settings(&id, stored, Value::Object(effective.clone()));
     Ok(effective)
+}
+
+/// Inspect a pack the user picked with "Install pack…": the webview hands
+/// over the zip's bytes (raw IPC body), not a path. They're staged in the
+/// store's incoming folder, then inspected like a dropped file.
+#[tauri::command]
+pub fn packs_inspect_bytes(
+    packs: PacksState<'_>,
+    request: tauri::ipc::Request<'_>,
+) -> PackResult<InspectResult> {
+    let tauri::ipc::InvokeBody::Raw(bytes) = request.body() else {
+        return Err(PackError::new("PACK_ZIP_INVALID", &[]));
+    };
+    if bytes.len() as u64 > super::archive::MAX_ZIP_BYTES {
+        return Err(PackError::new(
+            "PACK_TOO_LARGE",
+            &[("limit", &super::error::mib(super::archive::MAX_ZIP_BYTES))],
+        ));
+    }
+    let dir = packs
+        .store()?
+        .as_ref()
+        .expect("checked in store()")
+        .incoming_dir();
+    std::fs::create_dir_all(&dir).map_err(|e| PackError::io("Couldn't stage the pack", e))?;
+    let path = dir.join(format!("{}.zip", &sha256_hex(bytes)[..16]));
+    std::fs::write(&path, bytes).map_err(|e| PackError::io("Couldn't stage the pack", e))?;
+    packs_inspect(packs, path.to_string_lossy().into_owned())
 }

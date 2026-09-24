@@ -18,7 +18,46 @@ export const PERMISSION_LABEL_KEYS = {
   'prompter:load': 'prompterLoad',
   'prompter:control': 'prompterControl',
   'prompter:events': 'prompterEvents',
+  'files:import': 'filesImport',
 };
+
+// ---- installed packs (src-tauri/src/packs/commands.rs) --------------------------
+
+export const listPacks = () => (isTauri ? invoke('packs_list') : Promise.resolve([]));
+/** Validate a pack file dropped onto the window (a native path). */
+export const inspectPackPath = (path) => invoke('packs_inspect', { path });
+/** Validate a pack picked with "Install pack…": the zip's bytes, sent raw. */
+export const inspectPackFile = async (file) =>
+  invoke('packs_inspect_bytes', new Uint8Array(await file.arrayBuffer()));
+/** Install exactly what was inspected; refused if the file changed since. */
+export const installPack = (path, bundleHash) => invoke('packs_install', { path, bundleHash });
+export const uninstallPack = (id) => invoke('packs_uninstall', { id });
+export const setPackEnabled = (id, enabled) => invoke('packs_set_enabled', { id, enabled });
+export const getPackGrants = (id) => invoke('packs_grants', { id });
+export const setPackGrant = (id, permission, allowed, internet) =>
+  invoke('packs_set_grant', { id, permission, allowed, internet });
+export const getPackSettings = (id) => invoke('packs_settings_get', { id });
+export const setPackSettings = (id, values) => invoke('packs_settings_set', { id, values });
+export const getPackNetLog = (id) => invoke('packs_net_log', { id });
+export const clearPackNetLog = (id) => invoke('packs_net_clear_log', { id });
+
+/** The badge a pack shows: 'verified' (✓ signed by eyeread.in) or 'community'. */
+export function packBadge(pack) {
+  if (pack?.dev) return 'dev';
+  return pack?.verified ? 'verified' : 'community';
+}
+
+/** Why a pack is blocked, or null: tampered files, a revocation, a crash. */
+export function packProblem(pack) {
+  if (!pack || pack.status === 'ok') return null;
+  return { status: pack.status, reason: pack.statusReason || '' };
+}
+
+/** A pack-command error ({ code, message } from Rust) as display text. */
+export function packErrorMessage(err) {
+  if (err && typeof err === 'object' && err.message) return err.message;
+  return String(err ?? '');
+}
 
 export async function getConnectedAppsStatus() {
   if (!isTauri) return null;
@@ -125,3 +164,22 @@ export async function importPayload(file, maxBytes) {
 export function acceptAttribute(accept) {
   return Array.isArray(accept) && accept.length ? accept.join(',') : undefined;
 }
+
+// ---- install flow ----------------------------------------------------------------
+
+const INSTALL_EVENT = 'eyeread:install-pack';
+
+/** Ask the main window's installer to review a picked `.zip` File. */
+export function requestPackInstall(file) {
+  window.dispatchEvent(new CustomEvent(INSTALL_EVENT, { detail: { file } }));
+}
+
+/** Listen for install requests from Settings. Returns an unlisten function. */
+export function onPackInstallRequest(cb) {
+  const handler = (e) => cb(e.detail);
+  window.addEventListener(INSTALL_EVENT, handler);
+  return () => window.removeEventListener(INSTALL_EVENT, handler);
+}
+
+/** The pack files in a drop: `.zip` only. */
+export const packPathsIn = (paths) => (paths || []).filter((p) => /\.zip$/i.test(p));
