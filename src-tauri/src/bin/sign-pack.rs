@@ -70,21 +70,28 @@ fn read_pack(path: &Path) -> Result<Vec<archive::Entry>, String> {
 }
 
 /// An unencrypted key is used as is; an encrypted one prompts for its password.
+/// Errors are fixed messages: nothing read from the key file is ever printed.
 fn load_secret_key(path: &Path) -> Result<minisign::SecretKey, String> {
-    let text = std::fs::read_to_string(path).map_err(|e| format!("secret key: {e}"))?;
-    let key_box =
-        || minisign::SecretKeyBox::from_string(&text).map_err(|e| format!("secret key: {e}"));
+    let text = std::fs::read_to_string(path)
+        .map_err(|_| "secret key: couldn't read the file".to_string())?;
+    let key_box = || {
+        minisign::SecretKeyBox::from_string(&text)
+            .map_err(|_| "secret key: not a minisign secret key file".to_string())
+    };
     match key_box()?.into_unencrypted_secret_key() {
         Ok(sk) => Ok(sk),
         Err(_) => key_box()?
             .into_secret_key(None)
-            .map_err(|e| format!("secret key: {e}")),
+            .map_err(|_| "secret key: wrong password, or the key is damaged".to_string()),
     }
 }
 
+/// Anything signed with the secret key is reported only as success or a
+/// fixed failure message, so no key-derived data reaches the terminal.
+const SIGNING_FAILED: &str = "signing failed";
+
 fn run() -> Result<String, String> {
     let args = parse_args()?;
-    let sk = load_secret_key(&args.secret_key)?;
     let pk = match &args.public_key {
         Some(path) => {
             Some(minisign::PublicKey::from_file(path).map_err(|e| format!("public key: {e}"))?)
@@ -98,12 +105,17 @@ fn run() -> Result<String, String> {
 
     if let Some(list_path) = &args.revocations {
         let json = std::fs::read(list_path).map_err(|e| format!("{}: {e}", list_path.display()))?;
-        let sig = signer::sign_revocations(&json, &sk, pk.as_ref()).map_err(|e| e.to_string())?;
-        let sig_path = PathBuf::from(format!("{}.minisig", list_path.display()));
+        serde_json::from_slice::<signature::RevocationList>(&json)
+            .map_err(|e| format!("{}: {e}", list_path.display()))?;
+        let sk = load_secret_key(&args.secret_key)?;
+        let sig = signer::sign_revocations(&json, &sk, pk.as_ref()).map_err(|_| SIGNING_FAILED)?;
         if let Some(keys) = &keyring {
-            signature::RevocationList::load(&String::from_utf8_lossy(&json), &sig, keys)?;
+            signature::RevocationList::load(&String::from_utf8_lossy(&json), &sig, keys)
+                .map_err(|_| "the signed list doesn't verify with --public-key")?;
         }
-        std::fs::write(&sig_path, sig).map_err(|e| format!("{}: {e}", sig_path.display()))?;
+        let sig_path = PathBuf::from(format!("{}.minisig", list_path.display()));
+        std::fs::write(&sig_path, sig)
+            .map_err(|_| format!("{}: couldn't write", sig_path.display()))?;
         return Ok(format!(
             "Signed {} → {}",
             list_path.display(),
@@ -111,31 +123,51 @@ fn run() -> Result<String, String> {
         ));
     }
 
+    // Validate the reviewed pack first, exactly like the installer, and build
+    // the report (each pack's hash, for the revocation list) from it.
     let (input, output) = (&args.positional[0], &args.positional[1]);
     let app_version = semver::Version::parse(env!("CARGO_PKG_VERSION")).expect("crate version");
-    let signed = signer::sign_pack(read_pack(input)?, &sk, pk.as_ref(), &app_version)
-        .map_err(|e| e.to_string())?;
-
-    // Round trip: the signed zip must pass the installer's checks.
-    let bundle = validate::validate_entries(
-        archive::read_zip(&signed).map_err(|e| e.to_string())?,
+    let entries = read_pack(input)?;
+    let reviewed = validate::validate_entries(
+        entries
+            .iter()
+            .filter(|e| !e.path.ends_with("files.json") && !e.path.ends_with("files.json.minisig"))
+            .cloned()
+            .collect(),
         &app_version,
     )
     .map_err(|e| e.to_string())?;
-    let mut report = Vec::new();
-    for pack in bundle.all() {
-        let m = &pack.manifest;
-        report.push(format!("  {}@{}  {}", m.id, m.version, pack.pack_hash));
-    }
+    let mut report: Vec<String> = reviewed
+        .all()
+        .map(|p| {
+            format!(
+                "  {}@{}  {}",
+                p.manifest.id, p.manifest.version, p.pack_hash
+            )
+        })
+        .collect();
+
+    let sk = load_secret_key(&args.secret_key)?;
+    let signed =
+        signer::sign_pack(entries, &sk, pk.as_ref(), &app_version).map_err(|_| SIGNING_FAILED)?;
+
+    // Round trip: the signed zip must pass the installer's checks, and verify.
+    let round_trip = archive::read_zip(&signed)
+        .ok()
+        .and_then(|e| validate::validate_entries(e, &app_version).ok());
+    let Some(bundle) = round_trip else {
+        return Err("the signed pack doesn't pass the installer's checks".into());
+    };
     if let Some(keys) = &keyring {
-        let result = signature::check_bundle(&bundle, keys, &signature::RevocationList::default())
-            .map_err(|e| e.to_string())?;
-        if !result.is_verified(&bundle.top.manifest.id) {
+        let verified =
+            signature::check_bundle(&bundle, keys, &signature::RevocationList::default())
+                .is_ok_and(|r| r.is_verified(&bundle.top.manifest.id));
+        if !verified {
             return Err("the signed pack doesn't verify with --public-key".into());
         }
         report.push("  verified with --public-key".into());
     }
-    std::fs::write(output, signed).map_err(|e| format!("{}: {e}", output.display()))?;
+    std::fs::write(output, signed).map_err(|_| format!("{}: couldn't write", output.display()))?;
     Ok(format!(
         "Signed {} → {}\n{}",
         input.display(),
