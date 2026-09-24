@@ -7,12 +7,12 @@ import {
   useState,
 } from 'react';
 import { listen } from '../lib/tauri';
-import { extensionsAvailable, resolvePairing, serveExtensionCalls } from '../lib/extensions';
+import { packsAvailable, resolveAppPairing, servePackCalls } from '../lib/packs';
 import { newScript } from '../lib/store';
-import { ExtensionPairModal } from '../components/ExtensionPairModal';
+import { ConnectedAppPairModal } from '../components/ConnectedAppPairModal';
 
-/** Build a library script from validated extension params. */
-function extensionScript({ title, text, language }, tag) {
+/** Build a library script from validated call params. */
+function callerScript({ title, text, language }, tag) {
   return {
     ...newScript(),
     title,
@@ -24,21 +24,21 @@ function extensionScript({ title, text, language }, tag) {
 }
 
 /**
- * Main-window host for the local extension API:
+ * Main-window host for packs and Connected apps:
  *   • shows the pairing prompt when an app asks to connect, and
  *   • executes `scripts.create` / `prompter.load` through the same paths the
  *     UI uses — the library state (persisted by MainWindow's debounced save)
  *     and `startReading` (permissions gate → showOverlay, so placement and
  *     share protection apply exactly as when the user presses Play).
  *
- * Every script an extension sends lands in the library, so there is always a
- * visible record of what was shown and which extension sent it.
+ * Every script a caller sends lands in the library, so there is always a
+ * visible record of what was shown and which app sent it.
  *
  * @param setScripts    MainWindow's scripts state setter
  * @param startReading  MainWindow's (script) => void reading entry point
  * @returns { pairingModal } element to render (or null)
  */
-export function useExtensionHost({ setScripts, startReading }) {
+export function usePacksHost({ setScripts, startReading }) {
   const [pairing, setPairing] = useState(null);
   const startReadingRef = useRef(startReading);
   useLayoutEffect(() => {
@@ -46,27 +46,27 @@ export function useExtensionHost({ setScripts, startReading }) {
   });
 
   useEffect(() => {
-    if (!extensionsAvailable) return undefined;
+    if (!packsAvailable) return undefined;
     const unlisteners = [];
     let cancelled = false;
     const keep = (fn) => {
       if (cancelled) fn();
       else unlisteners.push(fn);
     };
-    listen('extensions:pair-request', (p) => {
+    listen('packs:apps-pair-request', (p) => {
       if (p?.requestId) setPairing(p);
     }).then(keep);
-    listen('extensions:pair-cancelled', (p) => {
+    listen('packs:apps-pair-cancelled', (p) => {
       setPairing((cur) => (cur?.requestId === p?.requestId ? null : cur));
     }).then(keep);
-    serveExtensionCalls('main', {
+    servePackCalls('main', {
       'scripts.create': (params) => {
-        const s = extensionScript(params, 'draft');
+        const s = callerScript(params, 'draft');
         setScripts((ss) => [s, ...ss]);
         return { scriptId: s.id };
       },
       'prompter.load': (params) => {
-        const s = extensionScript(params, 'ready');
+        const s = callerScript(params, 'ready');
         setScripts((ss) => [s, ...ss]);
         startReadingRef.current(s);
         return { scriptId: s.id };
@@ -81,7 +81,7 @@ export function useExtensionHost({ setScripts, startReading }) {
   const decide = useCallback(
     (approve) => {
       if (!pairing) return;
-      resolvePairing(pairing.requestId, approve).catch(() => {});
+      resolveAppPairing(pairing.requestId, approve).catch(() => {});
       setPairing(null);
     },
     [pairing]
@@ -90,7 +90,7 @@ export function useExtensionHost({ setScripts, startReading }) {
   const deny = useCallback(() => decide(false), [decide]);
 
   const pairingModal = pairing
-    ? createElement(ExtensionPairModal, {
+    ? createElement(ConnectedAppPairModal, {
         name: pairing.name,
         scopes: pairing.scopes,
         onAllow: allow,

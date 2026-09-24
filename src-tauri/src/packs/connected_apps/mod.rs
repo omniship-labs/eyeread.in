@@ -1,19 +1,21 @@
-//! Local extension API — lets other apps on this computer (companion tools,
-//! stream-deck/foot-pedal controllers, writing assistants, …) drive
-//! eyeread.in without any third-party code running inside the app.
+//! Connected apps: a local HTTP API that lets other programs on this computer
+//! (companion tools, Stream Deck / foot-pedal controllers, writing apps, …)
+//! drive eyeread.in without any third-party code running inside the app.
+//! Lives under Settings → Packs → Connected apps; it shares its permission
+//! names with packs (`spec/packs/FORMAT.md`).
 //!
-//! Design, in short (full contract: docs/EXTENSIONS.md):
+//! Design, in short (full contract: docs/PACKS.md):
 //!   • Off by default. Nothing listens until the user enables it in Settings.
 //!   • Loopback only (127.0.0.1), and requests from web browsers are refused
 //!     outright (see `http::read_request`), so web pages can't reach it.
-//!   • Every extension pairs once: the user sees its name + requested scopes
-//!     and approves or denies. Approval mints a bearer token that only the
-//!     extension holds (we persist a SHA-256 of it, never the token itself).
-//!     The user can revoke any extension from Settings at any time.
+//!   • Every app pairs once: the user sees its name + requested scopes and
+//!     approves or denies. Approval mints a bearer token that only the app
+//!     holds (we persist a SHA-256 of it, never the token itself). The user
+//!     can revoke any app from Settings at any time.
 //!   • Every endpoint needs a scope. Work that touches app state is handed to
 //!     the owning window over an event ("RPC") and executed by the same code
 //!     paths as the UI (library persistence, `showOverlay`, transport
-//!     controls), so an extension can never bypass share protection, window
+//!     controls), so an app can never bypass share protection, window
 //!     placement or the mic permission flow.
 
 mod http;
@@ -35,7 +37,10 @@ use tauri_plugin_store::StoreExt;
 
 pub const API_VERSION: u32 = 1;
 pub const PORT: u16 = 17842;
-const STORE_FILE: &str = "extensions.json";
+const STORE_FILE: &str = "packs.json";
+// packs.json is shared with the packs runtime, so connected-apps keys are prefixed.
+const STORE_KEY_ENABLED: &str = "appsEnabled";
+const STORE_KEY_GRANTS: &str = "appGrants";
 
 pub const SCOPE_SCRIPTS_WRITE: &str = "scripts:write";
 pub const SCOPE_PROMPTER_LOAD: &str = "prompter:load";
@@ -95,7 +100,7 @@ struct Inner {
     prompter: Value,
 }
 
-pub struct Extensions {
+pub struct ConnectedApps {
     app: AppHandle,
     inner: Mutex<Inner>,
     connections: AtomicUsize,
@@ -196,7 +201,7 @@ fn validate_pairing(body: &Value) -> Result<(String, Vec<String>), &'static str>
 
 /// Validate a script payload (`POST /v1/scripts`, `POST /v1/prompter/load`)
 /// into the params handed to the main window.
-fn validate_script(body: &Value, extension_name: &str) -> Result<Value, &'static str> {
+fn validate_script(body: &Value, app_name: &str) -> Result<Value, &'static str> {
     let text = body
         .get("text")
         .and_then(Value::as_str)
@@ -206,7 +211,7 @@ fn validate_script(body: &Value, extension_name: &str) -> Result<Value, &'static
         return Err("text_required");
     }
     let title = match body.get("title") {
-        None | Some(Value::Null) => format!("From {extension_name}"),
+        None | Some(Value::Null) => format!("From {app_name}"),
         Some(Value::String(t))
             if !t.trim().is_empty() && t.trim().chars().count() <= MAX_TITLE_CHARS =>
         {
@@ -254,7 +259,7 @@ fn rpc_error_status(code: &str) -> u16 {
 
 // ---- state + lifecycle --------------------------------------------------------
 
-impl Extensions {
+impl ConnectedApps {
     fn lock(&self) -> MutexGuard<'_, Inner> {
         // A panic while holding the lock can't leave Inner logically broken
         // (every mutation is a single assignment/push/remove), so recover.
@@ -264,22 +269,22 @@ impl Extensions {
     fn persist(&self, inner: &Inner) {
         match self.app.store(STORE_FILE) {
             Ok(store) => {
-                store.set("enabled", inner.enabled);
+                store.set(STORE_KEY_ENABLED, inner.enabled);
                 store.set(
-                    "grants",
+                    STORE_KEY_GRANTS,
                     serde_json::to_value(&inner.grants).unwrap_or(Value::Null),
                 );
                 if let Err(e) = store.save() {
-                    eprintln!("[extensions] failed to save {STORE_FILE}: {e}");
+                    eprintln!("[packs/apps] failed to save {STORE_FILE}: {e}");
                 }
             }
-            Err(e) => eprintln!("[extensions] failed to open {STORE_FILE}: {e}"),
+            Err(e) => eprintln!("[packs/apps] failed to open {STORE_FILE}: {e}"),
         }
     }
 
     fn status(&self) -> Value {
         let inner = self.lock();
-        let extensions: Vec<Value> = inner
+        let apps: Vec<Value> = inner
             .grants
             .iter()
             .map(|g| {
@@ -297,12 +302,12 @@ impl Extensions {
             "port": PORT,
             "apiVersion": API_VERSION,
             "error": inner.error,
-            "extensions": extensions,
+            "apps": apps,
         })
     }
 
     fn emit_changed(&self) {
-        let _ = self.app.emit_to("main", "extensions:changed", ());
+        let _ = self.app.emit_to("main", "packs:apps-changed", ());
     }
 
     fn start_server(self: &Arc<Self>, inner: &mut Inner) {
@@ -312,24 +317,24 @@ impl Extensions {
         match TcpListener::bind((Ipv4Addr::LOCALHOST, PORT)) {
             Ok(listener) => {
                 let stop = Arc::new(AtomicBool::new(false));
-                let ext = Arc::clone(self);
+                let apps = Arc::clone(self);
                 let thread_stop = Arc::clone(&stop);
                 let spawned = thread::Builder::new()
-                    .name("eyeread-ext-accept".into())
-                    .spawn(move || ext.accept_loop(listener, thread_stop));
+                    .name("eyeread-apps-accept".into())
+                    .spawn(move || apps.accept_loop(listener, thread_stop));
                 match spawned {
                     Ok(_) => {
                         inner.server = Some(ServerHandle { stop });
                         inner.error = None;
                     }
                     Err(e) => {
-                        eprintln!("[extensions] failed to start: {e}");
+                        eprintln!("[packs/apps] failed to start: {e}");
                         inner.error = Some("start_failed".into());
                     }
                 }
             }
             Err(e) => {
-                eprintln!("[extensions] unable to bind 127.0.0.1:{PORT}: {e}");
+                eprintln!("[packs/apps] unable to bind 127.0.0.1:{PORT}: {e}");
                 inner.error = Some(
                     if e.kind() == std::io::ErrorKind::AddrInUse {
                         "port_in_use"
@@ -361,7 +366,7 @@ impl Extensions {
     }
 
     fn accept_loop(self: Arc<Self>, listener: TcpListener, stop: Arc<AtomicBool>) {
-        eprintln!("[extensions] listening on 127.0.0.1:{PORT}");
+        eprintln!("[packs/apps] listening on 127.0.0.1:{PORT}");
         for conn in listener.incoming() {
             if stop.load(Ordering::SeqCst) {
                 break;
@@ -371,18 +376,18 @@ impl Extensions {
                 self.connections.fetch_sub(1, Ordering::SeqCst);
                 continue; // dropping the stream closes it
             }
-            let ext = Arc::clone(&self);
+            let apps = Arc::clone(&self);
             let spawned = thread::Builder::new()
-                .name("eyeread-ext-conn".into())
+                .name("eyeread-apps-conn".into())
                 .spawn(move || {
-                    ext.handle_connection(stream);
-                    ext.connections.fetch_sub(1, Ordering::SeqCst);
+                    apps.handle_connection(stream);
+                    apps.connections.fetch_sub(1, Ordering::SeqCst);
                 });
             if spawned.is_err() {
                 self.connections.fetch_sub(1, Ordering::SeqCst);
             }
         }
-        eprintln!("[extensions] stopped");
+        eprintln!("[packs/apps] stopped");
     }
 
     fn handle_connection(&self, mut stream: TcpStream) {
@@ -423,7 +428,7 @@ impl Extensions {
                 200,
                 json!({
                     "ok": true,
-                    "api": "eyeread.extensions",
+                    "api": "eyeread.connected-apps",
                     "apiVersion": API_VERSION,
                     "appVersion": self.app.package_info().version.to_string(),
                     "scopes": SCOPES,
@@ -497,7 +502,7 @@ impl Extensions {
     }
 
     /// Hand `method` to a window and wait for its answer
-    /// (`extensions_rpc_result`). Each window listens on its own event name:
+    /// (`packs_apps_rpc_result`). Each window listens on its own event name:
     /// a JS `listen()` receives events for every target, so a shared name
     /// would deliver main's calls to the overlay too.
     fn rpc(&self, window: &str, method: &str, grant: &Grant, params: Value) -> Reply {
@@ -508,11 +513,11 @@ impl Extensions {
             "id": id,
             "method": method,
             "params": params,
-            "extension": { "id": grant.id, "name": grant.name },
+            "caller": { "kind": "app", "id": grant.id, "name": grant.name },
         });
         if self
             .app
-            .emit_to(window, &format!("extensions:rpc:{window}"), payload)
+            .emit_to(window, &format!("packs:rpc:{window}"), payload)
             .is_err()
         {
             self.lock().rpc.remove(&id);
@@ -553,7 +558,7 @@ impl Extensions {
 
         let _ = self.app.emit_to(
             "main",
-            "extensions:pair-request",
+            "packs:apps-pair-request",
             json!({ "requestId": request_id, "name": name, "scopes": scopes }),
         );
         if let Some(win) = self.app.get_webview_window("main") {
@@ -576,7 +581,7 @@ impl Extensions {
 
         match decision {
             Ok(true) => {
-                let token = format!("erx_{}", random_hex(32));
+                let token = format!("era_{}", random_hex(32));
                 let grant = Grant {
                     id: random_hex(8),
                     name,
@@ -584,7 +589,7 @@ impl Extensions {
                     token_hash: token_hash(&token),
                     created_at: now_ms(),
                 };
-                let extension_id = grant.id.clone();
+                let app_id = grant.id.clone();
                 {
                     let mut inner = self.lock();
                     inner.grants.push(grant);
@@ -595,7 +600,7 @@ impl Extensions {
                     201,
                     json!({
                         "ok": true,
-                        "extensionId": extension_id,
+                        "appId": app_id,
                         "token": token,
                         "scopes": scopes,
                     }),
@@ -605,7 +610,7 @@ impl Extensions {
             Err(e) => {
                 let _ = self.app.emit_to(
                     "main",
-                    "extensions:pair-cancelled",
+                    "packs:apps-pair-cancelled",
                     json!({ "requestId": request_id }),
                 );
                 Ok(match e {
@@ -657,20 +662,20 @@ pub fn init(app: &AppHandle) {
     let (enabled, grants) = match app.store(STORE_FILE) {
         Ok(store) => (
             store
-                .get("enabled")
+                .get(STORE_KEY_ENABLED)
                 .and_then(|v| v.as_bool())
                 .unwrap_or(false),
             store
-                .get("grants")
+                .get(STORE_KEY_GRANTS)
                 .and_then(|v| serde_json::from_value::<Vec<Grant>>(v).ok())
                 .unwrap_or_default(),
         ),
         Err(e) => {
-            eprintln!("[extensions] failed to open {STORE_FILE}: {e}");
+            eprintln!("[packs/apps] failed to open {STORE_FILE}: {e}");
             (false, Vec::new())
         }
     };
-    let ext = Arc::new(Extensions {
+    let apps = Arc::new(ConnectedApps {
         app: app.clone(),
         inner: Mutex::new(Inner {
             enabled,
@@ -686,52 +691,52 @@ pub fn init(app: &AppHandle) {
         next_stream_id: AtomicU64::new(0),
     });
     if enabled {
-        let mut inner = ext.lock();
-        ext.start_server(&mut inner);
+        let mut inner = apps.lock();
+        apps.start_server(&mut inner);
     }
-    app.manage(ext);
+    app.manage(apps);
 }
 
 // ---- commands (called by the app's own windows) --------------------------------
 
-type Ext<'a> = State<'a, Arc<Extensions>>;
+type Apps<'a> = State<'a, Arc<ConnectedApps>>;
 
 #[tauri::command]
-pub fn extensions_status(ext: Ext<'_>) -> Value {
-    ext.status()
+pub fn packs_apps_status(apps: Apps<'_>) -> Value {
+    apps.status()
 }
 
 #[tauri::command]
-pub fn extensions_set_enabled(ext: Ext<'_>, enabled: bool) -> Value {
+pub fn packs_apps_set_enabled(apps: Apps<'_>, enabled: bool) -> Value {
     {
-        let mut inner = ext.lock();
+        let mut inner = apps.lock();
         inner.enabled = enabled;
         if enabled {
-            ext.start_server(&mut inner);
+            apps.start_server(&mut inner);
         } else {
-            Extensions::stop_server(&mut inner);
+            ConnectedApps::stop_server(&mut inner);
         }
-        ext.persist(&inner);
+        apps.persist(&inner);
     }
-    ext.status()
+    apps.status()
 }
 
 #[tauri::command]
-pub fn extensions_revoke(ext: Ext<'_>, id: String) -> Value {
+pub fn packs_apps_revoke(apps: Apps<'_>, id: String) -> Value {
     {
-        let mut inner = ext.lock();
+        let mut inner = apps.lock();
         inner.grants.retain(|g| g.id != id);
-        // Ends that extension's open event streams immediately.
+        // Ends that app's open event streams immediately.
         inner.streams.retain(|s| s.grant_id != id);
-        ext.persist(&inner);
+        apps.persist(&inner);
     }
-    ext.emit_changed();
-    ext.status()
+    apps.emit_changed();
+    apps.status()
 }
 
 #[tauri::command]
-pub fn extensions_resolve_pairing(ext: Ext<'_>, request_id: String, approve: bool) {
-    let mut inner = ext.lock();
+pub fn packs_apps_resolve_pairing(apps: Apps<'_>, request_id: String, approve: bool) {
+    let mut inner = apps.lock();
     if inner
         .pairing
         .as_ref()
@@ -744,13 +749,13 @@ pub fn extensions_resolve_pairing(ext: Ext<'_>, request_id: String, approve: boo
 }
 
 #[tauri::command]
-pub fn extensions_rpc_result(
-    ext: Ext<'_>,
+pub fn packs_apps_rpc_result(
+    apps: Apps<'_>,
     id: String,
     result: Option<Value>,
     error: Option<String>,
 ) {
-    if let Some(tx) = ext.lock().rpc.remove(&id) {
+    if let Some(tx) = apps.lock().rpc.remove(&id) {
         let _ = tx.send(match error {
             Some(code) => Err(code),
             None => Ok(result.unwrap_or(Value::Null)),
@@ -761,8 +766,8 @@ pub fn extensions_rpc_result(
 /// The overlay reports its reading state here (throttled on the JS side);
 /// it's fanned out to `prompter:events` subscribers.
 #[tauri::command]
-pub fn extensions_prompter_state(ext: Ext<'_>, state: Value) {
-    let mut inner = ext.lock();
+pub fn packs_apps_prompter_state(apps: Apps<'_>, state: Value) {
+    let mut inner = apps.lock();
     let line = state.to_string();
     inner.prompter = state;
     inner.streams.retain(|s| s.tx.send(line.clone()).is_ok());
@@ -855,9 +860,9 @@ mod tests {
         let a = random_hex(32);
         assert_eq!(a.len(), 64);
         assert_ne!(a, random_hex(32));
-        let h = token_hash("erx_abc");
+        let h = token_hash("era_abc");
         assert_eq!(h.len(), 64);
-        assert!(ct_eq(h.as_bytes(), token_hash("erx_abc").as_bytes()));
-        assert!(!ct_eq(h.as_bytes(), token_hash("erx_abd").as_bytes()));
+        assert!(ct_eq(h.as_bytes(), token_hash("era_abc").as_bytes()));
+        assert!(!ct_eq(h.as_bytes(), token_hash("era_abd").as_bytes()));
     }
 }

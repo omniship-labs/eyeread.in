@@ -343,28 +343,31 @@
       }
     }
   },
-  "extensions": {
-    "title": "拡張機能",
-    "enable": "拡張機能を許可",
-    "enableHint": "このコンピューター上のアプリがローカル API（127.0.0.1:{{port}}）経由で eyeread.in に接続できるようにします。初期設定はオフで、アプリごとに承認が必要です。",
-    "errorPortInUse": "ポート {{port}} は別のアプリが使用中のため、拡張機能は接続できません。",
-    "errorStart": "拡張機能 API を開始できませんでした。",
-    "none": "接続中の拡張機能はまだありません。",
-    "revoke": "取り消す",
-    "docs": "拡張機能を作る",
-    "docsHint": "開発者向けの API リファレンスとサンプル。",
-    "docsCta": "ドキュメントを開く",
-    "pairTitle": "「{{name}}」が接続を求めています",
-    "pairIntro": "このコンピューター上のアプリが eyeread.in の使用を求めています。信頼できるアプリだけを許可してください。アクセスは「設定 → 拡張機能」でいつでも取り消せます。",
-    "allow": "許可",
-    "deny": "拒否",
-    "scopes": {
+  "packs": {
+    "title": "パック",
+    "apps": {
+      "title": "接続済みアプリ",
+      "enable": "アプリの接続を許可",
+      "enableHint": "このコンピューター上のアプリがローカル API（127.0.0.1:{{port}}）経由で eyeread.in に接続できるようにします。初期設定はオフで、アプリごとに承認が必要です。",
+      "errorPortInUse": "ポート {{port}} は別のアプリが使用中のため、接続済みアプリは eyeread.in に接続できません。",
+      "errorStart": "接続済みアプリの API を開始できませんでした。",
+      "none": "接続中のアプリはまだありません。",
+      "revoke": "取り消す",
+      "docs": "接続アプリを作る",
+      "docsHint": "開発者向けの API リファレンスとサンプル。",
+      "docsCta": "ドキュメントを開く",
+      "pairTitle": "「{{name}}」が接続を求めています",
+      "pairIntro": "このコンピューター上のアプリが eyeread.in の使用を求めています。信頼できるアプリだけを許可してください。アクセスは「設定 → パック → 接続済みアプリ」でいつでも取り消せます。",
+      "allow": "許可",
+      "deny": "拒否"
+    },
+    "permissions": {
       "scriptsWrite": "原稿を追加",
       "prompterLoad": "プロンプターに読み込む",
       "prompterControl": "再生を操作",
       "prompterEvents": "読み上げの進み具合を見る"
     },
-    "scopeHints": {
+    "permissionHints": {
       "scriptsWrite": "ライブラリに新しい原稿を追加します。",
       "prompterLoad": "テキストをプロンプターで開き、読み上げを開始します。",
       "prompterControl": "再生、一時停止、最初から、指定した語へ移動、プロンプターを閉じる。",

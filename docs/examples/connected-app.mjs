@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Minimal eyeread.in extension (Node 18+, no dependencies). See ../EXTENSIONS.md.
+// Minimal eyeread.in connected app (Node 18+, no dependencies). See ../PACKS.md.
 //
-//   node docs/examples/extension-client.mjs "Text to read"   # load text into the prompter
-//   node docs/examples/extension-client.mjs --follow         # print reading progress
+//   node docs/examples/connected-app.mjs "Text to read"   # load text into the prompter
+//   node docs/examples/connected-app.mjs --follow         # print reading progress
 //
 // First run pairs with the app (approve the prompt in eyeread.in) and saves the
 // token to ~/.eyeread-example-token. Delete that file to pair again.
@@ -12,7 +12,7 @@ import { join } from 'node:path';
 
 const API = 'http://127.0.0.1:17842';
 const TOKEN_FILE = join(homedir(), '.eyeread-example-token');
-const NAME = 'Example extension';
+const NAME = 'Example connected app';
 const SCOPES = ['prompter:load', 'prompter:events'];
 
 async function call(path, { token, body, method = body ? 'POST' : 'GET' } = {}) {
@@ -74,7 +74,9 @@ async function follow(token) {
 try {
   await call('/v1'); // is the API on?
 } catch {
-  console.error('eyeread.in is not reachable. Is it running, with Settings → Extensions on?');
+  console.error(
+    'eyeread.in is not reachable. Is it running, with Settings → Packs → Connected apps on?'
+  );
   process.exit(1);
 }
 
@@ -84,10 +86,10 @@ if (arg === '--follow') {
   await follow(token);
 } else {
   const text =
-    arg || 'Hello from an eyeread.in extension. This text was sent over the local API.';
+    arg || 'Hello from an eyeread.in connected app. This text was sent over the local API.';
   const { scriptId } = await call('/v1/prompter/load', {
     token,
-    body: { title: 'From the example extension', text },
+    body: { title: 'From the example connected app', text },
   });
   console.log(`Loaded script ${scriptId} into the prompter.`);
 }

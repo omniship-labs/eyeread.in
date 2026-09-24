@@ -1,4 +1,4 @@
-mod extensions;
+mod packs;
 
 use std::sync::Mutex;
 use tauri::{
@@ -417,15 +417,15 @@ pub fn run() {
             set_app_protected,
             set_dock_hidden,
             attach_window_to_all_spaces,
-            extensions::extensions_status,
-            extensions::extensions_set_enabled,
-            extensions::extensions_revoke,
-            extensions::extensions_resolve_pairing,
-            extensions::extensions_rpc_result,
-            extensions::extensions_prompter_state,
+            packs::connected_apps::packs_apps_status,
+            packs::connected_apps::packs_apps_set_enabled,
+            packs::connected_apps::packs_apps_revoke,
+            packs::connected_apps::packs_apps_resolve_pairing,
+            packs::connected_apps::packs_apps_rpc_result,
+            packs::connected_apps::packs_apps_prompter_state,
         ])
         .setup(|app| {
-            extensions::init(app.handle());
+            packs::connected_apps::init(app.handle());
             Ok(())
         })
         .build(tauri::generate_context!())

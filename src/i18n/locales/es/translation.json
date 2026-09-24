@@ -343,28 +343,31 @@
       }
     }
   },
-  "extensions": {
-    "title": "Extensiones",
-    "enable": "Permitir extensiones",
-    "enableHint": "Permite que las apps de este ordenador se conecten a eyeread.in mediante una API local (127.0.0.1:{{port}}). Desactivado por defecto; cada app necesita tu aprobación.",
-    "errorPortInUse": "Otra app ya está usando el puerto {{port}}, así que las extensiones no pueden conectarse.",
-    "errorStart": "No se pudo iniciar la API de extensiones.",
-    "none": "Aún no hay extensiones conectadas.",
-    "revoke": "Revocar",
-    "docs": "Crear una extensión",
-    "docsHint": "La referencia de la API y ejemplos para desarrolladores.",
-    "docsCta": "Abrir docs",
-    "pairTitle": "«{{name}}» quiere conectarse",
-    "pairIntro": "Una app de este ordenador quiere usar eyeread.in. Permite solo apps de confianza. Puedes revocar el acceso en cualquier momento en Ajustes → Extensiones.",
-    "allow": "Permitir",
-    "deny": "Denegar",
-    "scopes": {
+  "packs": {
+    "title": "Packs",
+    "apps": {
+      "title": "Apps conectadas",
+      "enable": "Permitir apps conectadas",
+      "enableHint": "Permite que las apps de este ordenador se conecten a eyeread.in mediante una API local (127.0.0.1:{{port}}). Desactivado por defecto; cada app necesita tu aprobación.",
+      "errorPortInUse": "Otra app ya está usando el puerto {{port}}, así que las apps conectadas no pueden llegar a eyeread.in.",
+      "errorStart": "No se pudo iniciar la API de apps conectadas.",
+      "none": "Aún no hay apps conectadas.",
+      "revoke": "Revocar",
+      "docs": "Crear una app conectada",
+      "docsHint": "La referencia de la API y ejemplos para desarrolladores.",
+      "docsCta": "Abrir docs",
+      "pairTitle": "«{{name}}» quiere conectarse",
+      "pairIntro": "Una app de este ordenador quiere usar eyeread.in. Permite solo apps de confianza. Puedes revocar el acceso en cualquier momento en Ajustes → Packs → Apps conectadas.",
+      "allow": "Permitir",
+      "deny": "Denegar"
+    },
+    "permissions": {
       "scriptsWrite": "Añadir guiones",
       "prompterLoad": "Cargar en el teleprompter",
       "prompterControl": "Controlar la reproducción",
       "prompterEvents": "Ver el progreso de lectura"
     },
-    "scopeHints": {
+    "permissionHints": {
       "scriptsWrite": "Añade guiones nuevos a tu biblioteca.",
       "prompterLoad": "Abre texto en el teleprompter e inicia una sesión de lectura.",
       "prompterControl": "Reproducir, pausar, reiniciar, saltar a una palabra o cerrar el teleprompter.",

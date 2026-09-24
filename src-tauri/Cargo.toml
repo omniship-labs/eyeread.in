@@ -26,7 +26,7 @@ tauri-plugin-os = "2"
 tauri-plugin-window-state = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# Extension API: token generation + hashing (both already in the tree via tauri)
+# Connected apps API: token generation + hashing (both already in the tree via tauri)
 getrandom = "0.2"
 sha2 = "0.10"
 

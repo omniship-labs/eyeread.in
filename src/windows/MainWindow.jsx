@@ -78,7 +78,7 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
-import { useExtensionHost } from '../hooks/useExtensionHost';
+import { usePacksHost } from '../hooks/usePacksHost';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
 import { useUpdateCheck } from '../hooks/useUpdateCheck';
 import { useTour } from '../hooks/useTour';
@@ -313,8 +313,8 @@ export function MainWindow() {
     });
   };
 
-  // Local extension API: pairing prompt + calls routed to this window.
-  const { pairingModal } = useExtensionHost({ setScripts, startReading });
+  // Packs / Connected apps: pairing prompt + calls routed to this window.
+  const { pairingModal } = usePacksHost({ setScripts, startReading });
 
   return (
     <div className={'app-shell' + (shieldActive(settings) ? ' shielded' : ' exposed')}>

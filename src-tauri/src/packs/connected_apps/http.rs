@@ -1,6 +1,6 @@
-//! Minimal, strict HTTP/1.1 request reader for the extension API.
+//! Minimal, strict HTTP/1.1 request reader for the Connected apps API.
 //!
-//! The extension API is a local, request/response JSON API spoken by native
+//! The Connected apps API is a local, request/response JSON API spoken by native
 //! tools (scripts, companion apps, hardware controllers) — never by web
 //! pages. This reader is intentionally narrow: one request per connection,
 //! bounded header and body sizes, `Content-Length` bodies only, and it
@@ -149,7 +149,7 @@ pub fn read_request<S: Read + Write>(stream: &mut S, port: u16) -> Result<Reques
     // request to a loopback address. Native clients send neither, so refusing
     // them shuts out web pages (including "simple" no-preflight requests)
     // without needing CORS at all. (Only Sec-Fetch-Site: Node's built-in
-    // fetch sends Sec-Fetch-Mode, and Node extensions must work.)
+    // fetch sends Sec-Fetch-Mode, and Node clients must work.)
     if req.header("origin").is_some() || req.header("sec-fetch-site").is_some() {
         return Err(HttpError::BrowserRequest);
     }

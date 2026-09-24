@@ -1,10 +1,19 @@
-# Extensions
+# Packs
 
-eyeread.in has a **local extension API**: other apps on the same computer can
-add scripts, open them in the prompter, drive playback, and follow reading
-progress. Extensions are separate programs, written in any language, that talk
-to the app over HTTP on `127.0.0.1`. No third-party code runs inside
-eyeread.in.
+There are two ways to build on eyeread.in, and they share one set of
+permissions:
+
+- **Packs** are installable, sandboxed JS packages that run inside the app,
+  managed under Settings → Packs. Their format and API are specified in
+  [`spec/packs/`](../spec/packs/README.md).
+- **Connected apps** are separate programs, written in any language, that talk
+  to the app over a local HTTP API on `127.0.0.1`. No third-party code runs
+  inside eyeread.in. This page documents that API.
+
+## Connected apps
+
+Other apps on the same computer can add scripts, open them in the prompter,
+drive playback, and follow reading progress.
 
 Some things you can build with it:
 
@@ -13,29 +22,31 @@ Some things you can build with it:
 - A recording tool that starts capture when reading starts
 - A progress display for a producer or a second screen
 
-The implementation lives in `src-tauri/src/extensions/` (server, auth, routing)
-and `src/lib/extensions.js` (window-side handlers).
+The implementation lives in `src-tauri/src/packs/connected_apps/` (server,
+auth, routing) and `src/lib/packs.js` (window-side handlers).
 
-## How it works
+### How it works
 
-1. **The user turns it on.** Settings → Advanced → Extensions → _Allow
-   extensions_. It's off by default, and nothing listens on a port until it's
-   turned on.
-2. **Your extension pairs once.** It asks for the scopes it needs. eyeread.in
-   shows the user your extension's name and exactly what it's asking for, and
+1. **The user turns it on.** Settings → Packs → Connected apps → _Allow
+   connected apps_ (Packs shows in the Advanced settings view). It's off by
+   default, and nothing listens on a port until it's turned on.
+2. **Your app pairs once.** It asks for the scopes it needs. eyeread.in
+   shows the user your app's name and exactly what it's asking for, and
    they choose Allow or Deny. Allow returns a bearer token.
-3. **Your extension stores that token** and sends it with every request. The
+3. **Your app stores that token** and sends it with every request. The
    app keeps only a SHA-256 hash of it.
-4. **The user stays in control.** Every paired extension appears in Settings
-   and can be revoked with one click. Revoking takes effect immediately, and
-   the extension's open event streams are closed.
+4. **The user stays in control.** Every paired app appears in Settings and
+   can be revoked with one click. Revoking takes effect immediately, and the
+   app's open event streams are closed.
 
 Work that changes the app goes through the same code paths as the UI. Scripts
 land in the library, and loading one follows exactly the same path as pressing
 _Start reading_: the permissions check, window placement, and screen-share
-protection all apply. An extension can't bypass any of them.
+protection all apply. A connected app can't bypass any of them.
 
-## Scopes
+### Scopes
+
+Scopes have the same names, and mean the same thing, as pack permissions.
 
 | Scope              | Grants                                                                  |
 | ------------------ | ----------------------------------------------------------------------- |
@@ -48,7 +59,10 @@ Ask for the fewest scopes you need; the user sees every one. No scope can
 **read** the user's library. `prompter:events` reports only the script that is
 currently being read, and only while a session is active.
 
-## Protocol
+The pack permission `files:import` has no scope here: a connected app is a
+regular program and reads files itself.
+
+### Protocol
 
 - Base URL: `http://127.0.0.1:17842`
 - JSON in, JSON out. Send `Content-Type: application/json` with every `POST`.
@@ -62,26 +76,26 @@ currently being read, and only while a session is active.
   Native HTTP clients (curl, Python `requests`, Node `fetch`, Go, Rust,
   PowerShell…) work as-is.
 
-### `GET /v1`
+#### `GET /v1`
 
 No auth. Checks that the API is running and which version it speaks.
 
 ```json
 {
   "ok": true,
-  "api": "eyeread.extensions",
+  "api": "eyeread.connected-apps",
   "apiVersion": 1,
   "appVersion": "0.1.5",
   "scopes": ["scripts:write", "prompter:load", "prompter:control", "prompter:events"]
 }
 ```
 
-A connection error means the app isn't running, or the user hasn't enabled
-extensions.
+A connection error means the app isn't running, or the user hasn't turned on
+connected apps.
 
-### `POST /v1/pair`
+#### `POST /v1/pair`
 
-No auth. Asks the user to approve your extension. The request **stays open
+No auth. Asks the user to approve your app. The request **stays open
 while the user decides**, for up to 2 minutes, so use a long client timeout.
 
 ```json
@@ -96,8 +110,8 @@ On approval, `201`:
 ```json
 {
   "ok": true,
-  "extensionId": "61145e838473eeef",
-  "token": "erx_…",
+  "appId": "61145e838473eeef",
+  "token": "era_…",
   "scopes": ["scripts:write", "prompter:load"]
 }
 ```
@@ -108,12 +122,12 @@ again. If it's lost, or the user revokes you (`401`), pair again.
 Other outcomes: `403 pairing_denied`, `408 pairing_timeout`,
 `409 pairing_in_progress` (another prompt is already open; retry later).
 
-### `GET /v1/me`
+#### `GET /v1/me`
 
-Any valid token. Returns your extension's `id`, `name` and `scopes`. Use it to
+Any valid token. Returns your app's `id`, `name` and `scopes`. Use it to
 check that a stored token still works.
 
-### `POST /v1/scripts`: `scripts:write`
+#### `POST /v1/scripts`: `scripts:write`
 
 Adds a script to the library, where the user can open it themselves.
 
@@ -122,13 +136,13 @@ Adds a script to the library, where the user can open it themselves.
 ```
 
 - `text`: required, non-empty.
-- `title`: optional, up to 200 characters. Defaults to `From <extension name>`.
+- `title`: optional, up to 200 characters. Defaults to `From <app name>`.
 - `language`: optional BCP-47 tag for voice tracking, such as `en-US` or
   `pt-BR`.
 
 Response: `{ "ok": true, "scriptId": "…" }`
 
-### `POST /v1/prompter/load`: `prompter:load`
+#### `POST /v1/prompter/load`: `prompter:load`
 
 Same body as `/v1/scripts`. Adds the script to the library (so the user always
 has a record of what was shown, and from where), then opens it in the prompter
@@ -137,7 +151,7 @@ user is asked first, just as when they press _Start reading_ themselves.
 
 Response: `{ "ok": true, "scriptId": "…" }`
 
-### `POST /v1/prompter/control`: `prompter:control`
+#### `POST /v1/prompter/control`: `prompter:control`
 
 ```json
 { "action": "seek", "wordIndex": 42 }
@@ -148,7 +162,7 @@ Response: `{ "ok": true, "scriptId": "…" }`
 
 `409 no_active_session` if the prompter isn't open.
 
-### `GET /v1/prompter/state`: `prompter:events`
+#### `GET /v1/prompter/state`: `prompter:events`
 
 ```json
 {
@@ -167,7 +181,7 @@ Response: `{ "ok": true, "scriptId": "…" }`
 When no session is active, `scriptId` and `title` are `null` and the counters
 are `0`.
 
-### `GET /v1/prompter/events`: `prompter:events`
+#### `GET /v1/prompter/events`: `prompter:events`
 
 A [Server-Sent Events](https://developer.mozilla.org/docs/Web/API/Server-sent_events)
 stream. It starts with the current state, then sends an `event: state` with the
@@ -179,10 +193,10 @@ event: state
 data: {"sessionActive":true,"playing":false,"scriptId":"…","title":"Keynote","wordIndex":6,"wordCount":640}
 ```
 
-The stream closes if the user revokes you or turns extensions off; reconnect
-with backoff. At most 8 streams can be open at once across all extensions.
+The stream closes if the user revokes you or turns connected apps off; reconnect
+with backoff. At most 8 streams can be open at once across all apps.
 
-### Errors
+#### Errors
 
 | Status | `error`                        | Meaning                                             |
 | ------ | ------------------------------ | --------------------------------------------------- |
@@ -202,12 +216,12 @@ with backoff. At most 8 streams can be open at once across all extensions.
 | 415    | `json_required`                | Missing `Content-Type: application/json`            |
 | 422    | `text_required`, `invalid_*`   | Validation failed (the code names the field)        |
 | 429    | `too_many_streams`             | Event stream limit reached                          |
-| 503    | `api_disabled`                 | The user turned extensions off mid-request          |
+| 503    | `api_disabled`                 | The user turned connected apps off mid-request      |
 | 504    | `app_not_responding`           | The app window didn't answer in time; retry         |
 
-## Quick start
+### Quick start
 
-With extensions enabled, pair and send a script with curl:
+With connected apps turned on, pair and send a script with curl:
 
 ```bash
 # 1. Pair (approve the prompt in eyeread.in)
@@ -219,17 +233,17 @@ curl -s -X POST http://127.0.0.1:17842/v1/pair \
 curl -s -X POST http://127.0.0.1:17842/v1/prompter/load \
   -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' \
-  -d '{"title":"Hello","text":"Hello from my extension."}'
+  -d '{"title":"Hello","text":"Hello from my app."}'
 ```
 
 A complete Node example (pairing, token storage, loading a script and following
-events) is in [`examples/extension-client.mjs`](examples/extension-client.mjs):
+events) is in [`examples/connected-app.mjs`](examples/connected-app.mjs):
 
 ```bash
-node docs/examples/extension-client.mjs "Text to read"
+node docs/examples/connected-app.mjs "Text to read"
 ```
 
-## Guidelines for extension authors
+### Guidelines for app authors
 
 - **Be honest about what you are.** Use a name users will recognize, and
   request only the scopes you use.
@@ -238,9 +252,9 @@ node docs/examples/extension-client.mjs "Text to read"
 - **Store tokens like passwords.** Anyone with your token can do whatever your
   scopes allow.
 - **Handle `401` by re-pairing**, and handle connection errors (app closed,
-  extensions off) gracefully.
+  connected apps off) gracefully.
 
-## Versioning
+### Versioning
 
 The API is versioned in the path (`/v1`) and in `apiVersion`. New endpoints,
 new optional fields and new error codes can arrive within `v1`. Clients should

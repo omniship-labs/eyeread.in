@@ -48,7 +48,7 @@ import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 import { DICTATION_SETTINGS_URL } from '../lib/speech';
 import { MIC_PRIVACY_SETTINGS_URL } from '../lib/mic';
-import { ExtensionError, reportPrompterState, serveExtensionCalls } from '../lib/extensions';
+import { PackCallError, reportPrompterState, servePackCalls } from '../lib/packs';
 
 export function OverlayWindow() {
   const { t } = useTranslation();
@@ -454,14 +454,14 @@ export function OverlayWindow() {
     [jumpTo]
   );
 
-  // ---- extension API: remote transport + reading-state feed -----------------
-  // `prompter.control` calls arrive from paired extensions (see
-  // useExtensionHost / docs/EXTENSIONS.md). The ref keeps the once-registered
+  // ---- packs / Connected apps: remote transport + reading-state feed ---------
+  // `prompter.control` calls arrive from paired apps (see usePacksHost /
+  // docs/PACKS.md). The ref keeps the once-registered
   // listener on the latest state and callbacks.
   const controlRef = useRef(null);
   useLayoutEffect(() => {
     controlRef.current = ({ action, wordIndex }) => {
-      if (!sessionActive || words.length === 0) throw new ExtensionError('no_active_session');
+      if (!sessionActive || words.length === 0) throw new PackCallError('no_active_session');
       if (action === 'play') setPlaying(true);
       else if (action === 'pause') setPlaying(false);
       else if (action === 'toggle') setPlaying((p) => !p);
@@ -469,14 +469,14 @@ export function OverlayWindow() {
       else if (action === 'close') close();
       else if (action === 'seek')
         onWordClick(Math.min(Math.max(0, wordIndex), words.length - 1));
-      else throw new ExtensionError('invalid_params');
+      else throw new PackCallError('invalid_params');
       return {};
     };
   });
   useEffect(() => {
     let un;
     let cancelled = false;
-    serveExtensionCalls('overlay', {
+    servePackCalls('overlay', {
       'prompter.control': (params) => controlRef.current(params),
     }).then((fn) => {
       if (cancelled) fn();

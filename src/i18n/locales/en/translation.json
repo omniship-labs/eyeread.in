@@ -343,28 +343,31 @@
       }
     }
   },
-  "extensions": {
-    "title": "Extensions",
-    "enable": "Allow extensions",
-    "enableHint": "Let apps on this computer connect to eyeread.in through a local API (127.0.0.1:{{port}}). Off by default; each app needs your approval.",
-    "errorPortInUse": "Port {{port}} is already in use by another app, so extensions can't connect.",
-    "errorStart": "Couldn't start the extension API.",
-    "none": "No extensions connected yet.",
-    "revoke": "Revoke",
-    "docs": "Build an extension",
-    "docsHint": "The API reference and examples for developers.",
-    "docsCta": "Open docs",
-    "pairTitle": "“{{name}}” wants to connect",
-    "pairIntro": "An app on this computer is asking to use eyeread.in. Only allow apps you trust. You can revoke access at any time in Settings → Extensions.",
-    "allow": "Allow",
-    "deny": "Deny",
-    "scopes": {
+  "packs": {
+    "title": "Packs",
+    "apps": {
+      "title": "Connected apps",
+      "enable": "Allow connected apps",
+      "enableHint": "Let apps on this computer connect to eyeread.in through a local API (127.0.0.1:{{port}}). Off by default; each app needs your approval.",
+      "errorPortInUse": "Port {{port}} is already in use by another app, so connected apps can't reach eyeread.in.",
+      "errorStart": "Couldn't start the Connected apps API.",
+      "none": "No apps connected yet.",
+      "revoke": "Revoke",
+      "docs": "Build a connected app",
+      "docsHint": "The API reference and examples for developers.",
+      "docsCta": "Open docs",
+      "pairTitle": "“{{name}}” wants to connect",
+      "pairIntro": "An app on this computer is asking to use eyeread.in. Only allow apps you trust. You can revoke access at any time in Settings → Packs → Connected apps.",
+      "allow": "Allow",
+      "deny": "Deny"
+    },
+    "permissions": {
       "scriptsWrite": "Add scripts",
       "prompterLoad": "Load into the prompter",
       "prompterControl": "Control playback",
       "prompterEvents": "See reading progress"
     },
-    "scopeHints": {
+    "permissionHints": {
       "scriptsWrite": "Adds new scripts to your library.",
       "prompterLoad": "Opens text in the prompter and starts a reading session.",
       "prompterControl": "Play, pause, restart, jump to a word, or close the prompter.",

@@ -62,6 +62,12 @@ export async function emitTo(label, event, payload) {
   channel().postMessage({ event, payload });
 }
 
+/** Call a Rust command. Native only: callers check `isTauri` first. */
+export async function invoke(cmd, args) {
+  const mod = await import('@tauri-apps/api/core');
+  return mod.invoke(cmd, args);
+}
+
 /** Cross-window event listen. Returns an unlisten function. */
 export async function listen(event, cb) {
   if (isTauri) {
