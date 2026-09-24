@@ -146,7 +146,9 @@ no native code, no HTML.
   relative path. Remote imports are blocked.
 - **Source must be readable.** A `.js` or `.mjs` file counts as minified, and is
   rejected, if any line is longer than 1000 characters, or if it's at least
-  2048 bytes and averages more than 200 bytes per line.
+  2048 bytes and averages more than 200 bytes per line. Lines end at `\n` (a
+  `\r` before it is part of the line ending), a final newline doesn't start
+  another line, and characters are Unicode code points.
 
 ### License
 
