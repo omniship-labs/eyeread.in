@@ -369,6 +369,14 @@ pub fn run() {
                   ALTER TABLE scripts_v3 RENAME TO scripts;",
             kind: MigrationKind::Up,
         },
+        // Which pack or connected app sent a script (JSON `{ kind, id, name }`),
+        // shown in the library. Null for scripts the user wrote.
+        Migration {
+            version: 4,
+            description: "add scripts.source for packs attribution",
+            sql: "ALTER TABLE scripts ADD COLUMN source TEXT;",
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()
@@ -427,8 +435,6 @@ pub fn run() {
             packs::connected_apps::packs_apps_set_enabled,
             packs::connected_apps::packs_apps_revoke,
             packs::connected_apps::packs_apps_resolve_pairing,
-            packs::connected_apps::packs_apps_rpc_result,
-            packs::connected_apps::packs_apps_prompter_state,
             packs::commands::packs_inspect,
             packs::commands::packs_install,
             packs::commands::packs_uninstall,
@@ -436,10 +442,15 @@ pub fn run() {
             packs::commands::packs_set_enabled,
             packs::commands::packs_net_log,
             packs::commands::packs_net_clear_log,
+            packs::commands::packs_rpc_result,
+            packs::commands::packs_prompter_state,
+            packs::commands::packs_grants,
+            packs::commands::packs_set_grant,
+            packs::commands::packs_settings_get,
+            packs::commands::packs_settings_set,
         ])
         .setup(|app| {
-            packs::connected_apps::init(app.handle());
-            packs::commands::init(app.handle());
+            packs::init(app.handle());
             Ok(())
         })
         .build(tauri::generate_context!())

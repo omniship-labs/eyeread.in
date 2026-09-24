@@ -372,6 +372,20 @@
       "prompterLoad": "Opens text in the prompter and starts a reading session.",
       "prompterControl": "Play, pause, restart, jump to a word, or close the prompter.",
       "prompterEvents": "The current script's title and your position in it, as you read."
+    },
+    "sourceLabel": "From {{name}}",
+    "attribution": {
+      "play": "Playing, started by {{name}}",
+      "pause": "Paused by {{name}}",
+      "toggle": "Play/pause by {{name}}",
+      "restart": "Restarted by {{name}}",
+      "seek": "Moved by {{name}}"
+    },
+    "import": {
+      "title": "“{{name}}” wants a file",
+      "body": "Choose one file to give this pack. It gets only that file’s name and contents, never where it is or anything else on your computer.",
+      "choose": "Choose file…",
+      "cancel": "Cancel"
     }
   }
 }

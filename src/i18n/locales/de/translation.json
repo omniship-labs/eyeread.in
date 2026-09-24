@@ -372,6 +372,20 @@
       "prompterLoad": "Öffnet Text im Prompter und startet eine Lesesitzung.",
       "prompterControl": "Abspielen, pausieren, neu starten, zu einem Wort springen oder den Prompter schließen.",
       "prompterEvents": "Titel des aktuellen Skripts und deine Position darin, während du liest."
+    },
+    "sourceLabel": "Von {{name}}",
+    "attribution": {
+      "play": "Wiedergabe gestartet von {{name}}",
+      "pause": "Pausiert von {{name}}",
+      "toggle": "Wiedergabe/Pause durch {{name}}",
+      "restart": "Neu gestartet von {{name}}",
+      "seek": "Verschoben von {{name}}"
+    },
+    "import": {
+      "title": "„{{name}}“ möchte eine Datei",
+      "body": "Wähle eine Datei für dieses Pack aus. Es erhält nur den Namen und Inhalt dieser Datei – nie ihren Speicherort oder sonst etwas auf deinem Computer.",
+      "choose": "Datei auswählen…",
+      "cancel": "Abbrechen"
     }
   }
 }

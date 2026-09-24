@@ -314,7 +314,7 @@ export function MainWindow() {
   };
 
   // Packs / Connected apps: pairing prompt + calls routed to this window.
-  const { pairingModal } = usePacksHost({ setScripts, startReading });
+  const { pairingModal, importModal } = usePacksHost({ setScripts, startReading });
 
   return (
     <div className={'app-shell' + (shieldActive(settings) ? ' shielded' : ' exposed')}>
@@ -486,6 +486,7 @@ export function MainWindow() {
       {consentModal}
       {permissionsModal}
       {pairingModal}
+      {importModal}
       {shortcutsOpen && <ShortcutsModal onClose={() => setShortcutsOpen(false)} />}
       {tourOverlay}
       <TipLayer enabled={settings.showTooltips !== false} />

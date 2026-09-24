@@ -131,6 +131,11 @@ export function Library({
             </div>
             <div className="sc-body">
               <div className="sc-title">{s.title}</div>
+              {s.source?.name && (
+                <div className="sc-source">
+                  {t('packs.sourceLabel', { name: s.source.name })}
+                </div>
+              )}
               <div className="sc-footer">
                 <div className="sc-stats">
                   <div className="sc-stat">

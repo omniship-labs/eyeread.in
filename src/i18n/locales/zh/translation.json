@@ -372,6 +372,20 @@
       "prompterLoad": "在提词器中打开文本并开始阅读。",
       "prompterControl": "播放、暂停、重新开始、跳到某个词或关闭提词器。",
       "prompterEvents": "阅读时当前稿件的标题以及你读到的位置。"
+    },
+    "sourceLabel": "来自 {{name}}",
+    "attribution": {
+      "play": "{{name}} 开始了播放",
+      "pause": "已被 {{name}} 暂停",
+      "toggle": "{{name}} 切换了播放/暂停",
+      "restart": "已被 {{name}} 重新开始",
+      "seek": "已被 {{name}} 移动位置"
+    },
+    "import": {
+      "title": "“{{name}}”请求一个文件",
+      "body": "请选择一个文件交给这个功能包。它只会收到该文件的名称和内容，不会知道文件的位置，也拿不到你电脑上的其他任何东西。",
+      "choose": "选择文件…",
+      "cancel": "取消"
     }
   }
 }

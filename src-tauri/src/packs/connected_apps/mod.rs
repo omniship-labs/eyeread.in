@@ -20,11 +20,11 @@
 
 mod http;
 
+use super::broker::{Broker, CallError, Caller};
 use http::{read_request, write_json, write_sse_head, Request};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::collections::HashMap;
 use std::io::Write;
 use std::net::{Ipv4Addr, SocketAddr, TcpListener, TcpStream};
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
@@ -53,17 +53,13 @@ pub const SCOPES: [&str; 4] = [
     SCOPE_PROMPTER_EVENTS,
 ];
 
-const CONTROL_ACTIONS: [&str; 6] = ["play", "pause", "toggle", "restart", "seek", "close"];
-
 const MAX_CONNECTIONS: usize = 32;
 const MAX_EVENT_STREAMS: usize = 8;
 const IO_TIMEOUT: Duration = Duration::from_secs(10);
 const PAIRING_TIMEOUT: Duration = Duration::from_secs(120);
-const RPC_TIMEOUT: Duration = Duration::from_secs(10);
 const KEEPALIVE_EVERY: Duration = Duration::from_secs(15);
 
 const MAX_NAME_CHARS: usize = 64;
-const MAX_TITLE_CHARS: usize = 200;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -94,14 +90,13 @@ struct Inner {
     grants: Vec<Grant>,
     /// At most one pairing prompt at a time: (request id, decision channel).
     pairing: Option<(String, SyncSender<bool>)>,
-    rpc: HashMap<String, SyncSender<Result<Value, String>>>,
     streams: Vec<EventStream>,
-    /// Latest prompter snapshot reported by the overlay window.
-    prompter: Value,
 }
 
 pub struct ConnectedApps {
     app: AppHandle,
+    /// Grants, action routing and prompter state are shared with packs.
+    broker: Arc<Broker>,
     inner: Mutex<Inner>,
     connections: AtomicUsize,
     next_stream_id: AtomicU64,
@@ -118,15 +113,12 @@ fn fail(status: u16, code: &str) -> Reply {
     Reply::Json(status, json!({ "ok": false, "error": code }))
 }
 
-fn idle_prompter_state() -> Value {
-    json!({
-        "sessionActive": false,
-        "playing": false,
-        "scriptId": null,
-        "title": null,
-        "wordIndex": 0,
-        "wordCount": 0,
-    })
+/// The broker's view of a paired app.
+fn caller(grant: &Grant) -> Caller {
+    Caller::App {
+        id: grant.id.clone(),
+        name: grant.name.clone(),
+    }
 }
 
 fn now_ms() -> u64 {
@@ -199,61 +191,26 @@ fn validate_pairing(body: &Value) -> Result<(String, Vec<String>), &'static str>
     Ok((name.to_string(), scopes))
 }
 
-/// Validate a script payload (`POST /v1/scripts`, `POST /v1/prompter/load`)
-/// into the params handed to the main window.
-fn validate_script(body: &Value, app_name: &str) -> Result<Value, &'static str> {
-    let text = body
-        .get("text")
-        .and_then(Value::as_str)
-        .map(str::trim)
-        .unwrap_or("");
-    if text.is_empty() {
-        return Err("text_required");
-    }
-    let title = match body.get("title") {
-        None | Some(Value::Null) => format!("From {app_name}"),
-        Some(Value::String(t))
-            if !t.trim().is_empty() && t.trim().chars().count() <= MAX_TITLE_CHARS =>
-        {
-            t.trim().to_string()
-        }
-        _ => return Err("invalid_title"),
-    };
-    let language = match body.get("language") {
-        None | Some(Value::Null) => Value::Null,
-        Some(Value::String(l))
-            if (2..=16).contains(&l.len())
-                && l.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') =>
-        {
-            Value::String(l.clone())
-        }
-        _ => return Err("invalid_language"),
-    };
-    Ok(json!({ "title": title, "text": text, "language": language }))
-}
-
-fn validate_control(body: &Value) -> Result<Value, &'static str> {
-    let action = body
-        .get("action")
-        .and_then(Value::as_str)
-        .filter(|a| CONTROL_ACTIONS.contains(a))
-        .ok_or("invalid_action")?;
-    if action == "seek" {
-        let idx = body
-            .get("wordIndex")
-            .and_then(Value::as_u64)
-            .ok_or("invalid_word_index")?;
-        return Ok(json!({ "action": action, "wordIndex": idx }));
-    }
-    Ok(json!({ "action": action }))
-}
-
-/// HTTP status for an error code returned by a window's RPC handler.
-fn rpc_error_status(code: &str) -> u16 {
-    match code {
-        "no_active_session" => 409,
-        "invalid_params" => 422,
-        _ => 500,
+/// The HTTP reply for a broker error. Codes are the API's documented ones.
+fn call_error_reply(err: CallError) -> Reply {
+    match err {
+        CallError::Denied(scope) => Reply::Json(
+            403,
+            json!({ "ok": false, "error": "missing_scope", "scope": scope }),
+        ),
+        CallError::Invalid(code) => fail(422, code),
+        CallError::Window(code) => fail(
+            match code.as_str() {
+                "no_active_session" => 409,
+                "invalid_params" => 422,
+                _ => 500,
+            },
+            &code,
+        ),
+        CallError::Busy => fail(409, "busy"),
+        // Nothing answered: the window isn't loaded (or was closed).
+        CallError::Timeout => fail(504, "app_not_responding"),
+        CallError::Unavailable => fail(503, "app_unavailable"),
     }
 }
 
@@ -360,7 +317,6 @@ impl ConnectedApps {
         // Dropping the senders wakes every waiting request: pending pairings
         // and RPCs fail fast, event streams end.
         inner.pairing = None;
-        inner.rpc.clear();
         inner.streams.clear();
         inner.error = None;
     }
@@ -441,14 +397,14 @@ impl ConnectedApps {
                     json!({ "ok": true, "id": g.id, "name": g.name, "scopes": g.scopes }),
                 )
             }),
-            ("POST", "/v1/scripts") => self.script_rpc(req, SCOPE_SCRIPTS_WRITE, "scripts.create"),
-            ("POST", "/v1/prompter/load") => {
-                self.script_rpc(req, SCOPE_PROMPTER_LOAD, "prompter.load")
+            ("POST", "/v1/scripts") => self.call(req, SCOPE_SCRIPTS_WRITE, "scripts.add"),
+            ("POST", "/v1/prompter/load") => self.call(req, SCOPE_PROMPTER_LOAD, "prompter.load"),
+            ("POST", "/v1/prompter/control") => {
+                self.call(req, SCOPE_PROMPTER_CONTROL, "prompter.control")
             }
-            ("POST", "/v1/prompter/control") => self.control(req),
             ("GET", "/v1/prompter/state") => {
                 self.authorize(req, Some(SCOPE_PROMPTER_EVENTS)).map(|_| {
-                    let state = self.lock().prompter.clone();
+                    let state = self.broker.prompter_state();
                     Reply::Json(200, json!({ "ok": true, "state": state }))
                 })
             }
@@ -477,7 +433,7 @@ impl ConnectedApps {
             .cloned()
             .ok_or_else(|| fail(401, "unauthorized"))?;
         if let Some(scope) = scope {
-            if !grant.scopes.iter().any(|s| s == scope) {
+            if !self.broker.allowed(&caller(&grant), scope) {
                 return Err(Reply::Json(
                     403,
                     json!({ "ok": false, "error": "missing_scope", "scope": scope }),
@@ -487,59 +443,22 @@ impl ConnectedApps {
         Ok(grant)
     }
 
-    fn control(&self, req: &Request) -> Result<Reply, Reply> {
-        let grant = self.authorize(req, Some(SCOPE_PROMPTER_CONTROL))?;
-        let body = parse_json_object(req)?;
-        let params = validate_control(&body).map_err(|c| fail(422, c))?;
-        Ok(self.rpc("overlay", "prompter.control", &grant, params))
-    }
-
-    fn script_rpc(&self, req: &Request, scope: &str, method: &str) -> Result<Reply, Reply> {
+    /// Run an action through the broker, which checks the grant again,
+    /// validates the body and routes it to the owning window.
+    fn call(&self, req: &Request, scope: &str, method: &str) -> Result<Reply, Reply> {
         let grant = self.authorize(req, Some(scope))?;
         let body = parse_json_object(req)?;
-        let params = validate_script(&body, &grant.name).map_err(|c| fail(422, c))?;
-        Ok(self.rpc("main", method, &grant, params))
-    }
-
-    /// Hand `method` to a window and wait for its answer
-    /// (`packs_apps_rpc_result`). Each window listens on its own event name:
-    /// a JS `listen()` receives events for every target, so a shared name
-    /// would deliver main's calls to the overlay too.
-    fn rpc(&self, window: &str, method: &str, grant: &Grant, params: Value) -> Reply {
-        let id = random_hex(16);
-        let (tx, rx) = mpsc::sync_channel(1);
-        self.lock().rpc.insert(id.clone(), tx);
-        let payload = json!({
-            "id": id,
-            "method": method,
-            "params": params,
-            "caller": { "kind": "app", "id": grant.id, "name": grant.name },
-        });
-        if self
-            .app
-            .emit_to(window, &format!("packs:rpc:{window}"), payload)
-            .is_err()
-        {
-            self.lock().rpc.remove(&id);
-            return fail(503, "app_unavailable");
-        }
-        let outcome = rx.recv_timeout(RPC_TIMEOUT);
-        self.lock().rpc.remove(&id);
-        match outcome {
-            Ok(Ok(result)) => {
-                let mut body = json!({ "ok": true });
-                if let (Some(out), Some(extra)) = (body.as_object_mut(), result.as_object()) {
-                    for (k, v) in extra {
-                        out.insert(k.clone(), v.clone());
-                    }
-                }
-                Reply::Json(200, body)
+        let result = self
+            .broker
+            .call(&caller(&grant), scope, method, &body)
+            .map_err(call_error_reply)?;
+        let mut out = json!({ "ok": true });
+        if let (Some(out), Some(extra)) = (out.as_object_mut(), result.as_object()) {
+            for (k, v) in extra {
+                out.insert(k.clone(), v.clone());
             }
-            Ok(Err(code)) => fail(rpc_error_status(&code), &code),
-            // Nothing answered: the window isn't loaded (or was closed).
-            Err(RecvTimeoutError::Timeout) => fail(504, "app_not_responding"),
-            Err(RecvTimeoutError::Disconnected) => fail(503, "api_disabled"),
         }
+        Ok(Reply::Json(200, out))
     }
 
     fn pair(&self, req: &Request) -> Result<Reply, Reply> {
@@ -590,6 +509,7 @@ impl ConnectedApps {
                     created_at: now_ms(),
                 };
                 let app_id = grant.id.clone();
+                self.broker.set_app_scopes(&grant.id, grant.scopes.clone());
                 {
                     let mut inner = self.lock();
                     inner.grants.push(grant);
@@ -636,7 +556,7 @@ impl ConnectedApps {
                 return;
             }
             inner.streams.push(EventStream { id, grant_id, tx });
-            inner.prompter.to_string()
+            self.broker.prompter_state().to_string()
         };
 
         let head_ok = write_sse_head(stream).is_ok();
@@ -658,7 +578,7 @@ impl ConnectedApps {
     }
 }
 
-pub fn init(app: &AppHandle) {
+pub fn init(app: &AppHandle, broker: Arc<Broker>) {
     let (enabled, grants) = match app.store(STORE_FILE) {
         Ok(store) => (
             store
@@ -675,21 +595,33 @@ pub fn init(app: &AppHandle) {
             (false, Vec::new())
         }
     };
+    for g in &grants {
+        broker.set_app_scopes(&g.id, g.scopes.clone());
+    }
     let apps = Arc::new(ConnectedApps {
         app: app.clone(),
+        broker: broker.clone(),
         inner: Mutex::new(Inner {
             enabled,
             server: None,
             error: None,
             grants,
             pairing: None,
-            rpc: HashMap::new(),
             streams: Vec::new(),
-            prompter: idle_prompter_state(),
         }),
         connections: AtomicUsize::new(0),
         next_stream_id: AtomicU64::new(0),
     });
+    // Fan the overlay's reading state out to `prompter:events` streams.
+    let weak = Arc::downgrade(&apps);
+    broker.on_prompter_state(Box::new(move |state| {
+        if let Some(apps) = weak.upgrade() {
+            let line = state.to_string();
+            apps.lock()
+                .streams
+                .retain(|s| s.tx.send(line.clone()).is_ok());
+        }
+    }));
     if enabled {
         let mut inner = apps.lock();
         apps.start_server(&mut inner);
@@ -726,6 +658,7 @@ pub fn packs_apps_revoke(apps: Apps<'_>, id: String) -> Value {
     {
         let mut inner = apps.lock();
         inner.grants.retain(|g| g.id != id);
+        apps.broker.remove_app(&id);
         // Ends that app's open event streams immediately.
         inner.streams.retain(|s| s.grant_id != id);
         apps.persist(&inner);
@@ -746,31 +679,6 @@ pub fn packs_apps_resolve_pairing(apps: Apps<'_>, request_id: String, approve: b
             let _ = tx.send(approve);
         }
     }
-}
-
-#[tauri::command]
-pub fn packs_apps_rpc_result(
-    apps: Apps<'_>,
-    id: String,
-    result: Option<Value>,
-    error: Option<String>,
-) {
-    if let Some(tx) = apps.lock().rpc.remove(&id) {
-        let _ = tx.send(match error {
-            Some(code) => Err(code),
-            None => Ok(result.unwrap_or(Value::Null)),
-        });
-    }
-}
-
-/// The overlay reports its reading state here (throttled on the JS side);
-/// it's fanned out to `prompter:events` subscribers.
-#[tauri::command]
-pub fn packs_apps_prompter_state(apps: Apps<'_>, state: Value) {
-    let mut inner = apps.lock();
-    let line = state.to_string();
-    inner.prompter = state;
-    inner.streams.retain(|s| s.tx.send(line.clone()).is_ok());
 }
 
 #[cfg(test)]
@@ -804,55 +712,6 @@ mod tests {
         ] {
             assert_eq!(validate_pairing(&bad).unwrap_err(), "invalid_scopes");
         }
-    }
-
-    #[test]
-    fn script_payload_validation() {
-        let p = validate_script(&json!({ "text": "  Hello there  " }), "Notes").unwrap();
-        assert_eq!(p["text"], "Hello there");
-        assert_eq!(p["title"], "From Notes");
-        assert_eq!(p["language"], Value::Null);
-
-        let p = validate_script(
-            &json!({ "text": "Hi", "title": "Talk", "language": "pt-BR" }),
-            "Notes",
-        )
-        .unwrap();
-        assert_eq!(p["title"], "Talk");
-        assert_eq!(p["language"], "pt-BR");
-
-        assert_eq!(
-            validate_script(&json!({ "text": "   " }), "N").unwrap_err(),
-            "text_required"
-        );
-        assert_eq!(
-            validate_script(&json!({ "text": "a", "title": 3 }), "N").unwrap_err(),
-            "invalid_title"
-        );
-        assert_eq!(
-            validate_script(&json!({ "text": "a", "language": "en US" }), "N").unwrap_err(),
-            "invalid_language"
-        );
-    }
-
-    #[test]
-    fn control_payload_validation() {
-        assert_eq!(
-            validate_control(&json!({ "action": "toggle" })).unwrap(),
-            json!({ "action": "toggle" })
-        );
-        assert_eq!(
-            validate_control(&json!({ "action": "seek", "wordIndex": 12 })).unwrap(),
-            json!({ "action": "seek", "wordIndex": 12 })
-        );
-        assert_eq!(
-            validate_control(&json!({ "action": "seek" })).unwrap_err(),
-            "invalid_word_index"
-        );
-        assert_eq!(
-            validate_control(&json!({ "action": "explode" })).unwrap_err(),
-            "invalid_action"
-        );
     }
 
     #[test]

@@ -372,6 +372,20 @@
       "prompterLoad": "Abre texto en el teleprompter e inicia una sesión de lectura.",
       "prompterControl": "Reproducir, pausar, reiniciar, saltar a una palabra o cerrar el teleprompter.",
       "prompterEvents": "El título del guion actual y tu posición en él mientras lees."
+    },
+    "sourceLabel": "De {{name}}",
+    "attribution": {
+      "play": "Reproducción iniciada por {{name}}",
+      "pause": "En pausa por {{name}}",
+      "toggle": "Reproducir/pausar por {{name}}",
+      "restart": "Reiniciado por {{name}}",
+      "seek": "Movido por {{name}}"
+    },
+    "import": {
+      "title": "«{{name}}» quiere un archivo",
+      "body": "Elige un archivo para este pack. Solo recibe el nombre y el contenido de ese archivo, nunca su ubicación ni nada más de tu ordenador.",
+      "choose": "Elegir archivo…",
+      "cancel": "Cancelar"
     }
   }
 }

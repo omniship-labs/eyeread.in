@@ -48,7 +48,12 @@ import { useReducedMotion } from '../hooks/useA11y';
 import { fmtTime } from '../lib/utils';
 import { DICTATION_SETTINGS_URL } from '../lib/speech';
 import { MIC_PRIVACY_SETTINGS_URL } from '../lib/mic';
-import { PackCallError, reportPrompterState, servePackCalls } from '../lib/packs';
+import {
+  controlAttribution,
+  PackCallError,
+  reportPrompterState,
+  servePackCalls,
+} from '../lib/packs';
 
 export function OverlayWindow() {
   const { t } = useTranslation();
@@ -455,12 +460,20 @@ export function OverlayWindow() {
   );
 
   // ---- packs / Connected apps: remote transport + reading-state feed ---------
-  // `prompter.control` calls arrive from paired apps (see usePacksHost /
-  // docs/PACKS.md). The ref keeps the once-registered
-  // listener on the latest state and callbacks.
+  // `prompter.control` calls arrive from packs and paired apps through the
+  // permission broker (see usePacksHost / docs/PACKS.md). The ref keeps the
+  // once-registered listener on the latest state and callbacks. Each one is
+  // credited briefly in the overlay ("Paused by Foot Pedal"); when callers
+  // conflict, the most recent command wins and is the one named.
+  const [attribution, setAttribution] = useState(null);
+  useEffect(() => {
+    if (!attribution) return undefined;
+    const timer = setTimeout(() => setAttribution(null), 2500);
+    return () => clearTimeout(timer);
+  }, [attribution]);
   const controlRef = useRef(null);
   useLayoutEffect(() => {
-    controlRef.current = ({ action, wordIndex }) => {
+    controlRef.current = ({ action, wordIndex }, caller) => {
       if (!sessionActive || words.length === 0) throw new PackCallError('no_active_session');
       if (action === 'play') setPlaying(true);
       else if (action === 'pause') setPlaying(false);
@@ -470,6 +483,8 @@ export function OverlayWindow() {
       else if (action === 'seek')
         onWordClick(Math.min(Math.max(0, wordIndex), words.length - 1));
       else throw new PackCallError('invalid_params');
+      const note = controlAttribution(action, caller);
+      if (note) setAttribution(t(note.key, note.params));
       return {};
     };
   });
@@ -477,7 +492,7 @@ export function OverlayWindow() {
     let un;
     let cancelled = false;
     servePackCalls('overlay', {
-      'prompter.control': (params) => controlRef.current(params),
+      'prompter.control': (params, caller) => controlRef.current(params, caller),
     }).then((fn) => {
       if (cancelled) fn();
       else un = fn;
@@ -722,6 +737,11 @@ export function OverlayWindow() {
         </div>
 
         <div className="ov-body">
+          {attribution && (
+            <div className="ov-attribution" role="status">
+              {attribution}
+            </div>
+          )}
           {words.length > 0 ? (
             <div
               className="ov-window"

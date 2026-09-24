@@ -5,7 +5,8 @@
 //! prompt, including a `bundleHash`; `packs_install` validates it again and
 //! refuses if that hash changed in between.
 
-use super::error::{PackError, PackResult, INSTALL_CHANGED};
+use super::broker::{Broker, Grant};
+use super::error::{PackError, PackResult, INSTALL_CHANGED, INSTALL_NOT_FOUND};
 use super::files_list::sha256_hex;
 use super::manifest::{Author, Manifest, PERMISSIONS};
 use super::net::{LogEntry, NetPolicy, NetProxy, ReqwestTransport};
@@ -13,6 +14,7 @@ use super::signature::{self, BundleVerification, Keyring, RevocationList, Verifi
 use super::store::{InstalledPack, PackStatus, PackStore};
 use super::validate::{self, ValidatedBundle, ValidatedPack};
 use serde::Serialize;
+use serde_json::{Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard};
@@ -20,6 +22,7 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 pub struct Packs {
     app: AppHandle,
+    broker: Arc<Broker>,
     app_version: semver::Version,
     store: Mutex<Option<PackStore>>,
 }
@@ -143,10 +146,9 @@ impl NetPolicy for Packs {
             .unwrap_or_default()
     }
 
-    /// Per-permission internet grants arrive with the permission broker
-    /// (#124). Until then internet stays off for every pack, as it starts.
-    fn internet_allowed(&self, _pack: &str, _permission: &str) -> bool {
-        false
+    /// The user's per-permission internet switch, from the broker.
+    fn internet_allowed(&self, pack: &str, permission: &str) -> bool {
+        self.broker.internet_allowed(pack, permission)
     }
 }
 
@@ -210,7 +212,7 @@ pub fn combine_permissions(bundle: &ValidatedBundle) -> Vec<CombinedPermission> 
         .collect()
 }
 
-pub fn init(app: &AppHandle) {
+pub fn init(app: &AppHandle, broker: Arc<Broker>) {
     let app_version = semver::Version::parse(&app.package_info().version.to_string())
         .unwrap_or_else(|_| semver::Version::new(0, 0, 0));
     let store = match app.path().app_data_dir() {
@@ -242,6 +244,7 @@ pub fn init(app: &AppHandle) {
     };
     let packs = Arc::new(Packs {
         app: app.clone(),
+        broker,
         app_version,
         store: Mutex::new(store),
     });
@@ -313,6 +316,9 @@ pub fn packs_uninstall(packs: PacksState<'_>, id: String) -> PackResult<Vec<Stri
         .as_mut()
         .expect("checked in store()")
         .uninstall(&id)?;
+    for id in &removed {
+        packs.broker.forget_pack(id);
+    }
     packs.emit_changed();
     Ok(removed)
 }
@@ -350,4 +356,149 @@ pub fn packs_net_log(net: State<'_, Arc<NetProxy>>, id: String) -> Vec<LogEntry>
 #[tauri::command]
 pub fn packs_net_clear_log(net: State<'_, Arc<NetProxy>>, id: String) {
     net.clear_log(&id);
+}
+
+// ---- broker: window answers, prompter state, grants and settings ------------
+
+/// A window's answer to a call the broker routed to it.
+#[tauri::command]
+pub fn packs_rpc_result(
+    broker: State<'_, Arc<Broker>>,
+    id: String,
+    result: Option<Value>,
+    error: Option<String>,
+) {
+    broker.rpc_result(&id, result, error);
+}
+
+/// The overlay reports its reading state here (throttled on the JS side).
+#[tauri::command]
+pub fn packs_prompter_state(broker: State<'_, Arc<Broker>>, state: Value) {
+    broker.set_prompter_state(state);
+}
+
+/// One row of a pack's Allow / Internet grid.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PermissionGrant {
+    pub permission: String,
+    /// Sites declared for this permission; empty means it has no internet.
+    pub network: Vec<String>,
+    pub allowed: bool,
+    pub internet: bool,
+}
+
+fn installed_manifest(packs: &Packs, id: &str) -> PackResult<Manifest> {
+    packs
+        .store()?
+        .as_ref()
+        .expect("checked in store()")
+        .get(id)
+        .map(|p| p.manifest.clone())
+        .ok_or_else(|| PackError::install(INSTALL_NOT_FOUND, format!("{id} isn't installed.")))
+}
+
+fn grant_rows(packs: &Packs, id: &str, manifest: &Manifest) -> Vec<PermissionGrant> {
+    manifest
+        .permission_names()
+        .into_iter()
+        .map(|p| {
+            let g = packs.broker.grant(id, p);
+            PermissionGrant {
+                permission: p.into(),
+                network: manifest.permissions[p].network.clone(),
+                allowed: g.allowed,
+                internet: g.internet,
+            }
+        })
+        .collect()
+}
+
+/// The pack's declared permissions and the user's grant for each. Every
+/// grant starts off.
+#[tauri::command]
+pub fn packs_grants(packs: PacksState<'_>, id: String) -> PackResult<Vec<PermissionGrant>> {
+    let manifest = installed_manifest(&packs, &id)?;
+    Ok(grant_rows(&packs, &id, &manifest))
+}
+
+/// Switch a permission (and its internet access) on or off. Only declared
+/// permissions can be granted, and internet only where sites are declared.
+#[tauri::command]
+pub fn packs_set_grant(
+    packs: PacksState<'_>,
+    id: String,
+    permission: String,
+    allowed: bool,
+    internet: bool,
+) -> PackResult<Vec<PermissionGrant>> {
+    let manifest = installed_manifest(&packs, &id)?;
+    let decl = manifest
+        .permissions
+        .get(&permission)
+        .ok_or_else(|| PackError::new("E_PERMISSION", &[("permission", &permission)]))?;
+    let internet = internet && !decl.network.is_empty();
+    packs
+        .broker
+        .set_grant(&id, &permission, Grant { allowed, internet });
+    Ok(grant_rows(&packs, &id, &manifest))
+}
+
+/// Every declared setting's value, defaults filled in.
+fn effective_settings(manifest: &Manifest, stored: &Map<String, Value>) -> Map<String, Value> {
+    manifest
+        .settings
+        .iter()
+        .map(|s| {
+            let value = stored
+                .get(&s.key)
+                .and_then(|v| s.check_value(v).ok())
+                .unwrap_or_else(|| s.default_value());
+            (s.key.clone(), value)
+        })
+        .collect()
+}
+
+#[tauri::command]
+pub fn packs_settings_get(packs: PacksState<'_>, id: String) -> PackResult<Map<String, Value>> {
+    let manifest = installed_manifest(&packs, &id)?;
+    Ok(effective_settings(&manifest, &packs.broker.settings(&id)))
+}
+
+/// Change some of a pack's declared settings. Each value is checked against
+/// its declaration; the pack's sandboxes get the new values.
+#[tauri::command]
+pub fn packs_settings_set(
+    packs: PacksState<'_>,
+    id: String,
+    values: Map<String, Value>,
+) -> PackResult<Map<String, Value>> {
+    let manifest = installed_manifest(&packs, &id)?;
+    let mut stored = packs.broker.settings(&id);
+    for (key, value) in values {
+        let setting = manifest
+            .settings
+            .iter()
+            .find(|s| s.key == key)
+            .ok_or_else(|| {
+                PackError::new(
+                    "E_INVALID_ARGUMENT",
+                    &[("detail", &format!("{key} isn't a setting of this pack"))],
+                )
+            })?;
+        let value = setting.check_value(&value).map_err(|why| {
+            PackError::new(
+                "E_INVALID_ARGUMENT",
+                &[("detail", &format!("{key}: {why}"))],
+            )
+        })?;
+        stored.insert(key, value);
+    }
+    // Keys the manifest no longer declares are dropped.
+    stored.retain(|k, _| manifest.settings.iter().any(|s| s.key == *k));
+    let effective = effective_settings(&manifest, &stored);
+    packs
+        .broker
+        .set_settings(&id, stored, Value::Object(effective.clone()));
+    Ok(effective)
 }

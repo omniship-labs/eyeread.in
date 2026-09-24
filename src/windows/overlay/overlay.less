@@ -285,6 +285,23 @@
   position: relative;
 }
 
+.ov-attribution {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg-heavy);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .ov-window {
   height: 168px; /* overridden inline — resizable */
   overflow: hidden;

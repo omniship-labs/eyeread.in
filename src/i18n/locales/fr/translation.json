@@ -372,6 +372,20 @@
       "prompterLoad": "Ouvre un texte dans le prompteur et lance une session de lecture.",
       "prompterControl": "Lecture, pause, recommencer, aller à un mot ou fermer le prompteur.",
       "prompterEvents": "Le titre du script en cours et votre position pendant la lecture."
+    },
+    "sourceLabel": "De {{name}}",
+    "attribution": {
+      "play": "Lecture lancée par {{name}}",
+      "pause": "Mis en pause par {{name}}",
+      "toggle": "Lecture/pause par {{name}}",
+      "restart": "Redémarré par {{name}}",
+      "seek": "Déplacé par {{name}}"
+    },
+    "import": {
+      "title": "« {{name}} » demande un fichier",
+      "body": "Choisissez un fichier à donner à ce pack. Il ne reçoit que le nom et le contenu de ce fichier, jamais son emplacement ni quoi que ce soit d’autre sur votre ordinateur.",
+      "choose": "Choisir un fichier…",
+      "cancel": "Annuler"
     }
   }
 }

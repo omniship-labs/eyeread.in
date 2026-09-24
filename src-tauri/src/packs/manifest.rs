@@ -92,6 +92,51 @@ pub struct Setting {
     pub kind: SettingKind,
 }
 
+impl Setting {
+    /// The value used until the user changes it (spec: "Default when omitted").
+    pub fn default_value(&self) -> Value {
+        match &self.kind {
+            SettingKind::Toggle { default } => Value::Bool(default.unwrap_or(false)),
+            SettingKind::Select { options, default } => Value::String(
+                default
+                    .clone()
+                    .or_else(|| options.first().map(|o| o.value.clone()))
+                    .unwrap_or_default(),
+            ),
+            SettingKind::Number { min, default, .. } => {
+                serde_json::json!(default.or(*min).unwrap_or(0.0))
+            }
+            SettingKind::Text { default, .. } => Value::String(default.clone().unwrap_or_default()),
+        }
+    }
+
+    /// Check a value the user set against this setting's type and limits.
+    pub fn check_value(&self, value: &Value) -> Result<Value, &'static str> {
+        match (&self.kind, value) {
+            (SettingKind::Toggle { .. }, Value::Bool(_)) => Ok(value.clone()),
+            (SettingKind::Select { options, .. }, Value::String(v)) => options
+                .iter()
+                .any(|o| o.value == *v)
+                .then(|| value.clone())
+                .ok_or("not one of the options"),
+            (SettingKind::Number { min, max, .. }, Value::Number(n)) => {
+                let n = n.as_f64().ok_or("not a number")?;
+                if min.is_some_and(|m| n < m) || max.is_some_and(|m| n > m) {
+                    return Err("out of range");
+                }
+                Ok(value.clone())
+            }
+            (SettingKind::Text { max_length, .. }, Value::String(v)) => {
+                if v.chars().count() > max_length.unwrap_or(200) as usize {
+                    return Err("too long");
+                }
+                Ok(value.clone())
+            }
+            _ => Err("wrong type"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Include {
     pub id: String,
