@@ -1,0 +1,28 @@
+{
+  "apiVersion": 1,
+  "id": "com.example.badselect",
+  "name": "Minimal",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fixture Author"
+  },
+  "license": "AGPL-3.0-only",
+  "main": "main.js",
+  "permissions": {
+    "prompter:control": {}
+  },
+  "settings": [
+    {
+      "key": "mode",
+      "type": "select",
+      "label": "Mode",
+      "options": [
+        {
+          "value": "a",
+          "label": "A"
+        }
+      ],
+      "default": "b"
+    }
+  ]
+}

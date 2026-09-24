@@ -1,0 +1,10 @@
+{
+  "format": 1,
+  "id": "com.example.hashed",
+  "version": "1.0.0",
+  "files": {
+    "LICENSE": "1effae9326a4ac601d0c32c108a7736220aa07ab37345ac85ff935d3caf65101",
+    "main.js": "1b63685c6f93039e67e8f81060a29e7a1000bc3430feae838aeed46acffef5b6",
+    "pack.json": "51ce65745e6e3b8171b7d8ccf1ac875165401eedf9aa5ff836a7cbc82e3f62f5"
+  }
+}

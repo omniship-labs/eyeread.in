@@ -4,7 +4,17 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default [
-  { ignores: ['**/dist', 'node_modules', 'src-tauri', 'design', 'public', '.claude'] },
+  {
+    ignores: [
+      '**/dist',
+      'node_modules',
+      'src-tauri',
+      'design',
+      'public',
+      '.claude',
+      'spec/packs/fixtures',
+    ],
+  },
   js.configs.recommended,
   {
     // React apps: the Tauri frontend (src/) and the marketing site (site/src/).
@@ -81,6 +91,7 @@ export default [
       'scripts/**/*.mjs',
       'site/vite.config.js',
       'site/scripts/**/*.mjs',
+      'spec/**/*.js',
     ],
     languageOptions: { globals: { ...globals.node } },
   },

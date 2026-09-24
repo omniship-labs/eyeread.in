@@ -1,0 +1,67 @@
+{
+  "apiVersion": 1,
+  "id": "com.example.notion-sync",
+  "name": "Notion Sync",
+  "version": "1.2.0",
+  "author": {
+    "name": "Ada Example",
+    "email": "ada@example.com",
+    "url": "https://example.com"
+  },
+  "license": "AGPL-3.0-only",
+  "main": "main.js",
+  "permissions": {
+    "scripts:write": {
+      "network": [
+        "https://api.notion.com",
+        "https://files.example.com:8443"
+      ]
+    },
+    "prompter:control": {},
+    "prompter:events": {}
+  },
+  "description": "Sends a Notion page to your library.",
+  "homepage": "https://example.com/notion-sync",
+  "minAppVersion": "0.1.0",
+  "settings": [
+    {
+      "key": "pageId",
+      "type": "text",
+      "label": "Notion page ID",
+      "placeholder": "abc123",
+      "maxLength": 64
+    },
+    {
+      "key": "autoOpen",
+      "type": "toggle",
+      "label": "Open after import",
+      "default": true
+    },
+    {
+      "key": "format",
+      "type": "select",
+      "label": "Format",
+      "options": [
+        {
+          "value": "plain",
+          "label": "Plain"
+        },
+        {
+          "value": "md",
+          "label": "Markdown"
+        }
+      ],
+      "default": "md"
+    },
+    {
+      "key": "pollSeconds",
+      "type": "number",
+      "label": "Check every",
+      "min": 10,
+      "max": 600,
+      "step": 10,
+      "unit": "s",
+      "default": 60
+    }
+  ]
+}

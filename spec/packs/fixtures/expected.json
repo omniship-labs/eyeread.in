@@ -1,0 +1,246 @@
+{
+  "$comment": "One entry per fixture folder. valid: install succeeds. schema: top-level pack.json passes pack.schema.json (null when it's missing or not JSON). error: the validation code install fails with. zipExtra: raw entries the test harness adds when zipping the folder (for paths a folder can't hold). runtime: a call the pack makes and the error it must get.",
+  "fixtures": {
+    "invalid-absolute-path": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_PATH_UNSAFE",
+      "zipExtra": [
+        {
+          "name": "/tmp/evil.js",
+          "content": "// absolute path\n"
+        }
+      ]
+    },
+    "invalid-api-version": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_API_VERSION"
+    },
+    "invalid-backslash-path": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_PATH_UNSAFE",
+      "zipExtra": [
+        {
+          "name": "..\\evil.js",
+          "content": "// backslash traversal\n"
+        }
+      ]
+    },
+    "invalid-bundle-cycle": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INCLUDE_CYCLE"
+    },
+    "invalid-bundle-missing-include": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INCLUDE_MISSING"
+    },
+    "invalid-bundle-self-include": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INCLUDE_CYCLE"
+    },
+    "invalid-bundle-unused": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INCLUDE_UNUSED"
+    },
+    "invalid-bundle-version": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INCLUDE_VERSION"
+    },
+    "invalid-case-duplicate": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_PATH_DUPLICATE",
+      "zipExtra": [
+        {
+          "name": "MAIN.js",
+          "content": "// clashes with main.js on case-insensitive disks\n"
+        }
+      ]
+    },
+    "invalid-extra-field": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-files-json-mismatch": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_FILES_MISMATCH"
+    },
+    "invalid-id": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-license-file-missing": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_LICENSE_FILE"
+    },
+    "invalid-license-file-wrong": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_LICENSE_FILE"
+    },
+    "invalid-license-mit": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_LICENSE"
+    },
+    "invalid-main-missing": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_MAIN_MISSING"
+    },
+    "invalid-manifest-json": {
+      "valid": false,
+      "schema": null,
+      "error": "PACK_MANIFEST_INVALID_JSON"
+    },
+    "invalid-manifest-missing": {
+      "valid": false,
+      "schema": null,
+      "error": "PACK_MANIFEST_MISSING"
+    },
+    "invalid-minified": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_MINIFIED"
+    },
+    "invalid-network-http": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-network-ip": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-network-localhost": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-network-path": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-network-uppercase": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-network-userinfo": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-network-wildcard": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_NETWORK_SITE"
+    },
+    "invalid-no-main-with-permissions": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-path-traversal": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_PATH_UNSAFE",
+      "zipExtra": [
+        {
+          "name": "../evil.js",
+          "content": "// escapes the pack folder\n"
+        }
+      ]
+    },
+    "invalid-settings-duplicate-key": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_SETTINGS"
+    },
+    "invalid-settings-number-range": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_SETTINGS"
+    },
+    "invalid-settings-select-default": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_SETTINGS"
+    },
+    "invalid-settings-unknown-type": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-symlink": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_LINK_NOT_ALLOWED",
+      "zipExtra": [
+        {
+          "name": "passwd",
+          "symlink": "/etc/passwd"
+        }
+      ]
+    },
+    "invalid-unknown-permission": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-wasm": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_FILE_TYPE"
+    },
+    "valid-bundle": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-files-json": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-minimal": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-multifile": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-net-undeclared-site": {
+      "valid": true,
+      "schema": true,
+      "error": null,
+      "runtime": {
+        "permission": "scripts:write",
+        "call": "net.fetch",
+        "url": "https://evil.example.net/steal",
+        "error": "E_NETWORK_DENIED"
+      }
+    },
+    "valid-network": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    }
+  }
+}

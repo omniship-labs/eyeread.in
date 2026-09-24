@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/omniship-labs/eyeread.in/blob/main/spec/packs/pack.schema.json",
+  "title": "eyeread.in pack manifest (pack.json), apiVersion 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "id", "name", "version", "author", "license"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "apiVersion": { "type": "integer", "minimum": 1 },
+    "id": { "$ref": "#/$defs/packId" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "version": { "$ref": "#/$defs/version" },
+    "description": { "type": "string", "maxLength": 280 },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "email": {
+          "type": "string",
+          "maxLength": 254,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "url": { "$ref": "#/$defs/httpsUrl" }
+      }
+    },
+    "homepage": { "$ref": "#/$defs/httpsUrl" },
+    "repository": { "$ref": "#/$defs/httpsUrl" },
+    "license": { "enum": ["AGPL-3.0-only", "AGPL-3.0-or-later", "AGPL-3.0"] },
+    "minAppVersion": { "$ref": "#/$defs/version" },
+    "main": {
+      "type": "string",
+      "maxLength": 255,
+      "pattern": "^(?!/)(?!.*(^|/)\\.{1,2}(/|$))(?!.*//)[^\\\\\\u0000-\\u001f]+\\.m?js$"
+    },
+    "permissions": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/permission" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "network": {
+            "type": "array",
+            "maxItems": 16,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/site" }
+          }
+        }
+      }
+    },
+    "settings": {
+      "type": "array",
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/setting" }
+    },
+    "includes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "version"],
+        "properties": {
+          "id": { "$ref": "#/$defs/packId" },
+          "version": { "$ref": "#/$defs/version" }
+        }
+      }
+    }
+  },
+  "anyOf": [
+    { "required": ["main"] },
+    {
+      "required": ["includes"],
+      "properties": { "permissions": { "maxProperties": 0 } }
+    }
+  ],
+  "$defs": {
+    "packId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100,
+      "pattern": "^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$"
+    },
+    "version": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?$"
+    },
+    "httpsUrl": {
+      "type": "string",
+      "maxLength": 2048,
+      "pattern": "^https://[^\\s/?#]+(?:[/?#]\\S*)?$"
+    },
+    "permission": {
+      "enum": [
+        "scripts:write",
+        "prompter:load",
+        "prompter:control",
+        "prompter:events",
+        "files:import"
+      ]
+    },
+    "site": {
+      "description": "An exact https origin: lowercase DNS host (at least one dot, last label starts with a letter), optional port, nothing else.",
+      "type": "string",
+      "maxLength": 262,
+      "pattern": "^https://[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\\.[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?(?::(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$"
+    },
+    "settingKey": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$" },
+    "settingBase": {
+      "type": "object",
+      "required": ["key", "type", "label"],
+      "properties": {
+        "key": { "$ref": "#/$defs/settingKey" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "description": { "type": "string", "maxLength": 280 }
+      }
+    },
+    "setting": {
+      "type": "object",
+      "required": ["type"],
+      "properties": { "type": { "enum": ["toggle", "select", "number", "text"] } },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/settingBase",
+          "unevaluatedProperties": false,
+          "properties": {
+            "type": { "const": "toggle" },
+            "default": { "type": "boolean" }
+          }
+        },
+        {
+          "$ref": "#/$defs/settingBase",
+          "unevaluatedProperties": false,
+          "required": ["options"],
+          "properties": {
+            "type": { "const": "select" },
+            "options": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["value", "label"],
+                "properties": {
+                  "value": { "type": "string", "minLength": 1, "maxLength": 64 },
+                  "label": { "type": "string", "minLength": 1, "maxLength": 64 }
+                }
+              }
+            },
+            "default": { "type": "string" }
+          }
+        },
+        {
+          "$ref": "#/$defs/settingBase",
+          "unevaluatedProperties": false,
+          "properties": {
+            "type": { "const": "number" },
+            "min": { "type": "number" },
+            "max": { "type": "number" },
+            "step": { "type": "number", "exclusiveMinimum": 0 },
+            "unit": { "type": "string", "maxLength": 16 },
+            "default": { "type": "number" }
+          }
+        },
+        {
+          "$ref": "#/$defs/settingBase",
+          "unevaluatedProperties": false,
+          "properties": {
+            "type": { "const": "text" },
+            "maxLength": { "type": "integer", "minimum": 1, "maximum": 2000 },
+            "placeholder": { "type": "string", "maxLength": 64 },
+            "multiline": { "type": "boolean" },
+            "default": { "type": "string", "maxLength": 2000 }
+          }
+        }
+      ]
+    }
+  }
+}
