@@ -245,6 +245,7 @@ jobs:
           if-no-files-found: ignore
       - name: Comment result on PR
         if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        continue-on-error: true
         uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
         with:
           header: app-e2e-visual-regression
