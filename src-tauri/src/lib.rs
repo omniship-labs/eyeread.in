@@ -434,6 +434,8 @@ pub fn run() {
             packs::commands::packs_uninstall,
             packs::commands::packs_list,
             packs::commands::packs_set_enabled,
+            packs::commands::packs_net_log,
+            packs::commands::packs_net_clear_log,
         ])
         .setup(|app| {
             packs::connected_apps::init(app.handle());

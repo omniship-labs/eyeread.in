@@ -134,6 +134,9 @@ allowed only if **all** of these hold:
 - No cookies are sent or kept, and no credentials are shared with anything else.
   The headers `Cookie`, `Host`, `Origin`, `Referer`, `Connection`,
   `Content-Length`, `Transfer-Encoding`, `Proxy-*` and `Sec-*` can't be set.
+- A declared site whose name resolves only to a private, loopback or
+  link-local address is refused (`E_NETWORK`): packs can't reach this machine
+  or the local network. Requests go direct, not through a system proxy.
 - Redirects are followed only to the **same origin**, at most 5. A redirect to
   another site fails with `E_NETWORK_DENIED`.
 - Request bodies are capped at 1 MiB and responses at 5 MiB (`E_TOO_LARGE`).

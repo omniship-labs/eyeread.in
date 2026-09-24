@@ -1200,6 +1200,8 @@ dependencies = [
  "objc2-app-kit",
  "objc2-foundation",
  "regex",
+ "reqwest",
+ "rustls",
  "semver",
  "serde",
  "serde_json",
@@ -1215,6 +1217,8 @@ dependencies = [
  "tauri-plugin-updater",
  "tauri-plugin-window-state",
  "tempfile",
+ "tokio",
+ "url",
  "zip 8.6.0",
 ]
 

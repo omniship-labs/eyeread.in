@@ -8,6 +8,7 @@
 use super::error::{PackError, PackResult, INSTALL_CHANGED};
 use super::files_list::sha256_hex;
 use super::manifest::{Author, Manifest, PERMISSIONS};
+use super::net::{LogEntry, NetPolicy, NetProxy, ReqwestTransport};
 use super::signature::{self, BundleVerification, Keyring, RevocationList, Verification};
 use super::store::{InstalledPack, PackStatus, PackStore};
 use super::validate::{self, ValidatedBundle, ValidatedPack};
@@ -128,6 +129,27 @@ impl From<InstalledPack> for PackListItem {
     }
 }
 
+impl NetPolicy for Packs {
+    /// Sites the installed pack declares for `permission`; none while the
+    /// pack is off or waiting for re-approval.
+    fn declared_sites(&self, pack: &str, permission: &str) -> Vec<String> {
+        let guard = self.store.lock().unwrap_or_else(|e| e.into_inner());
+        guard
+            .as_ref()
+            .and_then(|s| s.get(pack))
+            .filter(|p| p.enabled && !p.needs_approval())
+            .and_then(|p| p.manifest.permissions.get(permission))
+            .map(|d| d.network.clone())
+            .unwrap_or_default()
+    }
+
+    /// Per-permission internet grants arrive with the permission broker
+    /// (#124). Until then internet stays off for every pack, as it starts.
+    fn internet_allowed(&self, _pack: &str, _permission: &str) -> bool {
+        false
+    }
+}
+
 /// Identifies exactly what `packs_inspect` showed: every pack and its hash.
 pub fn bundle_hash(bundle: &ValidatedBundle) -> String {
     let lines: String = bundle
@@ -218,11 +240,15 @@ pub fn init(app: &AppHandle) {
             None
         }
     };
-    app.manage(Arc::new(Packs {
+    let packs = Arc::new(Packs {
         app: app.clone(),
         app_version,
         store: Mutex::new(store),
-    }));
+    });
+    let user_agent = format!("eyeread.in/{} (packs)", app.package_info().version);
+    let net = NetProxy::new(packs.clone(), Arc::new(ReqwestTransport::new(user_agent)));
+    app.manage(packs);
+    app.manage(Arc::new(net));
 }
 
 type PacksState<'a> = State<'a, Arc<Packs>>;
@@ -312,4 +338,16 @@ pub fn packs_set_enabled(
     // A failed enable can still have changed state (marked for re-approval).
     packs.emit_changed();
     result.map(PackListItem::from)
+}
+
+/// The pack's network log, for its Settings screen: time, permission,
+/// method, host, status and bytes. Never bodies.
+#[tauri::command]
+pub fn packs_net_log(net: State<'_, Arc<NetProxy>>, id: String) -> Vec<LogEntry> {
+    net.log(&id)
+}
+
+#[tauri::command]
+pub fn packs_net_clear_log(net: State<'_, Arc<NetProxy>>, id: String) {
+    net.clear_log(&id);
 }

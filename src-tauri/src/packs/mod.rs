@@ -10,6 +10,9 @@ pub mod files_list;
 #[cfg(test)]
 mod fixture_tests;
 pub mod manifest;
+pub mod net;
+#[cfg(test)]
+mod net_tests;
 pub mod signature;
 #[cfg(test)]
 mod signature_tests;
