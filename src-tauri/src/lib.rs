@@ -423,9 +423,15 @@ pub fn run() {
             packs::connected_apps::packs_apps_resolve_pairing,
             packs::connected_apps::packs_apps_rpc_result,
             packs::connected_apps::packs_apps_prompter_state,
+            packs::commands::packs_inspect,
+            packs::commands::packs_install,
+            packs::commands::packs_uninstall,
+            packs::commands::packs_list,
+            packs::commands::packs_set_enabled,
         ])
         .setup(|app| {
             packs::connected_apps::init(app.handle());
+            packs::commands::init(app.handle());
             Ok(())
         })
         .build(tauri::generate_context!())
