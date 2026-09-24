@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import { isTauri } from '../lib/tauri';
+import { isLinux, isTauri } from '../lib/tauri';
 
 /**
  * Region-based click-through for the transparent overlay window.
@@ -39,7 +39,12 @@ export function useClickThrough(refs, enabled = true, mode) {
   });
 
   useEffect(() => {
-    if (!isTauri || !enabled) return undefined;
+    // Tao 0.35.3 unconditionally unwraps the X11 window when handling
+    // setIgnoreCursorEvents. On Linux/Wayland there is no X11 window, so
+    // invoking it aborts the whole app from GTK's event-loop callback. Linux
+    // has no supported compositor-level click-through implementation here;
+    // keep the overlay interactive instead of crashing at startup.
+    if (!isTauri || !enabled || isLinux) return undefined;
 
     let cancelled = false;
     let timer = null;
