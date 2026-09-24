@@ -39,6 +39,39 @@ impl Packs {
         Ok(guard)
     }
 
+    /// Installed packs, for the pack host.
+    pub fn installed(&self) -> Vec<InstalledPack> {
+        self.store()
+            .map(|g| g.as_ref().expect("checked").list())
+            .unwrap_or_default()
+    }
+
+    /// The launch check, run by the host before a pack's sandboxes start.
+    pub fn verify(&self, id: &str) -> PackResult<()> {
+        self.store()?
+            .as_mut()
+            .expect("checked in store()")
+            .verify(id)
+    }
+
+    pub fn pack_dir(&self, id: &str, version: &str) -> PathBuf {
+        self.store()
+            .map(|g| g.as_ref().expect("checked").pack_dir(id, version))
+            .unwrap_or_default()
+    }
+
+    /// A pack's declared settings with defaults filled in.
+    pub fn effective_settings(&self, id: &str) -> Option<Map<String, Value>> {
+        let manifest = self.store().ok()?.as_ref()?.get(id)?.manifest.clone();
+        Some(effective_settings(&manifest, &self.broker.settings(id)))
+    }
+
+    pub fn mark_crashed(&self, id: &str, reason: &str) {
+        if let Ok(mut g) = self.store() {
+            let _ = g.as_mut().expect("checked").mark_crashed(id, reason);
+        }
+    }
+
     fn emit_changed(&self) {
         let _ = self.app.emit("packs:changed", ());
     }
@@ -251,9 +284,21 @@ pub fn init(app: &AppHandle, broker: Arc<Broker>) {
         store: Mutex::new(store),
     });
     let user_agent = format!("eyeread.in/{} (packs)", app.package_info().version);
-    let net = NetProxy::new(packs.clone(), Arc::new(ReqwestTransport::new(user_agent)));
+    let net = Arc::new(NetProxy::new(
+        packs.clone(),
+        Arc::new(ReqwestTransport::new(user_agent)),
+    ));
+    let host = super::host::Host::new(
+        app.clone(),
+        packs.clone(),
+        packs.broker.clone(),
+        net.clone(),
+    );
     app.manage(packs);
-    app.manage(Arc::new(net));
+    app.manage(net);
+    app.manage(host.clone());
+    host.listen();
+    std::thread::spawn(move || host.reconcile());
 }
 
 type PacksState<'a> = State<'a, Arc<Packs>>;
@@ -351,6 +396,15 @@ pub fn packs_set_enabled(
 
 /// The pack's network log, for its Settings screen: time, permission,
 /// method, host, status and bytes. Never bodies.
+/// A pack's log: console output, errors and denials from its sandboxes.
+#[tauri::command]
+pub fn packs_logs(
+    host: State<'_, Arc<super::host::Host>>,
+    id: String,
+) -> Vec<super::host::LogLine> {
+    host.logs(&id)
+}
+
 #[tauri::command]
 pub fn packs_net_log(net: State<'_, Arc<NetProxy>>, id: String) -> Vec<LogEntry> {
     net.log(&id)

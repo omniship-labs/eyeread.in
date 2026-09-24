@@ -1,62 +1,85 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/omniship-labs/eyeread.in/blob/main/spec/packs/protocol.schema.json",
-  "title": "eyeread.in host <-> sandbox message, v1",
-  "description": "ArrayBuffer fields can't be expressed in JSON Schema; they are typed as objects here and checked with instanceof by the host.",
+  "title": "eyeread.in sandbox <-> app message, v1",
+  "description": "Messages between a pack sandbox and the app (spec/packs/PROTOCOL.md). Binary data travels as base64 strings.",
   "type": "object",
   "required": ["v", "type"],
   "properties": {
-    "v": { "const": 1 },
+    "v": {
+      "const": 1
+    },
     "type": {
-      "enum": [
-        "init",
-        "ready",
-        "activate",
-        "call",
-        "result",
-        "event",
-        "log",
-        "error",
-        "ping",
-        "pong"
-      ]
+      "enum": ["init", "ready", "activate", "call", "result", "event", "log", "error"]
     }
   },
   "oneOf": [
-    { "$ref": "#/$defs/init" },
-    { "$ref": "#/$defs/ready" },
-    { "$ref": "#/$defs/activate" },
-    { "$ref": "#/$defs/call" },
-    { "$ref": "#/$defs/result" },
-    { "$ref": "#/$defs/event" },
-    { "$ref": "#/$defs/log" },
-    { "$ref": "#/$defs/error" },
-    { "$ref": "#/$defs/ping" },
-    { "$ref": "#/$defs/pong" }
+    {
+      "$ref": "#/$defs/init"
+    },
+    {
+      "$ref": "#/$defs/ready"
+    },
+    {
+      "$ref": "#/$defs/activate"
+    },
+    {
+      "$ref": "#/$defs/call"
+    },
+    {
+      "$ref": "#/$defs/result"
+    },
+    {
+      "$ref": "#/$defs/event"
+    },
+    {
+      "$ref": "#/$defs/log"
+    },
+    {
+      "$ref": "#/$defs/error"
+    }
   ],
   "$defs": {
-    "permission": { "$ref": "pack.schema.json#/$defs/permission" },
+    "permission": {
+      "$ref": "pack.schema.json#/$defs/permission"
+    },
     "settings": {
       "type": "object",
-      "propertyNames": { "$ref": "pack.schema.json#/$defs/settingKey" },
-      "additionalProperties": { "type": ["boolean", "number", "string"] }
+      "propertyNames": {
+        "$ref": "pack.schema.json#/$defs/settingKey"
+      },
+      "additionalProperties": {
+        "type": ["boolean", "number", "string"]
+      }
     },
     "init": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["v", "type", "apiVersion", "pack", "sandbox", "settings"],
+      "required": ["v", "type", "apiVersion", "pack", "sandbox", "settings", "main"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "init" },
-        "apiVersion": { "const": 1 },
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "init"
+        },
+        "apiVersion": {
+          "const": 1
+        },
         "pack": {
           "type": "object",
           "additionalProperties": false,
           "required": ["id", "version", "name"],
           "properties": {
-            "id": { "$ref": "pack.schema.json#/$defs/packId" },
-            "version": { "$ref": "pack.schema.json#/$defs/version" },
-            "name": { "type": "string" }
+            "id": {
+              "$ref": "pack.schema.json#/$defs/packId"
+            },
+            "version": {
+              "$ref": "pack.schema.json#/$defs/version"
+            },
+            "name": {
+              "type": "string"
+            }
           }
         },
         "sandbox": {
@@ -64,16 +87,30 @@
           "additionalProperties": false,
           "required": ["id", "permissions", "network"],
           "properties": {
-            "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
             "permissions": {
               "type": "array",
               "uniqueItems": true,
-              "items": { "$ref": "#/$defs/permission" }
+              "items": {
+                "$ref": "#/$defs/permission"
+              }
             },
-            "network": { "type": "boolean" }
+            "network": {
+              "type": "boolean"
+            }
           }
         },
-        "settings": { "$ref": "#/$defs/settings" }
+        "settings": {
+          "$ref": "#/$defs/settings"
+        },
+        "main": {
+          "type": "string",
+          "maxLength": 255
+        }
       }
     },
     "ready": {
@@ -81,12 +118,18 @@
       "additionalProperties": false,
       "required": ["v", "type", "handlers"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "ready" },
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "ready"
+        },
         "handlers": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/permission" }
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
         }
       }
     },
@@ -95,9 +138,15 @@
       "additionalProperties": false,
       "required": ["v", "type", "permission"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "activate" },
-        "permission": { "$ref": "#/$defs/permission" }
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "activate"
+        },
+        "permission": {
+          "$ref": "#/$defs/permission"
+        }
       }
     },
     "call": {
@@ -105,10 +154,26 @@
       "additionalProperties": false,
       "required": ["v", "type", "id", "permission", "method", "params"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "call" },
-        "id": { "type": "integer", "minimum": 1 },
-        "permission": { "anyOf": [{ "$ref": "#/$defs/permission" }, { "type": "null" }] },
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "call"
+        },
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "permission": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/permission"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "method": {
           "enum": [
             "scripts.add",
@@ -122,7 +187,9 @@
             "settings.get"
           ]
         },
-        "params": { "type": "object" }
+        "params": {
+          "type": "object"
+        }
       }
     },
     "result": {
@@ -130,10 +197,19 @@
       "additionalProperties": false,
       "required": ["v", "type", "id", "ok"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "result" },
-        "id": { "type": "integer", "minimum": 1 },
-        "ok": { "type": "boolean" },
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "result"
+        },
+        "id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ok": {
+          "type": "boolean"
+        },
         "value": {},
         "error": {
           "type": "object",
@@ -155,23 +231,49 @@
                 "E_INTERNAL"
               ]
             },
-            "message": { "type": "string" }
+            "message": {
+              "type": "string"
+            }
           }
         }
       },
-      "if": { "properties": { "ok": { "const": true } } },
-      "then": { "required": ["value"], "not": { "required": ["error"] } },
-      "else": { "required": ["error"], "not": { "required": ["value"] } }
+      "if": {
+        "properties": {
+          "ok": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "required": ["value"],
+        "not": {
+          "required": ["error"]
+        }
+      },
+      "else": {
+        "required": ["error"],
+        "not": {
+          "required": ["value"]
+        }
+      }
     },
     "event": {
       "type": "object",
       "additionalProperties": false,
       "required": ["v", "type", "name", "data"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "event" },
-        "name": { "enum": ["prompter.state", "settings.changed"] },
-        "data": { "type": "object" }
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "event"
+        },
+        "name": {
+          "enum": ["prompter.state", "settings.changed"]
+        },
+        "data": {
+          "type": "object"
+        }
       }
     },
     "log": {
@@ -179,13 +281,22 @@
       "additionalProperties": false,
       "required": ["v", "type", "level", "args"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "log" },
-        "level": { "enum": ["debug", "info", "warn", "error"] },
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "log"
+        },
+        "level": {
+          "enum": ["debug", "info", "warn", "error"]
+        },
         "args": {
           "type": "array",
           "maxItems": 32,
-          "items": { "type": "string", "maxLength": 4096 }
+          "items": {
+            "type": "string",
+            "maxLength": 4096
+          }
         }
       }
     },
@@ -194,31 +305,23 @@
       "additionalProperties": false,
       "required": ["v", "type", "message", "fatal"],
       "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "error" },
-        "message": { "type": "string", "maxLength": 4096 },
-        "stack": { "type": "string", "maxLength": 16384 },
-        "fatal": { "type": "boolean" }
-      }
-    },
-    "ping": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["v", "type", "seq"],
-      "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "ping" },
-        "seq": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "pong": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["v", "type", "seq"],
-      "properties": {
-        "v": { "const": 1 },
-        "type": { "const": "pong" },
-        "seq": { "type": "integer", "minimum": 0 }
+        "v": {
+          "const": 1
+        },
+        "type": {
+          "const": "error"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "stack": {
+          "type": "string",
+          "maxLength": 16384
+        },
+        "fatal": {
+          "type": "boolean"
+        }
       }
     }
   }

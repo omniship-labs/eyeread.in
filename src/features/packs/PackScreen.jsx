@@ -14,6 +14,7 @@ import {
   getPackNetLog,
   getPackSettings,
   packBadge,
+  packBlocked,
   packErrorMessage,
   packProblem,
   PERMISSION_LABEL_KEYS,
@@ -185,7 +186,6 @@ export function PackScreen({ pack, onBack }) {
   };
 
   const m = pack.manifest;
-  const problem = packProblem(pack);
 
   return (
     <div className="pk-screen">
@@ -218,7 +218,7 @@ export function PackScreen({ pack, onBack }) {
         <Switch
           size="sm"
           checked={!!pack.enabled}
-          disabled={!!problem}
+          disabled={packBlocked(pack)}
           label={t('packs.toggle', { name: m.name })}
           onChange={toggle}
         />
@@ -237,7 +237,7 @@ export function PackScreen({ pack, onBack }) {
           }}
         />
         <Button size="sm" variant="secondary" onClick={() => updateInput.current?.click()}>
-          {problem ? t('packs.screen.reinstall') : t('packs.screen.update')}
+          {packBlocked(pack) ? t('packs.screen.reinstall') : t('packs.screen.update')}
         </Button>
         {pack.topLevel &&
           (confirmUninstall ? (

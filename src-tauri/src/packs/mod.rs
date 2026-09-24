@@ -12,6 +12,7 @@ pub mod error;
 pub mod files_list;
 #[cfg(test)]
 mod fixture_tests;
+pub mod host;
 pub mod manifest;
 pub mod net;
 #[cfg(test)]

@@ -1,0 +1,15 @@
+{
+  "apiVersion": 1,
+  "id": "in.eyeread.test.probe",
+  "name": "Sandbox probe",
+  "version": "1.0.0",
+  "description": "Test pack: tries everything a sandbox must not allow, and logs what happened.",
+  "author": { "name": "eyeread.in tests" },
+  "license": "AGPL-3.0-only",
+  "main": "main.js",
+  "permissions": {
+    "scripts:write": { "network": ["https://example.com"] },
+    "prompter:control": {},
+    "prompter:events": {}
+  }
+}

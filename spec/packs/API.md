@@ -29,8 +29,10 @@ The app splits a pack by permission, from what `pack.json` declares:
   permission's API plus `net` is available.
 - All permissions without `network` share **one offline sandbox**, where each of
   their handlers runs. There's no `net` there.
-- Sandboxes can't share memory, storage or messages. Settings flow one way, from
-  the user into every sandbox.
+- Sandboxes can't share memory, storage or messages: each is its own hidden
+  webview with an opaque origin and no Tauri access (see
+  [`PROTOCOL.md`](PROTOCOL.md)). Settings flow one way, from the user into every
+  sandbox.
 
 So a pack is written as if it were one program, but each internet-connected
 permission is isolated from the rest. A handler for a permission the pack
@@ -207,9 +209,10 @@ HTTP error statuses (404, 500…) aren't errors: they resolve with `ok: false`.
 
 - Enabled packs start when the app starts, and stop immediately when switched off,
   uninstalled or revoked.
-- A sandbox that stops answering the host's heartbeat for 10 seconds, or crashes
-  (fails to load, or throws uncaught errors) 3 times in 5 minutes, is stopped and
-  the pack is disabled with the reason shown. The user can switch it back on.
+- A sandbox that fails to load, or stops responding for 10 seconds, is stopped
+  and restarted. After 3 of these in 5 minutes the pack is switched off with the
+  reason shown; the user can switch it back on. (Uncaught errors are logged but
+  don't stop the sandbox.)
 - The sandbox has no `localStorage`, `IndexedDB`, cookies or service workers, and
   its origin is opaque. Keep state in declared settings, or in memory.
 - It can't open windows, navigate, or load anything from outside its own pack.

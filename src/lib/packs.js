@@ -53,6 +53,12 @@ export function packProblem(pack) {
   return { status: pack.status, reason: pack.statusReason || '' };
 }
 
+/**
+ * Tampered or revoked: can't be switched on until reinstalled. A crashed pack
+ * shows its reason but can be switched back on.
+ */
+export const packBlocked = (pack) => pack?.status === 'tampered' || pack?.status === 'revoked';
+
 /** A pack-command error ({ code, message } from Rust) as display text. */
 export function packErrorMessage(err) {
   if (err && typeof err === 'object' && err.message) return err.message;

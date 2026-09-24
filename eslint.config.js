@@ -88,6 +88,7 @@ export default [
       'eslint.config.js',
       'playwright.config.js',
       'playwright.app.config.js',
+      'playwright.packs.config.js',
       'scripts/**/*.mjs',
       'site/vite.config.js',
       'site/scripts/**/*.mjs',
@@ -99,7 +100,24 @@ export default [
   {
     // Playwright specs run in Node but their page.evaluate() callbacks
     // reference browser globals (document, window).
-    files: ['site/tests/**/*.{js,mjs}', 'tests/app/**/*.{js,mjs}'],
+    files: [
+      'site/tests/**/*.{js,mjs}',
+      'tests/app/**/*.{js,mjs}',
+      'tests/packs-host/**/*.{js,mjs}',
+    ],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+  {
+    // The sandbox probe is a pack: browser code with the `eyeread` global.
+    files: ['tests/packs-host/probe-pack/**/*.js'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: { ...globals.browser, eyeread: 'readonly' },
+    },
+  },
+  {
+    // The pack sandbox bootstrap (served by the app into each sandbox).
+    files: ['src-tauri/src/packs/host/**/*.js'],
+    languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
   },
 ];

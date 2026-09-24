@@ -148,6 +148,7 @@ describe('protocol messages', () => {
         network: false,
       },
       settings: { autoOpen: true },
+      main: 'main.js',
     },
     { v: 1, type: 'ready', handlers: ['prompter:control'] },
     { v: 1, type: 'activate', permission: 'prompter:control' },
@@ -171,11 +172,10 @@ describe('protocol messages', () => {
     { v: 1, type: 'event', name: 'settings.changed', data: { autoOpen: false } },
     { v: 1, type: 'log', level: 'info', args: ['hello'] },
     { v: 1, type: 'error', message: 'boom', fatal: true },
-    { v: 1, type: 'ping', seq: 1 },
-    { v: 1, type: 'pong', seq: 1 },
   ];
   const bad = [
-    { v: 2, type: 'ping', seq: 1 },
+    { v: 2, type: 'log', level: 'info', args: [] },
+    { v: 1, type: 'ping', seq: 1 },
     {
       v: 1,
       type: 'call',

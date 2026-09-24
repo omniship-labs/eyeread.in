@@ -380,6 +380,7 @@ pub fn run() {
     ];
 
     tauri::Builder::default()
+        .register_asynchronous_uri_scheme_protocol(packs::host::SCHEME, packs::host::protocol)
         .menu(build_app_menu)
         .on_menu_event(|app, event| {
             if event.id.as_ref() == "about" {
@@ -441,6 +442,7 @@ pub fn run() {
             packs::commands::packs_uninstall,
             packs::commands::packs_list,
             packs::commands::packs_set_enabled,
+            packs::commands::packs_logs,
             packs::commands::packs_net_log,
             packs::commands::packs_net_clear_log,
             packs::commands::packs_rpc_result,

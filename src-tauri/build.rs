@@ -23,6 +23,7 @@ const APP_COMMANDS: &[&str] = &[
     "packs_uninstall",
     "packs_list",
     "packs_set_enabled",
+    "packs_logs",
     "packs_net_log",
     "packs_net_clear_log",
     "packs_rpc_result",

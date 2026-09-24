@@ -1,42 +1,63 @@
-# Host ↔ sandbox protocol (v1)
+# Sandbox protocol (v1)
 
-How the pack host talks to each sandbox frame. Packs never see this: the app's
-bootstrap script inside the frame turns it into the `eyeread.*` API. Every
-message shape is in [`protocol.schema.json`](protocol.schema.json).
+How a sandbox talks to the app. Packs never see this: the app's bootstrap
+script, loaded before the pack's code, turns it into the `eyeread.*` API.
+Message shapes are in [`protocol.schema.json`](protocol.schema.json).
 
-## Transport
+## Sandboxes and transport
 
-1. The host creates the sandbox frame and a `MessageChannel`.
-2. When the frame loads, the host posts **one** message to it with
-   `postMessage(init, '*', [port2])`. The bootstrap takes the port from that first
-   message, then ignores `window` messages for good.
-3. Everything after that goes over the port. The host keeps one port per
-   sandbox, so a message's sandbox (and pack) is known from the port it arrived
-   on, never from its contents.
+Each sandbox is its **own hidden webview**, with no Tauri capabilities (the
+app's commands sit behind an ACL that grants them only to the app's windows).
+Separate webviews can't reference each other, which sibling frames in one page
+always can.
 
-Messages are plain objects (structured clone). Every message has `"v": 1` and a
-`type`. A message over 8 MiB, or one that doesn't match the schema, is dropped
-and logged; a sandbox that keeps sending them counts as crashing.
+A sandbox's pages are served from the app's `packhost:` protocol under an
+unguessable token: `<base> = packhost://localhost/<token>` (on Windows,
+`http://packhost.localhost/<token>`). Every document is served with this CSP:
+
+```
+default-src 'none'; script-src <base>/; connect-src <base>/rpc <base>/events <base>/init;
+sandbox allow-scripts; base-uri 'none'; form-action 'none'; frame-src 'none';
+frame-ancestors 'none'; img-src 'none'; media-src 'none'; font-src 'none';
+style-src 'none'; worker-src 'none'; object-src 'none'; manifest-src 'none'
+```
+
+`sandbox allow-scripts` gives the document an **opaque origin**: no storage, no
+cookies, no BroadcastChannel shared with anything, no pop-ups, forms or
+navigation. The only requests allowed are to the sandbox's own three URLs:
+
+| Request             | Does                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| `GET <base>/init`   | Returns the `init` message: who this sandbox is.                                          |
+| `POST <base>/rpc`   | Sends one message (`ready`, `call`, `log`, `error`) and returns the reply.                |
+| `GET <base>/events` | Long poll: returns the queued messages for this sandbox (possibly `[]`) within 5 seconds. |
+
+`POST` bodies are sent as `text/plain` so they're simple requests. The pack's
+files are served from `<base>/pack/<path>`; nothing else of the app or of other
+packs is reachable. The app checks **every** call against the sandbox's
+permissions and the user's grants, so a pack that calls `rpc` directly gets
+exactly what the API would give it.
 
 ## Start-up
 
 ```
-host                                    sandbox
- │── init (+port) ───────────────────────▶│  bootstrap installs `eyeread`, imports main
- │◀────────────────────────────── ready ──│  handlers registered during evaluation
- │── activate {permission} ──────────────▶│  handler(ctx) called, once per permission
- │── activate {permission} ──────────────▶│
+sandbox                                   app
+ │── GET init ───────────────────────────▶│
+ │◀───────── init {pack, sandbox, main} ──│
+ │  bootstrap installs `eyeread`, imports <base>/pack/<main>
+ │── POST rpc: ready {handlers} ─────────▶│
+ │◀──────────────── {activate: [...]} ────│  each handler(ctx) runs once
+ │── GET events (long poll, repeated) ───▶│
 ```
 
-- **`init`** (host → sandbox): `pack` (`id`, `version`, `name`), `sandbox` (`id`,
-  `permissions` it may activate, and `network`: whether `net` exists), and
-  `settings` (current values).
-- **`ready`** (sandbox → host): `handlers`, the permissions the pack registered.
-  Sent after `main` has finished evaluating. If `main` throws or fails to load,
-  the sandbox sends `error` with `fatal: true` instead.
-- **`activate`** (host → sandbox): `permission`. Sent once per permission that is
-  in the sandbox, registered, and allowed. There is no `deactivate`: revoking a
-  permission destroys the sandbox, and the host starts a new one without it.
+- **`init`**: `pack` (`id`, `version`, `name`), `sandbox` (`id`, `permissions`,
+  and `network`: whether `net` exists), `settings` (current values), and `main`.
+- **`ready`**: `handlers`, the permissions the pack registered while `main`
+  first evaluated. The reply lists the permissions to activate: those in this
+  sandbox, registered, and allowed. If `main` fails to load, the bootstrap sends
+  `error` with `fatal: true` instead.
+- There is no deactivation: when a permission is revoked, the pack is switched
+  off or updated, the app closes the sandbox and starts a new one if needed.
 
 ## Calls
 
@@ -46,10 +67,10 @@ host                                    sandbox
 { "v": 1, "type": "result", "id": 8, "ok": false, "error": { "code": "E_NO_SESSION", "message": "The prompter isn't open." } }
 ```
 
-`id` is a positive integer, unique per sandbox while the call is pending. Every
-call gets exactly one `result`. The host checks, in order: the sandbox holds
-`permission`, the method belongs to `permission`, the user's grant is on
-(internet too, for `net.fetch`), then the arguments.
+`id` is a positive integer, unique per sandbox while the call is pending. The
+app checks, in order: the permission belongs to this sandbox, the method
+belongs to the permission, the user's grant is on (internet too, for
+`net.fetch`), then the arguments.
 
 | `method`               | `permission`                     | `params`                                     | `value`                    |
 | ---------------------- | -------------------------------- | -------------------------------------------- | -------------------------- |
@@ -63,34 +84,53 @@ call gets exactly one `result`. The host checks, in order: the sandbox holds
 | `net.fetch`            | the sandbox's network permission | `{ url, method, headers, body?, timeoutMs }` | `NetResponseData`          |
 | `settings.get`         | none (`null`)                    | `{}`                                         | settings object            |
 
-`action` is `play`, `pause`, `toggle`, `restart`, `seek` or `close`.
+`action` is `play`, `pause`, `toggle`, `restart`, `seek` or `close`. Binary data
+travels as base64 strings:
 
-- `ImportedFileData`: `{ name, type, size, data: ArrayBuffer }`.
-- `NetResponseData`: `{ status, url, headers, body: ArrayBuffer }`.
-- `net.fetch` `body` is an `ArrayBuffer` (the bootstrap encodes strings as UTF-8).
+- `ImportedFileData`: `{ name, type, size, data }`.
+- `NetResponseData`: `{ status, url, headers, body }`.
+- `net.fetch`'s request `body`, when present.
 
-## Events (host → sandbox)
+## Events
+
+Returned by `GET <base>/events`:
 
 ```json
-{ "v": 1, "type": "event", "name": "prompter.state", "data": { "sessionActive": true, "playing": false, "scriptId": "…", "title": "Keynote", "wordIndex": 6, "wordCount": 640 } }
-{ "v": 1, "type": "event", "name": "settings.changed", "data": { "autoOpen": false } }
+[
+  {
+    "v": 1,
+    "type": "event",
+    "name": "prompter.state",
+    "data": {
+      "sessionActive": true,
+      "playing": false,
+      "scriptId": "…",
+      "title": "Keynote",
+      "wordIndex": 6,
+      "wordCount": 640
+    }
+  },
+  { "v": 1, "type": "event", "name": "settings.changed", "data": { "autoOpen": false } }
+]
 ```
 
-`prompter.state` is sent only after `prompter.subscribe`, and only to a sandbox
-holding `prompter:events`. `settings.changed` goes to every sandbox of the pack.
+`prompter.state` goes only to a sandbox that holds `prompter:events` and has
+called `prompter.subscribe`. `settings.changed` goes to every sandbox of the pack.
 
 ## Logs, errors and the watchdog
 
 ```json
 { "v": 1, "type": "log", "level": "info", "args": ["word", "12"] }
 { "v": 1, "type": "error", "message": "boom", "stack": "…", "fatal": false }
-{ "v": 1, "type": "ping", "seq": 31 }
-{ "v": 1, "type": "pong", "seq": 31 }
 ```
 
 - `log` levels: `debug`, `info`, `warn`, `error`. `args` are strings, each up to
-  4 KiB; the bootstrap converts values with `String()` or JSON.
+  4 KiB; the bootstrap converts values with `String()` or JSON. The app keeps
+  them in the pack's log (Developer mode), with the sandbox's denials.
 - `error` reports uncaught errors and unhandled rejections. `fatal: true` means
-  `main` couldn't load.
-- The host sends `ping` every 2 seconds; the sandbox answers `pong` with the same
-  `seq`. No `pong` for 10 seconds means the sandbox is hung.
+  `main` couldn't load; the sandbox is stopped and counts as a crash.
+- **Heartbeat.** A live sandbox always has an `events` poll waiting or starts
+  the next one straight away. One that hasn't polled for 10 seconds is hung
+  (a busy loop can't start a new request): it's stopped and counts as a crash.
+- A crashed sandbox is restarted. 3 crashes of a pack's sandboxes within 5
+  minutes switch the pack off with the reason; the user can switch it back on.

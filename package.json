@@ -29,7 +29,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "git config core.hooksPath .githooks",
-    "spec:types": "tsc -p spec/packs/tsconfig.json"
+    "spec:types": "tsc -p spec/packs/tsconfig.json",
+    "packs:sandbox-test": "playwright test --config=playwright.packs.config.js"
   },
   "dependencies": {
     "@fontsource/hanken-grotesk": "^5.3.0",

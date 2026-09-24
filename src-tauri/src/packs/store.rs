@@ -33,6 +33,9 @@ pub enum PackStatus {
     Tampered,
     /// On eyeread.in's revocation list. Disabled for good.
     Revoked,
+    /// Stopped by the pack host after repeated crashes or hangs. The user
+    /// can switch it back on.
+    Crashed,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -60,8 +63,9 @@ pub struct InstalledPack {
 }
 
 impl InstalledPack {
+    /// Tampered or revoked: can't be switched on until reinstalled.
     pub fn needs_approval(&self) -> bool {
-        self.status != PackStatus::Ok
+        matches!(self.status, PackStatus::Tampered | PackStatus::Revoked)
     }
 }
 
@@ -369,6 +373,11 @@ impl PackStore {
             PackError::install(INSTALL_NOT_FOUND, format!("{id} isn't installed."))
         })?;
         pack.enabled = enabled;
+        if enabled && pack.status == PackStatus::Crashed {
+            // Switching a crashed pack back on gives it a fresh start.
+            pack.status = PackStatus::Ok;
+            pack.status_reason = None;
+        }
         let pack = pack.clone();
         self.save()?;
         Ok(pack)
@@ -415,6 +424,17 @@ impl PackStore {
             pack.enabled = false;
             self.save()?;
             return Err(PackError::install(INSTALL_NEEDS_APPROVAL, err.message));
+        }
+        Ok(())
+    }
+
+    /// The pack host gave up on a pack (repeated crashes or hangs).
+    pub fn mark_crashed(&mut self, id: &str, reason: &str) -> PackResult<()> {
+        if let Some(pack) = self.registry.packs.get_mut(id) {
+            pack.status = PackStatus::Crashed;
+            pack.status_reason = Some(reason.to_string());
+            pack.enabled = false;
+            self.save()?;
         }
         Ok(())
     }
@@ -714,6 +734,21 @@ pub(crate) mod tests {
             store.verify("com.example.a").unwrap_err().message,
             "LICENSE: listed in files.json but missing from the pack"
         );
+    }
+
+    #[test]
+    fn a_crashed_pack_can_be_switched_back_on() {
+        let (_dir, mut store) = store();
+        store
+            .install(&bundle(("com.example.a", "1.0.0"), &[]), &none())
+            .unwrap();
+        store
+            .mark_crashed("com.example.a", "Stopped responding.")
+            .unwrap();
+        let a = store.get("com.example.a").unwrap();
+        assert!(!a.enabled && a.status == PackStatus::Crashed && !a.needs_approval());
+        let a = store.set_enabled("com.example.a", true).unwrap();
+        assert!(a.enabled && a.status == PackStatus::Ok && a.status_reason.is_none());
     }
 
     #[test]

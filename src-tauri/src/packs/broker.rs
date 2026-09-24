@@ -311,6 +311,15 @@ impl Broker {
             .unwrap_or_default()
     }
 
+    /// All of a pack's grants, by permission.
+    pub fn grants_for(&self, pack: &str) -> BTreeMap<String, Grant> {
+        self.lock()
+            .pack_grants
+            .get(pack)
+            .cloned()
+            .unwrap_or_default()
+    }
+
     /// Set a pack's grant for one permission. Internet can only be on while
     /// the permission is allowed. Tells every window (the pack host restarts
     /// the affected sandbox).

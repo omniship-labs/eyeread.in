@@ -227,6 +227,25 @@ describe('PackScreen', () => {
     expect(screen.getByText(/Stopped after repeated crashes: Hung for 10 s\./)).toBeTruthy();
   });
 
+  it('lets a crashed pack be switched back on', async () => {
+    render(
+      <PackScreen
+        pack={installed({
+          enabled: false,
+          status: 'crashed',
+          statusReason: 'stopped responding for 10 seconds',
+        })}
+        onBack={() => {}}
+      />
+    );
+    expect(screen.getByText(/Stopped after repeated crashes/)).toBeTruthy();
+    const toggle = screen.getByRole('switch', { name: 'Notion Sync on or off' });
+    expect(toggle.disabled).toBe(false);
+    fireEvent.click(toggle);
+    expect(api.setPackEnabled).toHaveBeenCalledWith('com.example.notion', true);
+    await waitFor(() => expect(api.getPackGrants).toHaveBeenCalled());
+  });
+
   it('asks before uninstalling', async () => {
     const onBack = vi.fn();
     render(<PackScreen pack={installed()} onBack={onBack} />);

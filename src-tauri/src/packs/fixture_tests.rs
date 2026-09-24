@@ -161,3 +161,23 @@ fn error_messages_name_the_file_inside_an_included_pack() {
         err.message
     );
 }
+
+/// Not a test: installs a pack folder into a store, for trying packs in a
+/// local build. Run with
+/// `EYEREAD_PACKS_ROOT=<app data>/packs EYEREAD_PACK_FOLDER=<folder> cargo test install_folder -- --ignored`.
+#[test]
+#[ignore]
+fn install_folder_for_manual_testing() {
+    let root = std::env::var("EYEREAD_PACKS_ROOT").expect("EYEREAD_PACKS_ROOT");
+    let folder = std::env::var("EYEREAD_PACK_FOLDER").expect("EYEREAD_PACK_FOLDER");
+    let bundle = validate_entries(
+        archive::read_folder(Path::new(&folder)).unwrap(),
+        &semver::Version::new(0, 0, 0),
+    )
+    .unwrap();
+    let mut store = PackStore::open(root).unwrap();
+    store
+        .install(&bundle, &super::store::tests::none())
+        .unwrap();
+    println!("installed {}", bundle.top.manifest.id);
+}

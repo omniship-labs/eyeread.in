@@ -7,8 +7,8 @@ import { listen } from '../lib/tauri';
 import {
   getPackGrants,
   listPacks,
+  packBlocked,
   packErrorMessage,
-  packProblem,
   packsAvailable,
   requestPackInstall,
   setPackEnabled,
@@ -141,7 +141,7 @@ export function PacksSettings({ advanced }) {
                   <Switch
                     size="sm"
                     checked={!!p.enabled}
-                    disabled={!!packProblem(p)}
+                    disabled={packBlocked(p)}
                     label={t('packs.toggle', { name: p.manifest.name })}
                     onChange={(on) =>
                       setPackEnabled(p.id, on).catch((e) => setError(packErrorMessage(e)))
