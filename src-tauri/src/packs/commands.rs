@@ -6,6 +6,7 @@
 //! refuses if that hash changed in between.
 
 use super::broker::{Broker, Grant};
+use super::dev::{self, DevPack, DevPacks, DevSettings};
 use super::error::{PackError, PackResult, INSTALL_CHANGED, INSTALL_NOT_FOUND};
 use super::files_list::sha256_hex;
 use super::manifest::{Author, Manifest, PERMISSIONS};
@@ -19,12 +20,23 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard};
 use tauri::{AppHandle, Emitter, Manager, State};
+use tauri_plugin_store::StoreExt;
 
 pub struct Packs {
     app: AppHandle,
     broker: Arc<Broker>,
     app_version: semver::Version,
     store: Mutex<Option<PackStore>>,
+    dev: Mutex<DevState>,
+}
+
+/// Developer mode: its persisted settings, the loaded folders, and which
+/// dev packs the user switched off.
+#[derive(Default)]
+struct DevState {
+    settings: DevSettings,
+    packs: DevPacks,
+    off: BTreeSet<String>,
 }
 
 impl Packs {
@@ -39,15 +51,68 @@ impl Packs {
         Ok(guard)
     }
 
-    /// Installed packs, for the pack host.
+    fn dev(&self) -> MutexGuard<'_, DevState> {
+        self.dev.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
+    /// Dev packs as the host sees them: loaded folders that validate, while
+    /// Developer mode is on.
+    fn dev_packs(&self, include_broken: bool) -> Vec<(InstalledPack, Option<PackError>, PathBuf)> {
+        let dev = self.dev();
+        if !dev.settings.enabled {
+            return Vec::new();
+        }
+        dev.packs
+            .values()
+            .filter(|d| include_broken || d.error.is_none())
+            .filter_map(|d| {
+                let manifest = d.manifest.clone()?;
+                Some((
+                    InstalledPack {
+                        id: manifest.id.clone(),
+                        version: d.run_version(),
+                        pack_hash: String::new(),
+                        enabled: d.error.is_none() && !dev.off.contains(&manifest.id),
+                        manifest,
+                        files: Default::default(),
+                        top_level: true,
+                        used_by: Default::default(),
+                        status: PackStatus::Ok,
+                        verified: false,
+                        status_reason: None,
+                        installed_at: 0,
+                        dev: true,
+                    },
+                    d.error.clone(),
+                    d.folder.clone(),
+                ))
+            })
+            .collect()
+    }
+
+    fn dev_pack(&self, id: &str) -> Option<(InstalledPack, PathBuf)> {
+        self.dev_packs(false)
+            .into_iter()
+            .find(|(p, _, _)| p.id == id)
+            .map(|(p, _, folder)| (p, folder))
+    }
+
+    /// Installed packs, then dev packs: everything the host may run.
     pub fn installed(&self) -> Vec<InstalledPack> {
-        self.store()
+        let mut list = self
+            .store()
             .map(|g| g.as_ref().expect("checked").list())
-            .unwrap_or_default()
+            .unwrap_or_default();
+        list.extend(self.dev_packs(false).into_iter().map(|(p, _, _)| p));
+        list
     }
 
     /// The launch check, run by the host before a pack's sandboxes start.
+    /// Dev packs were just validated by the reload watcher.
     pub fn verify(&self, id: &str) -> PackResult<()> {
+        if self.dev_pack(id).is_some() {
+            return Ok(());
+        }
         self.store()?
             .as_mut()
             .expect("checked in store()")
@@ -55,14 +120,27 @@ impl Packs {
     }
 
     pub fn pack_dir(&self, id: &str, version: &str) -> PathBuf {
+        if let Some((_, folder)) = self.dev_pack(id).filter(|(p, _)| p.version == version) {
+            return folder;
+        }
         self.store()
             .map(|g| g.as_ref().expect("checked").pack_dir(id, version))
             .unwrap_or_default()
     }
 
+    /// The manifest of an installed or dev pack.
+    fn manifest_of(&self, id: &str) -> Option<(Manifest, bool)> {
+        let installed = self.store().ok().and_then(|g| {
+            g.as_ref()?
+                .get(id)
+                .map(|p| (p.manifest.clone(), p.enabled && !p.needs_approval()))
+        });
+        installed.or_else(|| self.dev_pack(id).map(|(p, _)| (p.manifest, p.enabled)))
+    }
+
     /// A pack's declared settings with defaults filled in.
     pub fn effective_settings(&self, id: &str) -> Option<Map<String, Value>> {
-        let manifest = self.store().ok()?.as_ref()?.get(id)?.manifest.clone();
+        let (manifest, _) = self.manifest_of(id)?;
         Some(effective_settings(&manifest, &self.broker.settings(id)))
     }
 
@@ -70,6 +148,48 @@ impl Packs {
         if let Ok(mut g) = self.store() {
             let _ = g.as_mut().expect("checked").mark_crashed(id, reason);
         }
+    }
+
+    fn save_dev(&self) {
+        let settings = {
+            let mut dev = self.dev();
+            dev.settings.folders = dev.packs.keys().cloned().collect();
+            dev.settings.clone()
+        };
+        if let Ok(store) = self.app.store("packs.json") {
+            store.set(
+                dev::STORE_KEY,
+                serde_json::to_value(settings).unwrap_or_default(),
+            );
+            let _ = store.save();
+        }
+    }
+
+    /// Reload watcher: re-read every loaded folder once a second.
+    fn watch_dev(self: &Arc<Self>) {
+        let weak = Arc::downgrade(self);
+        let _ = std::thread::Builder::new()
+            .name("eyeread-packs-dev".into())
+            .spawn(move || loop {
+                std::thread::sleep(std::time::Duration::from_secs(1));
+                let Some(packs) = weak.upgrade() else { return };
+                let changed = {
+                    let mut dev = packs.dev();
+                    if !dev.settings.enabled {
+                        continue;
+                    }
+                    let version = packs.app_version.clone();
+                    // Refresh every folder: no short-circuit.
+                    let mut changed = false;
+                    for p in dev.packs.values_mut() {
+                        changed |= p.refresh(&version);
+                    }
+                    changed
+                };
+                if changed {
+                    packs.emit_changed();
+                }
+            });
     }
 
     fn emit_changed(&self) {
@@ -148,6 +268,11 @@ pub struct PackListItem {
     pub status_reason: Option<String>,
     pub verified: bool,
     pub installed_at: u64,
+    /// Loaded in Developer mode from `folder`.
+    pub dev: bool,
+    pub folder: Option<String>,
+    /// Why a dev folder doesn't validate right now (it doesn't run meanwhile).
+    pub dev_error: Option<PackError>,
 }
 
 impl From<InstalledPack> for PackListItem {
@@ -163,6 +288,9 @@ impl From<InstalledPack> for PackListItem {
             status_reason: p.status_reason,
             verified: p.verified,
             installed_at: p.installed_at,
+            dev: p.dev,
+            folder: None,
+            dev_error: None,
         }
     }
 }
@@ -171,13 +299,9 @@ impl NetPolicy for Packs {
     /// Sites the installed pack declares for `permission`; none while the
     /// pack is off or waiting for re-approval.
     fn declared_sites(&self, pack: &str, permission: &str) -> Vec<String> {
-        let guard = self.store.lock().unwrap_or_else(|e| e.into_inner());
-        guard
-            .as_ref()
-            .and_then(|s| s.get(pack))
-            .filter(|p| p.enabled && !p.needs_approval())
-            .and_then(|p| p.manifest.permissions.get(permission))
-            .map(|d| d.network.clone())
+        self.manifest_of(pack)
+            .filter(|(_, on)| *on)
+            .and_then(|(m, _)| m.permissions.get(permission).map(|d| d.network.clone()))
             .unwrap_or_default()
     }
 
@@ -277,9 +401,25 @@ pub fn init(app: &AppHandle, broker: Arc<Broker>) {
             None
         }
     };
+    let dev_settings: DevSettings = app
+        .store("packs.json")
+        .ok()
+        .and_then(|s| s.get(dev::STORE_KEY))
+        .and_then(|v| serde_json::from_value(v).ok())
+        .unwrap_or_default();
+    let dev_packs: DevPacks = dev_settings
+        .folders
+        .iter()
+        .map(|f| (f.clone(), DevPack::load(f.clone(), &app_version)))
+        .collect();
     let packs = Arc::new(Packs {
         app: app.clone(),
         broker,
+        dev: Mutex::new(DevState {
+            settings: dev_settings,
+            packs: dev_packs,
+            off: BTreeSet::new(),
+        }),
         app_version,
         store: Mutex::new(store),
     });
@@ -294,6 +434,7 @@ pub fn init(app: &AppHandle, broker: Arc<Broker>) {
         packs.broker.clone(),
         net.clone(),
     );
+    packs.watch_dev();
     app.manage(packs);
     app.manage(net);
     app.manage(host.clone());
@@ -359,6 +500,18 @@ pub fn packs_install(
 
 #[tauri::command]
 pub fn packs_uninstall(packs: PacksState<'_>, id: String) -> PackResult<Vec<String>> {
+    // "Uninstalling" a dev pack unloads its folder; the folder stays.
+    let folder = packs
+        .dev_packs(true)
+        .into_iter()
+        .find(|(p, _, _)| p.id == id)
+        .map(|(_, _, f)| f);
+    if let Some(folder) = folder {
+        packs.dev().packs.remove(&folder);
+        packs.save_dev();
+        packs.emit_changed();
+        return Ok(vec![id]);
+    }
     let removed = packs
         .store()?
         .as_mut()
@@ -373,9 +526,15 @@ pub fn packs_uninstall(packs: PacksState<'_>, id: String) -> PackResult<Vec<Stri
 
 #[tauri::command]
 pub fn packs_list(packs: PacksState<'_>) -> PackResult<Vec<PackListItem>> {
-    let guard = packs.store()?;
-    let list = guard.as_ref().expect("checked in store()").list();
-    Ok(list.into_iter().map(PackListItem::from).collect())
+    let list = packs.store()?.as_ref().expect("checked in store()").list();
+    let mut items: Vec<PackListItem> = list.into_iter().map(PackListItem::from).collect();
+    for (pack, error, folder) in packs.dev_packs(true) {
+        let mut item = PackListItem::from(pack);
+        item.folder = Some(folder.to_string_lossy().into_owned());
+        item.dev_error = error;
+        items.push(item);
+    }
+    Ok(items)
 }
 
 #[tauri::command]
@@ -384,6 +543,18 @@ pub fn packs_set_enabled(
     id: String,
     enabled: bool,
 ) -> PackResult<PackListItem> {
+    if let Some((pack, _)) = packs.dev_pack(&id) {
+        {
+            let mut dev = packs.dev();
+            if enabled {
+                dev.off.remove(&id);
+            } else {
+                dev.off.insert(id.clone());
+            }
+        }
+        packs.emit_changed();
+        return Ok(PackListItem::from(InstalledPack { enabled, ..pack }));
+    }
     let result = packs
         .store()?
         .as_mut()
@@ -447,11 +618,8 @@ pub struct PermissionGrant {
 
 fn installed_manifest(packs: &Packs, id: &str) -> PackResult<Manifest> {
     packs
-        .store()?
-        .as_ref()
-        .expect("checked in store()")
-        .get(id)
-        .map(|p| p.manifest.clone())
+        .manifest_of(id)
+        .map(|(m, _)| m)
         .ok_or_else(|| PackError::install(INSTALL_NOT_FOUND, format!("{id} isn't installed.")))
 }
 
@@ -586,4 +754,114 @@ pub fn packs_inspect_bytes(
     let path = dir.join(format!("{}.zip", &sha256_hex(bytes)[..16]));
     std::fs::write(&path, bytes).map_err(|e| PackError::io("Couldn't stage the pack", e))?;
     packs_inspect(packs, path.to_string_lossy().into_owned())
+}
+
+// ---- Developer mode ---------------------------------------------------------------
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DevStatus {
+    pub enabled: bool,
+    pub folders: Vec<String>,
+}
+
+#[tauri::command]
+pub fn packs_dev_status(packs: PacksState<'_>) -> DevStatus {
+    let dev = packs.dev();
+    DevStatus {
+        enabled: dev.settings.enabled,
+        folders: dev
+            .packs
+            .keys()
+            .map(|f| f.to_string_lossy().into_owned())
+            .collect(),
+    }
+}
+
+/// Turn Developer mode on or off. Off stops every dev pack (their folders
+/// stay loaded for next time).
+#[tauri::command]
+pub fn packs_dev_set_mode(packs: PacksState<'_>, enabled: bool) -> DevStatus {
+    packs.dev().settings.enabled = enabled;
+    packs.save_dev();
+    packs.emit_changed();
+    packs_dev_status(packs)
+}
+
+/// Load an unpacked pack folder. It runs straight from disk and reloads on
+/// every change; its permissions start off like any pack's.
+#[tauri::command]
+pub fn packs_dev_load(packs: PacksState<'_>, folder: String) -> PackResult<PackListItem> {
+    let folder = PathBuf::from(folder);
+    if !folder.is_dir() {
+        return Err(dev::io_error(format!(
+            "{} isn't a folder.",
+            folder.display()
+        )));
+    }
+    let pack = DevPack::load(folder.clone(), &packs.app_version);
+    if let Some(e) = &pack.error {
+        if pack.manifest.is_none() {
+            return Err(e.clone());
+        }
+    }
+    let id = pack.id().unwrap_or_default().to_string();
+    let installed = packs
+        .store()?
+        .as_ref()
+        .expect("checked in store()")
+        .get(&id)
+        .is_some();
+    let elsewhere = packs
+        .dev()
+        .packs
+        .values()
+        .any(|p| p.folder != folder && p.id() == Some(id.as_str()));
+    dev::check_id_free(&id, installed, elsewhere)?;
+    {
+        let mut dev = packs.dev();
+        dev.settings.enabled = true;
+        dev.packs.insert(folder.clone(), pack);
+    }
+    packs.save_dev();
+    packs.emit_changed();
+    packs_list(packs)?
+        .into_iter()
+        .find(|p| p.dev && p.id == id)
+        .ok_or_else(|| dev::io_error("The folder didn't load."))
+}
+
+#[tauri::command]
+pub fn packs_dev_unload(packs: PacksState<'_>, folder: String) {
+    packs.dev().packs.remove(&PathBuf::from(folder));
+    packs.save_dev();
+    packs.emit_changed();
+}
+
+/// Validate a pack folder with the installer's own checks.
+#[tauri::command]
+pub fn packs_validate(packs: PacksState<'_>, folder: String) -> PackResult<Vec<String>> {
+    let bundle = dev::validate_folder(&PathBuf::from(folder), &packs.app_version)?;
+    Ok(bundle
+        .all()
+        .map(|p| format!("{}@{}", p.manifest.id, p.manifest.version))
+        .collect())
+}
+
+/// Build a pack folder into `<id>-<version>.zip` next to it.
+#[tauri::command]
+pub fn packs_build(packs: PacksState<'_>, folder: String) -> PackResult<String> {
+    dev::build(&PathBuf::from(folder), &packs.app_version).map(|p| p.to_string_lossy().into_owned())
+}
+
+/// Scaffold a new pack in `parent`, then load it.
+#[tauri::command]
+pub fn packs_new(
+    packs: PacksState<'_>,
+    parent: String,
+    name: String,
+    author: String,
+) -> PackResult<PackListItem> {
+    let folder = dev::scaffold(&PathBuf::from(parent), &name, &author)?;
+    packs_dev_load(packs, folder.to_string_lossy().into_owned())
 }

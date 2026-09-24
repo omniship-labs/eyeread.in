@@ -453,6 +453,28 @@
       "logRequest": "请求",
       "logResult": "结果",
       "logBytes": "字节"
+    },
+    "dev": {
+      "title": "开发者模式",
+      "enable": "开发者模式",
+      "hint": "运行未打包的功能包文件夹（编辑后自动重新加载），并验证或构建功能包。供制作功能包的人使用。",
+      "load": "加载文件夹…",
+      "new": "新建功能包…",
+      "newName": "功能包名称",
+      "newAuthor": "你的名字",
+      "create": "创建…",
+      "chooseFolder": "选择功能包文件夹",
+      "chooseParent": "选择在哪里创建功能包",
+      "validate": "验证",
+      "valid": "有效：{{packs}}",
+      "build": "构建功能包",
+      "built": "已构建：{{path}}",
+      "unload": "卸载",
+      "folder": "文件夹：{{folder}}",
+      "invalid": "验证未通过：{{message}}",
+      "log": "日志",
+      "logHint": "此功能包的控制台输出、错误、被拒绝的权限和网络请求，最新的在前。",
+      "logEmpty": "还没有记录。"
     }
   }
 }

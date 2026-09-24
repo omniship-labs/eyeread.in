@@ -6,13 +6,12 @@
 //! pack's canonical `files.json`, signs it with the trusted comment the
 //! verifier expects, and returns a new zip with the signatures inside.
 
-use super::archive::{Entry, FILES_JSON, SIGNATURE_FILE};
+use super::archive::{write_zip, Entry, FILES_JSON, SIGNATURE_FILE};
 use super::error::{PackError, PackResult};
 use super::signature::{trusted_comment, REVOCATIONS_COMMENT};
 use super::validate::validate_entries;
 use minisign::{PublicKey, SecretKey};
-use std::io::{Cursor, Write};
-use zip::write::SimpleFileOptions;
+use std::io::Cursor;
 
 const UNTRUSTED_COMMENT: &str = "signature from eyeread.in sign-pack";
 
@@ -41,18 +40,6 @@ fn is_old_signature_file(path: &str) -> bool {
         None => Some(path),
     };
     matches!(root_file, Some(FILES_JSON) | Some(SIGNATURE_FILE))
-}
-
-pub fn write_zip(entries: &[Entry]) -> Vec<u8> {
-    let mut zip = zip::ZipWriter::new(Cursor::new(Vec::new()));
-    let mut sorted: Vec<&Entry> = entries.iter().collect();
-    sorted.sort_by(|a, b| a.path.cmp(&b.path));
-    for e in sorted {
-        zip.start_file(e.path.as_str(), SimpleFileOptions::default())
-            .expect("zip entry");
-        zip.write_all(&e.bytes).expect("zip write");
-    }
-    zip.finish().expect("zip finish").into_inner()
 }
 
 /// Sign a pack and every pack it includes. `entries` are the reviewed pack's

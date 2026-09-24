@@ -41,6 +41,42 @@ export const setPackSettings = (id, values) => invoke('packs_settings_set', { id
 export const getPackNetLog = (id) => invoke('packs_net_log', { id });
 export const clearPackNetLog = (id) => invoke('packs_net_clear_log', { id });
 
+// ---- Developer mode ----------------------------------------------------------------
+
+export const getDevStatus = () => invoke('packs_dev_status');
+export const setDevMode = (enabled) => invoke('packs_dev_set_mode', { enabled });
+/** Run an unpacked folder; it reloads on every change. */
+export const loadDevFolder = (folder) => invoke('packs_dev_load', { folder });
+export const unloadDevFolder = (folder) => invoke('packs_dev_unload', { folder });
+/** The installer's own checks; resolves with `id@version` for each pack. */
+export const validatePackFolder = (folder) => invoke('packs_validate', { folder });
+/** Writes `<id>-<version>.zip` next to the folder; resolves with its path. */
+export const buildPackFolder = (folder) => invoke('packs_build', { folder });
+export const newPack = (parent, name, author) => invoke('packs_new', { parent, name, author });
+export const getPackLogs = (id) => invoke('packs_logs', { id });
+
+/**
+ * One timeline for the log panel: the sandbox log (console, errors,
+ * denials) and the network log, newest first.
+ */
+export function mergeLogs(logs, netLog) {
+  const lines = [
+    ...(logs || []).map((l) => ({
+      time: l.time,
+      level: l.level,
+      text: l.message,
+      kind: 'log',
+    })),
+    ...(netLog || []).map((e) => ({
+      time: e.time,
+      level: e.outcome === 'ok' ? 'net' : 'warn',
+      text: `${e.method} ${e.host} → ${e.outcome === 'ok' ? e.status : e.outcome} (${e.permission})`,
+      kind: 'net',
+    })),
+  ];
+  return lines.sort((a, b) => b.time - a.time);
+}
+
 /** The badge a pack shows: 'verified' (✓ signed by eyeread.in) or 'community'. */
 export function packBadge(pack) {
   if (pack?.dev) return 'dev';

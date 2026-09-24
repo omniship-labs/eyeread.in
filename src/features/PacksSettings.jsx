@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Switch } from '../components/Switch';
 import { listen } from '../lib/tauri';
 import {
+  getDevStatus,
   getPackGrants,
   listPacks,
   packBlocked,
@@ -14,6 +15,7 @@ import {
   setPackEnabled,
 } from '../lib/packs';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
+import { DeveloperMode } from './packs/DeveloperMode';
 import { PackBadge, PackProblem, PackScreen } from './packs/PackScreen';
 
 /** Whether any of a pack's permissions has internet switched on. */
@@ -33,9 +35,13 @@ export function PacksSettings({ advanced }) {
   const [online, setOnline] = useState({});
   const [openId, setOpenId] = useState(null);
   const [error, setError] = useState(null);
+  const [developer, setDeveloper] = useState(false);
   const fileInput = useRef(null);
 
   const refresh = useCallback(() => {
+    getDevStatus()
+      .then((s) => setDeveloper(!!s.enabled))
+      .catch(() => {});
     listPacks()
       .then(async (list) => {
         setPacks(list);
@@ -73,7 +79,7 @@ export function PacksSettings({ advanced }) {
       <div className="set-group-label">{t('packs.title')}</div>
 
       {open ? (
-        <PackScreen pack={open} onBack={() => setOpenId(null)} />
+        <PackScreen pack={open} developer={developer} onBack={() => setOpenId(null)} />
       ) : (
         <>
           <div className="set-row">
@@ -135,6 +141,11 @@ export function PacksSettings({ advanced }) {
                         })}
                       </span>
                       <PackProblem pack={p} />
+                      {p.devError && (
+                        <span className="set-error" role="alert">
+                          {t('packs.dev.invalid', { message: p.devError.message })}
+                        </span>
+                      )}
                     </span>
                     <ChevronRight size={16} aria-hidden="true" className="pk-chevron" />
                   </button>
@@ -154,6 +165,7 @@ export function PacksSettings({ advanced }) {
         </>
       )}
 
+      {advanced && !open && <DeveloperMode enabled={developer} onChange={refresh} />}
       {advanced && !open && <ConnectedAppsSettings />}
     </div>
   );

@@ -2,11 +2,12 @@
 //! the same signer the `sign-pack` tool uses, zipped, read back and verified.
 //! No real key is involved anywhere.
 
+use super::archive::write_zip;
 use super::archive::{self, Entry};
 use super::signature::{
     check_bundle, verify_pack, Keyring, Revocation, RevocationList, Verification,
 };
-use super::signer::{sign_pack, sign_revocations, write_zip};
+use super::signer::{sign_pack, sign_revocations};
 use super::store::tests::pack_entries;
 use super::store::PackStore;
 use super::validate::{validate_entries, ValidatedBundle};

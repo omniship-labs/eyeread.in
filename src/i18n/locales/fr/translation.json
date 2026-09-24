@@ -453,6 +453,28 @@
       "logRequest": "Requête",
       "logResult": "Résultat",
       "logBytes": "Octets"
+    },
+    "dev": {
+      "title": "Mode développeur",
+      "enable": "Mode développeur",
+      "hint": "Exécutez des dossiers de packs décompressés qui se rechargent pendant que vous les modifiez, et validez ou construisez des packs. Pour les créateurs de packs.",
+      "load": "Charger un dossier…",
+      "new": "Nouveau pack…",
+      "newName": "Nom du pack",
+      "newAuthor": "Votre nom",
+      "create": "Créer…",
+      "chooseFolder": "Choisir un dossier de pack",
+      "chooseParent": "Choisir où créer le pack",
+      "validate": "Valider",
+      "valid": "Valide : {{packs}}",
+      "build": "Construire le pack",
+      "built": "Construit : {{path}}",
+      "unload": "Décharger",
+      "folder": "Dossier : {{folder}}",
+      "invalid": "Non valide : {{message}}",
+      "log": "Journal",
+      "logHint": "Sortie console, erreurs, autorisations refusées et requêtes réseau de ce pack, les plus récentes d’abord.",
+      "logEmpty": "Rien n’a encore été journalisé."
     }
   }
 }

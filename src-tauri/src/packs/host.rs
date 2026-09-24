@@ -1051,6 +1051,7 @@ mod tests {
             verified: false,
             status_reason: None,
             installed_at: 0,
+            dev: false,
         }
     }
 

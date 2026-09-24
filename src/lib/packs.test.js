@@ -4,6 +4,7 @@ import {
   callerSource,
   controlAttribution,
   importPayload,
+  mergeLogs,
   PackCallError,
 } from './packs';
 
@@ -53,5 +54,43 @@ describe('files:import', () => {
   it('builds the picker filter from the pack’s extensions', () => {
     expect(acceptAttribute(['.md', '.txt'])).toBe('.md,.txt');
     expect(acceptAttribute([])).toBeUndefined();
+  });
+});
+
+describe('Developer mode log panel', () => {
+  it('merges the sandbox and network logs, newest first', () => {
+    const lines = mergeLogs(
+      [
+        { time: 1, level: 'info', message: 'Ready', sandbox: 'prompter:control' },
+        { time: 3, level: 'warn', message: 'net.fetch: denied' },
+      ],
+      [
+        {
+          time: 2,
+          permission: 'scripts:write',
+          method: 'GET',
+          host: 'api.notion.com',
+          status: 200,
+          outcome: 'ok',
+        },
+        {
+          time: 4,
+          permission: 'scripts:write',
+          method: 'GET',
+          host: 'evil.example',
+          status: null,
+          outcome: 'E_NETWORK_DENIED',
+        },
+      ]
+    );
+    expect(lines.map((l) => l.time)).toEqual([4, 3, 2, 1]);
+    expect(lines[0]).toMatchObject({
+      level: 'warn',
+      text: 'GET evil.example → E_NETWORK_DENIED (scripts:write)',
+    });
+    expect(lines[2]).toMatchObject({
+      level: 'net',
+      text: 'GET api.notion.com → 200 (scripts:write)',
+    });
   });
 });

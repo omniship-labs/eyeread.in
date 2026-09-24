@@ -1386,3 +1386,52 @@
     color: var(--text-secondary);
   }
 }
+
+/* Developer mode */
+.pk-new {
+  gap: 8px;
+  .er-input {
+    flex: 1;
+  }
+}
+.pk-devlog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  li {
+    display: flex;
+    gap: 10px;
+    padding: 2px 0;
+  }
+}
+.pk-devlog-time {
+  color: var(--text-tertiary);
+  flex: none;
+}
+.pk-devlog-level {
+  width: 40px;
+  flex: none;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.pk-devlog-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.pk-devlog-warn .pk-devlog-level,
+.pk-devlog-warn .pk-devlog-text {
+  color: var(--warning);
+}
+.pk-devlog-error .pk-devlog-level,
+.pk-devlog-error .pk-devlog-text {
+  color: var(--danger);
+}
+.pk-devlog-net .pk-devlog-level {
+  color: var(--accent-text);
+}

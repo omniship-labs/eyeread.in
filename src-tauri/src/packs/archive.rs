@@ -244,6 +244,20 @@ pub fn read_zip(bytes: &[u8]) -> PackResult<Vec<Entry>> {
     check_entries(raw)
 }
 
+/// Write a pack's files as a zip, in path order (Build pack, sign-pack).
+pub fn write_zip(entries: &[Entry]) -> Vec<u8> {
+    use std::io::Write;
+    let mut zip = zip::ZipWriter::new(Cursor::new(Vec::new()));
+    let mut sorted: Vec<&Entry> = entries.iter().collect();
+    sorted.sort_by(|a, b| a.path.cmp(&b.path));
+    for e in sorted {
+        zip.start_file(e.path.as_str(), zip::write::SimpleFileOptions::default())
+            .expect("zip entry");
+        zip.write_all(&e.bytes).expect("zip write");
+    }
+    zip.finish().expect("zip finish").into_inner()
+}
+
 /// Read a pack from a `.zip` file on disk.
 pub fn read_zip_file(path: &Path) -> PackResult<Vec<Entry>> {
     let meta = fs::metadata(path).map_err(|e| PackError::io("Couldn't open the pack", e))?;

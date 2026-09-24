@@ -404,6 +404,7 @@ pub fn run() {
         })
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_os::init())
@@ -451,6 +452,13 @@ pub fn run() {
             packs::commands::packs_set_grant,
             packs::commands::packs_settings_get,
             packs::commands::packs_settings_set,
+            packs::commands::packs_dev_status,
+            packs::commands::packs_dev_set_mode,
+            packs::commands::packs_dev_load,
+            packs::commands::packs_dev_unload,
+            packs::commands::packs_validate,
+            packs::commands::packs_build,
+            packs::commands::packs_new,
         ])
         .setup(|app| {
             packs::init(app.handle());

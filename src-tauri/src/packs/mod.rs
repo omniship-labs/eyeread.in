@@ -8,6 +8,7 @@ pub mod broker;
 mod broker_tests;
 pub mod commands;
 pub mod connected_apps;
+pub mod dev;
 pub mod error;
 pub mod files_list;
 #[cfg(test)]

@@ -453,6 +453,28 @@
       "logRequest": "Anfrage",
       "logResult": "Ergebnis",
       "logBytes": "Bytes"
+    },
+    "dev": {
+      "title": "Entwicklermodus",
+      "enable": "Entwicklermodus",
+      "hint": "Entpackte Pack-Ordner ausführen, die sich beim Bearbeiten neu laden, und Packs prüfen oder bauen. Für alle, die Packs entwickeln.",
+      "load": "Ordner laden…",
+      "new": "Neues Pack…",
+      "newName": "Pack-Name",
+      "newAuthor": "Dein Name",
+      "create": "Erstellen…",
+      "chooseFolder": "Pack-Ordner wählen",
+      "chooseParent": "Wählen, wo das Pack erstellt wird",
+      "validate": "Prüfen",
+      "valid": "Gültig: {{packs}}",
+      "build": "Pack bauen",
+      "built": "Gebaut: {{path}}",
+      "unload": "Entladen",
+      "folder": "Ordner: {{folder}}",
+      "invalid": "Nicht gültig: {{message}}",
+      "log": "Protokoll",
+      "logHint": "Konsolenausgaben, Fehler, verweigerte Berechtigungen und Netzwerkanfragen dieses Packs, neueste zuerst.",
+      "logEmpty": "Noch nichts protokolliert."
     }
   }
 }

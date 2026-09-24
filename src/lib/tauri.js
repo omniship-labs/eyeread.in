@@ -68,6 +68,14 @@ export async function invoke(cmd, args) {
   return mod.invoke(cmd, args);
 }
 
+/** Ask for a folder with the native picker. Resolves to its path, or null. */
+export async function pickFolder(title) {
+  if (!isTauri) return null;
+  const { open } = await import('@tauri-apps/plugin-dialog');
+  const picked = await open({ directory: true, multiple: false, title });
+  return typeof picked === 'string' ? picked : null;
+}
+
 /**
  * Files dropped onto this window, as native paths (Tauri's drag-and-drop).
  * `cb(paths)` runs on drop; `onHover(bool)` while files are over the window.

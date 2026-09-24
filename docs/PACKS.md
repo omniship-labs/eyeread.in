@@ -10,6 +10,28 @@ permissions:
   to the app over a local HTTP API on `127.0.0.1`. No third-party code runs
   inside eyeread.in. This page documents that API.
 
+## Making a pack
+
+Everything can be done from the app, in Settings → Packs (Advanced view) →
+**Developer mode**:
+
+1. **New pack…** asks for a name and a folder, and creates `pack.json`, a
+   commented `main.js`, the AGPL `LICENSE` and a `README.md`. The pack is
+   loaded straight away.
+2. It runs from that folder with a **Dev** badge. Its permissions start off,
+   like any pack's: turn them on in the pack's screen.
+3. **Edit and save**: the pack reloads within a second. If a change doesn't
+   validate, the error shows on the pack and it stops until you fix it.
+4. The pack's **Log** shows its console output, errors, permission denials
+   and network requests, newest first.
+5. **Validate** runs the installer's own checks; **Build pack** writes
+   `<id>-<version>.zip` (with `files.json`) next to the folder, ready to
+   share or to submit for Verified.
+
+The format and API are in [`spec/packs/`](../spec/packs/README.md). Error
+messages come from `spec/packs/errors.json`, so the app and the creator CLI
+(#127) word them the same way.
+
 ## Verified packs (maintainers)
 
 A pack gets the ✓ **Verified by eyeread.in** badge when OmniShip signs it after

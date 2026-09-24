@@ -8,7 +8,9 @@ import { Segmented } from '../../components/Segmented';
 import { Slider } from '../../components/Slider';
 import { Switch } from '../../components/Switch';
 import { listen } from '../../lib/tauri';
+import { PackLog } from './PackLog';
 import {
+  buildPackFolder,
   clearPackNetLog,
   getPackGrants,
   getPackNetLog,
@@ -23,6 +25,8 @@ import {
   setPackGrant,
   setPackSettings,
   uninstallPack,
+  unloadDevFolder,
+  validatePackFolder,
 } from '../../lib/packs';
 
 const BADGE_TONES = { verified: 'success', community: 'warning', dev: 'accent' };
@@ -130,13 +134,14 @@ function formatTime(ms) {
  * log are drawn by the app; only the declared settings come from the pack,
  * and they use the app's own controls (no custom HTML in v1).
  */
-export function PackScreen({ pack, onBack }) {
+export function PackScreen({ pack, onBack, developer = false }) {
   const { t } = useTranslation();
   const [grants, setGrants] = useState([]);
   const [settings, setSettings] = useState({});
   const [log, setLog] = useState([]);
   const [error, setError] = useState(null);
   const [confirmUninstall, setConfirmUninstall] = useState(false);
+  const [devResult, setDevResult] = useState(null);
   const updateInput = useRef(null);
   const id = pack.id;
 
@@ -184,6 +189,21 @@ export function PackScreen({ pack, onBack }) {
   const uninstall = () => {
     uninstallPack(id).then(onBack).catch(fail);
   };
+  const validate = () => {
+    setError(null);
+    validatePackFolder(pack.folder)
+      .then((packs) => setDevResult(t('packs.dev.valid', { packs: packs.join(', ') })))
+      .catch(fail);
+  };
+  const build = () => {
+    setError(null);
+    buildPackFolder(pack.folder)
+      .then((path) => setDevResult(t('packs.dev.built', { path })))
+      .catch(fail);
+  };
+  const unload = () => {
+    unloadDevFolder(pack.folder).then(onBack).catch(fail);
+  };
 
   const m = pack.manifest;
 
@@ -214,6 +234,16 @@ export function PackScreen({ pack, onBack }) {
             </span>
           )}
           <PackProblem pack={pack} />
+          {pack.dev && (
+            <span className="pk-desc set-mono">
+              {t('packs.dev.folder', { folder: pack.folder })}
+            </span>
+          )}
+          {pack.devError && (
+            <span className="set-error" role="alert">
+              {t('packs.dev.invalid', { message: pack.devError.message })}
+            </span>
+          )}
         </div>
         <Switch
           size="sm"
@@ -224,45 +254,64 @@ export function PackScreen({ pack, onBack }) {
         />
       </div>
 
-      <div className="set-row pk-actions">
-        <input
-          ref={updateInput}
-          type="file"
-          accept=".zip"
-          hidden
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            e.target.value = '';
-            if (file) requestPackInstall(file);
-          }}
-        />
-        <Button size="sm" variant="secondary" onClick={() => updateInput.current?.click()}>
-          {packBlocked(pack) ? t('packs.screen.reinstall') : t('packs.screen.update')}
-        </Button>
-        {pack.topLevel &&
-          (confirmUninstall ? (
-            <>
-              <span className="pk-confirm">
-                {t('packs.screen.uninstallConfirm', { name: m.name })}
-              </span>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setConfirmUninstall(false)}
-                autoFocus
-              >
-                {t('packs.screen.cancel')}
-              </Button>
-              <Button size="sm" variant="danger" onClick={uninstall}>
+      {pack.dev ? (
+        <div className="set-row pk-actions">
+          <Button size="sm" variant="secondary" onClick={validate}>
+            {t('packs.dev.validate')}
+          </Button>
+          <Button size="sm" variant="secondary" onClick={build}>
+            {t('packs.dev.build')}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={unload}>
+            {t('packs.dev.unload')}
+          </Button>
+          {devResult && (
+            <span className="pk-confirm" role="status">
+              {devResult}
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="set-row pk-actions">
+          <input
+            ref={updateInput}
+            type="file"
+            accept=".zip"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (file) requestPackInstall(file);
+            }}
+          />
+          <Button size="sm" variant="secondary" onClick={() => updateInput.current?.click()}>
+            {packBlocked(pack) ? t('packs.screen.reinstall') : t('packs.screen.update')}
+          </Button>
+          {pack.topLevel &&
+            (confirmUninstall ? (
+              <>
+                <span className="pk-confirm">
+                  {t('packs.screen.uninstallConfirm', { name: m.name })}
+                </span>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setConfirmUninstall(false)}
+                  autoFocus
+                >
+                  {t('packs.screen.cancel')}
+                </Button>
+                <Button size="sm" variant="danger" onClick={uninstall}>
+                  {t('packs.screen.uninstall')}
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" variant="ghost" onClick={() => setConfirmUninstall(true)}>
                 {t('packs.screen.uninstall')}
               </Button>
-            </>
-          ) : (
-            <Button size="sm" variant="ghost" onClick={() => setConfirmUninstall(true)}>
-              {t('packs.screen.uninstall')}
-            </Button>
-          ))}
-      </div>
+            ))}
+        </div>
+      )}
 
       {error && (
         <div className="set-row">
@@ -352,6 +401,8 @@ export function PackScreen({ pack, onBack }) {
           ))}
         </>
       )}
+
+      {(developer || pack.dev) && <PackLog id={id} />}
 
       <div className="set-subgroup-label">{t('packs.screen.network')}</div>
       <div className="set-row">

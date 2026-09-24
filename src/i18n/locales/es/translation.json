@@ -453,6 +453,28 @@
       "logRequest": "Petición",
       "logResult": "Resultado",
       "logBytes": "Bytes"
+    },
+    "dev": {
+      "title": "Modo desarrollador",
+      "enable": "Modo desarrollador",
+      "hint": "Ejecuta carpetas de packs sin empaquetar que se recargan al editarlas, y valida o empaqueta packs. Para quienes crean packs.",
+      "load": "Cargar carpeta…",
+      "new": "Nuevo pack…",
+      "newName": "Nombre del pack",
+      "newAuthor": "Tu nombre",
+      "create": "Crear…",
+      "chooseFolder": "Elige una carpeta de pack",
+      "chooseParent": "Elige dónde crear el pack",
+      "validate": "Validar",
+      "valid": "Válido: {{packs}}",
+      "build": "Empaquetar",
+      "built": "Creado {{path}}",
+      "unload": "Descargar",
+      "folder": "Carpeta: {{folder}}",
+      "invalid": "No es válido: {{message}}",
+      "log": "Registro",
+      "logHint": "Salida de consola, errores, permisos denegados y peticiones de red de este pack, de la más reciente a la más antigua.",
+      "logEmpty": "Aún no hay nada registrado."
     }
   }
 }

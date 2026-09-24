@@ -60,6 +60,9 @@ pub struct InstalledPack {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status_reason: Option<String>,
     pub installed_at: u64,
+    /// Loaded from a folder in Developer mode, not installed.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub dev: bool,
 }
 
 impl InstalledPack {
@@ -290,6 +293,7 @@ impl PackStore {
                 status: PackStatus::Ok,
                 verified: verified.contains(id),
                 status_reason: None,
+                dev: false,
                 installed_at: if *write {
                     now_ms()
                 } else {

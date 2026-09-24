@@ -75,6 +75,15 @@
     "allow-packs-set-grant",
     "allow-packs-settings-get",
     "allow-packs-settings-set",
-    "allow-packs-logs"
+    "allow-packs-logs",
+    "allow-packs-dev-status",
+    "allow-packs-dev-set-mode",
+    "allow-packs-dev-load",
+    "allow-packs-dev-unload",
+    "allow-packs-validate",
+    "allow-packs-build",
+    "allow-packs-new",
+    "dialog:allow-open",
+    "dialog:allow-save"
   ]
 }

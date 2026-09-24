@@ -32,6 +32,13 @@ const APP_COMMANDS: &[&str] = &[
     "packs_set_grant",
     "packs_settings_get",
     "packs_settings_set",
+    "packs_dev_status",
+    "packs_dev_set_mode",
+    "packs_dev_load",
+    "packs_dev_unload",
+    "packs_validate",
+    "packs_build",
+    "packs_new",
 ];
 
 fn main() {

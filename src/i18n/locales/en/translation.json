@@ -453,6 +453,28 @@
       "logRequest": "Request",
       "logResult": "Result",
       "logBytes": "Bytes"
+    },
+    "dev": {
+      "title": "Developer mode",
+      "enable": "Developer mode",
+      "hint": "Run unpacked pack folders that reload as you edit, and validate or build packs. For people making packs.",
+      "load": "Load folder…",
+      "new": "New pack…",
+      "newName": "Pack name",
+      "newAuthor": "Your name",
+      "create": "Create…",
+      "chooseFolder": "Choose a pack folder",
+      "chooseParent": "Choose where to create the pack",
+      "validate": "Validate",
+      "valid": "Valid: {{packs}}",
+      "build": "Build pack",
+      "built": "Built {{path}}",
+      "unload": "Unload",
+      "folder": "Folder: {{folder}}",
+      "invalid": "Doesn’t validate: {{message}}",
+      "log": "Log",
+      "logHint": "Console output, errors, permission denials and network requests from this pack, newest first.",
+      "logEmpty": "Nothing logged yet."
     }
   }
 }
