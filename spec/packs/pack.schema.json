@@ -33,7 +33,8 @@
     "main": {
       "type": "string",
       "maxLength": 255,
-      "pattern": "^(?!/)(?!.*(^|/)\\.{1,2}(/|$))(?!.*//)[^\\\\\\u0000-\\u001f]+\\.m?js$"
+      "description": "A path inside the pack. Segment rules (no .., no empty segments) are the path rules in FORMAT.md; this pattern stays free of lookarounds so any regex engine can run it.",
+      "pattern": "^[^/\\\\\\u0000-\\u001f][^\\\\\\u0000-\\u001f]*\\.m?js$"
     },
     "permissions": {
       "type": "object",

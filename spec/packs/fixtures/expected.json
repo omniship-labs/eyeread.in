@@ -99,6 +99,11 @@
       "schema": true,
       "error": "PACK_MAIN_MISSING"
     },
+    "invalid-main-outside": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_MAIN_MISSING"
+    },
     "invalid-manifest-json": {
       "valid": false,
       "schema": null,

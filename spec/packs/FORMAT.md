@@ -141,6 +141,7 @@ no native code, no HTML.
 
 ### Code
 
+- `main` must name a file in the pack; otherwise `PACK_MAIN_MISSING`.
 - `main` is an **ES module**. It can `import` other files in the same pack by
   relative path. Remote imports are blocked.
 - **Source must be readable.** A `.js` or `.mjs` file counts as minified, and is
@@ -274,7 +275,10 @@ tool gives the same answer for the same pack:
 9. Bundles: `PACK_INCLUDE_DUPLICATE`, `PACK_INCLUDE_MISSING`,
    `PACK_INCLUDE_VERSION`, `PACK_INCLUDE_CYCLE`, `PACK_INCLUDE_LIMIT`,
    `PACK_INCLUDE_UNUSED`, then steps 2–8 for each included pack, in `includes`
-   order, depth first.
+   order, depth first. Walking the graph reads each included `pack.json`; if
+   one is missing or isn't JSON, that error is reported when the walk reaches
+   it. Files under `packs/` that aren't inside a pack folder, and `packs/`
+   folders inside an included pack, count as `PACK_INCLUDE_UNUSED`.
 10. `PACK_SIGNATURE_INVALID`, `PACK_REVOKED`.
 
 [`fixtures/`](fixtures) has a pack for each of these, with the code it must fail
