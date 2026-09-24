@@ -1,0 +1,13 @@
+{
+  "apiVersion": 1,
+  "id": "com.example.nocode",
+  "name": "Minimal",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fixture Author"
+  },
+  "license": "AGPL-3.0-only",
+  "permissions": {
+    "prompter:control": {}
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "apiVersion": 1,
+  "id": "com.example.badrange",
+  "name": "Minimal",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fixture Author"
+  },
+  "license": "AGPL-3.0-only",
+  "main": "main.js",
+  "permissions": {
+    "prompter:control": {}
+  },
+  "settings": [
+    {
+      "key": "n",
+      "type": "number",
+      "label": "N",
+      "min": 10,
+      "max": 1,
+      "default": 5
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "format": 1,
+  "id": "com.example.tampered",
+  "version": "1.0.0",
+  "files": {
+    "LICENSE": "1effae9326a4ac601d0c32c108a7736220aa07ab37345ac85ff935d3caf65101",
+    "main.js": "0000000000000000000000000000000000000000000000000000000000000000",
+    "pack.json": "7b7fd3a14808a6bc0d5548397d159332c551bfc5b747d1726f7366d9ce255df6"
+  }
+}

@@ -4,3 +4,5 @@ src-tauri/target
 src-tauri/gen
 design
 .playwright-mcp
+# Test packs: some are deliberately malformed or minified.
+spec/packs/fixtures

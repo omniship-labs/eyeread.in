@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/omniship-labs/eyeread.in/blob/main/spec/packs/files.schema.json",
+  "title": "eyeread.in pack file list (files.json), format 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "version", "files"],
+  "properties": {
+    "format": { "const": 1 },
+    "id": { "$ref": "pack.schema.json#/$defs/packId" },
+    "version": { "$ref": "pack.schema.json#/$defs/version" },
+    "files": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 500,
+      "propertyNames": { "type": "string", "minLength": 1, "maxLength": 255 },
+      "additionalProperties": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  }
+}
