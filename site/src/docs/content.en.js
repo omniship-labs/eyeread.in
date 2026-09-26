@@ -61,6 +61,11 @@ export default {
         title: 'Tauri commands & API',
         body: 'The Rust commands the front end invokes, the plugins in use, and the cross-window event layer.',
       },
+      {
+        key: 'packs',
+        title: 'Build packs',
+        body: 'Extend eyeread.in with sandboxed packs: permissions, internet rules, Developer mode, and getting Verified.',
+      },
     ],
     stackHeading: 'The stack at a glance',
   },
@@ -215,5 +220,79 @@ export default {
     eventsHeading: 'Cross-window events',
     eventsBody:
       'Windows coordinate over Tauri’s event system. The platform layer wraps emitTo so that, in a plain browser, the same calls fall back to a BroadcastChannel named “eyeread” — keeping multi-window behaviour working in the web demo.',
+  },
+
+  packs: {
+    nav: 'Build packs',
+    title: 'Build packs for eyeread.in',
+    description:
+      'Build sandboxed packs that extend eyeread.in: permissions, per-permission internet access, Developer mode, and the Verified review process.',
+    lead: 'Packs let you build on eyeread.in without touching its code. Users decide, per permission, what each pack may do and whether it may use the internet.',
+    conceptsHeading: 'Concepts',
+    concepts: [
+      'A pack is a .zip holding a pack.json manifest, an AGPL LICENSE and your code. One big main.js is fine.',
+      'Permissions are what your pack can do. You declare them, and the user switches each one on. They all start off.',
+      'Internet is per permission: a permission can declare the exact https:// sites it needs, and gets internet only for those, once the user allows it.',
+      'The app runs your code in sandboxes with no DOM, storage or direct network. Each permission with internet gets its own sandbox; the offline ones share one.',
+      'A pack can include other packs, like a mod pack. Shared packs are installed once and keep one set of settings.',
+      'Unsigned packs install as Community, with a warning. Reviewed packs are signed by OmniShip and show ✓ Verified by eyeread.in.',
+    ],
+    firstHeading: 'Your first pack',
+    firstIntro:
+      'Everything can be done from the app: open Settings → Packs, switch to the Advanced view, and turn on Developer mode. New pack… creates a pack.json, a commented main.js, the license and a README, and loads it with a Dev badge. It reloads within a second of each save; Validate and Build pack produce the zip.',
+    manifestHeading: 'The manifest',
+    manifestIntro:
+      'pack.json says who made the pack, what it may do, and which sites each permission may reach. Unknown fields are rejected, so it means exactly what the user is shown.',
+    permissionsHeading: 'Permissions',
+    permissions: [
+      { name: 'scripts:write', note: 'Add scripts to the library.' },
+      { name: 'prompter:load', note: 'Open text in the prompter and start a reading session.' },
+      { name: 'prompter:control', note: 'Play, pause, restart, seek or close the prompter.' },
+      {
+        name: 'prompter:events',
+        note: 'Read the prompter’s state; the script is only described during an active session.',
+      },
+      {
+        name: 'files:import',
+        note: 'Ask the user to pick a file with the app’s own picker, and receive only that file.',
+      },
+    ],
+    permissionsNote:
+      'Ask for as few as you need. Users see every one, and none can read their library.',
+    handlerHeading: 'One handler per permission',
+    handlerIntro:
+      'Register a handler for each permission at the top level of main.js. The app calls it once, with only that permission’s API, and restarts its sandbox without it if the user revokes it.',
+    netHeading: 'Internet rules',
+    netRules: [
+      'Declare exact origins: https://, a host name and an optional port. No paths, wildcards, IP addresses or localhost.',
+      'Call them with net.fetch. The app makes the request and refuses any other site, including redirects elsewhere.',
+      'No cookies, 60 requests a minute, 1 MiB up and 5 MiB down per request.',
+      'Every request shows in the pack’s network log, which the user can see.',
+      'Say in your description what you send and where.',
+    ],
+    rulesHeading: 'Rules the installer enforces',
+    rules: [
+      'AGPL only, with the license text in the pack.',
+      'Readable source: minified code is rejected.',
+      'JS, JSON, Markdown, text, CSS and images only. No HTML, WebAssembly or native code.',
+      'Up to 20 MiB in total, 5 MiB per file and 500 files.',
+    ],
+    cliHeading: 'Command-line tools',
+    cliIntro:
+      'The creator CLI and scaffold are coming with the SDK. Until they’re published, use Developer mode’s New pack, Validate and Build pack buttons, which run the same checks.',
+    verifiedHeading: 'Getting Verified',
+    verifiedIntro:
+      'Anyone can share a pack as Community. For the ✓ Verified badge, submit it for review:',
+    verifiedSteps: [
+      'Open a pull request with your pack’s source in omniship-labs/eyeread.in-packs.',
+      'Sign the Pack CLA. The CLA bot asks on your first pull request.',
+      'Automated checks run: validation, a license check and, for updates, a summary of new permissions and sites.',
+      'A maintainer reviews it against the checklist and the content policy. The target is 2 weeks.',
+      'Once approved, it’s signed offline and published as a release. Signing never happens in CI.',
+    ],
+    verifiedNote:
+      'Updates get a diff-only review. Users keep the last Verified version until the new one is signed, and approve again if it asks for new permissions or sites.',
+    specHeading: 'Full reference',
+    specIntro: 'The exact rules live in the spec and the creator guide in the repository:',
   },
 };

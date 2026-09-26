@@ -8,6 +8,7 @@ const CARD_ICON = {
   architecture: 'aperture',
   contributing: 'heart',
   tauriApi: 'code',
+  packs: 'package',
 };
 
 // The slug a card's `key` maps to, so cards can link to their page.

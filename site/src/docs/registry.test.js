@@ -20,6 +20,7 @@ const REQUIRED_ARRAYS = {
   architecture: ['windows', 'designBody', 'dataBody'],
   contributing: ['looking', 'askFirst', 'checklist'],
   tauriApi: ['plugins'],
+  packs: ['concepts', 'permissions', 'netRules', 'rules', 'verifiedSteps'],
 };
 
 describe('docs registry', () => {

@@ -12,6 +12,7 @@ permissions:
 
 ## Making a pack
 
+For a full creator guide, see [Build packs for eyeread.in](BUILDING_PACKS.md).
 Everything can be done from the app, in Settings → Packs (Advanced view) →
 **Developer mode**:
 
@@ -41,7 +42,7 @@ the verifier is `src-tauri/src/packs/signature.rs`.
 - **Keys.** Two minisign keys, main and an offline backup. Only their public
   halves go in the app (`TRUSTED_KEYS` in `signature.rs`); the private keys
   never go in this repo or CI. Until the keys exist, both entries are empty and
-  every pack installs as Community.
+  every pack installs as Community. See [Signing keys](#signing-keys).
 - **Signing** a reviewed pack, on the machine that holds the key:
 
   ```bash
@@ -67,6 +68,44 @@ the verifier is `src-tauri/src/packs/signature.rs`.
   The list ships with the next app update: matching packs are blocked at
   install, and disabled at launch with the reason shown. A unit test fails if
   the shipped list is neither empty nor correctly signed.
+
+### Signing keys
+
+**Who can sign.** Only Mrithyunjay Halinge (MJ) holds the keys and signs packs.
+Adding a signer means giving them the main key in person or through a password
+manager share, and recording it here.
+
+**Generating them** (done once, offline, never in this repo or CI):
+
+```bash
+minisign -G -p eyeread-packs-main.pub   -s eyeread-packs-main.key
+minisign -G -p eyeread-packs-backup.pub -s eyeread-packs-backup.key
+```
+
+Give each key its own strong password. `TRUSTED_KEYS` takes the second line of
+each `.pub` file (the base64 key starting with `RW`): `main` first, then
+`backup`.
+
+**Custody.**
+
+- **Main** signs every pack and revocation list. Keep the key and password in
+  the maintainer's password manager or offline vault.
+- **Backup** is never used day to day. Keep it on separate offline media, in a
+  different place, with its password stored separately.
+- Never put either in git, CI, chat, or a cloud-synced folder. Losing both
+  means no pack can be Verified until an app update ships new keys.
+
+**Rotating** (either key can sign, so reviews never have to stop):
+
+1. Generate a new key offline.
+2. Replace the old key's entry in `TRUSTED_KEYS` and ship an app update.
+3. Packs signed only by the removed key lose their badge in that update, so
+   re-sign the current Verified version of each pack with a key that stays,
+   and publish them before the update ships.
+
+**If a key leaks:** sign with the other key from then on; add any pack signed
+with the leaked key that you didn't approve to `revoked.json` and sign the list
+with the other key; then rotate as above in the next release.
 
 ## Connected apps
 
