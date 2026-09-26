@@ -78,6 +78,43 @@ describe('docs registry', () => {
   });
 });
 
+// Every translated locale is partial by design (page by page — see
+// content.en.js's header comment), but whatever a locale DOES translate must
+// shadow the English shape exactly: same keys, same array lengths. A missing
+// or renamed field would silently fall back to English mid-page instead of
+// failing loudly, so this is the thing that actually catches that.
+describe('translated docs bundles match the English shape', () => {
+  const locales = Object.keys(docsResources).filter((code) => code !== 'en');
+
+  describe.each(locales)('%s', (code) => {
+    const bundle = docsResources[code];
+
+    it.each(Object.keys(bundle))('page "%s" has the same keys as English, in order', (key) => {
+      expect(en[key], `en.${key} exists`).toBeDefined();
+      expect(Object.keys(bundle[key])).toEqual(Object.keys(en[key]));
+    });
+
+    it.each(Object.keys(bundle).filter((key) => Array.isArray(bundle[key]?.permissions)))(
+      'page "%s": permission names are untranslated technical literals',
+      (key) => {
+        expect(bundle[key].permissions.map((p) => p.name)).toEqual(
+          en[key].permissions.map((p) => p.name)
+        );
+      }
+    );
+
+    it.each(
+      Object.keys(bundle).flatMap((key) =>
+        Object.keys(bundle[key])
+          .filter((field) => Array.isArray(bundle[key][field]))
+          .map((field) => [key, field])
+      )
+    )('page "%s": array field "%s" has the same length as English', (key, field) => {
+      expect(bundle[key][field]).toHaveLength(en[key][field].length);
+    });
+  });
+});
+
 // The prerender writes pages at trailing-slash URLs (/docs/, /docs/build/);
 // the router must match those exact paths or direct loads render nothing.
 describe('docs routing', () => {

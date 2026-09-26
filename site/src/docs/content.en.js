@@ -1,17 +1,20 @@
 /* ============================================================
    eyeread.in · marketing site — developer docs copy (English)
    ------------------------------------------------------------
-   This is the `docs` i18next namespace bundle. Only English
-   exists for now; every other locale falls back to it via
-   i18next `fallbackLng` (see ../i18n/index.js), so the docs
-   render in English regardless of the visitor's language until
-   a translation is added.
+   This is the `docs` i18next namespace bundle — the source of
+   truth every other locale's docs bundle falls back to, key by
+   key, via i18next `fallbackLng` (see ../i18n/index.js). A
+   locale's own content.<code>.js need not translate every page:
+   `packs` is the first one translated (see content.fr.js etc.);
+   the rest render in English everywhere until translated too.
 
-   To add a language: create ./content.<code>.js mirroring this
-   shape, import it in ../i18n/index.js, and add it to the
-   `docs` namespace resources. Translate the prose here — the
-   technical literals (commands, file paths, API signatures,
-   code blocks) live in the page components and stay constant.
+   To translate a page into a new language: in that locale's
+   content.<code>.js, add just the top-level key(s) for the
+   page(s) you're translating (see registry.js's `docsResources`
+   for the full locale list). Translate the prose — the technical
+   literals (commands, file paths, API signatures, code blocks,
+   and this app's own fixed feature/UI names: Packs, Connected
+   apps, Verified, Community, Developer mode) stay constant.
 
    Node-safe (plain data, no browser/JSX deps) so the build-time
    prerender can read each page's <title>/description from it.
@@ -236,6 +239,8 @@ export default {
     permissionsHeading: 'Permissions',
     permissionsIntro:
       'A pack (and a Connected app, which shares the same names as its API scopes) declares only what it needs. Nothing is granted until the user turns it on, per pack, per permission:',
+    permissionCol: 'Permission',
+    grantsCol: 'Grants',
     permissions: [
       { name: 'scripts:write', grants: 'Add a script to the user’s library.' },
       {
@@ -267,7 +272,6 @@ export default {
       'The scaffold above writes an AGENTS.md into every new pack — the sandbox rules, the manifest fields, the eyeread.on(...) handler shape per permission, and the validate/build workflow, all in one self-contained file. It needs no setup: any coding agent that reads project files (Claude Code, Cursor, Codex, Copilot, …) picks it up the moment it opens the folder.',
       'Claude Code users also get a proper Skill that triggers on pack-related requests even before a pack folder exists, with the full spec bundled in as references. Install it with any of the 75+ agents vercel-labs/skills supports, not just Claude Code:',
     ],
-    agentInstallLabel: 'terminal',
     verifiedHeading: 'Verified packs',
     verifiedBody:
       'A pack gets the ✓ Verified by eyeread.in badge once its maintainer signs it after review. Until then — or if a pack ships with no signature at all — it installs as Community, with a warning. A tampered or revoked signature blocks install entirely.',
@@ -279,5 +283,17 @@ export default {
     moreHeading: 'Full reference',
     moreBody:
       'The complete spec (pack.json schema, the eyeread.* API, file and size limits, the Connected apps HTTP protocol) lives in the eyeread.in-packs-sdk repo and this app’s own docs/PACKS.md.',
+    moreLinks: [
+      {
+        label: 'omniship-labs/eyeread.in-packs-sdk',
+        href: 'https://github.com/omniship-labs/eyeread.in-packs-sdk',
+        body: 'the spec, the CLI, and the scaffold.',
+      },
+      {
+        label: 'docs/PACKS.md',
+        href: 'https://github.com/omniship-labs/eyeread.in/blob/main/docs/PACKS.md',
+        body: 'the Connected apps HTTP API, in full.',
+      },
+    ],
   },
 };

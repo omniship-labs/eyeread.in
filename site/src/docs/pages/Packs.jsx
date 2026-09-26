@@ -7,6 +7,7 @@ export default function Packs() {
   const connectedBody = t('packs.connectedBody', { returnObjects: true });
   const whatBody = t('packs.whatBody', { returnObjects: true });
   const agentBody = t('packs.agentBody', { returnObjects: true });
+  const moreLinks = t('packs.moreLinks', { returnObjects: true });
 
   return (
     <article className="doc-prose">
@@ -23,8 +24,8 @@ export default function Packs() {
       <table className="doc-table">
         <thead>
           <tr>
-            <th>Permission</th>
-            <th>Grants</th>
+            <th>{t('packs.permissionCol')}</th>
+            <th>{t('packs.grantsCol')}</th>
           </tr>
         </thead>
         <tbody>
@@ -52,9 +53,7 @@ npx @omniship-labs/eyeread.in-packs build`}</CodeBlock>
       {agentBody.map((p) => (
         <p key={p}>{p}</p>
       ))}
-      <CodeBlock
-        label={t('packs.agentInstallLabel')}
-      >{`npx skills add https://github.com/omniship-labs/eyeread.in-packs-sdk/tree/main/.claude/skills/eyeread-packs`}</CodeBlock>
+      <CodeBlock label="terminal">{`npx skills add https://github.com/omniship-labs/eyeread.in-packs-sdk/tree/main/.claude/skills/eyeread-packs`}</CodeBlock>
 
       <h2>{t('packs.verifiedHeading')}</h2>
       <p>{t('packs.verifiedBody')}</p>
@@ -67,26 +66,14 @@ npx @omniship-labs/eyeread.in-packs build`}</CodeBlock>
       <h2>{t('packs.moreHeading')}</h2>
       <p>{t('packs.moreBody')}</p>
       <ul>
-        <li>
-          <a
-            href="https://github.com/omniship-labs/eyeread.in-packs-sdk"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            omniship-labs/eyeread.in-packs-sdk
-          </a>{' '}
-          — the spec, the CLI, and the scaffold.
-        </li>
-        <li>
-          <a
-            href="https://github.com/omniship-labs/eyeread.in/blob/main/docs/PACKS.md"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            docs/PACKS.md
-          </a>{' '}
-          — the Connected apps HTTP API, in full.
-        </li>
+        {moreLinks.map((link) => (
+          <li key={link.href}>
+            <a href={link.href} target="_blank" rel="noopener noreferrer">
+              {link.label}
+            </a>{' '}
+            — {link.body}
+          </li>
+        ))}
       </ul>
     </article>
   );
