@@ -21,6 +21,7 @@ import {
   Palette,
   FileText,
   Wrench,
+  Package,
 } from 'lucide-react';
 import { Icon as IconifyIcon } from '@iconify/react';
 import githubIcon from '@iconify-icons/mdi/github';
@@ -44,6 +45,7 @@ const LUCIDE = {
   palette: Palette,
   'file-text': FileText,
   wrench: Wrench,
+  package: Package,
 };
 
 const BRAND = {

@@ -8,6 +8,7 @@ import BuildFromSource from './pages/BuildFromSource.jsx';
 import Architecture from './pages/Architecture.jsx';
 import Contributing from './pages/Contributing.jsx';
 import TauriApi from './pages/TauriApi.jsx';
+import Packs from './pages/Packs.jsx';
 
 const PAGE_COMPONENTS = {
   index: Overview,
@@ -15,6 +16,7 @@ const PAGE_COMPONENTS = {
   architecture: Architecture,
   contributing: Contributing,
   tauriApi: TauriApi,
+  packs: Packs,
 };
 
 // GitHub source for "Edit this page" — maps a page key to its content slice.

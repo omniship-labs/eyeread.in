@@ -21,13 +21,17 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { DEFAULT_LOCALE, locales, resources } from './registry.js';
 import { DOCS_NS, docsResources } from '../docs/registry.js';
 
-// Developer docs are English-only for now; they live in their own `docs`
-// namespace so they never affect the marketing `translation` shape. Other
-// locales have no `docs` bundle, so they fall back to English (fallbackLng).
-const withDocs = {
-  ...resources,
-  [DEFAULT_LOCALE]: { ...resources[DEFAULT_LOCALE], [DOCS_NS]: docsResources[DEFAULT_LOCALE] },
-};
+// Developer docs live in their own `docs` namespace so they never affect the
+// marketing `translation` shape. Not every docs page is translated into every
+// locale (docsResources entries can be partial, page by page); any key a
+// locale doesn't have falls back to English (fallbackLng), same as the
+// marketing namespace.
+const withDocs = Object.fromEntries(
+  Object.entries(resources).map(([code, bundle]) => [
+    code,
+    docsResources[code] ? { ...bundle, [DOCS_NS]: docsResources[code] } : bundle,
+  ])
+);
 
 // Re-export the registry so existing app imports (`from './i18n/index.js'`)
 // keep working, while build scripts can import './registry.js' directly.
