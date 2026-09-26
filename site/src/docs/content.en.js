@@ -279,7 +279,7 @@ export default {
     ],
     cliHeading: 'Command-line tools',
     cliIntro:
-      'The creator CLI and scaffold are coming with the SDK. Until they’re published, use Developer mode’s New pack, Validate and Build pack buttons, which run the same checks.',
+      'The scaffold, CLI and types live in the packs SDK repository. They aren’t on npm yet: until they are, run them from a clone of the SDK, or use Developer mode’s New pack, Validate and Build pack buttons, which run the same checks.',
     verifiedHeading: 'Getting Verified',
     verifiedIntro:
       'Anyone can share a pack as Community. For the ✓ Verified badge, submit it for review:',

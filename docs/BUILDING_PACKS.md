@@ -145,16 +145,19 @@ same order, with the same messages ([`errors.json`](../spec/packs/errors.json)).
 
 ## Command-line tools
 
-The creator CLI and scaffold are coming with the SDK
-(`omniship-labs/eyeread.in-packs-sdk`):
+The scaffold, CLI and types live in the SDK,
+[`omniship-labs/eyeread.in-packs-sdk`](https://github.com/omniship-labs/eyeread.in-packs-sdk),
+which also has [authoring rules](https://github.com/omniship-labs/eyeread.in-packs-sdk/blob/main/docs/PACK_AUTHORING.md)
+for AI coding agents:
 
 ```bash
 npm create @omniship-labs/eyeread.in-packs my-pack   # scaffold
-npx eyeread.in-packs validate                         # same checks as the app
-npx eyeread.in-packs build                            # writes the zip and files.json
+npx @omniship-labs/eyeread.in-packs validate          # same checks as the app
+npx @omniship-labs/eyeread.in-packs build             # writes the zip and files.json
 ```
 
-Until they're published, use Developer mode's **New pack**, **Validate** and
+They aren't on npm yet. Until they are, run them from a clone of the SDK repo
+(its README shows how), or use Developer mode's **New pack**, **Validate** and
 **Build pack**.
 
 ## Sharing your pack
