@@ -13,7 +13,11 @@ permissions:
 ## Making a pack
 
 Everything can be done from the app, in Settings → Packs (Advanced view) →
-**Developer mode**:
+**Developer mode**. There's also a command-line path that doesn't need the app
+open — `npm create @omniship-labs/eyeread.in-packs` to scaffold, then
+`npx @omniship-labs/eyeread.in-packs validate`/`build` — from
+[omniship-labs/eyeread.in-packs-sdk](https://github.com/omniship-labs/eyeread.in-packs-sdk).
+The in-app flow:
 
 1. **New pack…** asks for a name and a folder, and creates `pack.json`, a
    commented `main.js`, the AGPL `LICENSE` and a `README.md`. The pack is
@@ -30,7 +34,9 @@ Everything can be done from the app, in Settings → Packs (Advanced view) →
 
 The format and API are in [`spec/packs/`](../spec/packs/README.md). Error
 messages come from `spec/packs/errors.json`, so the app and the creator CLI
-(#127) word them the same way.
+(`npx @omniship-labs/eyeread.in-packs validate`, from
+[omniship-labs/eyeread.in-packs-sdk](https://github.com/omniship-labs/eyeread.in-packs-sdk))
+word them the same way.
 
 ## Verified packs (maintainers)
 

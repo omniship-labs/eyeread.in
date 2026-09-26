@@ -3,13 +3,18 @@
 This folder is the contract for **packs**: installable, sandboxed JS packages for
 eyeread.in. Everything that reads, writes, validates or runs a pack builds
 against it: the installer (#120), signature checks (#121), the pack host (#122),
-the network proxy (#123), the permission broker (#124), the Settings UI (#125),
-Developer mode (#126) and the creator CLI (#127).
+the network proxy (#123), the permission broker (#124), the Settings UI (#125)
+and Developer mode (#126) here in the app, and the creator CLI, scaffold and
+types package in [`omniship-labs/eyeread.in-packs-sdk`](https://github.com/omniship-labs/eyeread.in-packs-sdk) (#127).
 
-> **Home.** The spec's long-term home is `omniship-labs/eyeread.in-packs-sdk`
-> (#127), with the app pinning a version of it. That repo doesn't exist yet, so
-> the spec lives here until it does. When it moves, this folder becomes a pinned
-> copy and nothing else in it changes.
+> **Home.** The spec's canonical home is now
+> [`omniship-labs/eyeread.in-packs-sdk`](https://github.com/omniship-labs/eyeread.in-packs-sdk),
+> which also hosts `@omniship-labs/eyeread.in-packs` (the `validate`/`build`
+> CLI), `create-eyeread.in-packs` (the `npm create` scaffold) and
+> `eyeread.in-packs-types`. This folder is a **pinned copy**, kept in sync by
+> hand for now (there's no automated sync yet — when you change anything here,
+> port the same change to the SDK repo, and vice versa). Nothing about the
+> file layout changed by the move.
 
 | File                                           | What it is                                                                   |
 | ---------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -44,4 +49,4 @@ npm run spec:types          # eyeread.d.ts compiles (tsc --noEmit)
 The feature is called **packs** everywhere: UI, docs, code and file names. The
 local HTTP API for external programs is **Connected apps** (Settings → Packs →
 Connected apps). It shares the permission names below but isn't part of this
-spec; see [`docs/PACKS.md`](../../docs/PACKS.md) once #130 lands.
+spec; see [`docs/PACKS.md`](../../docs/PACKS.md).

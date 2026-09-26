@@ -1,17 +1,20 @@
 /* ============================================================
    eyeread.in · marketing site — developer docs copy (English)
    ------------------------------------------------------------
-   This is the `docs` i18next namespace bundle. Only English
-   exists for now; every other locale falls back to it via
-   i18next `fallbackLng` (see ../i18n/index.js), so the docs
-   render in English regardless of the visitor's language until
-   a translation is added.
+   This is the `docs` i18next namespace bundle — the source of
+   truth every other locale's docs bundle falls back to, key by
+   key, via i18next `fallbackLng` (see ../i18n/index.js). A
+   locale's own content.<code>.js need not translate every page:
+   `packs` is the first one translated (see content.fr.js etc.);
+   the rest render in English everywhere until translated too.
 
-   To add a language: create ./content.<code>.js mirroring this
-   shape, import it in ../i18n/index.js, and add it to the
-   `docs` namespace resources. Translate the prose here — the
-   technical literals (commands, file paths, API signatures,
-   code blocks) live in the page components and stay constant.
+   To translate a page into a new language: in that locale's
+   content.<code>.js, add just the top-level key(s) for the
+   page(s) you're translating (see registry.js's `docsResources`
+   for the full locale list). Translate the prose — the technical
+   literals (commands, file paths, API signatures, code blocks,
+   and this app's own fixed feature/UI names: Packs, Connected
+   apps, Verified, Community, Developer mode) stay constant.
 
    Node-safe (plain data, no browser/JSX deps) so the build-time
    prerender can read each page's <title>/description from it.
@@ -60,6 +63,11 @@ export default {
         key: 'tauriApi',
         title: 'Tauri commands & API',
         body: 'The Rust commands the front end invokes, the plugins in use, and the cross-window event layer.',
+      },
+      {
+        key: 'packs',
+        title: 'Packs',
+        body: 'Build a sandboxed extension or a Connected app: the permission model, the eyeread.* API, and how to ship one.',
       },
     ],
     stackHeading: 'The stack at a glance',
@@ -215,5 +223,77 @@ export default {
     eventsHeading: 'Cross-window events',
     eventsBody:
       'Windows coordinate over Tauri’s event system. The platform layer wraps emitTo so that, in a plain browser, the same calls fall back to a BroadcastChannel named “eyeread” — keeping multi-window behaviour working in the web demo.',
+  },
+
+  packs: {
+    nav: 'Packs',
+    title: 'Packs',
+    description:
+      'Packs — installable, sandboxed JS extensions for eyeread.in — and Connected apps, the local API for external programs. The permission model, and how to build one.',
+    lead: 'Two ways to build on eyeread.in without touching its code, sharing one permission model: packs run inside the app in a sandbox; Connected apps are separate programs that talk to it over a local API.',
+    whatHeading: 'What a pack is',
+    whatBody: [
+      'A pack is a small JS extension — a manifest (pack.json) plus code — that the app runs in a locked-down sandbox with no DOM, no filesystem, and no network of its own. The only way out is a global eyeread object, gated by the permissions the pack declares and the user explicitly grants.',
+      'Every permission with declared internet access runs in its own isolated sandbox; permissions without it share one offline sandbox. Packs can’t see each other’s code, memory, or network traffic.',
+    ],
+    permissionsHeading: 'Permissions',
+    permissionsIntro:
+      'A pack (and a Connected app, which shares the same names as its API scopes) declares only what it needs. Nothing is granted until the user turns it on, per pack, per permission:',
+    permissionCol: 'Permission',
+    grantsCol: 'Grants',
+    permissions: [
+      { name: 'scripts:write', grants: 'Add a script to the user’s library.' },
+      {
+        name: 'prompter:load',
+        grants: 'Open text in the prompter and start a reading session.',
+      },
+      {
+        name: 'prompter:control',
+        grants: 'Play, pause, restart, seek, or close the prompter.',
+      },
+      {
+        name: 'prompter:events',
+        grants: 'Read the prompter’s live state — only while a session is active.',
+      },
+      {
+        name: 'files:import',
+        grants:
+          'Ask the user to pick a file with the app’s own picker; the pack sees only that file.',
+      },
+    ],
+    permissionsNote:
+      'Internet access is off unless a permission declares exact https:// sites in pack.json — no wildcards, IPs, or localhost. Declaring a site doesn’t turn it on; the user still switches it on per permission.',
+    makeHeading: 'Make one',
+    makeIntro:
+      'Everything can be done from the app itself, in Settings → Packs → Developer mode: New pack…, live reload on save, a per-pack log, and Validate/Build. There’s also a command-line path that needs no app open, from the SDK repo:',
+    makeStepsHeading: 'From the command line',
+    agentHeading: 'Building one with an AI agent',
+    agentBody: [
+      'The scaffold above writes an AGENTS.md into every new pack — the sandbox rules, the manifest fields, the eyeread.on(...) handler shape per permission, and the validate/build workflow, all in one self-contained file. It needs no setup: any coding agent that reads project files (Claude Code, Cursor, Codex, Copilot, …) picks it up the moment it opens the folder.',
+      'Claude Code users also get a proper Skill that triggers on pack-related requests even before a pack folder exists, with the full spec bundled in as references. Install it with any of the 75+ agents vercel-labs/skills supports, not just Claude Code:',
+    ],
+    verifiedHeading: 'Verified packs',
+    verifiedBody:
+      'A pack gets the ✓ Verified by eyeread.in badge once its maintainer signs it after review. Until then — or if a pack ships with no signature at all — it installs as Community, with a warning. A tampered or revoked signature blocks install entirely.',
+    connectedHeading: 'Connected apps',
+    connectedBody: [
+      'If your integration is easier to write as its own program — in any language — Connected apps give it the same capabilities over a local HTTP API on 127.0.0.1, with the app never running your code. Pair once via a one-click Allow/Deny prompt, then call scripts:write, prompter:load, prompter:control, or prompter:events with a bearer token.',
+      'Browsers can’t reach this API by design (no CORS, Origin/Sec-Fetch-Site checks) — it’s for native tools: a writing app, a Stream Deck or foot-pedal integration, a recording tool, a second-screen progress display.',
+    ],
+    moreHeading: 'Full reference',
+    moreBody:
+      'The complete spec (pack.json schema, the eyeread.* API, file and size limits, the Connected apps HTTP protocol) lives in the eyeread.in-packs-sdk repo and this app’s own docs/PACKS.md.',
+    moreLinks: [
+      {
+        label: 'omniship-labs/eyeread.in-packs-sdk',
+        href: 'https://github.com/omniship-labs/eyeread.in-packs-sdk',
+        body: 'the spec, the CLI, and the scaffold.',
+      },
+      {
+        label: 'docs/PACKS.md',
+        href: 'https://github.com/omniship-labs/eyeread.in/blob/main/docs/PACKS.md',
+        body: 'the Connected apps HTTP API, in full.',
+      },
+    ],
   },
 };
