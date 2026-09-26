@@ -31,6 +31,7 @@ export const docsPages = [
   { slug: 'architecture', key: 'architecture' },
   { slug: 'contributing', key: 'contributing' },
   { slug: 'tauri-api', key: 'tauriApi' },
+  { slug: 'packs', key: 'packs' },
 ];
 
 // URL a docs page is served at (index lives at the docs root).
