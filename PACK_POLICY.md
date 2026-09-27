@@ -37,7 +37,8 @@ claiming to be official, endorsed or made by OmniShip unless it is.
 Use other people's trademarks only as far as needed to say what the pack works
 with ("Sends Notion pages to your library"), and not in a way that suggests the
 owner made or endorses the pack. The same applies to the eyeread.in and
-OmniShip names and logos.
+OmniShip names and logos, except that you may say your pack is "Verified by
+eyeread.in" for any version that is currently Verified.
 
 ### 4. Obfuscated code
 
@@ -57,6 +58,11 @@ description says. In particular:
   site.
 - No selling or sharing users' data with anyone other than the declared
   service the user asked the pack to talk to.
+
+### 6. Hidden functionality
+
+A pack must do what its description and manifest say, and nothing else. If it
+connects to a third-party service, it must follow that service's terms.
 
 ### Also
 
