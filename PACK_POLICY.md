@@ -64,15 +64,21 @@ description says. In particular:
 A pack must do what its description and manifest say, and nothing else. If it
 connects to a third-party service, it must follow that service's terms.
 
-### 7. Paid or premium packs
+### 7. Paid packs must still show their code
 
-Verified packs are free, and every feature in them is free. No license keys,
-payment prompts, trials, locked features, or "upgrade to unlock" messages. Packs
-are AGPL, so anyone who has one may share it anyway.
+You may charge for a pack, or for features in it. What we require is the same
+as for any pack: the complete, readable source is in the pack.
 
-A pack may connect to a paid service the user already has an account with (a
-subscription tool, a hardware vendor's service). The pack itself must still be
-free.
+- Any license or payment check must be readable code in the pack, like the
+  rest. No hidden, obfuscated or downloaded checks.
+- If the check calls a server, that server must be a declared site, and the
+  description must say what's sent to it.
+- Say in the description what's free and what's paid, and where to buy.
+- Payment happens outside eyeread.in; the app doesn't take payments.
+
+Packs are AGPL, so anyone who gets your pack may study, change and share it,
+including removing a license check. Charging works best for support, updates,
+or a service your pack connects to.
 
 ### Also
 

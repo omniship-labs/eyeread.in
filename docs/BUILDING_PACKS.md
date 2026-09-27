@@ -166,10 +166,12 @@ They aren't on npm yet. Until they are, run them from a clone of the SDK repo
   tick "I understand the risks" before installing.
 - **Verified:** submit it for review, below.
 
-Packs are free. Because they're AGPL, anyone who has your pack may share it,
-and Verified packs can't include license keys, payment prompts or locked
-features (see the [content policy](../PACK_POLICY.md)). Your pack can still
-connect to a paid service of your own.
+You may charge for your pack, or for some of its features, as long as its
+full source stays readable in the pack, license checks included. Say what's
+paid in the description, and take payment outside the app. Because packs are
+AGPL, buyers may share and change them, so charging works best for support,
+updates, or a service your pack connects to. See the
+[content policy](../PACK_POLICY.md#7-paid-packs-must-still-show-their-code).
 
 ### Getting Verified
 
