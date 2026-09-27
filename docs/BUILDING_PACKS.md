@@ -166,6 +166,11 @@ They aren't on npm yet. Until they are, run them from a clone of the SDK repo
   tick "I understand the risks" before installing.
 - **Verified:** submit it for review, below.
 
+Packs are free. Because they're AGPL, anyone who has your pack may share it,
+and Verified packs can't include license keys, payment prompts or locked
+features (see the [content policy](../PACK_POLICY.md)). Your pack can still
+connect to a paid service of your own.
+
 ### Getting Verified
 
 1. Open a pull request with your pack's source in

@@ -64,6 +64,16 @@ description says. In particular:
 A pack must do what its description and manifest say, and nothing else. If it
 connects to a third-party service, it must follow that service's terms.
 
+### 7. Paid or premium packs
+
+Verified packs are free, and every feature in them is free. No license keys,
+payment prompts, trials, locked features, or "upgrade to unlock" messages. Packs
+are AGPL, so anyone who has one may share it anyway.
+
+A pack may connect to a paid service the user already has an account with (a
+subscription tool, a hardware vendor's service). The pack itself must still be
+free.
+
 ### Also
 
 We won't verify anything that's illegal, harmful to users (malware, scams,
