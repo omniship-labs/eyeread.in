@@ -1,8 +1,5 @@
 # Pack content policy
 
-> **Draft, pending sign-off.** This policy isn't final yet and may change
-> before the first pack is Verified.
-
 This is what we won't verify. A pack that breaks it doesn't get the
 ✓ **Verified by eyeread.in** badge, and a Verified pack found to break it later
 is revoked.
