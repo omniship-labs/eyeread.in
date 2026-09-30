@@ -56,3 +56,25 @@ function isEyereadError(err: unknown): err is Eyeread.EyereadError {
   return err instanceof Error && 'code' in err;
 }
 isEyereadError(new Error('x'));
+
+eyeread.on('prompter:control', async ({ prompter, keys, mouse }) => {
+  await prompter.advance(1);
+  await prompter.advance(-5);
+  // @ts-expect-error: keys is absent until the user allows input
+  keys.onKey(() => {});
+  keys?.onKey((e) => {
+    if (e.type === 'down' && !e.repeat && e.code === 'ArrowRight' && !e.modifiers.ctrl) {
+      void prompter.advance(1);
+    }
+    // @ts-expect-error: no typed character is delivered
+    e.key;
+  });
+  mouse?.onButton((e) => e.button.toFixed());
+  mouse?.onWheel?.((e) => e.deltaY.toFixed());
+  mouse?.onMove?.((e) => e.x + e.y);
+});
+
+eyeread.on('prompter:events', (ctx) => {
+  // @ts-expect-error: only prompter:control gets input
+  ctx.keys;
+});

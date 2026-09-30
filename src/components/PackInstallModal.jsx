@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Globe, Package, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from './Badge';
-import { PERMISSION_LABEL_KEYS } from '../lib/packs';
+import { describeInput, inputFromCombined, PERMISSION_LABEL_KEYS } from '../lib/packs';
 import './permissions-modal.less';
 
 /**
@@ -28,6 +28,8 @@ export function PackInstallModal({ review, error, busy, onInstall, onDeny }) {
   }, [onDeny]);
 
   const pack = review?.pack;
+  // Every site any permission in the bundle declares, for the input consent line.
+  const allSites = [...new Set((review?.permissions ?? []).flatMap((p) => p.network))];
   const verified = !!pack?.verified;
   const blocked = !review || !!error || !!review.conflict;
   const canInstall = !busy && !blocked && (verified || understood);
@@ -105,6 +107,18 @@ export function PackInstallModal({ review, error, busy, onInstall, onDeny }) {
                         <div className="pk-sites">
                           <Globe size={12} aria-hidden="true" />{' '}
                           {t('packs.install.sites', { sites: p.network.join(', ') })}
+                        </div>
+                      )}
+                      {p.input && (
+                        <div className="pk-sites" data-testid="pk-install-input">
+                          {t('packs.input.reads', {
+                            what: describeInput(inputFromCombined(p.input), t),
+                          })}
+                          {allSites.length > 0 &&
+                            ` ${t('packs.input.withInternet', {
+                              what: describeInput(inputFromCombined(p.input), t),
+                              sites: allSites.join(', '),
+                            })}`}
                         </div>
                       )}
                     </li>

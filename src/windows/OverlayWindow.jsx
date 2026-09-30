@@ -41,6 +41,7 @@ import {
   showSettingsWindow,
   openExternal,
 } from '../lib/tauri';
+import { usePackInput } from '../hooks/usePackInput';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { useTour } from '../hooks/useTour';
 import { TipLayer } from '../components/TipLayer';
@@ -122,6 +123,7 @@ export function OverlayWindow() {
 
   // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
   const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
+  usePackInput();
 
   // First-run tour tips for the prompter controls. Only ever active once a
   // reading session is genuinely showing and interactive (not click-through
@@ -473,7 +475,7 @@ export function OverlayWindow() {
   }, [attribution]);
   const controlRef = useRef(null);
   useLayoutEffect(() => {
-    controlRef.current = ({ action, wordIndex }, caller) => {
+    controlRef.current = ({ action, wordIndex, words: delta }, caller) => {
       if (!sessionActive || words.length === 0) throw new PackCallError('no_active_session');
       if (action === 'play') setPlaying(true);
       else if (action === 'pause') setPlaying(false);
@@ -482,6 +484,8 @@ export function OverlayWindow() {
       else if (action === 'close') close();
       else if (action === 'seek')
         onWordClick(Math.min(Math.max(0, wordIndex), words.length - 1));
+      else if (action === 'advance')
+        onWordClick(Math.min(Math.max(0, active + delta), words.length - 1));
       else throw new PackCallError('invalid_params');
       const note = controlAttribution(action, caller);
       if (note) setAttribution(t(note.key, note.params));

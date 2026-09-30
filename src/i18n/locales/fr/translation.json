@@ -375,6 +375,16 @@
       "prompterEvents": "Le titre du script en cours et votre position pendant la lecture.",
       "filesImport": "Vous demande de choisir un fichier avec le sélecteur de l’app et ne reçoit que ce fichier."
     },
+    "input": {
+      "keys": "les touches {{keys}}",
+      "anyKey": "n’importe quelle touche",
+      "buttons": "les boutons de souris {{buttons}}",
+      "anyButton": "n’importe quel bouton de souris",
+      "wheel": "la molette de la souris",
+      "position": "la position du pointeur",
+      "reads": "Lit {{what}} quand eyeread.in a le focus, jamais ce que vous saisissez dans les champs de texte.",
+      "withInternet": "Ce pack peut voir {{what}} et accéder à {{sites}}."
+    },
     "sourceLabel": "De {{name}}",
     "attribution": {
       "play": "Lecture lancée par {{name}}",
@@ -452,7 +462,10 @@
       "logPermission": "Autorisation",
       "logRequest": "Requête",
       "logResult": "Résultat",
-      "logBytes": "Octets"
+      "logBytes": "Octets",
+      "input": "Saisie",
+      "inputLabel": "Saisie pour : {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "Mode développeur",

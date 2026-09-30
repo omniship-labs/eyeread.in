@@ -51,7 +51,7 @@ sandbox                                   app
 ```
 
 - **`init`**: `pack` (`id`, `version`, `name`), `sandbox` (`id`, `permissions`,
-  and `network`: whether `net` exists), `settings` (current values), and `main`.
+  `network`: whether `net` exists, and `input`: `{ keyboard, mouse, wheel, position }` when this is an input sandbox), `settings` (current values), and `main`.
 - **`ready`**: `handlers`, the permissions the pack registered while `main`
   first evaluated. The reply lists the permissions to activate: those in this
   sandbox, registered, and allowed. If `main` fails to load, the bootstrap sends
@@ -80,11 +80,13 @@ belongs to the permission, the user's grant is on (internet too, for
 | `prompter.getState`    | `prompter:events`                | `{}`                                         | `PrompterState`            |
 | `prompter.subscribe`   | `prompter:events`                | `{}`                                         | `null`; then `event`s      |
 | `prompter.unsubscribe` | `prompter:events`                | `{}`                                         | `null`                     |
+| `input.subscribe`      | `prompter:control`               | `{ source }`                                 | `null`; then `event`s      |
+| `input.unsubscribe`    | `prompter:control`               | `{ source }`                                 | `null`                     |
 | `files.import`         | `files:import`                   | `{ accept?, maxBytes? }`                     | `ImportedFileData \| null` |
 | `net.fetch`            | the sandbox's network permission | `{ url, method, headers, body?, timeoutMs }` | `NetResponseData`          |
 | `settings.get`         | none (`null`)                    | `{}`                                         | settings object            |
 
-`action` is `play`, `pause`, `toggle`, `restart`, `seek` or `close`. Binary data
+`action` is `play`, `pause`, `toggle`, `restart`, `seek`, `advance` or `close`. `seek` takes `wordIndex`, `advance` takes `words`. `input.*`'s `source` is `keyboard` or `mouse`. Binary data
 travels as base64 strings:
 
 - `ImportedFileData`: `{ name, type, size, data }`.
@@ -116,6 +118,20 @@ Returned by `GET <base>/events`:
 
 `prompter.state` goes only to a sandbox that holds `prompter:events` and has
 called `prompter.subscribe`. `settings.changed` goes to every sandbox of the pack.
+
+Input events go only to a sandbox that holds `prompter:control` with the user's
+input grant, has called `input.subscribe` for the source, and whose pack
+declared the event:
+
+| `name`               | `source`   | `data`                                                   |
+| -------------------- | ---------- | -------------------------------------------------------- |
+| `input.key`          | `keyboard` | `{ type, code, modifiers, repeat }`                      |
+| `input.mouse.button` | `mouse`    | `{ type, button, modifiers }`                            |
+| `input.mouse.wheel`  | `mouse`    | `{ deltaX, deltaY, modifiers }`, only with `wheel: true` |
+| `input.mouse.move`   | `mouse`    | `{ x, y }`, only with `position: true`                   |
+
+The app reports input only while eyeread.in is focused, never from a text field,
+and only when some sandbox is subscribed.
 
 ## Logs, errors and the watchdog
 

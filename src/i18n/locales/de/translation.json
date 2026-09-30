@@ -375,6 +375,16 @@
       "prompterEvents": "Titel des aktuellen Skripts und deine Position darin, während du liest.",
       "filesImport": "Bittet dich, mit der Dateiauswahl der App eine Datei zu wählen, und erhält nur diese Datei."
     },
+    "input": {
+      "keys": "die Tasten {{keys}}",
+      "anyKey": "jede Taste",
+      "buttons": "Maustasten {{buttons}}",
+      "anyButton": "jede Maustaste",
+      "wheel": "das Mausrad",
+      "position": "die Zeigerposition",
+      "reads": "Liest {{what}}, solange eyeread.in im Fokus ist, nie das, was du in Textfelder tippst.",
+      "withInternet": "Dieses Pack kann {{what}} sehen und {{sites}} erreichen."
+    },
     "sourceLabel": "Von {{name}}",
     "attribution": {
       "play": "Wiedergabe gestartet von {{name}}",
@@ -452,7 +462,10 @@
       "logPermission": "Berechtigung",
       "logRequest": "Anfrage",
       "logResult": "Ergebnis",
-      "logBytes": "Bytes"
+      "logBytes": "Bytes",
+      "input": "Eingabe",
+      "inputLabel": "Eingabe für: {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "Entwicklermodus",
