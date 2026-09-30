@@ -1,0 +1,44 @@
+{
+  "apiVersion": 1,
+  "name": "Fixture",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fixture Author"
+  },
+  "license": "AGPL-3.0-only",
+  "main": "main.js",
+  "id": "com.example.input",
+  "permissions": {
+    "input:keyboard": {
+      "keys": [
+        "ArrowRight",
+        "ArrowLeft",
+        "Space"
+      ],
+      "scope": "global"
+    },
+    "input:mouse": {
+      "buttons": [
+        3,
+        4
+      ],
+      "position": true
+    },
+    "input:midi": {},
+    "input:gamepad": {},
+    "prompter:control": {}
+  },
+  "settings": [
+    {
+      "key": "advanceKey",
+      "type": "key",
+      "label": "Advance key",
+      "default": "ArrowRight"
+    },
+    {
+      "key": "pauseKey",
+      "type": "key",
+      "label": "Pause key"
+    }
+  ]
+}

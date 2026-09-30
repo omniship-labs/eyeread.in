@@ -57,8 +57,12 @@ with that permission's API. It may be `async`; a rejection is logged as an error
 | `prompter:control` | `{ prompter: { play, pause, toggle, restart, seek, close }, settings, net? }` |
 | `prompter:events`  | `{ prompter: { getState, onState }, settings, net? }`                         |
 | `files:import`     | `{ files: { import }, settings, net? }`                                       |
+| `input:keyboard`   | `{ keys: { onKey }, settings }`                                               |
+| `input:mouse`      | `{ mouse: { onButton, onWheel, onMove? }, settings }`                         |
+| `input:midi`       | `{ midi: { onMessage }, settings }`                                           |
+| `input:gamepad`    | `{ gamepad: { onButton, onAxis }, settings }`                                 |
 
-`net` is present only when the permission declares `network`.
+`net` is present only when the permission declares `network`. Input permissions can't declare it, so they never get `net`.
 
 ### `scripts.add({ text, title?, language? })` → `Promise<{ scriptId }>`
 
@@ -117,6 +121,54 @@ the folder: only the file's name, type, size and contents.
 
 `text()` decodes as UTF-8; `bytes()` returns a `Uint8Array`. Only one picker per
 pack can be open at a time (`E_BUSY`).
+
+### Input: `keys`, `mouse`, `midi`, `gamepad`
+
+Each `on…` method calls back for every event and returns `unsubscribe()`. The
+pack turns input into actions by calling other APIs, which it keeps from their
+own handlers (all offline permissions share one sandbox):
+
+```js
+let control;
+let wordIndex = 0;
+eyeread.on('prompter:control', ({ prompter }) => (control = prompter));
+eyeread.on('prompter:events', ({ prompter }) => {
+  prompter.onState((state) => (wordIndex = state.wordIndex));
+});
+eyeread.on('input:keyboard', ({ keys, settings }) => {
+  keys.onKey(async (e) => {
+    const { advanceKey } = await settings.get();
+    if (e.type === 'down' && e.code === advanceKey && control) {
+      await control.seek(wordIndex + 1);
+    }
+  });
+});
+```
+
+Delivery follows what the user allowed: events arrive only while the pack is
+enabled, only for the `keys` or `buttons` the manifest lists (if it lists any),
+and only while eyeread.in is focused unless the pack declared `scope: "global"`
+and the user chose it. Events are never buffered or replayed.
+
+**`keys.onKey(cb)`**: `cb({ type: 'down' | 'up', code, modifiers, repeat })`.
+`code` is the physical key (`'KeyA'`, `'ArrowRight'`). The typed character is not
+delivered. `modifiers` is `{ ctrl, shift, alt, meta }`.
+
+**`mouse.onButton(cb)`**: `cb({ type: 'down' | 'up', button, modifiers })`.
+**`mouse.onWheel(cb)`**: `cb({ deltaX, deltaY, modifiers })`.
+**`mouse.onMove(cb)`**: `cb({ x, y })`, screen coordinates. Only when the
+manifest sets `position: true` and the user allowed it; otherwise `onMove` is
+missing. No event carries a window, a title or what was under the pointer.
+
+**`midi.onMessage(cb)`**: `cb({ device, type, channel, data1, data2 })` for
+messages from the devices the user picked for this pack. `type` is
+`'noteOn'`, `'noteOff'`, `'controlChange'`, `'programChange'` or `'other'`.
+
+**`gamepad.onButton(cb)`**: `cb({ device, button, pressed, value })`.
+**`gamepad.onAxis(cb)`**: `cb({ device, axis, value })`, `value` from -1 to 1.
+
+`device` is `{ id, name }`: `id` is opaque and stable for this pack, and `name`
+is what the device calls itself.
 
 ### `net.fetch(url, init?)` → `Promise<NetResponse>`
 

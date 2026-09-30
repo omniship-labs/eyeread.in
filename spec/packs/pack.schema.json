@@ -48,7 +48,21 @@
             "maxItems": 16,
             "uniqueItems": true,
             "items": { "$ref": "#/$defs/site" }
-          }
+          },
+          "scope": { "enum": ["focused", "global"] },
+          "keys": {
+            "type": "array",
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/keyCode" }
+          },
+          "buttons": {
+            "type": "array",
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": { "type": "integer", "minimum": 0, "maximum": 4 }
+          },
+          "position": { "type": "boolean" }
         }
       }
     },
@@ -102,8 +116,19 @@
         "prompter:load",
         "prompter:control",
         "prompter:events",
-        "files:import"
+        "files:import",
+        "input:keyboard",
+        "input:mouse",
+        "input:midi",
+        "input:gamepad"
       ]
+    },
+    "keyCode": {
+      "description": "A KeyboardEvent.code value such as KeyA, ArrowRight, Space, F13 or Numpad1.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[A-Za-z0-9]+$"
     },
     "site": {
       "description": "An exact https origin: lowercase DNS host (at least one dot, last label starts with a letter), optional port, nothing else.",
@@ -124,7 +149,7 @@
     "setting": {
       "type": "object",
       "required": ["type"],
-      "properties": { "type": { "enum": ["toggle", "select", "number", "text"] } },
+      "properties": { "type": { "enum": ["toggle", "select", "number", "text", "key"] } },
       "oneOf": [
         {
           "$ref": "#/$defs/settingBase",
@@ -178,6 +203,14 @@
             "placeholder": { "type": "string", "maxLength": 64 },
             "multiline": { "type": "boolean" },
             "default": { "type": "string", "maxLength": 2000 }
+          }
+        },
+        {
+          "$ref": "#/$defs/settingBase",
+          "unevaluatedProperties": false,
+          "properties": {
+            "type": { "const": "key" },
+            "default": { "type": "string", "maxLength": 32, "pattern": "^[A-Za-z0-9]*$" }
           }
         }
       ]

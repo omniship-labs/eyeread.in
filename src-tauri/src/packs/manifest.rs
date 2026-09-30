@@ -14,13 +14,23 @@ const PACK_SCHEMA: &str = include_str!("../../../spec/packs/pack.schema.json");
 /// The `apiVersion`s this app runs.
 pub const SUPPORTED_API_VERSIONS: [u64; 1] = [1];
 
-pub const PERMISSIONS: [&str; 5] = [
+pub const PERMISSIONS: [&str; 9] = [
     "scripts:write",
     "prompter:load",
     "prompter:control",
     "prompter:events",
     "files:import",
+    "input:keyboard",
+    "input:mouse",
+    "input:midi",
+    "input:gamepad",
 ];
+
+/// Permissions that read the user's keyboard, mouse or hardware. They can't
+/// declare `network`: input stays in the offline sandbox.
+pub fn is_input_permission(permission: &str) -> bool {
+    permission.starts_with("input:")
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -36,6 +46,18 @@ pub struct Author {
 pub struct PermissionDecl {
     #[serde(default)]
     pub network: Vec<String>,
+    /// Input permissions: `"focused"` (the default) or `"global"`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope: Option<String>,
+    /// `input:keyboard`: only these `KeyboardEvent.code`s are delivered.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub keys: Vec<String>,
+    /// `input:mouse`: only these buttons are delivered.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub buttons: Vec<u8>,
+    /// `input:mouse`: also deliver pointer position.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub position: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -79,6 +101,16 @@ pub enum SettingKind {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         default: Option<String>,
     },
+    /// A key the user picks, stored as a `KeyboardEvent.code` (or `""`).
+    Key {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        default: Option<String>,
+    },
+}
+
+/// A `KeyboardEvent.code` value: letters and digits only, up to 32.
+fn is_key_code(s: &str) -> bool {
+    s.len() <= 32 && s.chars().all(|c| c.is_ascii_alphanumeric())
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -105,7 +137,9 @@ impl Setting {
             SettingKind::Number { min, default, .. } => {
                 serde_json::json!(default.or(*min).unwrap_or(0.0))
             }
-            SettingKind::Text { default, .. } => Value::String(default.clone().unwrap_or_default()),
+            SettingKind::Text { default, .. } | SettingKind::Key { default } => {
+                Value::String(default.clone().unwrap_or_default())
+            }
         }
     }
 
@@ -130,6 +164,13 @@ impl Setting {
                     return Err("too long");
                 }
                 Ok(value.clone())
+            }
+            (SettingKind::Key { .. }, Value::String(v)) => {
+                if is_key_code(v) {
+                    Ok(value.clone())
+                } else {
+                    Err("not a key")
+                }
             }
             _ => Err("wrong type"),
         }
@@ -239,6 +280,12 @@ pub fn parse(bytes: &[u8], app_version: &semver::Version) -> PackResult<Manifest
         }
     }
 
+    if let Some(perms) = value.get("permissions").and_then(Value::as_object) {
+        for (permission, decl) in perms {
+            check_permission_options(permission, decl)?;
+        }
+    }
+
     if let Some(err) = validator().iter_errors(&value).next() {
         let pointer = err.instance_path().as_str();
         let pointer = if pointer.is_empty() { "/" } else { pointer };
@@ -267,6 +314,37 @@ pub fn parse(bytes: &[u8], app_version: &semver::Version) -> PackResult<Manifest
     Ok(manifest)
 }
 
+/// Input permissions can't declare `network`, and each option belongs to
+/// particular permissions. The schema can't say either.
+fn check_permission_options(permission: &str, decl: &Value) -> PackResult<()> {
+    let Some(decl) = decl.as_object() else {
+        return Ok(());
+    };
+    let input = is_input_permission(permission);
+    if input && decl.contains_key("network") {
+        return Err(PackError::new(
+            "PACK_INPUT_NETWORK",
+            &[("permission", permission)],
+        ));
+    }
+    for option in decl.keys() {
+        let allowed = match option.as_str() {
+            "network" => true,
+            "scope" => input,
+            "keys" => permission == "input:keyboard",
+            "buttons" | "position" => permission == "input:mouse",
+            _ => true, // unknown fields are the schema's to reject
+        };
+        if !allowed {
+            return Err(PackError::new(
+                "PACK_PERMISSION_OPTION",
+                &[("permission", permission), ("option", option)],
+            ));
+        }
+    }
+    Ok(())
+}
+
 fn check_settings(settings: &[Setting]) -> PackResult<()> {
     let mut keys = HashSet::new();
     for s in settings {
@@ -276,7 +354,7 @@ fn check_settings(settings: &[Setting]) -> PackResult<()> {
             return Err(fail("the key is used by another setting"));
         }
         match &s.kind {
-            SettingKind::Toggle { .. } => {}
+            SettingKind::Toggle { .. } | SettingKind::Key { .. } => {}
             SettingKind::Select { options, default } => {
                 let mut values = HashSet::new();
                 if !options.iter().all(|o| values.insert(o.value.as_str())) {
@@ -363,6 +441,121 @@ mod tests {
         ] {
             assert!(!site_is_valid(bad), "{bad}");
         }
+    }
+
+    fn perms(v: Value) -> Vec<u8> {
+        manifest(serde_json::json!({ "permissions": v }))
+    }
+
+    #[test]
+    fn input_permissions_parse_with_their_options() {
+        let m = parse(
+            &perms(serde_json::json!({
+                "input:keyboard": { "keys": ["ArrowRight", "Space"], "scope": "global" },
+                "input:mouse": { "buttons": [3, 4], "position": true },
+                "input:midi": {},
+            })),
+            &app(),
+        )
+        .unwrap();
+        assert_eq!(
+            m.permissions["input:keyboard"].keys,
+            ["ArrowRight", "Space"]
+        );
+        assert_eq!(
+            m.permissions["input:keyboard"].scope.as_deref(),
+            Some("global")
+        );
+        assert_eq!(m.permissions["input:mouse"].buttons, [3, 4]);
+        assert!(m.permissions["input:mouse"].position);
+        assert_eq!(
+            m.permission_names(),
+            ["input:keyboard", "input:mouse", "input:midi"]
+        );
+    }
+
+    #[test]
+    fn input_permissions_cant_declare_network() {
+        for p in [
+            "input:keyboard",
+            "input:mouse",
+            "input:midi",
+            "input:gamepad",
+        ] {
+            let m = perms(serde_json::json!({ p: { "network": ["https://api.example.com"] } }));
+            assert_eq!(
+                parse(&m, &app()).unwrap_err().code,
+                "PACK_INPUT_NETWORK",
+                "{p}"
+            );
+        }
+        // An empty list is still a declaration.
+        let m = perms(serde_json::json!({ "input:midi": { "network": [] } }));
+        assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_INPUT_NETWORK");
+    }
+
+    #[test]
+    fn options_belong_to_their_permissions() {
+        for (p, opt, v) in [
+            ("input:midi", "keys", serde_json::json!(["KeyA"])),
+            ("input:mouse", "keys", serde_json::json!(["KeyA"])),
+            ("input:keyboard", "buttons", serde_json::json!([0])),
+            ("input:keyboard", "position", serde_json::json!(true)),
+            ("scripts:write", "scope", serde_json::json!("global")),
+        ] {
+            let m = perms(serde_json::json!({ p: { opt: v } }));
+            assert_eq!(
+                parse(&m, &app()).unwrap_err().code,
+                "PACK_PERMISSION_OPTION",
+                "{p} {opt}"
+            );
+        }
+    }
+
+    #[test]
+    fn bad_key_codes_and_scopes_fail_the_schema() {
+        for d in [
+            serde_json::json!({ "keys": ["Not A Key"] }),
+            serde_json::json!({ "keys": ["KeyA", "KeyA"] }),
+            serde_json::json!({ "scope": "everywhere" }),
+        ] {
+            let m = perms(serde_json::json!({ "input:keyboard": d }));
+            assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_MANIFEST_SCHEMA");
+        }
+        let m = perms(serde_json::json!({ "input:mouse": { "buttons": [5] } }));
+        assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_MANIFEST_SCHEMA");
+    }
+
+    #[test]
+    fn key_settings() {
+        let m = parse(
+            &manifest(serde_json::json!({ "settings": [
+                { "key": "next", "type": "key", "label": "Next", "default": "ArrowRight" },
+                { "key": "back", "type": "key", "label": "Back" },
+            ]})),
+            &app(),
+        )
+        .unwrap();
+        assert_eq!(
+            m.settings[0].default_value(),
+            serde_json::json!("ArrowRight")
+        );
+        assert_eq!(m.settings[1].default_value(), serde_json::json!(""));
+        assert!(m.settings[0]
+            .check_value(&serde_json::json!("KeyN"))
+            .is_ok());
+        assert!(m.settings[0].check_value(&serde_json::json!("")).is_ok());
+        assert!(m.settings[0]
+            .check_value(&serde_json::json!("not a key"))
+            .is_err());
+        assert!(m.settings[0].check_value(&serde_json::json!(5)).is_err());
+        let bad = manifest(serde_json::json!({ "settings": [
+            { "key": "k", "type": "key", "label": "K", "default": "Not A Key" },
+        ]}));
+        assert_eq!(
+            parse(&bad, &app()).unwrap_err().code,
+            "PACK_MANIFEST_SCHEMA"
+        );
     }
 
     #[test]

@@ -79,6 +79,21 @@
       "schema": false,
       "error": "PACK_MANIFEST_SCHEMA"
     },
+    "invalid-input-key-code": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-input-network": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_NETWORK"
+    },
+    "invalid-input-option": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_PERMISSION_OPTION"
+    },
     "invalid-main-missing": {
       "valid": false,
       "schema": true,
@@ -202,6 +217,11 @@
       "error": null
     },
     "valid-files-json": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-input": {
       "valid": true,
       "schema": true,
       "error": null

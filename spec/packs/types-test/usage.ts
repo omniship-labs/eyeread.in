@@ -56,3 +56,31 @@ function isEyereadError(err: unknown): err is Eyeread.EyereadError {
   return err instanceof Error && 'code' in err;
 }
 isEyereadError(new Error('x'));
+
+eyeread.on('input:keyboard', ({ keys }) => {
+  const stop = keys.onKey((e) => {
+    if (e.type === 'down' && !e.repeat && e.code === 'ArrowRight' && !e.modifiers.ctrl) stop();
+    // @ts-expect-error: no typed character is delivered
+    e.key;
+  });
+});
+
+eyeread.on('input:mouse', ({ mouse }) => {
+  mouse.onButton((e) => e.button.toFixed());
+  mouse.onWheel((e) => e.deltaY.toFixed());
+  mouse.onMove?.((e) => e.x + e.y);
+});
+
+eyeread.on('input:midi', ({ midi }) => {
+  midi.onMessage((m) => m.device.name.trim() + m.data1);
+});
+
+eyeread.on('input:gamepad', ({ gamepad }) => {
+  gamepad.onButton((b) => b.pressed && b.device.id);
+  gamepad.onAxis((a) => a.value.toFixed(2));
+});
+
+eyeread.on('input:keyboard', (ctx) => {
+  // @ts-expect-error: input permissions never get net
+  ctx.net.fetch('https://example.com');
+});

@@ -11,7 +11,11 @@ declare global {
       | 'prompter:load'
       | 'prompter:control'
       | 'prompter:events'
-      | 'files:import';
+      | 'files:import'
+      | 'input:keyboard'
+      | 'input:mouse'
+      | 'input:midi'
+      | 'input:gamepad';
 
     type ErrorCode =
       | 'E_PERMISSION'
@@ -103,6 +107,87 @@ declare global {
       import(options?: ImportOptions): Promise<ImportedFile | null>;
     }
 
+    interface Modifiers {
+      readonly ctrl: boolean;
+      readonly shift: boolean;
+      readonly alt: boolean;
+      readonly meta: boolean;
+    }
+
+    interface KeyEvent {
+      readonly type: 'down' | 'up';
+      /** The physical key, a `KeyboardEvent.code` such as `'KeyA'`. No typed character. */
+      readonly code: string;
+      readonly modifiers: Modifiers;
+      readonly repeat: boolean;
+    }
+
+    interface KeysApi {
+      onKey(callback: (event: KeyEvent) => void): Unsubscribe;
+    }
+
+    interface MouseButtonEvent {
+      readonly type: 'down' | 'up';
+      /** 0 left, 1 middle, 2 right, 3 back, 4 forward. */
+      readonly button: number;
+      readonly modifiers: Modifiers;
+    }
+
+    interface MouseWheelEvent {
+      readonly deltaX: number;
+      readonly deltaY: number;
+      readonly modifiers: Modifiers;
+    }
+
+    interface MouseMoveEvent {
+      readonly x: number;
+      readonly y: number;
+    }
+
+    interface MouseApi {
+      onButton(callback: (event: MouseButtonEvent) => void): Unsubscribe;
+      onWheel(callback: (event: MouseWheelEvent) => void): Unsubscribe;
+      /** Present only when pack.json sets `position: true` and the user allowed it. */
+      onMove?(callback: (event: MouseMoveEvent) => void): Unsubscribe;
+    }
+
+    interface InputDevice {
+      /** Opaque and stable for this pack. */
+      readonly id: string;
+      readonly name: string;
+    }
+
+    interface MidiMessage {
+      readonly device: InputDevice;
+      readonly type: 'noteOn' | 'noteOff' | 'controlChange' | 'programChange' | 'other';
+      readonly channel: number;
+      readonly data1: number;
+      readonly data2: number;
+    }
+
+    interface MidiApi {
+      onMessage(callback: (message: MidiMessage) => void): Unsubscribe;
+    }
+
+    interface GamepadButtonEvent {
+      readonly device: InputDevice;
+      readonly button: number;
+      readonly pressed: boolean;
+      readonly value: number;
+    }
+
+    interface GamepadAxisEvent {
+      readonly device: InputDevice;
+      readonly axis: number;
+      /** From -1 to 1. */
+      readonly value: number;
+    }
+
+    interface GamepadApi {
+      onButton(callback: (event: GamepadButtonEvent) => void): Unsubscribe;
+      onAxis(callback: (event: GamepadAxisEvent) => void): Unsubscribe;
+    }
+
     type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
     interface NetRequestInit {
@@ -130,7 +215,7 @@ declare global {
 
     interface BaseContext {
       settings: SettingsApi;
-      /** Present only when the permission declares `network` in pack.json. */
+      /** Present only when the permission declares `network` in pack.json. Never for input permissions. */
       net?: NetApi;
     }
 
@@ -140,6 +225,10 @@ declare global {
       'prompter:control': BaseContext & { prompter: PrompterControlApi };
       'prompter:events': BaseContext & { prompter: PrompterEventsApi };
       'files:import': BaseContext & { files: FilesApi };
+      'input:keyboard': BaseContext & { keys: KeysApi };
+      'input:mouse': BaseContext & { mouse: MouseApi };
+      'input:midi': BaseContext & { midi: MidiApi };
+      'input:gamepad': BaseContext & { gamepad: GamepadApi };
     }
 
     type Handler<P extends Permission> = (context: ContextMap[P]) => void | Promise<void>;

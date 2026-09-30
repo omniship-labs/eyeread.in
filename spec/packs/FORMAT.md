@@ -45,22 +45,22 @@ are rejected, so a manifest means exactly what the user was shown.
 }
 ```
 
-| Field           | Required | Rules                                                                                                   |
-| --------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| `apiVersion`    | yes      | Integer. The app must support it (v1 apps support `1`).                                                 |
-| `id`            | yes      | Reverse-DNS style, lowercase: `com.example.my-pack`. At least one dot, 3–100 characters. Never changes. |
-| `name`          | yes      | 1–64 characters, shown to the user.                                                                     |
-| `version`       | yes      | Semantic version without build metadata: `1.2.0`, `2.0.0-beta.1`.                                       |
-| `description`   | no       | Up to 280 characters.                                                                                   |
-| `author`        | yes      | `{ "name", "email"?, "url"? }`. `url` must be `https://`.                                               |
-| `homepage`      | no       | `https://` URL.                                                                                         |
-| `repository`    | no       | `https://` URL.                                                                                         |
-| `license`       | yes      | The pack's license, shown to the user: 1–100 characters, ideally an SPDX identifier such as `MIT`.      |
-| `minAppVersion` | no       | Lowest eyeread.in version the pack runs on.                                                             |
-| `main`          | see note | Path to the entry module, ending in `.js` or `.mjs`.                                                    |
-| `permissions`   | no       | Map of permission → `{ "network"?: [sites] }`. Missing or `{}` means the pack asks for nothing.         |
-| `settings`      | no       | Declared settings (below), in display order. Up to 32.                                                  |
-| `includes`      | no       | Packs this one bundles: `[{ "id", "version" }]`. Up to 32.                                              |
+| Field           | Required | Rules                                                                                                                                          |
+| --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apiVersion`    | yes      | Integer. The app must support it (v1 apps support `1`).                                                                                        |
+| `id`            | yes      | Reverse-DNS style, lowercase: `com.example.my-pack`. At least one dot, 3–100 characters. Never changes.                                        |
+| `name`          | yes      | 1–64 characters, shown to the user.                                                                                                            |
+| `version`       | yes      | Semantic version without build metadata: `1.2.0`, `2.0.0-beta.1`.                                                                              |
+| `description`   | no       | Up to 280 characters.                                                                                                                          |
+| `author`        | yes      | `{ "name", "email"?, "url"? }`. `url` must be `https://`.                                                                                      |
+| `homepage`      | no       | `https://` URL.                                                                                                                                |
+| `repository`    | no       | `https://` URL.                                                                                                                                |
+| `license`       | yes      | The pack's license, shown to the user: 1–100 characters, ideally an SPDX identifier such as `MIT`.                                             |
+| `minAppVersion` | no       | Lowest eyeread.in version the pack runs on.                                                                                                    |
+| `main`          | see note | Path to the entry module, ending in `.js` or `.mjs`.                                                                                           |
+| `permissions`   | no       | Map of permission → `{ "network"?: [sites] }` (input permissions take other options instead). Missing or `{}` means the pack asks for nothing. |
+| `settings`      | no       | Declared settings (below), in display order. Up to 32.                                                                                         |
+| `includes`      | no       | Packs this one bundles: `[{ "id", "version" }]`. Up to 32.                                                                                     |
 
 `main` is required, except in a pure bundle: a pack with `includes` and no
 `permissions` may leave it out and ship no code of its own.
@@ -74,9 +74,47 @@ are rejected, so a manifest means exactly what the user was shown.
 | `prompter:control` | Play, pause, restart, seek or close the prompter                                  |
 | `prompter:events`  | Read the prompter's state; the script is only described during an active session  |
 | `files:import`     | Ask the user to pick a file with the app's own picker, and receive only that file |
+| `input:keyboard`   | Receive key presses (see [Input permissions](#input-permissions))                 |
+| `input:mouse`      | Receive mouse button presses and wheel scrolls                                    |
+| `input:midi`       | Receive MIDI messages from devices the user picks                                 |
+| `input:gamepad`    | Receive button and axis changes from gamepads the user picks                      |
 
 These are the same names the Connected apps HTTP API uses as scopes, and they
 share one grant model.
+
+### Input permissions
+
+`input:keyboard`, `input:mouse`, `input:midi` and `input:gamepad` let a pack react
+to the user's keyboard, mouse or hardware. The pack decides what an input means
+and calls the other APIs (`prompter:control`, for example) itself; the app only
+delivers events. All are off until the user allows them.
+
+An input permission **can't declare `network`** (`PACK_INPUT_NETWORK`). Input
+runs in the offline sandbox, which can't reach the internet and shares nothing
+with a sandbox that can, so what a pack reads from the user's input has nowhere
+to go.
+
+Options, all optional:
+
+| Option     | Permissions      | Meaning                                                                                                                                                                    |
+| ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scope`    | all four         | `"focused"` (default): events only while eyeread.in is focused. `"global"`: also when other apps are focused. The user can always choose `focused`.                        |
+| `keys`     | `input:keyboard` | Up to 64 [`KeyboardEvent.code`](https://developer.mozilla.org/docs/Web/API/KeyboardEvent/code) values, like `"Space"` or `"F13"`. When set, only these keys are delivered. |
+| `buttons`  | `input:mouse`    | Up to 5 button numbers (0 left, 1 middle, 2 right, 3 back, 4 forward). When set, only these.                                                                               |
+| `position` | `input:mouse`    | `true` to also receive pointer position. Off by default and shown in the install prompt.                                                                                   |
+
+An option on a permission that doesn't take it is `PACK_PERMISSION_OPTION`.
+
+```json
+"permissions": {
+  "input:keyboard": { "keys": ["ArrowRight", "ArrowLeft", "Space"] },
+  "prompter:control": {}
+}
+```
+
+Declare `keys` or `buttons` whenever the pack needs only a few inputs: the
+install prompt shows them, and Verified review prefers it. A pack that asks for
+`scope: "global"` or every key has to justify it in review.
 
 ### Internet access, per permission
 
@@ -111,12 +149,15 @@ controls. Packs read them with `eyeread.settings.get()`.
 | `select` | `options`: 1–50 of `{ "value", "label" }`                        | `string`  | first option         |
 | `number` | `min`?, `max`?, `step`? (> 0), `unit`? (≤ 16 characters)         | `number`  | `min`, else `0`      |
 | `text`   | `maxLength`? (1–2000, default 200), `placeholder`?, `multiline`? | `string`  | `""`                 |
+| `key`    | none                                                             | `string`  | `""`                 |
 
 Every setting has `key` (a letter, then letters, digits or `_`; up to 64
 characters), `type`, `label` (1–64 characters) and optionally `description` (up
 to 280) and `default`. Keys are unique. A `select` default must be one of its
 options; a `number` default must be within `min`–`max`, and `min` ≤ `max`; a
 `text` default must fit `maxLength`.
+
+A `key` setting is drawn as a "press a key" control. Its value is a `KeyboardEvent.code` string such as `"KeyN"`, or `""` for none, and a `default` follows the same rule. It lets users rebind a pack's keys without a declared `keys` list changing.
 
 There is no secret setting type in v1. Values are stored per pack id and survive
 updates; a key that disappears in an update is dropped.
