@@ -366,14 +366,22 @@
       "prompterLoad": "プロンプターに読み込む",
       "prompterControl": "再生を操作",
       "prompterEvents": "読み上げの進み具合を見る",
-      "filesImport": "ファイルを読み込む"
+      "filesImport": "ファイルを読み込む",
+      "inputKeyboard": "キー入力を読み取る",
+      "inputMouse": "マウスボタンとホイールを読み取る",
+      "inputMidi": "MIDI デバイスを読み取る",
+      "inputGamepad": "ゲームパッドを読み取る"
     },
     "permissionHints": {
       "scriptsWrite": "ライブラリに新しい原稿を追加します。",
       "prompterLoad": "テキストをプロンプターで開き、読み上げを開始します。",
       "prompterControl": "再生、一時停止、最初から、指定した語へ移動、プロンプターを閉じる。",
       "prompterEvents": "読んでいる間の現在の原稿のタイトルと読み進めた位置。",
-      "filesImport": "アプリのファイル選択でファイルを 1 つ選ぶよう求め、そのファイルだけを受け取ります。"
+      "filesImport": "アプリのファイル選択でファイルを 1 つ選ぶよう求め、そのファイルだけを受け取ります。",
+      "inputKeyboard": "eyeread.in がフォーカスされている間に押されたキーを読み取りますが、テキスト欄への入力内容は読み取りません。インターネットには接続できません。",
+      "inputMouse": "eyeread.in がフォーカスされている間のマウスボタンの操作とスクロールを読み取ります。インターネットには接続できません。",
+      "inputMidi": "選択した MIDI デバイスからのメッセージを読み取ります。インターネットには接続できません。",
+      "inputGamepad": "選択したゲームパッドのボタンとスティックの変化を読み取ります。インターネットには接続できません。"
     },
     "sourceLabel": "{{name}} から",
     "attribution": {

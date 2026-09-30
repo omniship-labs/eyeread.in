@@ -366,14 +366,22 @@
       "prompterLoad": "Load into the prompter",
       "prompterControl": "Control playback",
       "prompterEvents": "See reading progress",
-      "filesImport": "Import a file"
+      "filesImport": "Import a file",
+      "inputKeyboard": "Read key presses",
+      "inputMouse": "Read mouse buttons and wheel",
+      "inputMidi": "Read MIDI devices",
+      "inputGamepad": "Read gamepads"
     },
     "permissionHints": {
       "scriptsWrite": "Adds new scripts to your library.",
       "prompterLoad": "Opens text in the prompter and starts a reading session.",
       "prompterControl": "Play, pause, restart, jump to a word, or close the prompter.",
       "prompterEvents": "The current script's title and your position in it, as you read.",
-      "filesImport": "Asks you to pick a file with the app’s own picker, and receives only that file."
+      "filesImport": "Asks you to pick a file with the app’s own picker, and receives only that file.",
+      "inputKeyboard": "Sees which keys you press while eyeread.in is focused, but not what you type into text fields. It can't reach the internet.",
+      "inputMouse": "Sees mouse button presses and scrolling while eyeread.in is focused. It can't reach the internet.",
+      "inputMidi": "Sees messages from MIDI devices you choose. It can't reach the internet.",
+      "inputGamepad": "Sees button and stick changes from gamepads you choose. It can't reach the internet."
     },
     "sourceLabel": "From {{name}}",
     "attribution": {

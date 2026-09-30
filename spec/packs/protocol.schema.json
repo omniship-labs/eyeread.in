@@ -110,6 +110,17 @@
         "main": {
           "type": "string",
           "maxLength": 255
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["position"],
+          "properties": {
+            "position": {
+              "type": "boolean",
+              "description": "Whether mouse.onMove exists: the manifest asked for pointer position."
+            }
+          }
         }
       }
     },
@@ -182,6 +193,8 @@
             "prompter.getState",
             "prompter.subscribe",
             "prompter.unsubscribe",
+            "input.subscribe",
+            "input.unsubscribe",
             "files.import",
             "net.fetch",
             "settings.get"
@@ -269,7 +282,14 @@
           "const": "event"
         },
         "name": {
-          "enum": ["prompter.state", "settings.changed"]
+          "enum": [
+            "prompter.state",
+            "settings.changed",
+            "input.key",
+            "input.mouse.button",
+            "input.mouse.wheel",
+            "input.mouse.move"
+          ]
         },
         "data": {
           "type": "object"

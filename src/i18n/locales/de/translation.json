@@ -366,14 +366,22 @@
       "prompterLoad": "In den Prompter laden",
       "prompterControl": "Wiedergabe steuern",
       "prompterEvents": "Lesefortschritt sehen",
-      "filesImport": "Eine Datei importieren"
+      "filesImport": "Eine Datei importieren",
+      "inputKeyboard": "Tastendrücke lesen",
+      "inputMouse": "Maustasten und Mausrad lesen",
+      "inputMidi": "MIDI-Geräte lesen",
+      "inputGamepad": "Gamepads lesen"
     },
     "permissionHints": {
       "scriptsWrite": "Fügt deiner Bibliothek neue Skripte hinzu.",
       "prompterLoad": "Öffnet Text im Prompter und startet eine Lesesitzung.",
       "prompterControl": "Abspielen, pausieren, neu starten, zu einem Wort springen oder den Prompter schließen.",
       "prompterEvents": "Titel des aktuellen Skripts und deine Position darin, während du liest.",
-      "filesImport": "Bittet dich, mit der Dateiauswahl der App eine Datei zu wählen, und erhält nur diese Datei."
+      "filesImport": "Bittet dich, mit der Dateiauswahl der App eine Datei zu wählen, und erhält nur diese Datei.",
+      "inputKeyboard": "Sieht, welche Tasten du drückst, solange eyeread.in im Fokus ist, aber nicht, was du in Textfelder tippst. Kein Internetzugriff.",
+      "inputMouse": "Sieht Mausklicks und Scrollen, solange eyeread.in im Fokus ist. Kein Internetzugriff.",
+      "inputMidi": "Sieht Nachrichten von MIDI-Geräten, die du auswählst. Kein Internetzugriff.",
+      "inputGamepad": "Sieht Tasten- und Stick-Änderungen von Gamepads, die du auswählst. Kein Internetzugriff."
     },
     "sourceLabel": "Von {{name}}",
     "attribution": {

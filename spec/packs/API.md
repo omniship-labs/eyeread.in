@@ -147,8 +147,10 @@ eyeread.on('input:keyboard', ({ keys, settings }) => {
 
 Delivery follows what the user allowed: events arrive only while the pack is
 enabled, only for the `keys` or `buttons` the manifest lists (if it lists any),
-and only while eyeread.in is focused unless the pack declared `scope: "global"`
-and the user chose it. Events are never buffered or replayed.
+and only while eyeread.in is focused. **Global delivery (`scope: "global"`) isn't
+available yet:** a pack that declares it is delivered focused events only.
+Keys pressed in a text field of the app are never delivered, so a pack can't
+read what the user types there. Events are never buffered or replayed.
 
 **`keys.onKey(cb)`**: `cb({ type: 'down' | 'up', code, modifiers, repeat })`.
 `code` is the physical key (`'KeyA'`, `'ArrowRight'`). The typed character is not

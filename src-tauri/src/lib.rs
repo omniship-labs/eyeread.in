@@ -448,6 +448,8 @@ pub fn run() {
             packs::commands::packs_net_clear_log,
             packs::commands::packs_rpc_result,
             packs::commands::packs_prompter_state,
+            packs::commands::packs_input_event,
+            packs::commands::packs_input_wanted,
             packs::commands::packs_grants,
             packs::commands::packs_set_grant,
             packs::commands::packs_settings_get,

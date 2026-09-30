@@ -22,11 +22,12 @@
 
 use super::broker::{Broker, CallError, Caller, Grant};
 use super::commands::Packs;
-use super::manifest::Manifest;
+use super::input::{self, InputEvent, Wanted};
+use super::manifest::{Manifest, PermissionDecl};
 use super::net::{NetProxy, NetRequest};
 use super::store::{InstalledPack, PackStatus};
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, HashMap, VecDeque};
+use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
@@ -203,6 +204,10 @@ struct Sandbox {
     plan: SandboxPlan,
     events: VecDeque<Value>,
     subscribed: bool,
+    /// Input permissions this sandbox asked to receive events for.
+    inputs: HashSet<String>,
+    /// What the pack declared per permission (input filters).
+    decls: BTreeMap<String, PermissionDecl>,
     last_seen: Instant,
 }
 
@@ -346,6 +351,8 @@ impl Host {
             plan,
             events: VecDeque::new(),
             subscribed: false,
+            inputs: HashSet::new(),
+            decls: pack.manifest.permissions.clone(),
             last_seen: Instant::now(),
         };
         self.lock().sandboxes.insert(token.clone(), sandbox);
@@ -380,6 +387,7 @@ impl Host {
     fn stop(&self, token: &str, label: &str) {
         self.lock().sandboxes.remove(token);
         self.changed.notify_all();
+        self.notify_wanted();
         if let Some(window) = self.app.get_webview_window(label) {
             let _ = window.destroy();
         }
@@ -451,6 +459,40 @@ impl Host {
         }
         drop(inner);
         self.changed.notify_all();
+    }
+
+    // ---- input ----
+
+    /// What the windows should report: input some running sandbox subscribed to.
+    pub fn wanted(&self) -> Wanted {
+        let inner = self.lock();
+        let mut wanted = Wanted::default();
+        for s in inner.sandboxes.values() {
+            for p in &s.inputs {
+                wanted.add(p, s.decls.get(p));
+            }
+        }
+        wanted
+    }
+
+    /// Tell the windows when that changes.
+    fn notify_wanted(&self) {
+        let _ = self.app.emit("packs:input-wanted", self.wanted());
+    }
+
+    /// Deliver an event a window reported to every sandbox that subscribed to
+    /// it, whose pack declared it, and whose grant is on.
+    pub fn deliver_input(&self, event: &InputEvent) {
+        let permission = event.permission();
+        self.push_event(
+            |s| {
+                s.inputs.contains(permission)
+                    && s.decls.get(permission).is_some_and(|d| event.passes(d))
+                    && self.broker.grant(&s.pack, permission).allowed
+            },
+            event.name(),
+            &event.data(),
+        );
     }
 
     /// Hook the host up to the app: pack and grant changes, settings, and
@@ -645,6 +687,11 @@ impl Host {
             s.main.clone(),
         );
         let (permissions, network) = (s.plan.permissions.clone(), s.plan.network.is_some());
+        // `mouse.onMove` exists only when the manifest asked for pointer position.
+        let position = permissions.iter().any(|p| p == input::PERMISSION_MOUSE)
+            && s.decls
+                .get(input::PERMISSION_MOUSE)
+                .is_some_and(|d| d.position);
         drop(inner);
         json!({
             "v": 1,
@@ -652,6 +699,7 @@ impl Host {
             "apiVersion": 1,
             "pack": { "id": pack, "version": version, "name": name },
             "sandbox": { "id": token, "permissions": permissions, "network": network },
+            "input": { "position": position },
             "settings": self.packs.effective_settings(&pack).unwrap_or_default(),
             "main": main,
         })
@@ -798,6 +846,29 @@ impl Host {
                     "headers": out.headers,
                     "body": b64::encode(&out.body),
                 }))
+            }
+            "input.subscribe" | "input.unsubscribe" => {
+                let Some(p) = permission.filter(|p| plan.permissions.iter().any(|x| x == p)) else {
+                    return Err(denied(permission.unwrap_or(method)));
+                };
+                if !self.broker.grant(pack, p).allowed {
+                    return Err(denied(p));
+                }
+                if p != input::PERMISSION_KEYBOARD && p != input::PERMISSION_MOUSE {
+                    return Err((
+                        "E_UNSUPPORTED",
+                        format!("{p} isn't available in this version of eyeread.in."),
+                    ));
+                }
+                if let Some(s) = self.lock().sandboxes.get_mut(token) {
+                    if method == "input.subscribe" {
+                        s.inputs.insert(p.to_string());
+                    } else {
+                        s.inputs.remove(p);
+                    }
+                }
+                self.notify_wanted();
+                Ok(Value::Null)
             }
             "prompter.subscribe" | "prompter.unsubscribe" => {
                 let p = "prompter:events";

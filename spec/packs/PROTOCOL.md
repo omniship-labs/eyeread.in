@@ -51,7 +51,8 @@ sandbox                                   app
 ```
 
 - **`init`**: `pack` (`id`, `version`, `name`), `sandbox` (`id`, `permissions`,
-  and `network`: whether `net` exists), `settings` (current values), and `main`.
+  and `network`: whether `net` exists), `input` (`position`: whether
+  `mouse.onMove` exists), `settings` (current values), and `main`.
 - **`ready`**: `handlers`, the permissions the pack registered while `main`
   first evaluated. The reply lists the permissions to activate: those in this
   sandbox, registered, and allowed. If `main` fails to load, the bootstrap sends
@@ -80,6 +81,8 @@ belongs to the permission, the user's grant is on (internet too, for
 | `prompter.getState`    | `prompter:events`                | `{}`                                         | `PrompterState`            |
 | `prompter.subscribe`   | `prompter:events`                | `{}`                                         | `null`; then `event`s      |
 | `prompter.unsubscribe` | `prompter:events`                | `{}`                                         | `null`                     |
+| `input.subscribe`      | `input:keyboard`, `input:mouse`  | `{}`                                         | `null`; then `event`s      |
+| `input.unsubscribe`    | `input:keyboard`, `input:mouse`  | `{}`                                         | `null`                     |
 | `files.import`         | `files:import`                   | `{ accept?, maxBytes? }`                     | `ImportedFileData \| null` |
 | `net.fetch`            | the sandbox's network permission | `{ url, method, headers, body?, timeoutMs }` | `NetResponseData`          |
 | `settings.get`         | none (`null`)                    | `{}`                                         | settings object            |
@@ -116,6 +119,20 @@ Returned by `GET <base>/events`:
 
 `prompter.state` goes only to a sandbox that holds `prompter:events` and has
 called `prompter.subscribe`. `settings.changed` goes to every sandbox of the pack.
+
+Input events go only to a sandbox that holds the permission, has called
+`input.subscribe` for it, and whose pack declared the event:
+
+| `name`               | Permission       | `data`                                 |
+| -------------------- | ---------------- | -------------------------------------- |
+| `input.key`          | `input:keyboard` | `{ type, code, modifiers, repeat }`    |
+| `input.mouse.button` | `input:mouse`    | `{ type, button, modifiers }`          |
+| `input.mouse.wheel`  | `input:mouse`    | `{ deltaX, deltaY, modifiers }`        |
+| `input.mouse.move`   | `input:mouse`    | `{ x, y }`, only with `position: true` |
+
+The app reports input only while eyeread.in is focused, never from a text field,
+and only when some sandbox is subscribed. `input:midi` and `input:gamepad`
+subscriptions are refused with `E_UNSUPPORTED` until those sources exist.
 
 ## Logs, errors and the watchdog
 

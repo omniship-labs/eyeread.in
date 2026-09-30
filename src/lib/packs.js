@@ -19,6 +19,10 @@ export const PERMISSION_LABEL_KEYS = {
   'prompter:control': 'prompterControl',
   'prompter:events': 'prompterEvents',
   'files:import': 'filesImport',
+  'input:keyboard': 'inputKeyboard',
+  'input:mouse': 'inputMouse',
+  'input:midi': 'inputMidi',
+  'input:gamepad': 'inputGamepad',
 };
 
 // ---- installed packs (src-tauri/src/packs/commands.rs) --------------------------

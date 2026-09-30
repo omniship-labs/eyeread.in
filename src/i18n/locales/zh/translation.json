@@ -366,14 +366,22 @@
       "prompterLoad": "载入提词器",
       "prompterControl": "控制播放",
       "prompterEvents": "查看阅读进度",
-      "filesImport": "导入文件"
+      "filesImport": "导入文件",
+      "inputKeyboard": "读取按键",
+      "inputMouse": "读取鼠标按键和滚轮",
+      "inputMidi": "读取 MIDI 设备",
+      "inputGamepad": "读取游戏手柄"
     },
     "permissionHints": {
       "scriptsWrite": "向你的稿件库添加新稿件。",
       "prompterLoad": "在提词器中打开文本并开始阅读。",
       "prompterControl": "播放、暂停、重新开始、跳到某个词或关闭提词器。",
       "prompterEvents": "阅读时当前稿件的标题以及你读到的位置。",
-      "filesImport": "请你用应用自带的选择器挑一个文件，并且只拿到这个文件。"
+      "filesImport": "请你用应用自带的选择器挑一个文件，并且只拿到这个文件。",
+      "inputKeyboard": "在 eyeread.in 处于焦点时，能看到你按了哪些键，但看不到你在文本框中输入的内容。无法访问互联网。",
+      "inputMouse": "在 eyeread.in 处于焦点时，能看到鼠标点击和滚动。无法访问互联网。",
+      "inputMidi": "能看到你所选 MIDI 设备发来的消息。无法访问互联网。",
+      "inputGamepad": "能看到你所选游戏手柄的按键和摇杆变化。无法访问互联网。"
     },
     "sourceLabel": "来自 {{name}}",
     "attribution": {

@@ -366,14 +366,22 @@
       "prompterLoad": "Charger dans le prompteur",
       "prompterControl": "Contrôler la lecture",
       "prompterEvents": "Voir la progression",
-      "filesImport": "Importer un fichier"
+      "filesImport": "Importer un fichier",
+      "inputKeyboard": "Lire les touches pressées",
+      "inputMouse": "Lire les boutons et la molette de la souris",
+      "inputMidi": "Lire les appareils MIDI",
+      "inputGamepad": "Lire les manettes"
     },
     "permissionHints": {
       "scriptsWrite": "Ajoute de nouveaux scripts à votre bibliothèque.",
       "prompterLoad": "Ouvre un texte dans le prompteur et lance une session de lecture.",
       "prompterControl": "Lecture, pause, recommencer, aller à un mot ou fermer le prompteur.",
       "prompterEvents": "Le titre du script en cours et votre position pendant la lecture.",
-      "filesImport": "Vous demande de choisir un fichier avec le sélecteur de l’app et ne reçoit que ce fichier."
+      "filesImport": "Vous demande de choisir un fichier avec le sélecteur de l’app et ne reçoit que ce fichier.",
+      "inputKeyboard": "Voit quelles touches vous pressez quand eyeread.in a le focus, mais pas ce que vous saisissez dans les champs de texte. Pas d’accès à internet.",
+      "inputMouse": "Voit les clics de souris et le défilement quand eyeread.in a le focus. Pas d’accès à internet.",
+      "inputMidi": "Voit les messages des appareils MIDI que vous choisissez. Pas d’accès à internet.",
+      "inputGamepad": "Voit les changements de boutons et de joysticks des manettes que vous choisissez. Pas d’accès à internet."
     },
     "sourceLabel": "De {{name}}",
     "attribution": {

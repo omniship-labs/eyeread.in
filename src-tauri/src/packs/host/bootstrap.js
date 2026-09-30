@@ -74,6 +74,18 @@
   let accepting = true;
   const settingsListeners = new Set();
   const stateListeners = new Set();
+  // Input listeners, by event. A permission is subscribed while any of its
+  // listeners exist.
+  const keyListeners = new Set();
+  const mouseButtonListeners = new Set();
+  const mouseWheelListeners = new Set();
+  const mouseMoveListeners = new Set();
+  const inputSets = {
+    'input:keyboard': [keyListeners],
+    'input:mouse': [mouseButtonListeners, mouseWheelListeners, mouseMoveListeners],
+  };
+  const listenerCount = (permission) =>
+    inputSets[permission].reduce((n, set) => n + set.size, 0);
 
   const settingsApi = Object.freeze({
     get: () => call(null, 'settings.get', {}),
@@ -122,6 +134,27 @@
 
   let init = null;
 
+  /** Add an input listener; the first one subscribes the permission, the last unsubscribes. */
+  function onInput(permission, set, callback) {
+    if (typeof callback !== 'function')
+      throw new EyereadError('E_INVALID_ARGUMENT', 'callback must be a function');
+    set.add(callback);
+    if (listenerCount(permission) === 1)
+      call(permission, 'input.subscribe', {}).catch((e) => reportError(e, false));
+    return () => {
+      if (!set.delete(callback) || listenerCount(permission) > 0) return;
+      call(permission, 'input.unsubscribe', {}).catch(() => {});
+    };
+  }
+  // MIDI and gamepad aren't delivered by this version of eyeread.in: the
+  // subscription is refused with E_UNSUPPORTED, which is logged as an error.
+  function onUnsupported(permission, callback) {
+    if (typeof callback !== 'function')
+      throw new EyereadError('E_INVALID_ARGUMENT', 'callback must be a function');
+    call(permission, 'input.subscribe', {}).catch((e) => reportError(e, false));
+    return () => {};
+  }
+
   /** A handler's context: its own permission's API, settings, and net if declared. */
   function contextFor(permission) {
     const c = (method, params) => call(permission, method, params);
@@ -158,6 +191,33 @@
               if (stateListeners.size === 0) c('prompter.unsubscribe', {}).catch(() => {});
             };
           },
+        });
+        break;
+      case 'input:keyboard':
+        ctx.keys = Object.freeze({
+          onKey: (callback) => onInput(permission, keyListeners, callback),
+        });
+        break;
+      case 'input:mouse': {
+        const mouse = {
+          onButton: (callback) => onInput(permission, mouseButtonListeners, callback),
+          onWheel: (callback) => onInput(permission, mouseWheelListeners, callback),
+        };
+        // Only when the manifest asked for pointer position.
+        if (init.input?.position)
+          mouse.onMove = (callback) => onInput(permission, mouseMoveListeners, callback);
+        ctx.mouse = Object.freeze(mouse);
+        break;
+      }
+      case 'input:midi':
+        ctx.midi = Object.freeze({
+          onMessage: (callback) => onUnsupported(permission, callback),
+        });
+        break;
+      case 'input:gamepad':
+        ctx.gamepad = Object.freeze({
+          onButton: (callback) => onUnsupported(permission, callback),
+          onAxis: (callback) => onUnsupported(permission, callback),
         });
         break;
       case 'files:import':
@@ -218,12 +278,15 @@
   // ---- events (and heartbeat) ----------------------------------------------------
   function dispatch(message) {
     if (message.type !== 'event') return;
-    const listeners =
-      message.name === 'settings.changed'
-        ? settingsListeners
-        : message.name === 'prompter.state'
-          ? stateListeners
-          : null;
+    const byName = {
+      'settings.changed': settingsListeners,
+      'prompter.state': stateListeners,
+      'input.key': keyListeners,
+      'input.mouse.button': mouseButtonListeners,
+      'input.mouse.wheel': mouseWheelListeners,
+      'input.mouse.move': mouseMoveListeners,
+    };
+    const listeners = Object.hasOwn(byName, message.name) ? byName[message.name] : null;
     for (const callback of listeners ?? []) {
       try {
         callback(message.data);

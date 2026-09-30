@@ -41,6 +41,7 @@ import {
   showSettingsWindow,
   openExternal,
 } from '../lib/tauri';
+import { usePackInput } from '../hooks/usePackInput';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { useTour } from '../hooks/useTour';
 import { TipLayer } from '../components/TipLayer';
@@ -122,6 +123,7 @@ export function OverlayWindow() {
 
   // Screen-share shield toggle (shared gate; Linux gets a risk prompt first).
   const { setShielded, consentModal } = useShareProtection(settings, patchSettings);
+  usePackInput();
 
   // First-run tour tips for the prompter controls. Only ever active once a
   // reading session is genuinely showing and interactive (not click-through

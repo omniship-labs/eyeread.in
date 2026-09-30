@@ -620,6 +620,26 @@ pub fn packs_prompter_state(broker: State<'_, Arc<Broker>>, state: Value) {
     broker.set_prompter_state(state);
 }
 
+/// A window reports a key press or mouse event while eyeread.in is focused
+/// (never from a text field: the JS side drops those). Delivered to the packs
+/// that subscribed and declared it; the rest of the app never sees it.
+#[tauri::command]
+pub fn packs_input_event(
+    host: State<'_, Arc<super::host::Host>>,
+    kind: String,
+    data: Value,
+) -> Result<(), String> {
+    let event = super::input::InputEvent::parse(&kind, &data)?;
+    host.deliver_input(&event);
+    Ok(())
+}
+
+/// What input the windows should report right now.
+#[tauri::command]
+pub fn packs_input_wanted(host: State<'_, Arc<super::host::Host>>) -> super::input::Wanted {
+    host.wanted()
+}
+
 /// One row of a pack's Allow / Internet grid.
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

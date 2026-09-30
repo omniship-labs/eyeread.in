@@ -109,7 +109,7 @@ pub enum SettingKind {
 }
 
 /// A `KeyboardEvent.code` value: letters and digits only, up to 32.
-fn is_key_code(s: &str) -> bool {
+pub fn is_key_code(s: &str) -> bool {
     s.len() <= 32 && s.chars().all(|c| c.is_ascii_alphanumeric())
 }
 

@@ -366,14 +366,22 @@
       "prompterLoad": "Cargar en el teleprompter",
       "prompterControl": "Controlar la reproducción",
       "prompterEvents": "Ver el progreso de lectura",
-      "filesImport": "Importar un archivo"
+      "filesImport": "Importar un archivo",
+      "inputKeyboard": "Leer pulsaciones de teclas",
+      "inputMouse": "Leer botones y rueda del ratón",
+      "inputMidi": "Leer dispositivos MIDI",
+      "inputGamepad": "Leer mandos de juego"
     },
     "permissionHints": {
       "scriptsWrite": "Añade guiones nuevos a tu biblioteca.",
       "prompterLoad": "Abre texto en el teleprompter e inicia una sesión de lectura.",
       "prompterControl": "Reproducir, pausar, reiniciar, saltar a una palabra o cerrar el teleprompter.",
       "prompterEvents": "El título del guion actual y tu posición en él mientras lees.",
-      "filesImport": "Te pide elegir un archivo con el selector de la app y solo recibe ese archivo."
+      "filesImport": "Te pide elegir un archivo con el selector de la app y solo recibe ese archivo.",
+      "inputKeyboard": "Ve qué teclas pulsas mientras eyeread.in tiene el foco, pero no lo que escribes en los campos de texto. No puede acceder a internet.",
+      "inputMouse": "Ve los clics del ratón y el desplazamiento mientras eyeread.in tiene el foco. No puede acceder a internet.",
+      "inputMidi": "Ve los mensajes de los dispositivos MIDI que elijas. No puede acceder a internet.",
+      "inputGamepad": "Ve los cambios de botones y palancas de los mandos que elijas. No puede acceder a internet."
     },
     "sourceLabel": "De {{name}}",
     "attribution": {
