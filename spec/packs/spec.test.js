@@ -73,9 +73,7 @@ describe('fixtures', () => {
       const ok = validatePack(JSON.parse(readFileSync(path, 'utf8')));
       expect(ok, JSON.stringify(validatePack.errors)).toBe(want.schema);
       // Schema failures behind a specific code must fail at the field that code names.
-      const field = { PACK_NETWORK_SITE: /\/network\/\d+$/, PACK_LICENSE: /^\/license$/ }[
-        want.error
-      ];
+      const field = { PACK_NETWORK_SITE: /\/network\/\d+$/ }[want.error];
       if (field) expect(validatePack.errors.some((e) => field.test(e.instancePath))).toBe(true);
     });
   }

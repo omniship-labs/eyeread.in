@@ -76,8 +76,8 @@ as for any pack: the complete, readable source is in the pack.
 - Say in the description what's free and what's paid, and where to buy.
 - Payment happens outside eyeread.in; the app doesn't take payments.
 
-Packs are AGPL, so anyone who gets your pack may study, change and share it,
-including removing a license check. Charging works best for support, updates,
+Any license is fine. Because the code is readable, a determined user can see
+how a license check works; charging tends to work best for support, updates,
 or a service your pack connects to.
 
 ### Also

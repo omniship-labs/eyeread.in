@@ -8,7 +8,6 @@ const REFERENCES = [
   { label: 'Pack format', href: `${REPO}/spec/packs/FORMAT.md` },
   { label: 'eyeread.* API', href: `${REPO}/spec/packs/API.md` },
   { label: 'Packs SDK', href: 'https://github.com/omniship-labs/eyeread.in-packs-sdk' },
-  { label: 'Pack CLA', href: `${REPO}/PACK_CLA.md` },
   { label: 'Content policy', href: `${REPO}/PACK_POLICY.md` },
 ];
 

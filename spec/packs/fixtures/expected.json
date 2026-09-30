@@ -79,21 +79,6 @@
       "schema": false,
       "error": "PACK_MANIFEST_SCHEMA"
     },
-    "invalid-license-file-missing": {
-      "valid": false,
-      "schema": true,
-      "error": "PACK_LICENSE_FILE"
-    },
-    "invalid-license-file-wrong": {
-      "valid": false,
-      "schema": true,
-      "error": "PACK_LICENSE_FILE"
-    },
-    "invalid-license-mit": {
-      "valid": false,
-      "schema": false,
-      "error": "PACK_LICENSE"
-    },
     "invalid-main-missing": {
       "valid": false,
       "schema": true,
@@ -221,6 +206,11 @@
       "schema": true,
       "error": null
     },
+    "valid-license-mit": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
     "valid-minimal": {
       "valid": true,
       "schema": true,
@@ -243,6 +233,11 @@
       }
     },
     "valid-network": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-no-license-file": {
       "valid": true,
       "schema": true,
       "error": null

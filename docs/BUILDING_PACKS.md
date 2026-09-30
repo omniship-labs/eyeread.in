@@ -12,8 +12,8 @@ in any language, see [Connected apps](PACKS.md#connected-apps) instead.
 
 ## Concepts
 
-- **A pack** is a `.zip` holding a `pack.json` manifest, an AGPL `LICENSE`, and
-  your code. One big `main.js` is fine; no special structure is needed.
+- **A pack** is a `.zip` holding a `pack.json` manifest and your code, under
+  any license you like. One big `main.js` is fine; no special structure is needed.
 - **Permissions** are what your pack can do. You declare them in `pack.json`,
   and the user switches each one on. They all start off.
 - **Internet is per permission.** A permission can declare the exact
@@ -34,7 +34,8 @@ in any language, see [Connected apps](PACKS.md#connected-apps) instead.
 1. Open Settings → Packs, switch to the Advanced view, and turn on
    **Developer mode**.
 2. Click **New pack…**, give it a name and pick a folder. You get `pack.json`,
-   a commented `main.js`, the AGPL `LICENSE` and a `README.md`, and the pack is
+   a commented `main.js`, an AGPL `LICENSE` (swap it for your own if you like)
+   and a `README.md`, and the pack is
    loaded straight away with a **Dev** badge.
 3. Turn on its permissions in the pack's screen, then edit `main.js`. The pack
    reloads within a second of each save.
@@ -133,8 +134,8 @@ bundle is Verified only if every pack in it is. See
 
 ## Rules the installer enforces
 
-- **License:** AGPL only (`AGPL-3.0-only`, `AGPL-3.0-or-later` or `AGPL-3.0`),
-  with the license text in the pack.
+- **License:** any. Say which in `license` (an SPDX identifier such as `MIT`
+  is best); the app shows it to users.
 - **Readable source:** minified code is rejected. Ship the source you wrote.
 - **Files:** JS, JSON, Markdown, text, CSS and images. No HTML, WebAssembly
   or native code.
@@ -168,22 +169,20 @@ They aren't on npm yet. Until they are, run them from a clone of the SDK repo
 
 You may charge for your pack, or for some of its features, as long as its
 full source stays readable in the pack, license checks included. Say what's
-paid in the description, and take payment outside the app. Because packs are
-AGPL, buyers may share and change them, so charging works best for support,
-updates, or a service your pack connects to. See the
+paid in the description, and take payment outside the app. Buyers can read
+all of the code, so whether they may share or change it depends on the license
+you choose. See the
 [content policy](../PACK_POLICY.md#7-paid-packs-must-still-show-their-code).
 
 ### Getting Verified
 
 1. Open a pull request with your pack's source in
    `omniship-labs/eyeread.in-packs`.
-2. Sign the [Pack CLA](../PACK_CLA.md). The CLA bot asks on your first pull
-   request, and review starts once you've signed.
-3. Automated checks run: validation, a license check and, for updates, a
-   summary of what changed, with new permissions and sites highlighted.
-4. A maintainer reviews it against the review checklist and the
+2. Automated checks run: validation and, for updates, a summary of what
+   changed, with new permissions and sites highlighted.
+3. A maintainer reviews it against the review checklist and the
    [content policy](../PACK_POLICY.md). **Target: 2 weeks.**
-5. Once approved, a maintainer signs it offline and publishes the signed zip as
+4. Once approved, a maintainer signs it offline and publishes the signed zip as
    a release. Signing never happens in CI.
 
 **Updates** get a diff-only review. Every version is signed separately, and

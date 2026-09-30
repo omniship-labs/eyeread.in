@@ -16,8 +16,6 @@ pub const MAX_DEPTH: usize = 4;
 const MAX_LINE_CHARS: usize = 1000;
 const MINIFIED_MIN_BYTES: usize = 2048;
 const MINIFIED_BYTES_PER_LINE: usize = 200;
-const LICENSE_FILES: [&str; 4] = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING"];
-const LICENSE_TEXT: &str = "gnu affero general public license";
 
 /// One validated pack: its manifest, its own files, and its hashes.
 #[derive(Debug, Clone)]
@@ -85,16 +83,6 @@ fn validate_pack(
         .clone();
     let manifest = manifest::parse(&manifest_bytes, app_version)?;
 
-    let has_license = LICENSE_FILES.iter().any(|name| {
-        find(&entries, name).is_some_and(|e| {
-            String::from_utf8_lossy(&e.bytes)
-                .to_lowercase()
-                .contains(LICENSE_TEXT)
-        })
-    });
-    if !has_license {
-        return Err(PackError::new("PACK_LICENSE_FILE", &[]));
-    }
     if let Some(main) = &manifest.main {
         if find(&entries, main).is_none() {
             return Err(PackError::new(

@@ -28,7 +28,7 @@
     },
     "homepage": { "$ref": "#/$defs/httpsUrl" },
     "repository": { "$ref": "#/$defs/httpsUrl" },
-    "license": { "enum": ["AGPL-3.0-only", "AGPL-3.0-or-later", "AGPL-3.0"] },
+    "license": { "type": "string", "minLength": 1, "maxLength": 100 },
     "minAppVersion": { "$ref": "#/$defs/version" },
     "main": {
       "type": "string",

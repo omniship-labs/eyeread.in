@@ -230,7 +230,7 @@ export default {
     lead: 'Packs let you build on eyeread.in without touching its code. Users decide, per permission, what each pack may do and whether it may use the internet.',
     conceptsHeading: 'Concepts',
     concepts: [
-      'A pack is a .zip holding a pack.json manifest, an AGPL LICENSE and your code. One big main.js is fine.',
+      'A pack is a .zip holding a pack.json manifest and your code, under any license you like. One big main.js is fine.',
       'Permissions are what your pack can do. You declare them, and the user switches each one on. They all start off.',
       'Internet is per permission: a permission can declare the exact https:// sites it needs, and gets internet only for those, once the user allows it.',
       'The app runs your code in sandboxes with no DOM, storage or direct network. Each permission with internet gets its own sandbox; the offline ones share one.',
@@ -272,7 +272,7 @@ export default {
     ],
     rulesHeading: 'Rules the installer enforces',
     rules: [
-      'AGPL only, with the license text in the pack.',
+      'Any license: say which in pack.json, and the app shows it to users.',
       'Readable source: minified code is rejected.',
       'JS, JSON, Markdown, text, CSS and images only. No HTML, WebAssembly or native code.',
       'Up to 20 MiB in total, 5 MiB per file and 500 files.',
@@ -285,8 +285,7 @@ export default {
       'Anyone can share a pack as Community. For the ✓ Verified badge, submit it for review:',
     verifiedSteps: [
       'Open a pull request with your pack’s source in omniship-labs/eyeread.in-packs.',
-      'Sign the Pack CLA. The CLA bot asks on your first pull request.',
-      'Automated checks run: validation, a license check and, for updates, a summary of new permissions and sites.',
+      'Automated checks run: validation and, for updates, a summary of new permissions and sites.',
       'A maintainer reviews it against the checklist and the content policy. The target is 2 weeks.',
       'Once approved, it’s signed offline and published as a release. Signing never happens in CI.',
     ],
