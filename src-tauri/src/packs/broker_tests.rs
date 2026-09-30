@@ -88,6 +88,7 @@ fn rpcs(bus: &FakeBus) -> Vec<(Option<String>, String, Value)> {
 const ON: Grant = Grant {
     allowed: true,
     internet: false,
+    input: false,
 };
 
 #[test]
@@ -246,9 +247,10 @@ fn internet_needs_the_permission_on_too() {
         Grant {
             allowed: false,
             internet: true,
+            input: true,
         },
     );
-    assert!(!g.internet);
+    assert!(!g.internet && !g.input);
     assert!(!broker.internet_allowed("com.example.notion", "scripts:write"));
     broker.set_grant(
         "com.example.notion",
@@ -256,6 +258,7 @@ fn internet_needs_the_permission_on_too() {
         Grant {
             allowed: true,
             internet: true,
+            input: false,
         },
     );
     assert!(broker.internet_allowed("com.example.notion", "scripts:write"));
@@ -466,4 +469,23 @@ fn argument_validation() {
         validate_control(&json!({ "action": "explode" })).unwrap_err(),
         "invalid_action"
     );
+}
+
+#[test]
+fn advance_moves_by_a_bounded_number_of_words() {
+    use crate::packs::broker::validate_control;
+    assert_eq!(
+        validate_control(&json!({ "action": "advance", "words": 1 })).unwrap(),
+        json!({ "action": "advance", "words": 1 })
+    );
+    assert!(validate_control(&json!({ "action": "advance", "words": -10000 })).is_ok());
+    for bad in [
+        json!({ "action": "advance" }),
+        json!({ "action": "advance", "words": 10001 }),
+        json!({ "action": "advance", "words": -10001 }),
+        json!({ "action": "advance", "words": 1.5 }),
+        json!({ "action": "advance", "words": "1" }),
+    ] {
+        assert!(validate_control(&bad).is_err(), "{bad}");
+    }
 }

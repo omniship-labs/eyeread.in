@@ -238,6 +238,50 @@ pub struct CombinedPermission {
     pub permission: String,
     pub packs: Vec<String>,
     pub network: Vec<String>,
+    /// What the packs ask to read from the keyboard and mouse, combined.
+    pub input: Option<CombinedInput>,
+}
+
+/// The `input` option across the pack and everything it includes, for the
+/// install prompt. "Any" means at least one pack didn't limit itself.
+#[derive(Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct CombinedInput {
+    pub keyboard: bool,
+    pub any_key: bool,
+    pub keys: Vec<String>,
+    pub mouse: bool,
+    pub any_button: bool,
+    pub buttons: Vec<u8>,
+    pub wheel: bool,
+    pub position: bool,
+    pub global: bool,
+}
+
+impl CombinedInput {
+    fn add(&mut self, d: &super::manifest::InputDecl) {
+        if let Some(k) = &d.keyboard {
+            self.keyboard = true;
+            self.any_key |= k.keys.is_empty();
+            for key in &k.keys {
+                if !self.keys.contains(key) {
+                    self.keys.push(key.clone());
+                }
+            }
+        }
+        if let Some(m) = &d.mouse {
+            self.mouse = true;
+            self.any_button |= m.buttons.is_empty();
+            for b in &m.buttons {
+                if !self.buttons.contains(b) {
+                    self.buttons.push(*b);
+                }
+            }
+            self.wheel |= m.wheel;
+            self.position |= m.position;
+        }
+        self.global |= d.scope.as_deref() == Some("global");
+    }
 }
 
 #[derive(Serialize)]
@@ -350,22 +394,28 @@ fn summarize(pack: &ValidatedPack, store: &PackStore, checks: &BundleVerificatio
 
 /// Every permission any pack in the bundle asks for, with the sites combined.
 pub fn combine_permissions(bundle: &ValidatedBundle) -> Vec<CombinedPermission> {
-    let mut out: BTreeMap<&str, (Vec<String>, BTreeSet<String>)> = BTreeMap::new();
+    type Entry = (Vec<String>, BTreeSet<String>, Option<CombinedInput>);
+    let mut out: BTreeMap<&str, Entry> = BTreeMap::new();
     for pack in bundle.all() {
         for p in pack.manifest.permission_names() {
-            let (packs, sites) = out.entry(p).or_default();
+            let (packs, sites, input) = out.entry(p).or_default();
             packs.push(pack.manifest.id.clone());
-            sites.extend(pack.manifest.permissions[p].network.iter().cloned());
+            let decl = &pack.manifest.permissions[p];
+            sites.extend(decl.network.iter().cloned());
+            if let Some(d) = &decl.input {
+                input.get_or_insert_with(CombinedInput::default).add(d);
+            }
         }
     }
     PERMISSIONS
         .iter()
         .filter_map(|p| {
-            let (packs, sites) = out.remove(p)?;
+            let (packs, sites, input) = out.remove(p)?;
             Some(CombinedPermission {
                 permission: (*p).into(),
                 packs,
                 network: sites.into_iter().collect(),
+                input,
             })
         })
         .collect()
@@ -649,6 +699,10 @@ pub struct PermissionGrant {
     pub network: Vec<String>,
     pub allowed: bool,
     pub internet: bool,
+    /// What the pack declared for `input` (only `prompter:control`); the user's
+    /// switch for it is `input_allowed`.
+    pub input: Option<super::manifest::InputDecl>,
+    pub input_allowed: bool,
 }
 
 fn installed_manifest(packs: &Packs, id: &str) -> PackResult<Manifest> {
@@ -669,6 +723,8 @@ fn grant_rows(packs: &Packs, id: &str, manifest: &Manifest) -> Vec<PermissionGra
                 network: manifest.permissions[p].network.clone(),
                 allowed: g.allowed,
                 internet: g.internet,
+                input: manifest.permissions[p].input.clone(),
+                input_allowed: g.input,
             }
         })
         .collect()
@@ -682,8 +738,9 @@ pub fn packs_grants(packs: PacksState<'_>, id: String) -> PackResult<Vec<Permiss
     Ok(grant_rows(&packs, &id, &manifest))
 }
 
-/// Switch a permission (and its internet access) on or off. Only declared
-/// permissions can be granted, and internet only where sites are declared.
+/// Switch a permission (and its internet and input access) on or off. Only
+/// declared permissions can be granted, internet only where sites are declared,
+/// and input only where `input` is declared.
 #[tauri::command]
 pub fn packs_set_grant(
     packs: PacksState<'_>,
@@ -691,6 +748,7 @@ pub fn packs_set_grant(
     permission: String,
     allowed: bool,
     internet: bool,
+    input: Option<bool>,
 ) -> PackResult<Vec<PermissionGrant>> {
     let manifest = installed_manifest(&packs, &id)?;
     let decl = manifest
@@ -698,9 +756,16 @@ pub fn packs_set_grant(
         .get(&permission)
         .ok_or_else(|| PackError::new("E_PERMISSION", &[("permission", &permission)]))?;
     let internet = internet && !decl.network.is_empty();
-    packs
-        .broker
-        .set_grant(&id, &permission, Grant { allowed, internet });
+    let input = input.unwrap_or(false) && decl.input.is_some();
+    packs.broker.set_grant(
+        &id,
+        &permission,
+        Grant {
+            allowed,
+            internet,
+            input,
+        },
+    );
     Ok(grant_rows(&packs, &id, &manifest))
 }
 

@@ -57,30 +57,24 @@ function isEyereadError(err: unknown): err is Eyeread.EyereadError {
 }
 isEyereadError(new Error('x'));
 
-eyeread.on('input:keyboard', ({ keys }) => {
-  const stop = keys.onKey((e) => {
-    if (e.type === 'down' && !e.repeat && e.code === 'ArrowRight' && !e.modifiers.ctrl) stop();
+eyeread.on('prompter:control', async ({ prompter, keys, mouse }) => {
+  await prompter.advance(1);
+  await prompter.advance(-5);
+  // @ts-expect-error: keys is absent until the user allows input
+  keys.onKey(() => {});
+  keys?.onKey((e) => {
+    if (e.type === 'down' && !e.repeat && e.code === 'ArrowRight' && !e.modifiers.ctrl) {
+      void prompter.advance(1);
+    }
     // @ts-expect-error: no typed character is delivered
     e.key;
   });
+  mouse?.onButton((e) => e.button.toFixed());
+  mouse?.onWheel?.((e) => e.deltaY.toFixed());
+  mouse?.onMove?.((e) => e.x + e.y);
 });
 
-eyeread.on('input:mouse', ({ mouse }) => {
-  mouse.onButton((e) => e.button.toFixed());
-  mouse.onWheel((e) => e.deltaY.toFixed());
-  mouse.onMove?.((e) => e.x + e.y);
-});
-
-eyeread.on('input:midi', ({ midi }) => {
-  midi.onMessage((m) => m.device.name.trim() + m.data1);
-});
-
-eyeread.on('input:gamepad', ({ gamepad }) => {
-  gamepad.onButton((b) => b.pressed && b.device.id);
-  gamepad.onAxis((a) => a.value.toFixed(2));
-});
-
-eyeread.on('input:keyboard', (ctx) => {
-  // @ts-expect-error: input permissions never get net
-  ctx.net.fetch('https://example.com');
+eyeread.on('prompter:events', (ctx) => {
+  // @ts-expect-error: only prompter:control gets input
+  ctx.keys;
 });

@@ -6,9 +6,9 @@
 use super::archive::{self, Entry, FILES_JSON, SIGNATURE_FILE};
 use super::error::{PackError, PackResult};
 use super::files_list::FilesList;
-use super::manifest::{self, is_input_permission, Manifest};
+use super::manifest::{self, Manifest};
 use serde_json::Value;
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 use std::path::Path;
 
 pub const MAX_INCLUDED: usize = 32;
@@ -273,47 +273,39 @@ pub fn validate_entries(
     Ok(ValidatedBundle { top, included })
 }
 
-/// A pack that reads input can't declare `network`, and neither can any pack
-/// it includes, at any depth: a bundle is one install, and its sandboxes share
-/// app state, so input could otherwise be carried out by an included pack that
-/// has `net`. (A pack's own permissions are checked in `manifest.rs`.)
+/// If any pack in a bundle declares `network` and any pack in it reads input,
+/// every input declaration in the bundle must be narrow
+/// (`InputDecl::too_wide`). A bundle is one install, and its sandboxes share app
+/// state, so input could otherwise be carried out by a pack that has `net`;
+/// narrow input leaks next to nothing. (One pack's own permissions are checked
+/// in `manifest.rs`; this covers the rest of the bundle, in either direction.)
 fn check_input_bundle(top: &ValidatedPack, included: &[ValidatedPack]) -> PackResult<()> {
-    let by_id: HashMap<&str, &ValidatedPack> = included
-        .iter()
-        .map(|p| (p.manifest.id.as_str(), p))
-        .collect();
-    let reads_input = |p: &ValidatedPack| {
-        p.manifest
-            .permissions
-            .keys()
-            .any(|k| is_input_permission(k))
-    };
     let has_network = |p: &ValidatedPack| {
         p.manifest
             .permissions
             .values()
             .any(|d| !d.network.is_empty())
     };
-    for root in std::iter::once(top)
-        .chain(included)
-        .filter(|p| reads_input(p))
-    {
-        let mut stack: Vec<&str> = root
-            .manifest
-            .includes
+    if !std::iter::once(top).chain(included).any(has_network) {
+        return Ok(());
+    }
+    for (pack, folder) in std::iter::once((top, String::new())).chain(
+        included
             .iter()
-            .map(|i| i.id.as_str())
-            .collect();
-        let mut seen = HashSet::new();
-        while let Some(id) = stack.pop() {
-            let Some(pack) = by_id.get(id).filter(|_| seen.insert(id)) else {
-                continue;
-            };
-            if has_network(pack) {
-                return Err(PackError::new("PACK_INPUT_PACK_NETWORK", &[])
-                    .in_folder(&format!("packs/{id}/")));
+            .map(|p| (p, format!("packs/{}/", p.manifest.id))),
+    ) {
+        for input in pack
+            .manifest
+            .permissions
+            .values()
+            .filter_map(|d| d.input.as_ref())
+        {
+            if let Some(reason) = input.too_wide() {
+                return Err(
+                    PackError::new("PACK_INPUT_PACK_NETWORK", &[("reason", &reason)])
+                        .in_folder(&folder),
+                );
             }
-            stack.extend(pack.manifest.includes.iter().map(|i| i.id.as_str()));
         }
     }
     Ok(())
@@ -365,28 +357,38 @@ mod tests {
     }
 
     #[test]
-    fn a_pack_that_reads_input_cant_include_a_pack_with_network() {
-        let input = serde_json::json!({ "input:keyboard": {} });
+    fn a_bundle_with_network_keeps_every_input_narrow() {
+        let narrow = serde_json::json!({ "prompter:control": { "input": {
+            "keyboard": { "keys": ["ArrowRight", "ArrowLeft"] } } } });
+        let wide = serde_json::json!({ "prompter:control": { "input": { "keyboard": {} } } });
         let net =
             serde_json::json!({ "scripts:write": { "network": ["https://api.example.com"] } });
         let none = serde_json::json!({});
 
-        // The top reads input; the network is two levels down.
-        let err = chain(input.clone(), none.clone(), net.clone()).unwrap_err();
+        // Wide input at the top, network two levels down.
+        let err = chain(wide.clone(), none.clone(), net.clone()).unwrap_err();
         assert_eq!(err.code, "PACK_INPUT_PACK_NETWORK");
+        assert!(
+            err.message.contains("keyboard needs a keys list"),
+            "{}",
+            err.message
+        );
+        // Wide input in the middle, network below it, and the converse: the
+        // network pack at the top and the wide input pack included.
+        assert!(chain(none.clone(), wide.clone(), net.clone()).is_err());
+        let err = chain(net.clone(), none.clone(), wide.clone()).unwrap_err();
         assert!(
             err.message.starts_with("packs/com.example.b/"),
             "{}",
             err.message
         );
 
-        // A pack in the middle reads input and includes the network pack.
-        let err = chain(none.clone(), input.clone(), net.clone()).unwrap_err();
-        assert_eq!(err.code, "PACK_INPUT_PACK_NETWORK");
-
-        // No input anywhere: network in a bundle is fine.
+        // Narrow input is fine next to network, in either direction.
+        assert!(chain(narrow.clone(), none.clone(), net.clone()).is_ok());
+        assert!(chain(net.clone(), none.clone(), narrow.clone()).is_ok());
+        // No network anywhere: wide input is fine. No input: network is fine.
+        assert!(chain(wide.clone(), none.clone(), wide).is_ok());
         assert!(chain(none.clone(), net.clone(), net).is_ok());
-        assert!(chain(input.clone(), none.clone(), input).is_ok());
     }
 
     #[test]

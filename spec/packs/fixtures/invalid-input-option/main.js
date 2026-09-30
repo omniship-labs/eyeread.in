@@ -1,2 +1,2 @@
 // Test fixture.
-eyeread.on('input:midi', () => {});
+eyeread.on('prompter:events', () => {});

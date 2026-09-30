@@ -74,18 +74,17 @@
   let accepting = true;
   const settingsListeners = new Set();
   const stateListeners = new Set();
-  // Input listeners, by event. A permission is subscribed while any of its
-  // listeners exist.
+  // Input listeners, by event. A source (keyboard, mouse) is subscribed while
+  // any of its listeners exist.
   const keyListeners = new Set();
   const mouseButtonListeners = new Set();
   const mouseWheelListeners = new Set();
   const mouseMoveListeners = new Set();
   const inputSets = {
-    'input:keyboard': [keyListeners],
-    'input:mouse': [mouseButtonListeners, mouseWheelListeners, mouseMoveListeners],
+    keyboard: [keyListeners],
+    mouse: [mouseButtonListeners, mouseWheelListeners, mouseMoveListeners],
   };
-  const listenerCount = (permission) =>
-    inputSets[permission].reduce((n, set) => n + set.size, 0);
+  const listenerCount = (source) => inputSets[source].reduce((n, set) => n + set.size, 0);
 
   const settingsApi = Object.freeze({
     get: () => call(null, 'settings.get', {}),
@@ -134,25 +133,17 @@
 
   let init = null;
 
-  /** Add an input listener; the first one subscribes the permission, the last unsubscribes. */
-  function onInput(permission, set, callback) {
+  /** Add an input listener; the first one subscribes the source, the last unsubscribes. */
+  function onInput(source, set, callback) {
     if (typeof callback !== 'function')
       throw new EyereadError('E_INVALID_ARGUMENT', 'callback must be a function');
     set.add(callback);
-    if (listenerCount(permission) === 1)
-      call(permission, 'input.subscribe', {}).catch((e) => reportError(e, false));
+    if (listenerCount(source) === 1)
+      call('prompter:control', 'input.subscribe', { source }).catch((e) => reportError(e, false));
     return () => {
-      if (!set.delete(callback) || listenerCount(permission) > 0) return;
-      call(permission, 'input.unsubscribe', {}).catch(() => {});
+      if (!set.delete(callback) || listenerCount(source) > 0) return;
+      call('prompter:control', 'input.unsubscribe', { source }).catch(() => {});
     };
-  }
-  // MIDI and gamepad aren't delivered by this version of eyeread.in: the
-  // subscription is refused with E_UNSUPPORTED, which is logged as an error.
-  function onUnsupported(permission, callback) {
-    if (typeof callback !== 'function')
-      throw new EyereadError('E_INVALID_ARGUMENT', 'callback must be a function');
-    call(permission, 'input.subscribe', {}).catch((e) => reportError(e, false));
-    return () => {};
   }
 
   /** A handler's context: its own permission's API, settings, and net if declared. */
@@ -177,7 +168,24 @@
           restart: () => control('restart'),
           close: () => control('close'),
           seek: (wordIndex) => control('seek', { wordIndex }),
+          advance: (words) => control('advance', { words }),
         });
+        // Keyboard and mouse, only in a sandbox the user allowed input for.
+        if (init.sandbox.input?.keyboard) {
+          ctx.keys = Object.freeze({
+            onKey: (callback) => onInput('keyboard', keyListeners, callback),
+          });
+        }
+        if (init.sandbox.input?.mouse) {
+          const mouse = {
+            onButton: (callback) => onInput('mouse', mouseButtonListeners, callback),
+          };
+          if (init.sandbox.input.wheel)
+            mouse.onWheel = (callback) => onInput('mouse', mouseWheelListeners, callback);
+          if (init.sandbox.input.position)
+            mouse.onMove = (callback) => onInput('mouse', mouseMoveListeners, callback);
+          ctx.mouse = Object.freeze(mouse);
+        }
         break;
       case 'prompter:events':
         ctx.prompter = Object.freeze({
@@ -191,33 +199,6 @@
               if (stateListeners.size === 0) c('prompter.unsubscribe', {}).catch(() => {});
             };
           },
-        });
-        break;
-      case 'input:keyboard':
-        ctx.keys = Object.freeze({
-          onKey: (callback) => onInput(permission, keyListeners, callback),
-        });
-        break;
-      case 'input:mouse': {
-        const mouse = {
-          onButton: (callback) => onInput(permission, mouseButtonListeners, callback),
-          onWheel: (callback) => onInput(permission, mouseWheelListeners, callback),
-        };
-        // Only when the manifest asked for pointer position.
-        if (init.input?.position)
-          mouse.onMove = (callback) => onInput(permission, mouseMoveListeners, callback);
-        ctx.mouse = Object.freeze(mouse);
-        break;
-      }
-      case 'input:midi':
-        ctx.midi = Object.freeze({
-          onMessage: (callback) => onUnsupported(permission, callback),
-        });
-        break;
-      case 'input:gamepad':
-        ctx.gamepad = Object.freeze({
-          onButton: (callback) => onUnsupported(permission, callback),
-          onAxis: (callback) => onUnsupported(permission, callback),
         });
         break;
       case 'files:import':

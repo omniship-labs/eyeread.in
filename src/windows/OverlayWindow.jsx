@@ -475,7 +475,7 @@ export function OverlayWindow() {
   }, [attribution]);
   const controlRef = useRef(null);
   useLayoutEffect(() => {
-    controlRef.current = ({ action, wordIndex }, caller) => {
+    controlRef.current = ({ action, wordIndex, words: delta }, caller) => {
       if (!sessionActive || words.length === 0) throw new PackCallError('no_active_session');
       if (action === 'play') setPlaying(true);
       else if (action === 'pause') setPlaying(false);
@@ -484,6 +484,8 @@ export function OverlayWindow() {
       else if (action === 'close') close();
       else if (action === 'seek')
         onWordClick(Math.min(Math.max(0, wordIndex), words.length - 1));
+      else if (action === 'advance')
+        onWordClick(Math.min(Math.max(0, active + delta), words.length - 1));
       else throw new PackCallError('invalid_params');
       const note = controlAttribution(action, caller);
       if (note) setAttribution(t(note.key, note.params));

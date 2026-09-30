@@ -7,14 +7,17 @@
   },
   "license": "AGPL-3.0-only",
   "main": "main.js",
-  "id": "com.example.input-pack-net",
+  "id": "com.example.input-wide-same",
   "permissions": {
-    "input:keyboard": {
-      "keys": [
-        "Space"
-      ]
-    },
-    "scripts:write": {
+    "prompter:control": {
+      "input": {
+        "mouse": {
+          "buttons": [
+            0
+          ],
+          "wheel": true
+        }
+      },
       "network": [
         "https://api.example.com"
       ]

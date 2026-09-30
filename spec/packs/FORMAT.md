@@ -45,22 +45,22 @@ are rejected, so a manifest means exactly what the user was shown.
 }
 ```
 
-| Field           | Required | Rules                                                                                                                                          |
-| --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `apiVersion`    | yes      | Integer. The app must support it (v1 apps support `1`).                                                                                        |
-| `id`            | yes      | Reverse-DNS style, lowercase: `com.example.my-pack`. At least one dot, 3–100 characters. Never changes.                                        |
-| `name`          | yes      | 1–64 characters, shown to the user.                                                                                                            |
-| `version`       | yes      | Semantic version without build metadata: `1.2.0`, `2.0.0-beta.1`.                                                                              |
-| `description`   | no       | Up to 280 characters.                                                                                                                          |
-| `author`        | yes      | `{ "name", "email"?, "url"? }`. `url` must be `https://`.                                                                                      |
-| `homepage`      | no       | `https://` URL.                                                                                                                                |
-| `repository`    | no       | `https://` URL.                                                                                                                                |
-| `license`       | yes      | The pack's license, shown to the user: 1–100 characters, ideally an SPDX identifier such as `MIT`.                                             |
-| `minAppVersion` | no       | Lowest eyeread.in version the pack runs on.                                                                                                    |
-| `main`          | see note | Path to the entry module, ending in `.js` or `.mjs`.                                                                                           |
-| `permissions`   | no       | Map of permission → `{ "network"?: [sites] }` (input permissions take other options instead). Missing or `{}` means the pack asks for nothing. |
-| `settings`      | no       | Declared settings (below), in display order. Up to 32.                                                                                         |
-| `includes`      | no       | Packs this one bundles: `[{ "id", "version" }]`. Up to 32.                                                                                     |
+| Field           | Required | Rules                                                                                                                                   |
+| --------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `apiVersion`    | yes      | Integer. The app must support it (v1 apps support `1`).                                                                                 |
+| `id`            | yes      | Reverse-DNS style, lowercase: `com.example.my-pack`. At least one dot, 3–100 characters. Never changes.                                 |
+| `name`          | yes      | 1–64 characters, shown to the user.                                                                                                     |
+| `version`       | yes      | Semantic version without build metadata: `1.2.0`, `2.0.0-beta.1`.                                                                       |
+| `description`   | no       | Up to 280 characters.                                                                                                                   |
+| `author`        | yes      | `{ "name", "email"?, "url"? }`. `url` must be `https://`.                                                                               |
+| `homepage`      | no       | `https://` URL.                                                                                                                         |
+| `repository`    | no       | `https://` URL.                                                                                                                         |
+| `license`       | yes      | The pack's license, shown to the user: 1–100 characters, ideally an SPDX identifier such as `MIT`.                                      |
+| `minAppVersion` | no       | Lowest eyeread.in version the pack runs on.                                                                                             |
+| `main`          | see note | Path to the entry module, ending in `.js` or `.mjs`.                                                                                    |
+| `permissions`   | no       | Map of permission → `{ "network"?: [sites] }` (`prompter:control` also takes `input`). Missing or `{}` means the pack asks for nothing. |
+| `settings`      | no       | Declared settings (below), in display order. Up to 32.                                                                                  |
+| `includes`      | no       | Packs this one bundles: `[{ "id", "version" }]`. Up to 32.                                                                              |
 
 `main` is required, except in a pure bundle: a pack with `includes` and no
 `permissions` may leave it out and ship no code of its own.
@@ -71,61 +71,75 @@ are rejected, so a manifest means exactly what the user was shown.
 | ------------------ | --------------------------------------------------------------------------------- |
 | `scripts:write`    | Add scripts to the library                                                        |
 | `prompter:load`    | Open text in the prompter and start a reading session                             |
-| `prompter:control` | Play, pause, restart, seek or close the prompter                                  |
+| `prompter:control` | Play, pause, restart, seek, advance or close the prompter                         |
 | `prompter:events`  | Read the prompter's state; the script is only described during an active session  |
 | `files:import`     | Ask the user to pick a file with the app's own picker, and receive only that file |
-| `input:keyboard`   | Receive key presses (see [Input permissions](#input-permissions))                 |
-| `input:mouse`      | Receive mouse button presses and wheel scrolls                                    |
-| `input:midi`       | Receive MIDI messages from devices the user picks                                 |
-| `input:gamepad`    | Receive button and axis changes from gamepads the user picks                      |
 
 These are the same names the Connected apps HTTP API uses as scopes, and they
 share one grant model.
 
-### Input permissions
+### Input (keyboard and mouse)
 
-`input:keyboard`, `input:mouse`, `input:midi` and `input:gamepad` let a pack react
-to the user's keyboard, mouse or hardware. The pack decides what an input means
-and calls the other APIs (`prompter:control`, for example) itself; the app only
-delivers events. All are off until the user allows them.
-
-**A pack that reads input can't declare `network` on any permission**
-(`PACK_INPUT_NETWORK` for the input permission itself, `PACK_INPUT_PACK_NETWORK`
-for any other permission in the pack), and neither can any pack it includes, at
-any depth. The split into sandboxes isn't enough on its own: sandboxes share
-nothing in memory, but they share the app's state, such as the prompter's
-position and script titles. A pack's input could be encoded into that state by
-one sandbox and read back out, then sent away, by another sandbox that has
-`net`. So a pack either reads input or reaches the internet, never both; a pack
-that needs both has to be split into two packs.
-
-That rule closes the channel inside one pack or bundle. It doesn't stop two
-separately installed packs from working together, so the content policy also
-forbids that, and review checks for it: input may only drive the prompter and
-must never be encoded into script text, titles, seek positions, settings or logs
-(see `PACK_POLICY.md`).
-
-Options, all optional:
-
-| Option     | Permissions      | Meaning                                                                                                                                                                    |
-| ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `scope`    | all four         | `"focused"` (default): events only while eyeread.in is focused. `"global"`: also when other apps are focused. The user can always choose `focused`.                        |
-| `keys`     | `input:keyboard` | Up to 64 [`KeyboardEvent.code`](https://developer.mozilla.org/docs/Web/API/KeyboardEvent/code) values, like `"Space"` or `"F13"`. When set, only these keys are delivered. |
-| `buttons`  | `input:mouse`    | Up to 5 button numbers (0 left, 1 middle, 2 right, 3 back, 4 forward). When set, only these.                                                                               |
-| `position` | `input:mouse`    | `true` to also receive pointer position. Off by default and shown in the install prompt.                                                                                   |
-
-An option on a permission that doesn't take it is `PACK_PERMISSION_OPTION`.
+A permission that drives the prompter can also receive the user's keyboard or
+mouse, through an `input` option. It works like `network`: declared per
+permission, and off until the user turns it on for that permission. Only
+`prompter:control` takes it, so input can only drive the prompter. It can't
+become script text or a title, because `scripts:write` and `prompter:load`
+never get it.
 
 ```json
 "permissions": {
-  "input:keyboard": { "keys": ["ArrowRight", "ArrowLeft", "Space"] },
-  "prompter:control": {}
+  "prompter:control": {
+    "input": { "keyboard": { "keys": ["ArrowRight", "ArrowLeft"] } }
+  }
 }
 ```
 
-Declare `keys` or `buttons` whenever the pack needs only a few inputs: the
-install prompt shows them, and Verified review prefers it. A pack that asks for
-`scope: "global"` or every key has to justify it in review.
+`input` takes `keyboard` and/or `mouse` (at least one), and `scope`:
+
+| Option     | Meaning                                                                                                                                                                                                                                                  |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `keyboard` | `{ "keys"? }`: receive key presses. `keys` is up to 64 [`KeyboardEvent.code`](https://developer.mozilla.org/docs/Web/API/KeyboardEvent/code) values like `"Space"` or `"F13"`; when set, only these are delivered.                                       |
+| `mouse`    | `{ "buttons"?, "wheel"?, "position"? }`: receive button presses. `buttons` is up to 5 button numbers (0 left, 1 middle, 2 right, 3 back, 4 forward); when set, only these. `wheel: true` also delivers wheel scrolls, `position: true` pointer position. |
+| `scope`    | `"focused"` (default): events only while eyeread.in is focused. `"global"`: also when other apps are focused. The user can always choose `focused`.                                                                                                      |
+
+The app runs a permission that has input in its **own sandbox**, with only that
+permission's API, the input, and `net` if that permission declares `network`.
+Input handlers can't reach `scripts:write`, `prompter:load` or `files:import`.
+
+`input` on any permission other than `prompter:control` is
+`PACK_PERMISSION_OPTION`; `input` with neither `keyboard` nor `mouse` is
+`PACK_MANIFEST_SCHEMA`.
+
+#### Input and internet in one pack
+
+A pack can ask for input, or for internet access, without restriction on the
+other. A pack (or bundle) that does **both** may read input only if the input is
+**narrow**; otherwise it's `PACK_INPUT_PACK_NETWORK`, and the message says which
+limit failed:
+
+- `keyboard` lists its `keys`, at most 8.
+- `mouse` lists its `buttons`, at most 3, and sets neither `wheel` nor `position`.
+- `scope` is `"focused"` (the default), never `"global"`.
+
+The check covers every input declaration in the pack and in every pack it
+includes, at any depth, whichever pack holds the network. Input and network may
+share a permission, and then share a sandbox.
+
+Why any limit: the sandbox split doesn't keep input in. Sandboxes share
+nothing in memory, but they share the app's state, such as the prompter's
+position, so one sandbox could encode input into that state and another that has
+`net` could read it out and send it away. Narrow input makes that channel close
+to worthless: a handful of named keys, pressed while eyeread.in is focused and
+never in a text field, and no analog values. It is **not** zero. A pack that
+qualifies can still learn when one of its listed keys was pressed, so the app
+tells the user exactly which keys and sites (the install prompt and the grant
+grid), and review checks the pack.
+
+Two separately installed packs can still work together through the same shared
+state. The content policy forbids that and review looks for it: input may only
+drive the prompter and must never be encoded into script text, titles, seek
+positions, settings or logs (see `PACK_POLICY.md`).
 
 ### Internet access, per permission
 

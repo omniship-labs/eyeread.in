@@ -9,7 +9,11 @@
   "main": "main.js",
   "id": "com.example.input-bundle",
   "permissions": {
-    "input:keyboard": {}
+    "prompter:control": {
+      "input": {
+        "keyboard": {}
+      }
+    }
   },
   "includes": [
     {

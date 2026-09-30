@@ -101,6 +101,26 @@
             },
             "network": {
               "type": "boolean"
+            },
+            "input": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["keyboard", "mouse", "wheel", "position"],
+              "description": "Present for an input sandbox: which sources exist, and whether mouse.onWheel and mouse.onMove do.",
+              "properties": {
+                "keyboard": {
+                  "type": "boolean"
+                },
+                "mouse": {
+                  "type": "boolean"
+                },
+                "position": {
+                  "type": "boolean"
+                },
+                "wheel": {
+                  "type": "boolean"
+                }
+              }
             }
           }
         },
@@ -110,17 +130,6 @@
         "main": {
           "type": "string",
           "maxLength": 255
-        },
-        "input": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["position"],
-          "properties": {
-            "position": {
-              "type": "boolean",
-              "description": "Whether mouse.onMove exists: the manifest asked for pointer position."
-            }
-          }
         }
       }
     },

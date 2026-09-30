@@ -50,19 +50,15 @@ The handler is called **once**, after the module has loaded, if the permission
 is declared, allowed by the user, and belongs to this sandbox. It gets a context
 with that permission's API. It may be `async`; a rejection is logged as an error.
 
-| Permission         | Context                                                                       |
-| ------------------ | ----------------------------------------------------------------------------- |
-| `scripts:write`    | `{ scripts: { add }, settings, net? }`                                        |
-| `prompter:load`    | `{ prompter: { load }, settings, net? }`                                      |
-| `prompter:control` | `{ prompter: { play, pause, toggle, restart, seek, close }, settings, net? }` |
-| `prompter:events`  | `{ prompter: { getState, onState }, settings, net? }`                         |
-| `files:import`     | `{ files: { import }, settings, net? }`                                       |
-| `input:keyboard`   | `{ keys: { onKey }, settings }`                                               |
-| `input:mouse`      | `{ mouse: { onButton, onWheel, onMove? }, settings }`                         |
-| `input:midi`       | `{ midi: { onMessage }, settings }`                                           |
-| `input:gamepad`    | `{ gamepad: { onButton, onAxis }, settings }`                                 |
+| Permission         | Context                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| `scripts:write`    | `{ scripts: { add }, settings, net? }`                                                                |
+| `prompter:load`    | `{ prompter: { load }, settings, net? }`                                                              |
+| `prompter:control` | `{ prompter: { play, pause, toggle, restart, seek, advance, close }, settings, net?, keys?, mouse? }` |
+| `prompter:events`  | `{ prompter: { getState, onState }, settings, net? }`                                                 |
+| `files:import`     | `{ files: { import }, settings, net? }`                                                               |
 
-`net` is present only when the permission declares `network`. A pack that reads input can't declare `network` on any permission, so it never gets `net` anywhere.
+`net` is present only when the permission declares `network`. A `prompter:control` handler also gets `keys` and `mouse` when it has `input` and the user allowed it (see below).
 
 ### `scripts.add({ text, title?, language? })` → `Promise<{ scriptId }>`
 
@@ -78,9 +74,12 @@ from where), opens it in the prompter and starts reading. It follows the same
 path as the user pressing _Start reading_: the permissions check, window
 placement and screen-share protection all apply.
 
-### `prompter.play()`, `pause()`, `toggle()`, `restart()`, `close()`, `seek(wordIndex)` → `Promise<void>`
+### `prompter.play()`, `pause()`, `toggle()`, `restart()`, `close()`, `seek(wordIndex)`, `advance(words)` → `Promise<void>`
 
-Drive the open prompter. `seek` clamps `wordIndex` to the script. Rejects with
+Drive the open prompter. `seek` clamps `wordIndex` to the script. `advance` moves by
+a whole number of words from the current position (negative goes back, at most
+10 000 either way), clamped to the script, so a handler that can't read the
+position (an input handler) can still step through it. Rejects with
 `E_NO_SESSION` if the prompter isn't open. The overlay briefly shows which pack
 did it ("Paused by Foot Pedal"). If two packs send conflicting commands, the most
 recent wins.
@@ -122,61 +121,47 @@ the folder: only the file's name, type, size and contents.
 `text()` decodes as UTF-8; `bytes()` returns a `Uint8Array`. Only one picker per
 pack can be open at a time (`E_BUSY`).
 
-### Input: `keys`, `mouse`, `midi`, `gamepad`
+### Input: `keys` and `mouse`
 
-Each `on…` method calls back for every event and returns `unsubscribe()`. The
-pack turns input into actions by calling other APIs, which it keeps from their
-own handlers (all offline permissions share one sandbox):
+A `prompter:control` handler also gets `keys` and `mouse` when the manifest
+declares `input` for that permission **and the user has allowed input** for it.
+Otherwise they're `undefined`, like `net`, so check first. Turning input on or
+off restarts the pack's sandbox, so the handler runs again with the new answer.
 
 ```js
-let control;
-let wordIndex = 0;
-eyeread.on('prompter:control', ({ prompter }) => (control = prompter));
-eyeread.on('prompter:events', ({ prompter }) => {
-  prompter.onState((state) => (wordIndex = state.wordIndex));
-});
-eyeread.on('input:keyboard', ({ keys, settings }) => {
+eyeread.on('prompter:control', ({ prompter, keys, settings }) => {
+  if (!keys) return; // no input declared, or the user hasn't allowed it
   keys.onKey(async (e) => {
     const { advanceKey } = await settings.get();
-    if (e.type === 'down' && e.code === advanceKey && control) {
-      await control.seek(wordIndex + 1);
-    }
+    if (e.type === 'down' && !e.repeat && e.code === advanceKey) await prompter.advance(1);
   });
 });
 ```
 
-Input is for driving the prompter. A pack that reads it can't reach the
-internet from any sandbox, and must not encode what it reads into anything
-else: script text or titles, seek positions, settings or logs. The sandboxes of
-one pack share the app's state, so this is enforced by the manifest rule above
-and by review, not by the sandbox split.
-
 Delivery follows what the user allowed: events arrive only while the pack is
 enabled, only for the `keys` or `buttons` the manifest lists (if it lists any),
-and only while eyeread.in is focused. **Global delivery (`scope: "global"`) isn't
-available yet:** a pack that declares it is delivered focused events only.
-Keys pressed in a text field of the app are never delivered, so a pack can't
-read what the user types there. Events are never buffered or replayed.
+and only while eyeread.in is focused. **Global delivery (`scope: "global"`)
+isn't available yet:** a pack that declares it gets focused events only. Keys
+pressed in a text field of the app are never delivered, so a pack can't read
+what the user types there. Events are never buffered or replayed.
+
+Input is for driving the prompter. Its sandbox has only the control API (and
+`net`, if the permission declares it), and a pack must not encode what it reads
+into seek positions, settings or logs. A pack that also reaches the internet may
+only ask for narrow input (see [`FORMAT.md`](FORMAT.md#input-and-internet-in-one-pack));
+that is enforced at install, and review checks the rest.
 
 **`keys.onKey(cb)`**: `cb({ type: 'down' | 'up', code, modifiers, repeat })`.
 `code` is the physical key (`'KeyA'`, `'ArrowRight'`). The typed character is not
 delivered. `modifiers` is `{ ctrl, shift, alt, meta }`.
 
 **`mouse.onButton(cb)`**: `cb({ type: 'down' | 'up', button, modifiers })`.
-**`mouse.onWheel(cb)`**: `cb({ deltaX, deltaY, modifiers })`.
-**`mouse.onMove(cb)`**: `cb({ x, y })`, screen coordinates. Only when the
-manifest sets `position: true` and the user allowed it; otherwise `onMove` is
+**`mouse.onWheel(cb)`**: `cb({ deltaX, deltaY, modifiers })`, only with `wheel: true`.
+**`mouse.onMove(cb)`**: `cb({ x, y })`, screen coordinates, only with
+`position: true`. A method that needs an option the manifest didn't set is
 missing. No event carries a window, a title or what was under the pointer.
 
-**`midi.onMessage(cb)`**: `cb({ device, type, channel, data1, data2 })` for
-messages from the devices the user picked for this pack. `type` is
-`'noteOn'`, `'noteOff'`, `'controlChange'`, `'programChange'` or `'other'`.
-
-**`gamepad.onButton(cb)`**: `cb({ device, button, pressed, value })`.
-**`gamepad.onAxis(cb)`**: `cb({ device, axis, value })`, `value` from -1 to 1.
-
-`device` is `{ id, name }`: `id` is opaque and stable for this pack, and `name`
-is what the device calls itself.
+Each returns `unsubscribe()`.
 
 ### `net.fetch(url, init?)` → `Promise<NetResponse>`
 

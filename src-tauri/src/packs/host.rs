@@ -23,7 +23,7 @@
 use super::broker::{Broker, CallError, Caller, Grant};
 use super::commands::Packs;
 use super::input::{self, InputEvent, Wanted};
-use super::manifest::{Manifest, PermissionDecl};
+use super::manifest::{InputDecl, Manifest, PermissionDecl, INPUT_PERMISSION};
 use super::net::{NetProxy, NetRequest};
 use super::store::{InstalledPack, PackStatus};
 use serde_json::{json, Value};
@@ -54,11 +54,15 @@ const MAX_RPC_BYTES: usize = 8 * 1024 * 1024;
 // ---- planning (pure) -------------------------------------------------------------
 
 /// One sandbox a pack should have: the permissions it activates, and the
-/// network permission it serves `net` for (network sandboxes hold exactly one).
+/// network permission it serves `net` for, or whether it serves input (network
+/// and input sandboxes each hold exactly one permission).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SandboxPlan {
     pub permissions: Vec<String>,
     pub network: Option<String>,
+    /// This sandbox receives the user's keyboard and mouse. It holds exactly
+    /// `prompter:control`, alone or with its `net`.
+    pub input: bool,
 }
 
 /// Split a pack into sandboxes by its manifest and the user's grants. Only
@@ -71,13 +75,27 @@ pub fn plan(manifest: &Manifest, grants: &BTreeMap<String, Grant>) -> Vec<Sandbo
         if !allowed(p) {
             continue;
         }
-        if manifest.permissions[p].network.is_empty() {
-            offline.push(p.to_string());
-        } else {
+        let decl = &manifest.permissions[p];
+        let input_on =
+            p == INPUT_PERMISSION && decl.input.is_some() && grants.get(p).is_some_and(|g| g.input);
+        if !decl.network.is_empty() {
+            // Its own sandbox with `net`, and the input too if the user allowed
+            // it (the manifest only lets narrow input share a pack with network).
             plans.push(SandboxPlan {
                 permissions: vec![p.to_string()],
                 network: Some(p.to_string()),
+                input: input_on,
             });
+        } else if input_on {
+            // Its own sandbox, like a network permission: input handlers get
+            // only this permission's API, never scripts:write or the rest.
+            plans.push(SandboxPlan {
+                permissions: vec![p.to_string()],
+                network: None,
+                input: true,
+            });
+        } else {
+            offline.push(p.to_string());
         }
     }
     if !offline.is_empty() {
@@ -86,6 +104,7 @@ pub fn plan(manifest: &Manifest, grants: &BTreeMap<String, Grant>) -> Vec<Sandbo
             SandboxPlan {
                 permissions: offline,
                 network: None,
+                input: false,
             },
         );
     }
@@ -204,11 +223,18 @@ struct Sandbox {
     plan: SandboxPlan,
     events: VecDeque<Value>,
     subscribed: bool,
-    /// Input permissions this sandbox asked to receive events for.
+    /// Input sources (`keyboard`, `mouse`) this sandbox asked to receive.
     inputs: HashSet<String>,
     /// What the pack declared per permission (input filters).
     decls: BTreeMap<String, PermissionDecl>,
     last_seen: Instant,
+}
+
+impl Sandbox {
+    /// What the pack declared for `input`, for an input sandbox.
+    fn input_decl(&self) -> Option<&InputDecl> {
+        self.decls.get(INPUT_PERMISSION)?.input.as_ref()
+    }
 }
 
 /// One line of a pack's log (console, errors, denials), for Developer mode.
@@ -468,8 +494,8 @@ impl Host {
         let inner = self.lock();
         let mut wanted = Wanted::default();
         for s in inner.sandboxes.values() {
-            for p in &s.inputs {
-                wanted.add(p, s.decls.get(p));
+            for source in &s.inputs {
+                wanted.add(source, s.input_decl());
             }
         }
         wanted
@@ -480,15 +506,17 @@ impl Host {
         let _ = self.app.emit("packs:input-wanted", self.wanted());
     }
 
-    /// Deliver an event a window reported to every sandbox that subscribed to
-    /// it, whose pack declared it, and whose grant is on.
+    /// Deliver an event a window reported to every input sandbox that
+    /// subscribed to its source, whose pack declared it, and whose input grant
+    /// is on.
     pub fn deliver_input(&self, event: &InputEvent) {
-        let permission = event.permission();
+        let source = event.source();
         self.push_event(
             |s| {
-                s.inputs.contains(permission)
-                    && s.decls.get(permission).is_some_and(|d| event.passes(d))
-                    && self.broker.grant(&s.pack, permission).allowed
+                s.plan.input
+                    && s.inputs.contains(source)
+                    && s.input_decl().is_some_and(|d| event.passes(d))
+                    && self.broker.input_allowed(&s.pack, INPUT_PERMISSION)
             },
             event.name(),
             &event.data(),
@@ -687,19 +715,23 @@ impl Host {
             s.main.clone(),
         );
         let (permissions, network) = (s.plan.permissions.clone(), s.plan.network.is_some());
-        // `mouse.onMove` exists only when the manifest asked for pointer position.
-        let position = permissions.iter().any(|p| p == input::PERMISSION_MOUSE)
-            && s.decls
-                .get(input::PERMISSION_MOUSE)
-                .is_some_and(|d| d.position);
+        // An input sandbox is told which sources exist; `mouse.onMove` exists
+        // only when the manifest asked for pointer position.
+        let input = s.plan.input.then(|| s.input_decl()).flatten().map(|d| {
+            json!({
+                "keyboard": d.keyboard.is_some(),
+                "mouse": d.mouse.is_some(),
+                "wheel": d.mouse.as_ref().is_some_and(|m| m.wheel),
+                "position": d.mouse.as_ref().is_some_and(|m| m.position),
+            })
+        });
         drop(inner);
         json!({
             "v": 1,
             "type": "init",
             "apiVersion": 1,
             "pack": { "id": pack, "version": version, "name": name },
-            "sandbox": { "id": token, "permissions": permissions, "network": network },
-            "input": { "position": position },
+            "sandbox": { "id": token, "permissions": permissions, "network": network, "input": input },
             "settings": self.packs.effective_settings(&pack).unwrap_or_default(),
             "main": main,
         })
@@ -848,23 +880,30 @@ impl Host {
                 }))
             }
             "input.subscribe" | "input.unsubscribe" => {
-                let Some(p) = permission.filter(|p| plan.permissions.iter().any(|x| x == p)) else {
-                    return Err(denied(permission.unwrap_or(method)));
-                };
-                if !self.broker.grant(pack, p).allowed {
+                let p = INPUT_PERMISSION;
+                if permission != Some(p) || !plan.input || !self.broker.input_allowed(pack, p) {
                     return Err(denied(p));
                 }
-                if p != input::PERMISSION_KEYBOARD && p != input::PERMISSION_MOUSE {
-                    return Err((
-                        "E_UNSUPPORTED",
-                        format!("{p} isn't available in this version of eyeread.in."),
-                    ));
-                }
+                let source = params
+                    .get("source")
+                    .and_then(Value::as_str)
+                    .filter(|s| *s == input::SOURCE_KEYBOARD || *s == input::SOURCE_MOUSE)
+                    .ok_or((
+                        "E_INVALID_ARGUMENT",
+                        "source must be keyboard or mouse".to_string(),
+                    ))?;
                 if let Some(s) = self.lock().sandboxes.get_mut(token) {
+                    let declared = s.input_decl().is_some_and(|d| match source {
+                        input::SOURCE_KEYBOARD => d.keyboard.is_some(),
+                        _ => d.mouse.is_some(),
+                    });
+                    if !declared {
+                        return Err(denied(p));
+                    }
                     if method == "input.subscribe" {
-                        s.inputs.insert(p.to_string());
+                        s.inputs.insert(source.to_string());
                     } else {
-                        s.inputs.remove(p);
+                        s.inputs.remove(source);
                     }
                 }
                 self.notify_wanted();
@@ -1047,6 +1086,7 @@ mod tests {
                     Grant {
                         allowed: true,
                         internet: false,
+                        input: false,
                     },
                 )
             })
@@ -1072,18 +1112,84 @@ mod tests {
             vec![
                 SandboxPlan {
                     permissions: vec!["prompter:control".into(), "prompter:events".into()],
-                    network: None
+                    network: None,
+                    input: false,
                 },
                 SandboxPlan {
                     permissions: vec!["scripts:write".into()],
-                    network: Some("scripts:write".into())
+                    network: Some("scripts:write".into()),
+                    input: false,
                 },
                 SandboxPlan {
                     permissions: vec!["files:import".into()],
-                    network: Some("files:import".into())
+                    network: Some("files:import".into()),
+                    input: false,
                 },
             ]
         );
+    }
+
+    fn grants_with_input(on: &[&str], input_on: &[&str]) -> BTreeMap<String, Grant> {
+        on.iter()
+            .map(|p| {
+                (
+                    p.to_string(),
+                    Grant {
+                        allowed: true,
+                        internet: false,
+                        input: input_on.contains(p),
+                    },
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn input_gets_its_own_sandbox_only_when_the_user_allowed_it() {
+        let m = manifest(json!({
+            "prompter:control": { "input": { "keyboard": { "keys": ["Space"] } } },
+            "prompter:events": {},
+            "scripts:write": {},
+        }));
+        let names = ["prompter:control", "prompter:events", "scripts:write"];
+        // Input off: everything offline shares one sandbox, with no input.
+        let off = plan(&m, &grants_with_input(&names, &[]));
+        assert_eq!(off.len(), 1);
+        assert!(!off[0].input);
+        // Input on: prompter:control leaves the shared sandbox, alone with its input.
+        let on = plan(&m, &grants_with_input(&names, &["prompter:control"]));
+        assert_eq!(on.len(), 2);
+        assert_eq!(on[0].permissions, vec!["scripts:write", "prompter:events"]);
+        assert!(!on[0].input);
+        assert_eq!(on[1].permissions, vec!["prompter:control"]);
+        assert!(on[1].input && on[1].network.is_none());
+        // Turning it on or off changes the plan, so the sandbox restarts.
+        assert_ne!(off, on);
+    }
+
+    #[test]
+    fn a_permission_with_narrow_input_and_network_is_one_sandbox() {
+        let m = manifest(json!({
+            "prompter:control": {
+                "input": { "keyboard": { "keys": ["Space"] } },
+                "network": ["https://api.example.com"],
+            },
+        }));
+        let p = plan(
+            &m,
+            &grants_with_input(&["prompter:control"], &["prompter:control"]),
+        );
+        assert_eq!(
+            p,
+            vec![SandboxPlan {
+                permissions: vec!["prompter:control".into()],
+                network: Some("prompter:control".into()),
+                input: true,
+            }]
+        );
+        // Without the input grant it is just a network sandbox.
+        let p = plan(&m, &grants_with_input(&["prompter:control"], &[]));
+        assert!(!p[0].input && p[0].network.is_some());
     }
 
     #[test]
@@ -1100,7 +1206,8 @@ mod tests {
             plan(&m, &grants(&["prompter:control"])),
             vec![SandboxPlan {
                 permissions: vec!["prompter:control".into()],
-                network: None
+                network: None,
+                input: false,
             }]
         );
     }

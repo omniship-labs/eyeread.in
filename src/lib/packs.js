@@ -19,11 +19,53 @@ export const PERMISSION_LABEL_KEYS = {
   'prompter:control': 'prompterControl',
   'prompter:events': 'prompterEvents',
   'files:import': 'filesImport',
-  'input:keyboard': 'inputKeyboard',
-  'input:mouse': 'inputMouse',
-  'input:midi': 'inputMidi',
-  'input:gamepad': 'inputGamepad',
 };
+
+// ---- input (keyboard and mouse) on prompter:control ---------------------------
+
+/** The install prompt's combined summary, in the shape a manifest's `input` has. */
+export function inputFromCombined(c) {
+  if (!c) return null;
+  return {
+    ...(c.keyboard ? { keyboard: { keys: c.anyKey ? [] : c.keys } } : {}),
+    ...(c.mouse
+      ? {
+          mouse: {
+            buttons: c.anyButton ? [] : c.buttons,
+            wheel: c.wheel,
+            position: c.position,
+          },
+        }
+      : {}),
+  };
+}
+
+/**
+ * What a manifest's `input` reads, as plain words for the user ("the keys
+ * ArrowLeft, ArrowRight, mouse buttons 3, 4"), so the grant grid and install
+ * prompt say exactly which keys, not just "input".
+ */
+export function describeInput(input, t) {
+  if (!input) return '';
+  const parts = [];
+  if (input.keyboard) {
+    const keys = input.keyboard.keys ?? [];
+    parts.push(
+      keys.length ? t('packs.input.keys', { keys: keys.join(', ') }) : t('packs.input.anyKey')
+    );
+  }
+  if (input.mouse) {
+    const buttons = input.mouse.buttons ?? [];
+    parts.push(
+      buttons.length
+        ? t('packs.input.buttons', { buttons: buttons.join(', ') })
+        : t('packs.input.anyButton')
+    );
+    if (input.mouse.wheel) parts.push(t('packs.input.wheel'));
+    if (input.mouse.position) parts.push(t('packs.input.position'));
+  }
+  return parts.join(', ');
+}
 
 // ---- installed packs (src-tauri/src/packs/commands.rs) --------------------------
 
@@ -38,8 +80,8 @@ export const installPack = (path, bundleHash) => invoke('packs_install', { path,
 export const uninstallPack = (id) => invoke('packs_uninstall', { id });
 export const setPackEnabled = (id, enabled) => invoke('packs_set_enabled', { id, enabled });
 export const getPackGrants = (id) => invoke('packs_grants', { id });
-export const setPackGrant = (id, permission, allowed, internet) =>
-  invoke('packs_set_grant', { id, permission, allowed, internet });
+export const setPackGrant = (id, permission, allowed, internet, input) =>
+  invoke('packs_set_grant', { id, permission, allowed, internet, input });
 export const getPackSettings = (id) => invoke('packs_settings_get', { id });
 export const setPackSettings = (id, values) => invoke('packs_settings_set', { id, values });
 export const getPackNetLog = (id) => invoke('packs_net_log', { id });
@@ -173,6 +215,7 @@ const ATTRIBUTION_KEYS = {
   toggle: 'packs.attribution.toggle',
   restart: 'packs.attribution.restart',
   seek: 'packs.attribution.seek',
+  advance: 'packs.attribution.seek',
 };
 
 /**

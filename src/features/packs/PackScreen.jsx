@@ -12,6 +12,7 @@ import { PackLog } from './PackLog';
 import {
   buildPackFolder,
   clearPackNetLog,
+  describeInput,
   getPackGrants,
   getPackNetLog,
   getPackSettings,
@@ -171,10 +172,13 @@ export function PackScreen({ pack, onBack, developer = false }) {
     };
   }, [id]);
 
-  const grant = (permission, allowed, internet) => {
+  const grant = (permission, allowed, internet, input) => {
     setError(null);
-    setPackGrant(id, permission, allowed, internet).then(setGrants).catch(fail);
+    setPackGrant(id, permission, allowed, internet, input).then(setGrants).catch(fail);
   };
+  // Every site any permission of this pack declares: a pack that reads input
+  // and reaches the internet says so in plain words, with its keys and sites.
+  const allSites = [...new Set(grants.flatMap((g) => g.network))];
   const changeSetting = (key, value) => {
     setError(null);
     setSettings((s) => ({ ...s, [key]: value }));
@@ -334,6 +338,7 @@ export function PackScreen({ pack, onBack, developer = false }) {
             <span className="pk-grid-name">{t('packs.screen.permissionsHint')}</span>
             <span className="pk-grid-col">{t('packs.screen.allow')}</span>
             <span className="pk-grid-col">{t('packs.screen.internet')}</span>
+            <span className="pk-grid-col">{t('packs.screen.input')}</span>
           </div>
           {grants.map((g) => {
             const key = PERMISSION_LABEL_KEYS[g.permission];
@@ -353,13 +358,25 @@ export function PackScreen({ pack, onBack, developer = false }) {
                       {t('packs.install.sites', { sites: g.network.join(', ') })}
                     </span>
                   )}
+                  {g.input && (
+                    <span className="pk-sites" data-testid="pk-input-reads">
+                      {t('packs.input.reads', { what: describeInput(g.input, t) })}
+                      {allSites.length > 0 &&
+                        ` ${t('packs.input.withInternet', {
+                          what: describeInput(g.input, t),
+                          sites: allSites.join(', '),
+                        })}`}
+                    </span>
+                  )}
                 </div>
                 <span className="pk-grid-col">
                   <Switch
                     size="sm"
                     checked={g.allowed}
                     label={t('packs.screen.allowLabel', { permission: label })}
-                    onChange={(on) => grant(g.permission, on, on && g.internet)}
+                    onChange={(on) =>
+                      grant(g.permission, on, on && g.internet, on && g.inputAllowed)
+                    }
                   />
                 </span>
                 <span className="pk-grid-col">
@@ -369,10 +386,23 @@ export function PackScreen({ pack, onBack, developer = false }) {
                       checked={g.internet}
                       disabled={!g.allowed}
                       label={t('packs.screen.internetLabel', { permission: label })}
-                      onChange={(on) => grant(g.permission, g.allowed, on)}
+                      onChange={(on) => grant(g.permission, g.allowed, on, g.inputAllowed)}
                     />
                   ) : (
                     <span className="pk-muted">{t('packs.screen.noInternet')}</span>
+                  )}
+                </span>
+                <span className="pk-grid-col">
+                  {g.input ? (
+                    <Switch
+                      size="sm"
+                      checked={g.inputAllowed}
+                      disabled={!g.allowed}
+                      label={t('packs.screen.inputLabel', { permission: label })}
+                      onChange={(on) => grant(g.permission, g.allowed, g.internet, on)}
+                    />
+                  ) : (
+                    <span className="pk-muted">{t('packs.screen.noInput')}</span>
                   )}
                 </span>
               </div>

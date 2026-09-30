@@ -7,12 +7,12 @@
   },
   "license": "AGPL-3.0-only",
   "main": "main.js",
-  "id": "com.example.input-net",
+  "id": "com.example.input-empty",
   "permissions": {
-    "input:keyboard": {
-      "network": [
-        "https://api.example.com"
-      ]
+    "prompter:control": {
+      "input": {
+        "scope": "global"
+      }
     }
   }
 }

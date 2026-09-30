@@ -84,22 +84,27 @@
       "schema": true,
       "error": "PACK_INPUT_PACK_NETWORK"
     },
-    "invalid-input-key-code": {
+    "invalid-input-empty": {
       "valid": false,
       "schema": false,
       "error": "PACK_MANIFEST_SCHEMA"
     },
-    "invalid-input-network": {
+    "invalid-input-key-code": {
       "valid": false,
-      "schema": true,
-      "error": "PACK_INPUT_NETWORK"
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
     },
     "invalid-input-option": {
       "valid": false,
       "schema": true,
       "error": "PACK_PERMISSION_OPTION"
     },
-    "invalid-input-pack-network": {
+    "invalid-input-wide-network": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_PACK_NETWORK"
+    },
+    "invalid-input-wide-same-permission": {
       "valid": false,
       "schema": true,
       "error": "PACK_INPUT_PACK_NETWORK"
@@ -232,6 +237,11 @@
       "error": null
     },
     "valid-input": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-input-narrow-network": {
       "valid": true,
       "schema": true,
       "error": null

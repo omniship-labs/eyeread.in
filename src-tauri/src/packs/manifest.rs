@@ -14,23 +14,17 @@ const PACK_SCHEMA: &str = include_str!("../../../spec/packs/pack.schema.json");
 /// The `apiVersion`s this app runs.
 pub const SUPPORTED_API_VERSIONS: [u64; 1] = [1];
 
-pub const PERMISSIONS: [&str; 9] = [
+pub const PERMISSIONS: [&str; 5] = [
     "scripts:write",
     "prompter:load",
     "prompter:control",
     "prompter:events",
     "files:import",
-    "input:keyboard",
-    "input:mouse",
-    "input:midi",
-    "input:gamepad",
 ];
 
-/// Permissions that read the user's keyboard, mouse or hardware. They can't
-/// declare `network`: input stays in the offline sandbox.
-pub fn is_input_permission(permission: &str) -> bool {
-    permission.starts_with("input:")
-}
+/// The only permission that can carry `input`: input may only drive the
+/// prompter.
+pub const INPUT_PERMISSION: &str = "prompter:control";
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -46,18 +40,82 @@ pub struct Author {
 pub struct PermissionDecl {
     #[serde(default)]
     pub network: Vec<String>,
-    /// Input permissions: `"focused"` (the default) or `"global"`.
+    /// Keyboard and mouse input, only on `prompter:control`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input: Option<InputDecl>,
+}
+
+/// What a permission's `input` option declares.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct InputDecl {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub keyboard: Option<KeyboardDecl>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mouse: Option<MouseDecl>,
+    /// `"focused"` (the default) or `"global"`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scope: Option<String>,
-    /// `input:keyboard`: only these `KeyboardEvent.code`s are delivered.
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct KeyboardDecl {
+    /// Only these `KeyboardEvent.code`s are delivered; empty means all.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub keys: Vec<String>,
-    /// `input:mouse`: only these buttons are delivered.
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MouseDecl {
+    /// Only these buttons are delivered; empty means all.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub buttons: Vec<u8>,
-    /// `input:mouse`: also deliver pointer position.
+    /// Also deliver wheel scrolls.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub wheel: bool,
+    /// Also deliver pointer position.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub position: bool,
+}
+
+/// A pack that reaches the internet may also read input only if the input is
+/// narrow: at most this many keys and buttons.
+pub const NARROW_MAX_KEYS: usize = 8;
+pub const NARROW_MAX_BUTTONS: usize = 3;
+
+impl InputDecl {
+    /// Why this input is too wide to share a pack (or bundle) with internet
+    /// access, or `None` if it's narrow. A narrow input names its keys and
+    /// buttons, has no wheel or pointer position, and is focused-only.
+    pub fn too_wide(&self) -> Option<String> {
+        if let Some(k) = &self.keyboard {
+            if k.keys.is_empty() {
+                return Some("keyboard needs a keys list".into());
+            }
+            if k.keys.len() > NARROW_MAX_KEYS {
+                return Some(format!("keyboard can list at most {NARROW_MAX_KEYS} keys"));
+            }
+        }
+        if let Some(m) = &self.mouse {
+            if m.buttons.is_empty() {
+                return Some("mouse needs a buttons list".into());
+            }
+            if m.buttons.len() > NARROW_MAX_BUTTONS {
+                return Some(format!(
+                    "mouse can list at most {NARROW_MAX_BUTTONS} buttons"
+                ));
+            }
+            if m.wheel {
+                return Some("mouse can't ask for the wheel".into());
+            }
+            if m.position {
+                return Some("mouse can't ask for pointer position".into());
+            }
+        }
+        if self.scope.as_deref() == Some("global") {
+            return Some("scope can't be global".into());
+        }
+        None
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -315,53 +373,68 @@ pub fn parse(bytes: &[u8], app_version: &semver::Version) -> PackResult<Manifest
     Ok(manifest)
 }
 
-/// Input permissions can't declare `network`, and each option belongs to
-/// particular permissions. The schema can't say either.
+/// `input` belongs to `prompter:control` only, and needs keyboard or mouse. The
+/// schema can't say the first, and its message for the second prints the whole
+/// object.
 fn check_permission_options(permission: &str, decl: &Value) -> PackResult<()> {
     let Some(decl) = decl.as_object() else {
         return Ok(());
     };
-    let input = is_input_permission(permission);
-    if input && decl.contains_key("network") {
+    if !decl.contains_key("input") {
+        return Ok(());
+    }
+    if permission != INPUT_PERMISSION {
         return Err(PackError::new(
-            "PACK_INPUT_NETWORK",
-            &[("permission", permission)],
+            "PACK_PERMISSION_OPTION",
+            &[("permission", permission), ("option", "input")],
         ));
     }
-    for option in decl.keys() {
-        let allowed = match option.as_str() {
-            "network" => true,
-            "scope" => input,
-            "keys" => permission == "input:keyboard",
-            "buttons" | "position" => permission == "input:mouse",
-            _ => true, // unknown fields are the schema's to reject
-        };
-        if !allowed {
-            return Err(PackError::new(
-                "PACK_PERMISSION_OPTION",
-                &[("permission", permission), ("option", option)],
-            ));
-        }
+    // The schema says this too (`anyOf`), but its message would print the
+    // whole object; this one names the field.
+    let has_source = decl["input"]
+        .as_object()
+        .is_some_and(|i| i.contains_key("keyboard") || i.contains_key("mouse"));
+    if decl["input"].is_object() && !has_source {
+        return Err(PackError::new(
+            "PACK_MANIFEST_SCHEMA",
+            &[
+                ("pointer", &format!("/permissions/{permission}/input")),
+                ("detail", "needs keyboard or mouse"),
+            ],
+        ));
     }
     Ok(())
 }
 
-/// A pack that reads input can't declare `network` on any permission. The
-/// sandbox split alone isn't enough: sandboxes share app state (the
-/// prompter's position, script titles), so input could be encoded into state
-/// and read back out by a sandbox that has `net`. (The same goes for every
-/// pack it includes; `validate.rs` checks that once the bundle is read.)
+/// A pack that declares `network` anywhere can read input only if the input
+/// is narrow (`InputDecl::too_wide`). The sandbox split alone isn't enough to
+/// keep input in: sandboxes share app state (the prompter's position), so
+/// input could be encoded into state and read back out by a sandbox that has
+/// `net`. Narrow input leaks next to nothing. (The same goes for every pack it
+/// includes; `validate.rs` checks that once the bundle is read.)
 fn check_input_pack(perms: &serde_json::Map<String, Value>) -> PackResult<()> {
-    if !perms.keys().any(|p| is_input_permission(p)) {
-        return Ok(());
-    }
     let has_sites = |decl: &Value| {
         decl.get("network")
             .and_then(Value::as_array)
             .is_some_and(|sites| !sites.is_empty())
     };
-    if perms.values().any(has_sites) {
-        return Err(PackError::new("PACK_INPUT_PACK_NETWORK", &[]));
+    if !perms.values().any(has_sites) {
+        return Ok(());
+    }
+    for decl in perms.values() {
+        let Some(input) = decl.get("input") else {
+            continue;
+        };
+        // A declaration the schema would reject is reported by the schema.
+        let Ok(input) = serde_json::from_value::<InputDecl>(input.clone()) else {
+            continue;
+        };
+        if let Some(reason) = input.too_wide() {
+            return Err(PackError::new(
+                "PACK_INPUT_PACK_NETWORK",
+                &[("reason", &reason)],
+            ));
+        }
     }
     Ok(())
 }
@@ -469,111 +542,144 @@ mod tests {
     }
 
     #[test]
-    fn input_permissions_parse_with_their_options() {
+    fn input_parses_on_prompter_control() {
         let m = parse(
             &perms(serde_json::json!({
-                "input:keyboard": { "keys": ["ArrowRight", "Space"], "scope": "global" },
-                "input:mouse": { "buttons": [3, 4], "position": true },
-                "input:midi": {},
+                "prompter:control": { "input": {
+                    "keyboard": { "keys": ["ArrowRight", "Space"] },
+                    "mouse": { "buttons": [3, 4], "position": true },
+                    "scope": "global",
+                } },
             })),
             &app(),
         )
         .unwrap();
+        let input = m.permissions["prompter:control"].input.as_ref().unwrap();
         assert_eq!(
-            m.permissions["input:keyboard"].keys,
+            input.keyboard.as_ref().unwrap().keys,
             ["ArrowRight", "Space"]
         );
-        assert_eq!(
-            m.permissions["input:keyboard"].scope.as_deref(),
-            Some("global")
-        );
-        assert_eq!(m.permissions["input:mouse"].buttons, [3, 4]);
-        assert!(m.permissions["input:mouse"].position);
-        assert_eq!(
-            m.permission_names(),
-            ["input:keyboard", "input:mouse", "input:midi"]
-        );
+        assert_eq!(input.mouse.as_ref().unwrap().buttons, [3, 4]);
+        assert!(input.mouse.as_ref().unwrap().position);
+        assert_eq!(input.scope.as_deref(), Some("global"));
     }
 
     #[test]
-    fn input_permissions_cant_declare_network() {
+    fn input_belongs_to_prompter_control_only() {
         for p in [
-            "input:keyboard",
-            "input:mouse",
-            "input:midi",
-            "input:gamepad",
+            "scripts:write",
+            "prompter:load",
+            "prompter:events",
+            "files:import",
         ] {
-            let m = perms(serde_json::json!({ p: { "network": ["https://api.example.com"] } }));
-            assert_eq!(
-                parse(&m, &app()).unwrap_err().code,
-                "PACK_INPUT_NETWORK",
-                "{p}"
-            );
-        }
-        // An empty list is still a declaration.
-        let m = perms(serde_json::json!({ "input:midi": { "network": [] } }));
-        assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_INPUT_NETWORK");
-    }
-
-    #[test]
-    fn a_pack_that_reads_input_cant_declare_network_anywhere() {
-        let m = perms(serde_json::json!({
-            "input:keyboard": { "keys": ["Space"] },
-            "scripts:write": { "network": ["https://api.example.com"] },
-        }));
-        assert_eq!(
-            parse(&m, &app()).unwrap_err().code,
-            "PACK_INPUT_PACK_NETWORK"
-        );
-        // The permission-level case keeps its own code.
-        let m = perms(serde_json::json!({
-            "input:keyboard": { "network": ["https://api.example.com"] },
-        }));
-        assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_INPUT_NETWORK");
-        // Network without input is fine, and so is input with no sites anywhere.
-        let m = perms(serde_json::json!({
-            "scripts:write": { "network": ["https://api.example.com"] },
-            "prompter:events": {},
-        }));
-        assert!(parse(&m, &app()).is_ok());
-        let m = perms(serde_json::json!({
-            "input:keyboard": {},
-            "scripts:write": { "network": [] },
-            "prompter:control": {},
-        }));
-        assert!(parse(&m, &app()).is_ok());
-    }
-
-    #[test]
-    fn options_belong_to_their_permissions() {
-        for (p, opt, v) in [
-            ("input:midi", "keys", serde_json::json!(["KeyA"])),
-            ("input:mouse", "keys", serde_json::json!(["KeyA"])),
-            ("input:keyboard", "buttons", serde_json::json!([0])),
-            ("input:keyboard", "position", serde_json::json!(true)),
-            ("scripts:write", "scope", serde_json::json!("global")),
-        ] {
-            let m = perms(serde_json::json!({ p: { opt: v } }));
+            let m = perms(serde_json::json!({ p: { "input": { "keyboard": {} } } }));
             assert_eq!(
                 parse(&m, &app()).unwrap_err().code,
                 "PACK_PERMISSION_OPTION",
-                "{p} {opt}"
+                "{p}"
             );
         }
     }
 
     #[test]
-    fn bad_key_codes_and_scopes_fail_the_schema() {
-        for d in [
-            serde_json::json!({ "keys": ["Not A Key"] }),
-            serde_json::json!({ "keys": ["KeyA", "KeyA"] }),
-            serde_json::json!({ "scope": "everywhere" }),
+    fn input_and_network_can_share_a_permission_when_the_input_is_narrow() {
+        let ok = perms(serde_json::json!({ "prompter:control": {
+            "input": { "keyboard": { "keys": ["ArrowRight"] } },
+            "network": ["https://api.example.com"],
+        } }));
+        assert!(parse(&ok, &app()).is_ok());
+        let wide = perms(serde_json::json!({ "prompter:control": {
+            "input": { "keyboard": {} }, "network": ["https://api.example.com"],
+        } }));
+        assert_eq!(
+            parse(&wide, &app()).unwrap_err().code,
+            "PACK_INPUT_PACK_NETWORK"
+        );
+    }
+
+    fn with_net(input: Value) -> Vec<u8> {
+        perms(serde_json::json!({
+            "prompter:control": { "input": input },
+            "scripts:write": { "network": ["https://api.notion.com"] },
+        }))
+    }
+
+    fn narrow_reason(input: Value) -> Option<String> {
+        parse(&with_net(input), &app()).err().map(|e| {
+            assert_eq!(e.code, "PACK_INPUT_PACK_NETWORK");
+            e.message
+        })
+    }
+
+    #[test]
+    fn narrow_input_can_share_a_pack_with_network() {
+        let keys = |n: usize| -> Vec<String> { (0..n).map(|i| format!("F{}", i + 1)).collect() };
+        assert!(narrow_reason(serde_json::json!({ "keyboard": { "keys": keys(1) } })).is_none());
+        assert!(narrow_reason(serde_json::json!({ "keyboard": { "keys": keys(8) } })).is_none());
+        assert!(narrow_reason(serde_json::json!({ "mouse": { "buttons": [0, 3, 4] } })).is_none());
+        assert!(narrow_reason(serde_json::json!({
+            "keyboard": { "keys": ["ArrowRight"] }, "mouse": { "buttons": [3] }, "scope": "focused",
+        }))
+        .is_none());
+        // No network: any input is fine.
+        let wide =
+            serde_json::json!({ "keyboard": {}, "mouse": { "wheel": true, "position": true } });
+        let m = perms(serde_json::json!({ "prompter:control": { "input": wide } }));
+        assert!(parse(&m, &app()).is_ok());
+    }
+
+    #[test]
+    fn wide_input_with_network_says_which_limit_it_broke() {
+        let keys = |n: usize| -> Vec<String> { (0..n).map(|i| format!("F{}", i + 1)).collect() };
+        for (input, says) in [
+            (
+                serde_json::json!({ "keyboard": {} }),
+                "keyboard needs a keys list",
+            ),
+            (
+                serde_json::json!({ "keyboard": { "keys": keys(9) } }),
+                "at most 8 keys",
+            ),
+            (
+                serde_json::json!({ "mouse": {} }),
+                "mouse needs a buttons list",
+            ),
+            (
+                serde_json::json!({ "mouse": { "buttons": [0, 1, 2, 3] } }),
+                "at most 3 buttons",
+            ),
+            (
+                serde_json::json!({ "mouse": { "buttons": [0], "wheel": true } }),
+                "the wheel",
+            ),
+            (
+                serde_json::json!({ "mouse": { "buttons": [0], "position": true } }),
+                "pointer position",
+            ),
+            (
+                serde_json::json!({ "keyboard": { "keys": ["Space"] }, "scope": "global" }),
+                "scope can't be global",
+            ),
         ] {
-            let m = perms(serde_json::json!({ "input:keyboard": d }));
+            let message = narrow_reason(input.clone()).unwrap_or_else(|| panic!("{input} passed"));
+            assert!(message.contains(says), "{message}");
+        }
+    }
+
+    #[test]
+    fn bad_input_declarations_fail_the_schema() {
+        for input in [
+            serde_json::json!({ "keyboard": { "keys": ["Not A Key"] } }),
+            serde_json::json!({ "keyboard": { "keys": ["KeyA", "KeyA"] } }),
+            serde_json::json!({ "keyboard": {}, "scope": "everywhere" }),
+            serde_json::json!({ "mouse": { "buttons": [5] } }),
+            serde_json::json!({ "scope": "global" }),
+            serde_json::json!({ "keyboard": {}, "midi": {} }),
+            serde_json::json!({}),
+        ] {
+            let m = perms(serde_json::json!({ "prompter:control": { "input": input } }));
             assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_MANIFEST_SCHEMA");
         }
-        let m = perms(serde_json::json!({ "input:mouse": { "buttons": [5] } }));
-        assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_MANIFEST_SCHEMA");
     }
 
     #[test]

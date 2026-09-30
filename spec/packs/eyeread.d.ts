@@ -11,11 +11,7 @@ declare global {
       | 'prompter:load'
       | 'prompter:control'
       | 'prompter:events'
-      | 'files:import'
-      | 'input:keyboard'
-      | 'input:mouse'
-      | 'input:midi'
-      | 'input:gamepad';
+      | 'files:import';
 
     type ErrorCode =
       | 'E_PERMISSION'
@@ -69,6 +65,8 @@ declare global {
       restart(): Promise<void>;
       /** Clamped to the script. */
       seek(wordIndex: number): Promise<void>;
+      /** Move by a whole number of words from the current position; negative goes back. At most 10 000. Clamped to the script. */
+      advance(words: number): Promise<void>;
       close(): Promise<void>;
     }
 
@@ -146,46 +144,10 @@ declare global {
 
     interface MouseApi {
       onButton(callback: (event: MouseButtonEvent) => void): Unsubscribe;
-      onWheel(callback: (event: MouseWheelEvent) => void): Unsubscribe;
-      /** Present only when pack.json sets `position: true` and the user allowed it. */
+      /** Present only when pack.json sets `wheel: true` and the user allowed input. */
+      onWheel?(callback: (event: MouseWheelEvent) => void): Unsubscribe;
+      /** Present only when pack.json sets `position: true` and the user allowed input. */
       onMove?(callback: (event: MouseMoveEvent) => void): Unsubscribe;
-    }
-
-    interface InputDevice {
-      /** Opaque and stable for this pack. */
-      readonly id: string;
-      readonly name: string;
-    }
-
-    interface MidiMessage {
-      readonly device: InputDevice;
-      readonly type: 'noteOn' | 'noteOff' | 'controlChange' | 'programChange' | 'other';
-      readonly channel: number;
-      readonly data1: number;
-      readonly data2: number;
-    }
-
-    interface MidiApi {
-      onMessage(callback: (message: MidiMessage) => void): Unsubscribe;
-    }
-
-    interface GamepadButtonEvent {
-      readonly device: InputDevice;
-      readonly button: number;
-      readonly pressed: boolean;
-      readonly value: number;
-    }
-
-    interface GamepadAxisEvent {
-      readonly device: InputDevice;
-      readonly axis: number;
-      /** From -1 to 1. */
-      readonly value: number;
-    }
-
-    interface GamepadApi {
-      onButton(callback: (event: GamepadButtonEvent) => void): Unsubscribe;
-      onAxis(callback: (event: GamepadAxisEvent) => void): Unsubscribe;
     }
 
     type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -215,20 +177,22 @@ declare global {
 
     interface BaseContext {
       settings: SettingsApi;
-      /** Present only when the permission declares `network` in pack.json. Never for input permissions. */
+      /** Present only when the permission declares `network` in pack.json. Never in a pack that has input. */
       net?: NetApi;
     }
 
     interface ContextMap {
       'scripts:write': BaseContext & { scripts: ScriptsApi };
       'prompter:load': BaseContext & { prompter: PrompterLoadApi };
-      'prompter:control': BaseContext & { prompter: PrompterControlApi };
+      'prompter:control': BaseContext & {
+        prompter: PrompterControlApi;
+        /** Present only when pack.json declares `input.keyboard` and the user allowed input. */
+        keys?: KeysApi;
+        /** Present only when pack.json declares `input.mouse` and the user allowed input. */
+        mouse?: MouseApi;
+      };
       'prompter:events': BaseContext & { prompter: PrompterEventsApi };
       'files:import': BaseContext & { files: FilesApi };
-      'input:keyboard': BaseContext & { keys: KeysApi };
-      'input:mouse': BaseContext & { mouse: MouseApi };
-      'input:midi': BaseContext & { midi: MidiApi };
-      'input:gamepad': BaseContext & { gamepad: GamepadApi };
     }
 
     type Handler<P extends Permission> = (context: ContextMap[P]) => void | Promise<void>;

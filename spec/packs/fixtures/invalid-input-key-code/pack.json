@@ -9,10 +9,14 @@
   "main": "main.js",
   "id": "com.example.input-code",
   "permissions": {
-    "input:keyboard": {
-      "keys": [
-        "Not A Key"
-      ]
+    "prompter:control": {
+      "input": {
+        "keyboard": {
+          "keys": [
+            "Not A Key"
+          ]
+        }
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 //! The permission broker: one grant model for packs and connected apps, and
 //! the one route every action takes into the app.
 //!
-//! - **Grants.** Per pack and permission, `{ allowed, internet }`, all off
+//! - **Grants.** Per pack and permission, `{ allowed, internet, input }`, all off
 //!   until the user turns them on; per connected app, the scopes it was paired
 //!   with. Every call is checked here at the moment it's made, so revoking
 //!   takes effect on the very next call.
@@ -25,7 +25,11 @@ pub const PERMISSION_PROMPTER_CONTROL: &str = "prompter:control";
 pub const PERMISSION_PROMPTER_EVENTS: &str = "prompter:events";
 pub const PERMISSION_FILES_IMPORT: &str = "files:import";
 
-const CONTROL_ACTIONS: [&str; 6] = ["play", "pause", "toggle", "restart", "seek", "close"];
+const CONTROL_ACTIONS: [&str; 7] = [
+    "play", "pause", "toggle", "restart", "seek", "advance", "close",
+];
+/// `advance` moves by at most this many words either way.
+const MAX_ADVANCE_WORDS: i64 = 10_000;
 const MAX_TITLE_CHARS: usize = 200;
 const MAX_TEXT_BYTES: usize = 1024 * 1024;
 pub const MAX_IMPORT_BYTES: u64 = 10 * 1024 * 1024;
@@ -55,6 +59,10 @@ pub struct Grant {
     /// Only meaningful with `allowed`, and only for permissions that declare
     /// `network`.
     pub internet: bool,
+    /// Only meaningful with `allowed`, and only for a permission that declares
+    /// `input` (`prompter:control`).
+    #[serde(default)]
+    pub input: bool,
 }
 
 /// Who is asking. Windows show `name` for attribution.
@@ -201,6 +209,14 @@ pub fn validate_control(params: &Value) -> Result<Value, &'static str> {
             .ok_or("invalid_word_index")?;
         return Ok(json!({ "action": action, "wordIndex": idx }));
     }
+    if action == "advance" {
+        let words = params
+            .get("words")
+            .and_then(Value::as_i64)
+            .filter(|w| w.abs() <= MAX_ADVANCE_WORDS)
+            .ok_or("invalid_words")?;
+        return Ok(json!({ "action": action, "words": words }));
+    }
     Ok(json!({ "action": action }))
 }
 
@@ -327,6 +343,7 @@ impl Broker {
         let grant = Grant {
             allowed: grant.allowed,
             internet: grant.allowed && grant.internet,
+            input: grant.allowed && grant.input,
         };
         let snapshot = {
             let mut inner = self.lock();
@@ -381,6 +398,12 @@ impl Broker {
                 .and_then(|g| g.get(permission))
                 .is_some_and(|g| g.allowed),
         }
+    }
+
+    /// The user's per-permission input switch.
+    pub fn input_allowed(&self, pack: &str, permission: &str) -> bool {
+        let g = self.grant(pack, permission);
+        g.allowed && g.input
     }
 
     pub fn internet_allowed(&self, pack: &str, permission: &str) -> bool {

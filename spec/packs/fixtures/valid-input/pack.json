@@ -9,24 +9,26 @@
   "main": "main.js",
   "id": "com.example.input",
   "permissions": {
-    "input:keyboard": {
-      "keys": [
-        "ArrowRight",
-        "ArrowLeft",
-        "Space"
-      ],
-      "scope": "global"
+    "prompter:control": {
+      "input": {
+        "keyboard": {
+          "keys": [
+            "ArrowRight",
+            "ArrowLeft",
+            "Space"
+          ]
+        },
+        "mouse": {
+          "buttons": [
+            3,
+            4
+          ],
+          "position": true
+        },
+        "scope": "global"
+      }
     },
-    "input:mouse": {
-      "buttons": [
-        3,
-        4
-      ],
-      "position": true
-    },
-    "input:midi": {},
-    "input:gamepad": {},
-    "prompter:control": {}
+    "prompter:events": {}
   },
   "settings": [
     {

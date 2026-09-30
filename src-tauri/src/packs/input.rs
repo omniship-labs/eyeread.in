@@ -8,12 +8,13 @@
 //! must pass the `keys` / `buttons` / `position` the pack declared. Key
 //! events carry the physical key (`KeyboardEvent.code`), never the character.
 
-use super::manifest::{is_key_code, PermissionDecl};
+use super::manifest::{is_key_code, InputDecl};
 use serde::Serialize;
 use serde_json::{json, Value};
 
-pub const PERMISSION_KEYBOARD: &str = "input:keyboard";
-pub const PERMISSION_MOUSE: &str = "input:mouse";
+/// The two places input comes from, as a sandbox subscribes to them.
+pub const SOURCE_KEYBOARD: &str = "keyboard";
+pub const SOURCE_MOUSE: &str = "mouse";
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct Modifiers {
@@ -118,11 +119,11 @@ impl InputEvent {
         }
     }
 
-    /// The permission a pack needs to receive this event.
-    pub fn permission(&self) -> &'static str {
+    /// Where the event came from: what a sandbox subscribes to.
+    pub fn source(&self) -> &'static str {
         match self {
-            InputEvent::Key { .. } => PERMISSION_KEYBOARD,
-            _ => PERMISSION_MOUSE,
+            InputEvent::Key { .. } => SOURCE_KEYBOARD,
+            _ => SOURCE_MOUSE,
         }
     }
 
@@ -160,15 +161,19 @@ impl InputEvent {
         }
     }
 
-    /// Does the pack's manifest let it have this event?
-    pub fn passes(&self, decl: &PermissionDecl) -> bool {
+    /// Does what the pack declared for `input` let it have this event?
+    pub fn passes(&self, decl: &InputDecl) -> bool {
         match self {
-            InputEvent::Key { code, .. } => decl.keys.is_empty() || decl.keys.contains(code),
-            InputEvent::MouseButton { button, .. } => {
-                decl.buttons.is_empty() || decl.buttons.contains(button)
-            }
-            InputEvent::MouseWheel { .. } => true,
-            InputEvent::MouseMove { .. } => decl.position,
+            InputEvent::Key { code, .. } => decl
+                .keyboard
+                .as_ref()
+                .is_some_and(|k| k.keys.is_empty() || k.keys.contains(code)),
+            InputEvent::MouseButton { button, .. } => decl
+                .mouse
+                .as_ref()
+                .is_some_and(|m| m.buttons.is_empty() || m.buttons.contains(button)),
+            InputEvent::MouseWheel { .. } => decl.mouse.as_ref().is_some_and(|m| m.wheel),
+            InputEvent::MouseMove { .. } => decl.mouse.as_ref().is_some_and(|m| m.position),
         }
     }
 }
@@ -184,13 +189,15 @@ pub struct Wanted {
 }
 
 impl Wanted {
-    /// Add one subscribed sandbox: its permission and what the pack declared for it.
-    pub fn add(&mut self, permission: &str, decl: Option<&PermissionDecl>) {
-        match permission {
-            PERMISSION_KEYBOARD => self.keyboard = true,
-            PERMISSION_MOUSE => {
+    /// Add one subscribed sandbox: its source and what the pack declared.
+    pub fn add(&mut self, source: &str, decl: Option<&InputDecl>) {
+        match source {
+            SOURCE_KEYBOARD => self.keyboard = true,
+            SOURCE_MOUSE => {
                 self.mouse = true;
-                self.position |= decl.is_some_and(|d| d.position);
+                self.position |= decl
+                    .and_then(|d| d.mouse.as_ref())
+                    .is_some_and(|m| m.position);
             }
             _ => {}
         }
@@ -200,6 +207,7 @@ impl Wanted {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::packs::manifest::{KeyboardDecl, MouseDecl};
 
     fn key(code: &str) -> InputEvent {
         InputEvent::parse(
@@ -249,24 +257,36 @@ mod tests {
         assert_eq!(data["code"], "KeyA");
         assert!(data.get("key").is_none() && data.get("text").is_none());
         assert_eq!(key("KeyA").name(), "input.key");
-        assert_eq!(key("KeyA").permission(), "input:keyboard");
+        assert_eq!(key("KeyA").source(), "keyboard");
+    }
+
+    fn decl(keys: &[&str], buttons: &[u8], position: bool) -> InputDecl {
+        decl_with(keys, buttons, true, position)
+    }
+
+    fn decl_with(keys: &[&str], buttons: &[u8], wheel: bool, position: bool) -> InputDecl {
+        InputDecl {
+            keyboard: Some(KeyboardDecl {
+                keys: keys.iter().map(|k| k.to_string()).collect(),
+            }),
+            mouse: Some(MouseDecl {
+                buttons: buttons.to_vec(),
+                wheel,
+                position,
+            }),
+            scope: None,
+        }
     }
 
     #[test]
     fn declared_keys_and_buttons_filter_delivery() {
-        let any = PermissionDecl::default();
-        let only_arrows = PermissionDecl {
-            keys: vec!["ArrowRight".into(), "ArrowLeft".into()],
-            ..Default::default()
-        };
+        let any = decl(&[], &[], false);
+        let only_arrows = decl(&["ArrowRight", "ArrowLeft"], &[], false);
         assert!(key("KeyA").passes(&any));
         assert!(key("ArrowRight").passes(&only_arrows));
         assert!(!key("KeyA").passes(&only_arrows));
 
-        let side_buttons = PermissionDecl {
-            buttons: vec![3, 4],
-            ..Default::default()
-        };
+        let side_buttons = decl(&[], &[3, 4], false);
         let button = |b: u64| {
             InputEvent::parse("mouse.button", &json!({ "type": "down", "button": b })).unwrap()
         };
@@ -276,28 +296,46 @@ mod tests {
     }
 
     #[test]
+    fn a_source_the_pack_didnt_declare_gets_nothing() {
+        let keyboard_only = InputDecl {
+            keyboard: Some(KeyboardDecl::default()),
+            ..Default::default()
+        };
+        let wheel = InputEvent::parse("mouse.wheel", &json!({ "deltaX": 0, "deltaY": 1 })).unwrap();
+        let mouse_only = InputDecl {
+            mouse: Some(MouseDecl {
+                wheel: true,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        assert!(key("KeyA").passes(&keyboard_only) && !key("KeyA").passes(&mouse_only));
+        assert!(wheel.passes(&mouse_only) && !wheel.passes(&keyboard_only));
+    }
+
+    #[test]
+    fn the_wheel_needs_the_manifest_option() {
+        let wheel = InputEvent::parse("mouse.wheel", &json!({ "deltaX": 0, "deltaY": 1 })).unwrap();
+        assert!(wheel.passes(&decl_with(&[], &[], true, false)));
+        assert!(!wheel.passes(&decl_with(&[], &[3], false, false)));
+    }
+
+    #[test]
     fn pointer_position_needs_the_manifest_option() {
         let moved = InputEvent::parse("mouse.move", &json!({ "x": 1, "y": 2 })).unwrap();
-        assert!(!moved.passes(&PermissionDecl::default()));
-        assert!(moved.passes(&PermissionDecl {
-            position: true,
-            ..Default::default()
-        }));
+        assert!(!moved.passes(&decl(&[], &[], false)));
+        assert!(moved.passes(&decl(&[], &[], true)));
     }
 
     #[test]
     fn wanted_follows_subscriptions() {
         let mut w = Wanted::default();
         assert_eq!(w, Wanted::default());
-        w.add("input:keyboard", None);
+        w.add("keyboard", None);
         assert!(w.keyboard && !w.mouse && !w.position);
-        let with_position = PermissionDecl {
-            position: true,
-            ..Default::default()
-        };
-        w.add("input:mouse", Some(&PermissionDecl::default()));
+        w.add("mouse", Some(&decl(&[], &[], false)));
         assert!(w.mouse && !w.position);
-        w.add("input:mouse", Some(&with_position));
+        w.add("mouse", Some(&decl(&[], &[], true)));
         assert!(w.position);
     }
 }
