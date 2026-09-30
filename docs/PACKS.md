@@ -41,8 +41,8 @@ the verifier is `src-tauri/src/packs/signature.rs`.
 
 - **Keys.** Two minisign keys, main and an offline backup. Only their public
   halves go in the app (`TRUSTED_KEYS` in `signature.rs`); the private keys
-  never go in this repo or CI. Until the keys exist, both entries are empty and
-  every pack installs as Community. See [Signing keys](#signing-keys).
+  never go in this repo or CI. Key IDs: main `AEEAE29633271B56`, backup
+  `ECC75CEDAB1DB496`. See [Signing keys](#signing-keys).
 - **Signing** a reviewed pack, on the machine that holds the key:
 
   ```bash

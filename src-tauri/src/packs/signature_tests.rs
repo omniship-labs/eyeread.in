@@ -309,3 +309,13 @@ fn revocation_list_must_be_signed_unless_empty() {
     // The empty list needs no signature.
     assert!(RevocationList::load(r#"{ "format": 1, "revoked": [] }"#, "", &keys.keyring()).is_ok());
 }
+
+#[test]
+fn embedded_keys_are_both_set_and_valid() {
+    use super::signature::TRUSTED_KEYS;
+    for (name, key) in TRUSTED_KEYS {
+        let key = key.unwrap_or_else(|| panic!("pack key {name} is missing"));
+        Keyring::new(&[(name, key)]).unwrap();
+    }
+    Keyring::embedded();
+}
