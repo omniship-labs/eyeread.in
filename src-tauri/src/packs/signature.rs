@@ -16,10 +16,18 @@ use std::sync::OnceLock;
 /// OmniShip's pack-signing public keys (minisign, base64): a main key and an
 /// offline backup, so a key rotation doesn't need an emergency release.
 ///
-/// Both are `None` until the keys are generated (a maintainer task in #118;
-/// the private keys never go in this repo or CI). Until then no pack can be
-/// Verified: every pack installs as Community.
-pub const TRUSTED_KEYS: [(&str, Option<&str>); 2] = [("main", None), ("backup", None)];
+/// The private keys never go in this repo or CI; see `docs/PACKS.md`,
+/// "Signing keys". Key IDs: main AEEAE29633271B56, backup ECC75CEDAB1DB496.
+pub const TRUSTED_KEYS: [(&str, Option<&str>); 2] = [
+    (
+        "main",
+        Some("RWRWGyczluLqrqxtHCoyVZUGnt2CK9g9EDhPVh5fjsFp56MsbjUaGW6Q"),
+    ),
+    (
+        "backup",
+        Some("RWSWtB2r7VzH7FLJHXfyvCdnhqsJjur9TVaobi1I9F0GeeVNFLq6V66C"),
+    ),
+];
 
 /// The blocked-pack list shipped with this build, and its signature.
 const REVOKED_JSON: &str = include_str!("revoked.json");

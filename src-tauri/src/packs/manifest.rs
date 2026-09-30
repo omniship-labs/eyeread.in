@@ -13,7 +13,6 @@ const PACK_SCHEMA: &str = include_str!("../../../spec/packs/pack.schema.json");
 
 /// The `apiVersion`s this app runs.
 pub const SUPPORTED_API_VERSIONS: [u64; 1] = [1];
-pub const LICENSES: [&str; 3] = ["AGPL-3.0-only", "AGPL-3.0-or-later", "AGPL-3.0"];
 
 pub const PERMISSIONS: [&str; 5] = [
     "scripts:write",
@@ -208,7 +207,7 @@ pub fn site_is_valid(site: &str) -> bool {
 }
 
 /// Parse `pack.json` bytes and run steps 2–6: readable JSON, `apiVersion`,
-/// license, network sites, the schema, then app version and settings.
+/// network sites, the schema, then app version and settings.
 pub fn parse(bytes: &[u8], app_version: &semver::Version) -> PackResult<Manifest> {
     let value: Value = serde_json::from_slice(bytes)
         .map_err(|e| PackError::new("PACK_MANIFEST_INVALID_JSON", &[("detail", &e.to_string())]))?;
@@ -224,11 +223,6 @@ pub fn parse(bytes: &[u8], app_version: &semver::Version) -> PackResult<Manifest
                     ("supported", &supported.join(", ")),
                 ],
             ));
-        }
-    }
-    if let Some(license) = value.get("license").and_then(Value::as_str) {
-        if !LICENSES.contains(&license) {
-            return Err(PackError::new("PACK_LICENSE", &[("license", license)]));
         }
     }
     if let Some(perms) = value.get("permissions").and_then(Value::as_object) {

@@ -6,7 +6,7 @@ loads from a folder.
 ```
 my-pack.zip
 ├── pack.json            required: the manifest
-├── LICENSE              required: the AGPL text
+├── LICENSE              optional: your license text
 ├── main.js              the code (`main` in pack.json); can be one big file
 ├── lib/…                optional: more code or assets, imported by main.js
 ├── files.json           optional: per-file SHA-256 list (the build tool writes it)
@@ -55,7 +55,7 @@ are rejected, so a manifest means exactly what the user was shown.
 | `author`        | yes      | `{ "name", "email"?, "url"? }`. `url` must be `https://`.                                               |
 | `homepage`      | no       | `https://` URL.                                                                                         |
 | `repository`    | no       | `https://` URL.                                                                                         |
-| `license`       | yes      | `AGPL-3.0-only`, `AGPL-3.0-or-later` or `AGPL-3.0`. Anything else is rejected.                          |
+| `license`       | yes      | The pack's license, shown to the user: 1–100 characters, ideally an SPDX identifier such as `MIT`.      |
 | `minAppVersion` | no       | Lowest eyeread.in version the pack runs on.                                                             |
 | `main`          | see note | Path to the entry module, ending in `.js` or `.mjs`.                                                    |
 | `permissions`   | no       | Map of permission → `{ "network"?: [sites] }`. Missing or `{}` means the pack asks for nothing.         |
@@ -152,9 +152,9 @@ no native code, no HTML.
 
 ### License
 
-The manifest's `license` must be an AGPL identifier, and the pack's root must
-hold a `LICENSE`, `LICENSE.md`, `LICENSE.txt` or `COPYING` file containing the
-text `GNU AFFERO GENERAL PUBLIC LICENSE` (any case).
+Any license is allowed. The manifest's `license` says which one, and the app
+shows it to the user; it isn't checked. A `LICENSE` file is optional. What is
+required, whatever the license, is readable source (above).
 
 ## Limits
 
@@ -267,12 +267,11 @@ tool gives the same answer for the same pack:
 2. The manifest can be read: `PACK_MANIFEST_MISSING`, `PACK_MANIFEST_INVALID_JSON`.
 3. `PACK_API_VERSION`, when `apiVersion` is an integer the app doesn't support
    (a newer manifest may not match this schema).
-4. `PACK_LICENSE`, when `license` is a string that isn't allowed; then
-   `PACK_NETWORK_SITE`, for the first string in a `network` list that isn't a
+4. `PACK_NETWORK_SITE`, for the first string in a `network` list that isn't a
    valid site.
 5. `PACK_MANIFEST_SCHEMA`: anything else the schema rejects.
 6. `PACK_APP_VERSION`, `PACK_SETTINGS`.
-7. `PACK_LICENSE_FILE`, `PACK_MAIN_MISSING`, `PACK_MINIFIED`.
+7. `PACK_MAIN_MISSING`, `PACK_MINIFIED`.
 8. `PACK_FILES_JSON_INVALID`, `PACK_FILES_MISMATCH`.
 9. Bundles: `PACK_INCLUDE_DUPLICATE`, `PACK_INCLUDE_MISSING`,
    `PACK_INCLUDE_VERSION`, `PACK_INCLUDE_CYCLE`, `PACK_INCLUDE_LIMIT`,

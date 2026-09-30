@@ -12,8 +12,6 @@
     "PACK_MANIFEST_MISSING": "pack.json is missing from the root of the pack.",
     "PACK_MANIFEST_INVALID_JSON": "pack.json isn't valid JSON: {detail}",
     "PACK_MANIFEST_SCHEMA": "pack.json: {pointer} {detail}",
-    "PACK_LICENSE": "pack.json: license must be AGPL-3.0-only, AGPL-3.0-or-later or AGPL-3.0, not \"{license}\".",
-    "PACK_LICENSE_FILE": "The pack needs a LICENSE file with the GNU Affero General Public License text.",
     "PACK_API_VERSION": "pack.json: apiVersion {apiVersion} isn't supported by this version of eyeread.in (supported: {supported}).",
     "PACK_APP_VERSION": "This pack needs eyeread.in {minAppVersion} or later.",
     "PACK_MAIN_MISSING": "{path}: the main file named in pack.json doesn't exist.",

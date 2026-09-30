@@ -86,14 +86,14 @@ describe('DeveloperMode', () => {
 
   it('shows why a folder can’t be loaded, in the validator’s words', async () => {
     api.loadDevFolder.mockRejectedValue({
-      code: 'PACK_LICENSE_FILE',
-      message: 'The pack needs a LICENSE file with the GNU Affero General Public License text.',
+      code: 'PACK_MAIN_MISSING',
+      message: "main.js: the main file named in pack.json doesn't exist.",
     });
     platform.pickFolder.mockResolvedValue('/tmp/x');
     render(<DeveloperMode enabled onChange={() => {}} />);
     fireEvent.click(screen.getByRole('button', { name: 'Load folder…' }));
     expect((await screen.findByRole('alert')).textContent).toBe(
-      'The pack needs a LICENSE file with the GNU Affero General Public License text.'
+      "main.js: the main file named in pack.json doesn't exist."
     );
   });
 });
