@@ -6,9 +6,9 @@
 use super::archive::{self, Entry, FILES_JSON, SIGNATURE_FILE};
 use super::error::{PackError, PackResult};
 use super::files_list::FilesList;
-use super::manifest::{self, Manifest};
+use super::manifest::{self, is_input_permission, Manifest};
 use serde_json::Value;
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::Path;
 
 pub const MAX_INCLUDED: usize = 32;
@@ -269,12 +269,125 @@ pub fn validate_entries(
             .map_err(|e| e.in_folder(&folder))?;
         included.push(pack);
     }
+    check_input_bundle(&top, &included)?;
     Ok(ValidatedBundle { top, included })
+}
+
+/// A pack that reads input can't declare `network`, and neither can any pack
+/// it includes, at any depth: a bundle is one install, and its sandboxes share
+/// app state, so input could otherwise be carried out by an included pack that
+/// has `net`. (A pack's own permissions are checked in `manifest.rs`.)
+fn check_input_bundle(top: &ValidatedPack, included: &[ValidatedPack]) -> PackResult<()> {
+    let by_id: HashMap<&str, &ValidatedPack> = included
+        .iter()
+        .map(|p| (p.manifest.id.as_str(), p))
+        .collect();
+    let reads_input = |p: &ValidatedPack| {
+        p.manifest
+            .permissions
+            .keys()
+            .any(|k| is_input_permission(k))
+    };
+    let has_network = |p: &ValidatedPack| {
+        p.manifest
+            .permissions
+            .values()
+            .any(|d| !d.network.is_empty())
+    };
+    for root in std::iter::once(top)
+        .chain(included)
+        .filter(|p| reads_input(p))
+    {
+        let mut stack: Vec<&str> = root
+            .manifest
+            .includes
+            .iter()
+            .map(|i| i.id.as_str())
+            .collect();
+        let mut seen = HashSet::new();
+        while let Some(id) = stack.pop() {
+            let Some(pack) = by_id.get(id).filter(|_| seen.insert(id)) else {
+                continue;
+            };
+            if has_network(pack) {
+                return Err(PackError::new("PACK_INPUT_PACK_NETWORK", &[])
+                    .in_folder(&format!("packs/{id}/")));
+            }
+            stack.extend(pack.manifest.includes.iter().map(|i| i.id.as_str()));
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    use crate::packs::store::tests::pack_entries;
+
+    /// A pack's entries with `permissions` set in its pack.json.
+    fn with_permissions(mut entries: Vec<Entry>, permissions: Value) -> Vec<Entry> {
+        let e = entries.iter_mut().find(|e| e.path == "pack.json").unwrap();
+        let mut manifest: Value = serde_json::from_slice(&e.bytes).unwrap();
+        manifest["permissions"] = permissions;
+        e.bytes = serde_json::to_vec(&manifest).unwrap();
+        entries
+    }
+
+    /// top -> a -> b, each with the given permissions.
+    fn chain(top: Value, a: Value, b: Value) -> PackResult<ValidatedBundle> {
+        let mut entries = with_permissions(
+            pack_entries(
+                "com.example.top",
+                "1.0.0",
+                &[("com.example.a", "1.0.0")],
+                "// t\n",
+            ),
+            top,
+        );
+        let a_entries = with_permissions(
+            pack_entries(
+                "com.example.a",
+                "1.0.0",
+                &[("com.example.b", "1.0.0")],
+                "// a\n",
+            ),
+            a,
+        );
+        let b_entries = with_permissions(pack_entries("com.example.b", "1.0.0", &[], "// b\n"), b);
+        for (id, pack) in [("com.example.a", a_entries), ("com.example.b", b_entries)] {
+            entries.extend(pack.into_iter().map(|e| Entry {
+                path: format!("packs/{id}/{}", e.path),
+                bytes: e.bytes,
+            }));
+        }
+        validate_entries(entries, &semver::Version::new(1, 0, 0))
+    }
+
+    #[test]
+    fn a_pack_that_reads_input_cant_include_a_pack_with_network() {
+        let input = serde_json::json!({ "input:keyboard": {} });
+        let net =
+            serde_json::json!({ "scripts:write": { "network": ["https://api.example.com"] } });
+        let none = serde_json::json!({});
+
+        // The top reads input; the network is two levels down.
+        let err = chain(input.clone(), none.clone(), net.clone()).unwrap_err();
+        assert_eq!(err.code, "PACK_INPUT_PACK_NETWORK");
+        assert!(
+            err.message.starts_with("packs/com.example.b/"),
+            "{}",
+            err.message
+        );
+
+        // A pack in the middle reads input and includes the network pack.
+        let err = chain(none.clone(), input.clone(), net.clone()).unwrap_err();
+        assert_eq!(err.code, "PACK_INPUT_PACK_NETWORK");
+
+        // No input anywhere: network in a bundle is fine.
+        assert!(chain(none.clone(), net.clone(), net).is_ok());
+        assert!(chain(input.clone(), none.clone(), input).is_ok());
+    }
 
     #[test]
     fn minified_rule() {

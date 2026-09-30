@@ -1,0 +1,23 @@
+{
+  "apiVersion": 1,
+  "name": "Fixture",
+  "version": "1.0.0",
+  "author": {
+    "name": "Fixture Author"
+  },
+  "license": "AGPL-3.0-only",
+  "main": "main.js",
+  "id": "com.example.input-pack-net",
+  "permissions": {
+    "input:keyboard": {
+      "keys": [
+        "Space"
+      ]
+    },
+    "scripts:write": {
+      "network": [
+        "https://api.example.com"
+      ]
+    }
+  }
+}

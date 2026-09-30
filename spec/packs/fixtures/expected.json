@@ -79,6 +79,11 @@
       "schema": false,
       "error": "PACK_MANIFEST_SCHEMA"
     },
+    "invalid-input-bundle-network": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_PACK_NETWORK"
+    },
     "invalid-input-key-code": {
       "valid": false,
       "schema": false,
@@ -93,6 +98,11 @@
       "valid": false,
       "schema": true,
       "error": "PACK_PERMISSION_OPTION"
+    },
+    "invalid-input-pack-network": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_PACK_NETWORK"
     },
     "invalid-main-missing": {
       "valid": false,

@@ -89,10 +89,21 @@ to the user's keyboard, mouse or hardware. The pack decides what an input means
 and calls the other APIs (`prompter:control`, for example) itself; the app only
 delivers events. All are off until the user allows them.
 
-An input permission **can't declare `network`** (`PACK_INPUT_NETWORK`). Input
-runs in the offline sandbox, which can't reach the internet and shares nothing
-with a sandbox that can, so what a pack reads from the user's input has nowhere
-to go.
+**A pack that reads input can't declare `network` on any permission**
+(`PACK_INPUT_NETWORK` for the input permission itself, `PACK_INPUT_PACK_NETWORK`
+for any other permission in the pack), and neither can any pack it includes, at
+any depth. The split into sandboxes isn't enough on its own: sandboxes share
+nothing in memory, but they share the app's state, such as the prompter's
+position and script titles. A pack's input could be encoded into that state by
+one sandbox and read back out, then sent away, by another sandbox that has
+`net`. So a pack either reads input or reaches the internet, never both; a pack
+that needs both has to be split into two packs.
+
+That rule closes the channel inside one pack or bundle. It doesn't stop two
+separately installed packs from working together, so the content policy also
+forbids that, and review checks for it: input may only drive the prompter and
+must never be encoded into script text, titles, seek positions, settings or logs
+(see `PACK_POLICY.md`).
 
 Options, all optional:
 

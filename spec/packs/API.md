@@ -62,7 +62,7 @@ with that permission's API. It may be `async`; a rejection is logged as an error
 | `input:midi`       | `{ midi: { onMessage }, settings }`                                           |
 | `input:gamepad`    | `{ gamepad: { onButton, onAxis }, settings }`                                 |
 
-`net` is present only when the permission declares `network`. Input permissions can't declare it, so they never get `net`.
+`net` is present only when the permission declares `network`. A pack that reads input can't declare `network` on any permission, so it never gets `net` anywhere.
 
 ### `scripts.add({ text, title?, language? })` → `Promise<{ scriptId }>`
 
@@ -144,6 +144,12 @@ eyeread.on('input:keyboard', ({ keys, settings }) => {
   });
 });
 ```
+
+Input is for driving the prompter. A pack that reads it can't reach the
+internet from any sandbox, and must not encode what it reads into anything
+else: script text or titles, seek positions, settings or logs. The sandboxes of
+one pack share the app's state, so this is enforced by the manifest rule above
+and by review, not by the sandbox split.
 
 Delivery follows what the user allowed: events arrive only while the pack is
 enabled, only for the `keys` or `buttons` the manifest lists (if it lists any),

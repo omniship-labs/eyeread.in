@@ -107,6 +107,25 @@ use: reverse-DNS of a domain you control (`com.example.notion-sync` for
 `example.com`), or `io.github.<your-username>.<pack>` if you don't have one.
 No ids that suggest a company or product you aren't.
 
+### 12. Using input for anything but driving the prompter
+
+A pack that reads the keyboard, mouse or other devices (`input:*` permissions)
+may use what it reads only to drive the prompter: play, pause, move through the
+script. It must never encode input into anything else. That includes script
+text and titles (`scripts:write`, `prompter:load`), seek positions that don't
+follow from the script, settings, and logs. A seek that moves to the next word
+is navigation; a seek whose position is a keystroke is a leak.
+
+- The pack can't declare `network` on any permission, and neither can any pack
+  it includes. The installer enforces that. Don't get around it with a second
+  pack that reads state the first one writes: packs built to carry input out
+  together are refused the same way.
+- Ask only for the keys or buttons the pack uses (`keys`, `buttons`), and say in
+  the description which they are. Global scope and pointer position need a clear
+  reason in the description.
+- No recording, logging or storing of input, and nothing that tries to read what
+  the user types into other apps.
+
 ### Also
 
 We won't verify anything that's illegal, harmful to users (malware, scams,

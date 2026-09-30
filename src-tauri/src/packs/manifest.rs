@@ -284,6 +284,7 @@ pub fn parse(bytes: &[u8], app_version: &semver::Version) -> PackResult<Manifest
         for (permission, decl) in perms {
             check_permission_options(permission, decl)?;
         }
+        check_input_pack(perms)?;
     }
 
     if let Some(err) = validator().iter_errors(&value).next() {
@@ -341,6 +342,26 @@ fn check_permission_options(permission: &str, decl: &Value) -> PackResult<()> {
                 &[("permission", permission), ("option", option)],
             ));
         }
+    }
+    Ok(())
+}
+
+/// A pack that reads input can't declare `network` on any permission. The
+/// sandbox split alone isn't enough: sandboxes share app state (the
+/// prompter's position, script titles), so input could be encoded into state
+/// and read back out by a sandbox that has `net`. (The same goes for every
+/// pack it includes; `validate.rs` checks that once the bundle is read.)
+fn check_input_pack(perms: &serde_json::Map<String, Value>) -> PackResult<()> {
+    if !perms.keys().any(|p| is_input_permission(p)) {
+        return Ok(());
+    }
+    let has_sites = |decl: &Value| {
+        decl.get("network")
+            .and_then(Value::as_array)
+            .is_some_and(|sites| !sites.is_empty())
+    };
+    if perms.values().any(has_sites) {
+        return Err(PackError::new("PACK_INPUT_PACK_NETWORK", &[]));
     }
     Ok(())
 }
@@ -492,6 +513,35 @@ mod tests {
         // An empty list is still a declaration.
         let m = perms(serde_json::json!({ "input:midi": { "network": [] } }));
         assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_INPUT_NETWORK");
+    }
+
+    #[test]
+    fn a_pack_that_reads_input_cant_declare_network_anywhere() {
+        let m = perms(serde_json::json!({
+            "input:keyboard": { "keys": ["Space"] },
+            "scripts:write": { "network": ["https://api.example.com"] },
+        }));
+        assert_eq!(
+            parse(&m, &app()).unwrap_err().code,
+            "PACK_INPUT_PACK_NETWORK"
+        );
+        // The permission-level case keeps its own code.
+        let m = perms(serde_json::json!({
+            "input:keyboard": { "network": ["https://api.example.com"] },
+        }));
+        assert_eq!(parse(&m, &app()).unwrap_err().code, "PACK_INPUT_NETWORK");
+        // Network without input is fine, and so is input with no sites anywhere.
+        let m = perms(serde_json::json!({
+            "scripts:write": { "network": ["https://api.example.com"] },
+            "prompter:events": {},
+        }));
+        assert!(parse(&m, &app()).is_ok());
+        let m = perms(serde_json::json!({
+            "input:keyboard": {},
+            "scripts:write": { "network": [] },
+            "prompter:control": {},
+        }));
+        assert!(parse(&m, &app()).is_ok());
     }
 
     #[test]
