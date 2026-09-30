@@ -1,17 +1,20 @@
 /* ============================================================
    eyeread.in · marketing site — developer docs copy (English)
    ------------------------------------------------------------
-   This is the `docs` i18next namespace bundle. Only English
-   exists for now; every other locale falls back to it via
-   i18next `fallbackLng` (see ../i18n/index.js), so the docs
-   render in English regardless of the visitor's language until
-   a translation is added.
+   This is the `docs` i18next namespace bundle — the source of
+   truth every other locale's docs bundle falls back to, key by
+   key, via i18next `fallbackLng` (see ../i18n/index.js). A
+   locale's own content.<code>.js need not translate every page:
+   `packs` is the first one translated (see content.fr.js etc.);
+   the rest render in English everywhere until translated too.
 
-   To add a language: create ./content.<code>.js mirroring this
-   shape, import it in ../i18n/index.js, and add it to the
-   `docs` namespace resources. Translate the prose here — the
-   technical literals (commands, file paths, API signatures,
-   code blocks) live in the page components and stay constant.
+   To translate a page into a new language: in that locale's
+   content.<code>.js, add just the top-level key(s) for the
+   page(s) you're translating (see registry.js's `docsResources`
+   for the full locale list). Translate the prose — the technical
+   literals (commands, file paths, API signatures, code blocks,
+   and this app's own fixed feature/UI names: Packs, Connected
+   apps, Verified, Community, Developer mode) stay constant.
 
    Node-safe (plain data, no browser/JSX deps) so the build-time
    prerender can read each page's <title>/description from it.
@@ -63,8 +66,8 @@ export default {
       },
       {
         key: 'packs',
-        title: 'Build packs',
-        body: 'Extend eyeread.in with sandboxed packs: permissions, internet rules, Developer mode, and getting Verified.',
+        title: 'Packs',
+        body: 'Build a sandboxed extension or a Connected app: the permission model, the eyeread.* API, and how to ship one.',
       },
     ],
     stackHeading: 'The stack at a glance',
@@ -223,76 +226,74 @@ export default {
   },
 
   packs: {
-    nav: 'Build packs',
-    title: 'Build packs for eyeread.in',
+    nav: 'Packs',
+    title: 'Packs',
     description:
-      'Build sandboxed packs that extend eyeread.in: permissions, per-permission internet access, Developer mode, and the Verified review process.',
-    lead: 'Packs let you build on eyeread.in without touching its code. Users decide, per permission, what each pack may do and whether it may use the internet.',
-    conceptsHeading: 'Concepts',
-    concepts: [
-      'A pack is a .zip holding a pack.json manifest and your code, under any license you like. One big main.js is fine.',
-      'Permissions are what your pack can do. You declare them, and the user switches each one on. They all start off.',
-      'Internet is per permission: a permission can declare the exact https:// sites it needs, and gets internet only for those, once the user allows it.',
-      'The app runs your code in sandboxes with no DOM, storage or direct network. Each permission with internet gets its own sandbox; the offline ones share one.',
-      'A pack can include other packs, like a mod pack. Shared packs are installed once and keep one set of settings.',
-      'Unsigned packs install as Community, with a warning. Reviewed packs are signed by OmniShip and show ✓ Verified by eyeread.in.',
+      'Packs — installable, sandboxed JS extensions for eyeread.in — and Connected apps, the local API for external programs. The permission model, and how to build one.',
+    lead: 'Two ways to build on eyeread.in without touching its code, sharing one permission model: packs run inside the app in a sandbox; Connected apps are separate programs that talk to it over a local API.',
+    whatHeading: 'What a pack is',
+    whatBody: [
+      'A pack is a small JS extension — a manifest (pack.json) plus code — that the app runs in a locked-down sandbox with no DOM, no filesystem, and no network of its own. The only way out is a global eyeread object, gated by the permissions the pack declares and the user explicitly grants.',
+      'Every permission with declared internet access runs in its own isolated sandbox; permissions without it share one offline sandbox. Packs can’t see each other’s code, memory, or network traffic.',
     ],
-    firstHeading: 'Your first pack',
-    firstIntro:
-      'Everything can be done from the app: open Settings → Packs, switch to the Advanced view, and turn on Developer mode. New pack… creates a pack.json, a commented main.js, the license and a README, and loads it with a Dev badge. It reloads within a second of each save; Validate and Build pack produce the zip.',
-    manifestHeading: 'The manifest',
-    manifestIntro:
-      'pack.json says who made the pack, what it may do, and which sites each permission may reach. Unknown fields are rejected, so it means exactly what the user is shown.',
     permissionsHeading: 'Permissions',
+    permissionsIntro:
+      'A pack (and a Connected app, which shares the same names as its API scopes) declares only what it needs. Nothing is granted until the user turns it on, per pack, per permission:',
+    permissionCol: 'Permission',
+    grantsCol: 'Grants',
     permissions: [
-      { name: 'scripts:write', note: 'Add scripts to the library.' },
-      { name: 'prompter:load', note: 'Open text in the prompter and start a reading session.' },
-      { name: 'prompter:control', note: 'Play, pause, restart, seek or close the prompter.' },
+      { name: 'scripts:write', grants: 'Add a script to the user’s library.' },
+      {
+        name: 'prompter:load',
+        grants: 'Open text in the prompter and start a reading session.',
+      },
+      {
+        name: 'prompter:control',
+        grants: 'Play, pause, restart, seek, or close the prompter.',
+      },
       {
         name: 'prompter:events',
-        note: 'Read the prompter’s state; the script is only described during an active session.',
+        grants: 'Read the prompter’s live state — only while a session is active.',
       },
       {
         name: 'files:import',
-        note: 'Ask the user to pick a file with the app’s own picker, and receive only that file.',
+        grants:
+          'Ask the user to pick a file with the app’s own picker; the pack sees only that file.',
       },
     ],
     permissionsNote:
-      'Ask for as few as you need. Users see every one, and none can read their library.',
-    handlerHeading: 'One handler per permission',
-    handlerIntro:
-      'Register a handler for each permission at the top level of main.js. The app calls it once, with only that permission’s API, and restarts its sandbox without it if the user revokes it.',
-    netHeading: 'Internet rules',
-    netRules: [
-      'Declare exact origins: https://, a host name and an optional port. No paths, wildcards, IP addresses or localhost.',
-      'Call them with net.fetch. The app makes the request and refuses any other site, including redirects elsewhere.',
-      'No cookies, 60 requests a minute, 1 MiB up and 5 MiB down per request.',
-      'Every request shows in the pack’s network log, which the user can see.',
-      'Say in your description what you send and where.',
+      'Internet access is off unless a permission declares exact https:// sites in pack.json — no wildcards, IPs, or localhost. Declaring a site doesn’t turn it on; the user still switches it on per permission.',
+    makeHeading: 'Make one',
+    makeIntro:
+      'Everything can be done from the app itself, in Settings → Packs → Developer mode: New pack…, live reload on save, a per-pack log, and Validate/Build. There’s also a command-line path that needs no app open, from the SDK repo:',
+    makeStepsHeading: 'From the command line',
+    agentHeading: 'Building one with an AI agent',
+    agentBody: [
+      'The scaffold above writes an AGENTS.md into every new pack — the sandbox rules, the manifest fields, the eyeread.on(...) handler shape per permission, and the validate/build workflow, all in one self-contained file. It needs no setup: any coding agent that reads project files (Claude Code, Cursor, Codex, Copilot, …) picks it up the moment it opens the folder.',
+      'Claude Code users also get a proper Skill that triggers on pack-related requests even before a pack folder exists, with the full spec bundled in as references. Install it with any of the 75+ agents vercel-labs/skills supports, not just Claude Code:',
     ],
-    rulesHeading: 'Rules the installer enforces',
-    rules: [
-      'Any license: say which in pack.json, and the app shows it to users.',
-      'Readable source: minified code is rejected.',
-      'JS, JSON, Markdown, text, CSS and images only. No HTML, WebAssembly or native code.',
-      'Up to 20 MiB in total, 5 MiB per file and 500 files.',
+    verifiedHeading: 'Verified packs',
+    verifiedBody:
+      'A pack gets the ✓ Verified by eyeread.in badge once its maintainer signs it after review. Until then — or if a pack ships with no signature at all — it installs as Community, with a warning. A tampered or revoked signature blocks install entirely.',
+    connectedHeading: 'Connected apps',
+    connectedBody: [
+      'If your integration is easier to write as its own program — in any language — Connected apps give it the same capabilities over a local HTTP API on 127.0.0.1, with the app never running your code. Pair once via a one-click Allow/Deny prompt, then call scripts:write, prompter:load, prompter:control, or prompter:events with a bearer token.',
+      'Browsers can’t reach this API by design (no CORS, Origin/Sec-Fetch-Site checks) — it’s for native tools: a writing app, a Stream Deck or foot-pedal integration, a recording tool, a second-screen progress display.',
     ],
-    cliHeading: 'Command-line tools',
-    cliIntro:
-      'The scaffold, CLI and types live in the packs SDK repository. They aren’t on npm yet: until they are, run them from a clone of the SDK, or use Developer mode’s New pack, Validate and Build pack buttons, which run the same checks.',
-    verifiedHeading: 'Getting Verified',
-    verifiedIntro:
-      'Anyone can share a pack as Community. For the ✓ Verified badge, your pack stays in your own repo and the packs repo stores a reference to it:',
-    verifiedSteps: [
-      'Publish a release in your repo, with the zip from the build command attached.',
-      'Open a pull request in omniship-labs/eyeread.in-packs with the release’s repo, tag, commit, zip URL and pack hash.',
-      'Automated checks download the zip, confirm it matches, validate it, and summarize new permissions and sites.',
-      'A maintainer reviews it against the checklist and the content policy. The target is 2 weeks.',
-      'Once approved, it’s signed offline and the signature is stored next to your entry. Add it to your zip so hand-installed copies show as Verified too.',
+    moreHeading: 'Full reference',
+    moreBody:
+      'The complete spec (pack.json schema, the eyeread.* API, file and size limits, the Connected apps HTTP protocol) lives in the eyeread.in-packs-sdk repo and this app’s own docs/PACKS.md.',
+    moreLinks: [
+      {
+        label: 'omniship-labs/eyeread.in-packs-sdk',
+        href: 'https://github.com/omniship-labs/eyeread.in-packs-sdk',
+        body: 'the spec, the CLI, and the scaffold.',
+      },
+      {
+        label: 'docs/PACKS.md',
+        href: 'https://github.com/omniship-labs/eyeread.in/blob/main/docs/PACKS.md',
+        body: 'the Connected apps HTTP API, in full.',
+      },
     ],
-    verifiedNote:
-      'The zip URL can be on any host, but must download directly and never change. If it disappears or changes, the pack is withdrawn. Updates get a diff-only review, and users approve again if an update asks for new permissions or sites.',
-    specHeading: 'Full reference',
-    specIntro: 'The exact rules live in the spec and the creator guide in the repository:',
   },
 };
