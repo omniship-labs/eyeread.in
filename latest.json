@@ -1,23 +1,23 @@
 {
-  "version": "0.1.5-glimpse.202609270849",
+  "version": "0.1.5-glimpse.202609300912",
   "notes": "eyeread.in glimpse build — may be unstable.",
-  "pub_date": "2026-09-27T08:55:00Z",
+  "pub_date": "2026-09-30T09:17:26Z",
   "platforms": {
     "darwin-aarch64": {
-      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260927-084950/eyeread.in_glimpse_aarch64.app.tar.gz",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbnc2UGduOVQxTW1mQ0RmenlycmNyaEVac2hRTStYcDZRWTRYN3lwNUpHSE95T1dPV0hsNzNWdlM2MUFmclExdVJLODRYeDJmckttd2RHWEhPRDFERmdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNDk5MjMzCWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlLmFwcC50YXIuZ3oJdmVyc2lvbjowLjEuNS1nbGltcHNlLjIwMjYwOTI3MDg0OQpyY1AyTWUzTVhpWWw1aTdhNUJEL3dMbWF4bFk4bVlaU2RWWVFSMjJpMHJQZ3lXYmFranU5ZitXV2JFY2p1WFkwZ1pNWnZMVGJvWU1XdnV0cEU1QldBZz09Cg=="
+      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260930-091206/eyeread.in_glimpse_aarch64.app.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjFBRFFxK2p1VG03N2tpUUdrTnUzelVlbmFuYXY3cWxQUVh3M3BqeDF0WEp1c3VSdDQ1WWhsdzg1S3MrcjVpQkJYR0o3VTZCSlFLcmxOWlVyZ2Nib2d3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNzU5NzQwCWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlLmFwcC50YXIuZ3oJdmVyc2lvbjowLjEuNS1nbGltcHNlLjIwMjYwOTMwMDkxMgpZVWNlWnpONmVlMU0rdnBwcVc0cW0zNG5SNnd5WmxkUGd3WWx6SFA4bCtmWUkwZTk5TXdtNUdlQVY1YlQ4MmxLdjVadVdzUW5EZ0NXYmpHemdJY05BZz09Cg=="
     },
     "windows-x86_64": {
-      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260927-084950/eyeread.in_glimpse_x64-setup.exe",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjh5WUFBZU1wa3VYdHNBV05BTEJQZmF1dTNMMzZSZTFpOXlzcUhMT1Y4c0R1S1YvcDY5SjFRNTdrSWdrNC9kekNGVEd1Ym5UaVhrQXVDejVVTzlXZndzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNDk5MjUxCWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlXzAuMS41LWdsaW1wc2UuMjAyNjA5MjcwODQ5X3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjEuNS1nbGltcHNlLjIwMjYwOTI3MDg0OQpqRVlCVHVYOUpPMXc1Z09jbzlFaWpiZ240MFdudXdvUXRHcW1Yait6bHBYTkNQUC9TREtGaWd1WDdkNFVzTk81TTVvMVRIck40VlJNSHM1V3ErNnFBZz09Cg=="
+      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260930-091206/eyeread.in_glimpse_x64-setup.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjh0ZkVFbkE3L1h6anFmQ1U1aStBdDQvNldscnRNcVROZ0ZERnBVY3A0VnRmNFBPN2o1eXBTYXdOVVM3RVNsQkRsUnR4cm9SK3Y4RkJkeWZVSDY3RHc0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNzU5ODI3CWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlXzAuMS41LWdsaW1wc2UuMjAyNjA5MzAwOTEyX3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjEuNS1nbGltcHNlLjIwMjYwOTMwMDkxMgpvbWR1RlVyV09YZkhYRm1oN3R1ZmdnSEN3Z1gxWk1kZTRxd25idVJxOEgzekl4ay9vdUp5b2o1dmZNdkY3NmprRVQzZHZGRndTeTZUTGpwR1ZtRXJBQT09Cg=="
     },
     "windows-aarch64": {
-      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260927-084950/eyeread.in_glimpse_arm64-setup.exe",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjJqamZlVDhIbDdlU0JnSVNqcEQ5a0cvV016dVBBWXl0cVNhVjJjQzJCWWJkV0QySHFSUi93RmxyOGNNQXVLb2JTZ0VYNjVrd1BwODc5eVdqaTVGOGdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNDk5MjY0CWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlXzAuMS41LWdsaW1wc2UuMjAyNjA5MjcwODQ5X2FybTY0LXNldHVwLmV4ZQl2ZXJzaW9uOjAuMS41LWdsaW1wc2UuMjAyNjA5MjcwODQ5CjVHWE1EWlJqUERXUkdCV2lXK3ZObDZTMlVWNDkyUThwVmtWR0NiQ3JVMnN2TDRlbmZMRWoxeXRDc1FBMXN1VjJxa3RwWi8xb3pzeWRzL09qKzRrZ0JnPT0K"
+      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260930-091206/eyeread.in_glimpse_arm64-setup.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjVOQ3M1dG54cHlxMDNWN1FtdTVnWGZBQ1RDQk9oamsxeVFOS21wQlZZcVpXYkZpclgyVzNLUWJ6Q2FtbngrL0l1bmREV01HSk14UHZHTU1EdXlEUkFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNzU5ODAyCWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlXzAuMS41LWdsaW1wc2UuMjAyNjA5MzAwOTEyX2FybTY0LXNldHVwLmV4ZQl2ZXJzaW9uOjAuMS41LWdsaW1wc2UuMjAyNjA5MzAwOTEyClBYa2ZvU0l5U0dzMGowbytNWXI5NU8yUENVQTNFclV5aEVqaWtqbHVnK29SWWVVaE5ocWhhWjl0OGdWL3pzZHJ1SFYweWo0YitJL3k5Q2piTG94ZEFRPT0K"
     },
     "linux-x86_64": {
-      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260927-084950/eyeread.in_glimpse_amd64.AppImage",
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjBxdnNhTE9kVitROWppYmhrL2RsV0d3WENwTVk0djV5Q2pjSERmMURHczRSUi9rSzJxWjdNNEJNM3JRRnlwSG5UUEhXMEVsdC8xdVhZOHRvV0g2MFFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNDk5MjQyCWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlXzAuMS41LWdsaW1wc2UuMjAyNjA5MjcwODQ5X2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC4xLjUtZ2xpbXBzZS4yMDI2MDkyNzA4NDkKRVBMQURYMHoyRWhqY1NiUmp6alRxV2s0ZVdHREpveWE1NlN6QnliVG45N1dxdTZjWGZYWnJyVjZVdGxtY21EcWFPM1RxdXhrUC9XYlVra1JGcy93RHc9PQo="
+      "url": "https://github.com/omniship-labs/eyeread.in/releases/download/glimpse-v0.1.5-20260930-091206/eyeread.in_glimpse_amd64.AppImage",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUNEx3REFHN1gxbjNVTzcvYmJVbHY3aWw1eTFYbWxuREZmWTRNanhsMEFsZG1wa3VkNENyTlM3cjBqbU1uejg0OGFhdFVINFFZNG5CZWw1NU12YmQyVHRxbmsxUkErVmdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkwNzU5NzcxCWZpbGU6ZXllcmVhZC5pbiBnbGltcHNlXzAuMS41LWdsaW1wc2UuMjAyNjA5MzAwOTEyX2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC4xLjUtZ2xpbXBzZS4yMDI2MDkzMDA5MTIKUkpkVXgwU3c4N2c2bml3N2tFclJxSmpvNGxjSGprNXRJUkpOUFhNaEZmeDB5enJDL3cwa043cHhEQS9iQ1NLeWVIOFI2eVBPY3hyTkFwalRnV25qQWc9PQo="
     }
   }
 }
