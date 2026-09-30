@@ -139,7 +139,9 @@
       throw new EyereadError('E_INVALID_ARGUMENT', 'callback must be a function');
     set.add(callback);
     if (listenerCount(source) === 1)
-      call('prompter:control', 'input.subscribe', { source }).catch((e) => reportError(e, false));
+      call('prompter:control', 'input.subscribe', { source }).catch((e) =>
+        reportError(e, false)
+      );
     return () => {
       if (!set.delete(callback) || listenerCount(source) > 0) return;
       call('prompter:control', 'input.unsubscribe', { source }).catch(() => {});
