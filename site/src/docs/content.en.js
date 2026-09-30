@@ -282,15 +282,16 @@ export default {
       'The scaffold, CLI and types live in the packs SDK repository. They aren’t on npm yet: until they are, run them from a clone of the SDK, or use Developer mode’s New pack, Validate and Build pack buttons, which run the same checks.',
     verifiedHeading: 'Getting Verified',
     verifiedIntro:
-      'Anyone can share a pack as Community. For the ✓ Verified badge, submit it for review:',
+      'Anyone can share a pack as Community. For the ✓ Verified badge, your pack stays in your own repo and the packs repo stores a reference to it:',
     verifiedSteps: [
-      'Open a pull request with your pack’s source in omniship-labs/eyeread.in-packs.',
-      'Automated checks run: validation and, for updates, a summary of new permissions and sites.',
+      'Publish a release in your repo, with the zip from the build command attached.',
+      'Open a pull request in omniship-labs/eyeread.in-packs with the release’s repo, tag, commit, zip URL and pack hash.',
+      'Automated checks download the zip, confirm it matches, validate it, and summarize new permissions and sites.',
       'A maintainer reviews it against the checklist and the content policy. The target is 2 weeks.',
-      'Once approved, it’s signed offline and published as a release. Signing never happens in CI.',
+      'Once approved, it’s signed offline and the signature is stored next to your entry. Add it to your zip so hand-installed copies show as Verified too.',
     ],
     verifiedNote:
-      'Updates get a diff-only review. Users keep the last Verified version until the new one is signed, and approve again if it asks for new permissions or sites.',
+      'The zip URL can be on any host, but must download directly and never change. If it disappears or changes, the pack is withdrawn. Updates get a diff-only review, and users approve again if an update asks for new permissions or sites.',
     specHeading: 'Full reference',
     specIntro: 'The exact rules live in the spec and the creator guide in the repository:',
   },

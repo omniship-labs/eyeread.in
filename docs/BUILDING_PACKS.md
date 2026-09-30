@@ -176,15 +176,33 @@ you choose. See the
 
 ### Getting Verified
 
-1. Open a pull request with your pack's source in
-   `omniship-labs/eyeread.in-packs`.
-2. Automated checks run: validation and, for updates, a summary of what
-   changed, with new permissions and sites highlighted.
-3. A maintainer reviews it against the review checklist and the
-   [content policy](../PACK_POLICY.md). **Target: 2 weeks.**
-4. Once approved, a maintainer signs it offline and publishes the signed zip as
-   a release. Signing never happens in CI.
+Your pack stays in your own repo, under your license. The packs repo,
+`omniship-labs/eyeread.in-packs`, only stores a reference to each version and
+OmniShip's signature for it.
 
-**Updates** get a diff-only review. Every version is signed separately, and
-users keep the last Verified version until the new one is signed. If an update
-asks for new permissions or sites, users approve it again.
+1. **Publish a release** in your repo: tag the version (for example `v1.2.0`)
+   and attach the zip from `npx @omniship-labs/eyeread.in-packs build`.
+2. **Open a pull request** in the packs repo adding an entry for that version:
+   your repo, the tag, the commit it points to, the zip's URL and its pack hash
+   (`build` prints it).
+3. **Automated checks** download the zip, check that it matches the commit and
+   the pack hash, validate it, and summarize what changed since the last
+   Verified version, with new permissions and sites highlighted.
+4. **A maintainer reviews** it against the review checklist and the
+   [content policy](../PACK_POLICY.md). **Target: 2 weeks.**
+5. **Once approved**, the maintainer signs it offline and adds the signature
+   next to your entry. Signing never happens in CI. You also get the signature
+   file: add it to your zip as `files.json.minisig` and re-upload it, so copies
+   people install by hand show as Verified too. Adding it doesn't change the
+   pack hash.
+
+**The zip URL** can be on any host, but it must be `https://`, download the zip
+directly with no login, and never change for that version (no
+`/releases/latest/…` links). The packs repo checks every link daily. If a zip
+disappears for several days, or its contents change, the pack is withdrawn:
+it's hidden from the catalog and shows as Community on installed copies.
+
+**Updates** are a new release and a new entry, and get a diff-only review.
+Every version is signed separately, and users keep the last Verified version
+until the new one is signed. If an update asks for new permissions or sites,
+users approve it again.

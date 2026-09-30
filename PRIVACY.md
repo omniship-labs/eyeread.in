@@ -108,7 +108,8 @@ A future version will let you browse packs from catalogs. When it does,
 checking catalogs will be **opt-in** and off by default. Only catalog lists and
 the packs you choose will be downloaded, and none of your data will be sent. As
 with any download, the server hosting a catalog (ours, or a third party's you
-added) can see your IP address. We will update this policy before it ships.
+added) can see your IP address, and so can the server a pack is downloaded
+from, which is usually the pack author's. We will update this policy before it ships.
 
 ---
 
