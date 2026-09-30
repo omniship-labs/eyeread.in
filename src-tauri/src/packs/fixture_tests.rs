@@ -162,6 +162,49 @@ fn error_messages_name_the_file_inside_an_included_pack() {
     );
 }
 
+fn copy_folder(from: &Path, to: &Path) {
+    fs::create_dir_all(to).unwrap();
+    for item in fs::read_dir(from).unwrap().flatten() {
+        if item.file_type().unwrap().is_dir() {
+            copy_folder(&item.path(), &to.join(item.file_name()));
+        } else {
+            fs::copy(item.path(), to.join(item.file_name())).unwrap();
+        }
+    }
+}
+
+#[test]
+fn a_top_level_git_is_skipped_when_reading_a_folder() {
+    let tmp = tempfile::tempdir().unwrap();
+    let dir = tmp.path().join("pack");
+    copy_folder(&fixtures_dir().join("valid-multifile"), &dir);
+    let read = |dir: &Path| {
+        let entries = archive::read_folder(dir).unwrap();
+        let bundle = validate_entries(entries.clone(), &semver::Version::new(1, 0, 0)).unwrap();
+        (entries, bundle.top.pack_hash)
+    };
+    let clean = read(&dir);
+
+    // A repo's `.git` directory: bare names and nested objects the file-type
+    // rule would reject if they weren't skipped.
+    let git = dir.join(".git");
+    fs::create_dir_all(git.join("objects/ab")).unwrap();
+    fs::write(git.join("HEAD"), "ref: refs/heads/main\n").unwrap();
+    fs::write(git.join("config"), "[core]\n").unwrap();
+    fs::write(git.join("objects/ab/cdef0123"), [0u8, 1, 2]).unwrap();
+    assert_eq!(read(&dir), clean);
+
+    // A worktree or submodule uses a `.git` file instead.
+    fs::remove_dir_all(&git).unwrap();
+    fs::write(&git, "gitdir: ../.git/worktrees/pack\n").unwrap();
+    assert_eq!(read(&dir), clean);
+
+    // Only at the top level: a nested `.git` is still an entry like any other.
+    fs::write(dir.join("src/.git"), "gitdir: x\n").unwrap();
+    let err = archive::read_folder(&dir).unwrap_err();
+    assert_eq!(err.code, "PACK_FILE_TYPE");
+}
+
 /// Not a test: installs a pack folder into a store, for trying packs in a
 /// local build. Run with
 /// `EYEREAD_PACKS_ROOT=<app data>/packs EYEREAD_PACK_FOLDER=<folder> cargo test install_folder -- --ignored`.
