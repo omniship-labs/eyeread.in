@@ -89,3 +89,39 @@ pub fn sign_revocations(json: &[u8], sk: &SecretKey, pk: Option<&PublicKey>) -> 
         .map_err(|e| PackError::install("SIGN_FAILED", format!("revocation list: {e}")))?;
     sign_bytes(json, REVOCATIONS_COMMENT, sk, pk)
 }
+
+/// Sign only the pack's own `files.json`, for a catalog entry: the reviewed
+/// zip isn't rewritten, and the signature is added to it (or served next to
+/// it) later. `expected_pack_hash` is what the reviewer approved; signing
+/// refuses if the zip in hand hashes differently. Returns the contents of
+/// `files.json.minisig`.
+pub fn sign_signature_only(
+    entries: Vec<Entry>,
+    expected_pack_hash: &str,
+    sk: &SecretKey,
+    pk: Option<&PublicKey>,
+    app_version: &semver::Version,
+) -> PackResult<String> {
+    let entries: Vec<Entry> = entries
+        .into_iter()
+        .filter(|e| !is_old_signature_file(&e.path))
+        .collect();
+    let bundle = validate_entries(entries, app_version)?;
+    let top = &bundle.top;
+    if top.pack_hash != expected_pack_hash {
+        return Err(PackError::install(
+            "SIGN_FAILED",
+            format!(
+                "pack hash is {}, not the reviewed {expected_pack_hash}",
+                top.pack_hash
+            ),
+        ));
+    }
+    let m = &top.manifest;
+    sign_bytes(
+        &top.files.canonical_bytes(),
+        &trusted_comment(&m.id, &m.version, &top.pack_hash),
+        sk,
+        pk,
+    )
+}

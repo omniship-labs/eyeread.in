@@ -14,7 +14,7 @@ use super::error::{
 };
 use super::files_list::FilesList;
 use super::manifest::Manifest;
-use super::signature::RevocationList;
+use super::signature::{RevocationKind, RevocationList};
 use super::validate::{ValidatedBundle, ValidatedPack};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -443,24 +443,35 @@ impl PackStore {
         Ok(())
     }
 
-    /// Disable every installed pack on the revocation list. Returns their ids.
+    /// Apply the revocation list to installed packs: a block disables the pack
+    /// for good, an unverify only drops its ✓ Verified badge. Returns the ids
+    /// that changed.
     pub fn apply_revocations(&mut self, list: &RevocationList) -> PackResult<Vec<String>> {
-        let mut revoked = Vec::new();
+        let mut changed = Vec::new();
         for pack in self.registry.packs.values_mut() {
-            if let Some(r) = list.find(&pack.pack_hash) {
-                if pack.status != PackStatus::Revoked {
+            let Some(r) = list.find(&pack.pack_hash) else {
+                continue;
+            };
+            match r.kind {
+                RevocationKind::Block if pack.status != PackStatus::Revoked => {
                     pack.status = PackStatus::Revoked;
                     pack.status_reason = Some(r.reason.clone());
                     pack.enabled = false;
                     pack.verified = false;
-                    revoked.push(pack.id.clone());
+                    changed.push(pack.id.clone());
                 }
+                RevocationKind::Unverify if pack.verified => {
+                    pack.status_reason = Some(r.reason.clone());
+                    pack.verified = false;
+                    changed.push(pack.id.clone());
+                }
+                _ => {}
             }
         }
-        if !revoked.is_empty() {
+        if !changed.is_empty() {
             self.save()?;
         }
-        Ok(revoked)
+        Ok(changed)
     }
 
     /// Run the launch check on every enabled pack. Returns the ids that were

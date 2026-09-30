@@ -222,12 +222,17 @@ app's updater uses.
   trusted comment repeats them, the signature is bound to one version of one
   pack. Any edit, or copying the signature onto another pack, breaks it.
 
-| Result      | When                                                            | Shown as                        |
-| ----------- | --------------------------------------------------------------- | ------------------------------- |
-| `verified`  | The signature verifies, and the pack hash isn't revoked         | ✓ Verified by eyeread.in        |
-| `community` | There's no `files.json.minisig`                                 | Community (with a warning)      |
-| `invalid`   | A signature is present but doesn't verify: treated as tampering | Blocked                         |
-| `revoked`   | The pack hash is on the app's revocation list                   | Blocked, with the list's reason |
+| Result       | When                                                            | Shown as                          |
+| ------------ | --------------------------------------------------------------- | --------------------------------- |
+| `verified`   | The signature verifies, and the pack hash isn't revoked         | ✓ Verified by eyeread.in          |
+| `community`  | There's no `files.json.minisig`                                 | Community (with a warning)        |
+| `invalid`    | A signature is present but doesn't verify: treated as tampering | Blocked                           |
+| `revoked`    | The pack hash is on the app's revocation list (`block`)         | Blocked, with the list's reason   |
+| `unverified` | The pack hash is on the list as `unverify`                      | Community, with the list's reason |
+
+A signature may also arrive from outside the zip (the catalog's
+`files.json.minisig`). It is checked the same way, over the `files.json` computed
+from the pack's files, and only when the zip ships no signature of its own.
 
 A **bundle** is `verified` only if it and every pack it includes are. Developer
 mode packs are shown as `Dev` and never verified.

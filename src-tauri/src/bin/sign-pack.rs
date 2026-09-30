@@ -6,6 +6,10 @@
 //!       --secret-key <file> [--public-key <file>] <pack.zip | folder> <signed.zip>
 //!
 //!   cargo run --features pack-signing --bin sign-pack -- \
+//!       --secret-key <file> [--public-key <file>] --signature-only \
+//!       --pack-hash <hash> <pack.zip | folder> <files.json.minisig>
+//!
+//!   cargo run --features pack-signing --bin sign-pack -- \
 //!       --secret-key <file> [--public-key <file>] --revocations src/packs/revoked.json
 //!
 //! Keys are standard minisign key files (`minisign -G`). An encrypted secret
@@ -21,17 +25,24 @@ struct Args {
     key_file: PathBuf,
     public_key: Option<PathBuf>,
     revocations: Option<PathBuf>,
+    /// Write only `files.json.minisig` for the reviewed zip (catalog entries).
+    signature_only: bool,
+    /// The pack hash the reviewer approved; required with `--signature-only`.
+    pack_hash: Option<String>,
     positional: Vec<PathBuf>,
 }
 
 const USAGE: &str = "usage:
   sign-pack --secret-key <file> [--public-key <file>] <pack.zip | folder> <signed.zip>
+  sign-pack --secret-key <file> [--public-key <file>] --signature-only --pack-hash <hash> <pack.zip | folder> <files.json.minisig>
   sign-pack --secret-key <file> [--public-key <file>] --revocations <revoked.json>";
 
 fn parse_args() -> Result<Args, String> {
     let mut key_file = None;
     let mut public_key = None;
     let mut revocations = None;
+    let mut signature_only = false;
+    let mut pack_hash = None;
     let mut positional = Vec::new();
     let mut args = std::env::args_os().skip(1);
     while let Some(arg) = args.next() {
@@ -44,16 +55,24 @@ fn parse_args() -> Result<Args, String> {
             Some("--secret-key") => key_file = Some(value("--secret-key")?),
             Some("--public-key") => public_key = Some(value("--public-key")?),
             Some("--revocations") => revocations = Some(value("--revocations")?),
+            Some("--signature-only") => signature_only = true,
+            Some("--pack-hash") => {
+                pack_hash = Some(value("--pack-hash")?.to_string_lossy().into_owned())
+            }
             Some("-h") | Some("--help") => return Err(USAGE.into()),
             _ => positional.push(PathBuf::from(arg)),
         }
     }
     let key_file = key_file.ok_or_else(|| format!("--secret-key is required\n{USAGE}"))?;
     let wanted = if revocations.is_some() { 0 } else { 2 };
-    if positional.len() != wanted {
+    if positional.len() != wanted
+        || (signature_only && (pack_hash.is_none() || revocations.is_some()))
+    {
         return Err(USAGE.into());
     }
     Ok(Args {
+        signature_only,
+        pack_hash,
         key_file,
         public_key,
         revocations,
@@ -114,6 +133,51 @@ mod keyed {
             if signature::RevocationList::load(&String::from_utf8_lossy(json), &sig, keys).is_err()
             {
                 return Err("the signed list doesn't verify with --public-key");
+            }
+        }
+        if std::fs::write(out, sig).is_err() {
+            return Err("couldn't write the signature file");
+        }
+        Ok(())
+    }
+
+    /// Sign only the reviewed pack's `files.json` and write the signature to
+    /// `out`, checked against `keyring` when given.
+    pub fn sign_signature_only(
+        key_file: &Path,
+        pk: Option<&minisign::PublicKey>,
+        keyring: Option<&signature::Keyring>,
+        entries: Vec<archive::Entry>,
+        pack_hash: &str,
+        app_version: &semver::Version,
+        out: &Path,
+    ) -> Result<(), &'static str> {
+        let Some(sk) = load(key_file) else {
+            return Err(KEY_UNUSABLE);
+        };
+        let Ok(sig) = signer::sign_signature_only(entries.clone(), pack_hash, &sk, pk, app_version)
+        else {
+            return Err("signing failed (is --pack-hash the reviewed pack's hash?)");
+        };
+        if let Some(keys) = keyring {
+            let checked = validate::validate_entries(
+                entries
+                    .into_iter()
+                    .filter(|e| {
+                        !e.path.ends_with("files.json") && !e.path.ends_with("files.json.minisig")
+                    })
+                    .collect(),
+                app_version,
+            )
+            .ok()
+            .map(|mut bundle| {
+                let id = bundle.top.manifest.id.clone();
+                bundle.attach_signature(&id, sig.clone().into_bytes());
+                signature::check_bundle(&bundle, keys, &signature::RevocationList::default())
+                    .is_ok_and(|r| r.is_verified(&id))
+            });
+            if checked != Some(true) {
+                return Err("the signature doesn't verify with --public-key");
             }
         }
         if std::fs::write(out, sig).is_err() {
@@ -188,6 +252,26 @@ fn run() -> Result<String, String> {
             "Signed {} → {}",
             list_path.display(),
             sig_path.display()
+        ));
+    }
+
+    if args.signature_only {
+        let (input, output) = (&args.positional[0], &args.positional[1]);
+        let pack_hash = args.pack_hash.as_deref().unwrap_or_default();
+        let app_version = semver::Version::parse(env!("CARGO_PKG_VERSION")).expect("crate version");
+        keyed::sign_signature_only(
+            &args.key_file,
+            pk.as_ref(),
+            keyring.as_ref(),
+            read_pack(input)?,
+            pack_hash,
+            &app_version,
+            output,
+        )?;
+        return Ok(format!(
+            "Signed {} ({pack_hash}) → {}",
+            input.display(),
+            output.display()
         ));
     }
 
