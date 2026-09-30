@@ -268,7 +268,9 @@ pub fn read_zip_file(path: &Path) -> PackResult<Vec<Entry>> {
     read_zip(&bytes)
 }
 
-/// Read an unpacked pack folder (Developer mode), with the same checks.
+/// Read an unpacked pack folder (Developer mode), with the same checks. A
+/// top-level `.git` (a directory, or the file a worktree or submodule uses) is
+/// skipped before any check, so the folder can be a git repo's root.
 pub fn read_folder(root: &Path) -> PackResult<Vec<Entry>> {
     let mut raw = Vec::new();
     let mut total = 0u64;
@@ -282,6 +284,9 @@ pub fn read_folder(root: &Path) -> PackResult<Vec<Entry>> {
                 .file_name()
                 .into_string()
                 .map_err(|n| n.to_string_lossy().into_owned());
+            if prefix.is_empty() && name.as_deref() == Ok(".git") {
+                continue;
+            }
             let rel = match &name {
                 Ok(n) => Ok(format!("{prefix}{n}")),
                 Err(lossy) => Err(format!("{prefix}{lossy}").into_bytes()),

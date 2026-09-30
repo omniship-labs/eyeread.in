@@ -132,7 +132,9 @@ Every entry in the zip must be a regular file or a directory, with a path that:
 - doesn't differ from another entry's path only by letter case.
 
 Symlinks, hard links and device files are rejected. `__MACOSX/…` and `.DS_Store`
-entries are skipped: they're neither extracted nor hashed.
+entries are skipped: they're neither extracted nor hashed. When a pack is read
+from a folder, a `.git` at the folder's top level is skipped too, so the folder
+can be a git repo's root.
 
 Allowed file types: `.js`, `.mjs`, `.json`, `.md`, `.txt`, `.css`, `.svg`,
 `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, plus files named `LICENSE`, `COPYING`,
