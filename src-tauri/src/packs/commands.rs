@@ -445,15 +445,29 @@ pub fn init(app: &AppHandle, broker: Arc<Broker>) {
 type PacksState<'a> = State<'a, Arc<Packs>>;
 
 /// Validate a pack file and run the signature and revocation step.
-fn check(packs: &Packs, path: String) -> PackResult<(ValidatedBundle, BundleVerification)> {
-    let bundle = validate::validate_zip_file(&PathBuf::from(path), &packs.app_version)?;
+/// `catalog_signature` is the top pack's `files.json.minisig` when it came
+/// from the catalog instead of the zip.
+fn check(
+    packs: &Packs,
+    path: String,
+    catalog_signature: Option<String>,
+) -> PackResult<(ValidatedBundle, BundleVerification)> {
+    let mut bundle = validate::validate_zip_file(&PathBuf::from(path), &packs.app_version)?;
+    if let Some(sig) = catalog_signature {
+        let id = bundle.top.manifest.id.clone();
+        bundle.attach_signature(&id, sig.into_bytes());
+    }
     let checks = signature::check_bundle(&bundle, Keyring::embedded(), RevocationList::embedded())?;
     Ok((bundle, checks))
 }
 
 #[tauri::command]
-pub fn packs_inspect(packs: PacksState<'_>, path: String) -> PackResult<InspectResult> {
-    let (bundle, checks) = check(&packs, path.clone())?;
+pub fn packs_inspect(
+    packs: PacksState<'_>,
+    path: String,
+    signature: Option<String>,
+) -> PackResult<InspectResult> {
+    let (bundle, checks) = check(&packs, path.clone(), signature)?;
     let guard = packs.store()?;
     let store = guard.as_ref().expect("checked in store()");
     Ok(InspectResult {
@@ -475,8 +489,9 @@ pub fn packs_install(
     packs: PacksState<'_>,
     path: String,
     bundle_hash: String,
+    signature: Option<String>,
 ) -> PackResult<Vec<PackListItem>> {
-    let (bundle, checks) = check(&packs, path)?;
+    let (bundle, checks) = check(&packs, path, signature)?;
     if self::bundle_hash(&bundle) != bundle_hash {
         return Err(PackError::install(
             INSTALL_CHANGED,
@@ -753,7 +768,7 @@ pub fn packs_inspect_bytes(
     std::fs::create_dir_all(&dir).map_err(|e| PackError::io("Couldn't stage the pack", e))?;
     let path = dir.join(format!("{}.zip", &sha256_hex(bytes)[..16]));
     std::fs::write(&path, bytes).map_err(|e| PackError::io("Couldn't stage the pack", e))?;
-    packs_inspect(packs, path.to_string_lossy().into_owned())
+    packs_inspect(packs, path.to_string_lossy().into_owned(), None)
 }
 
 // ---- Developer mode ---------------------------------------------------------------

@@ -5,9 +5,9 @@
 use super::archive::write_zip;
 use super::archive::{self, Entry};
 use super::signature::{
-    check_bundle, verify_pack, Keyring, Revocation, RevocationList, Verification,
+    check_bundle, verify_pack, Keyring, Revocation, RevocationKind, RevocationList, Verification,
 };
-use super::signer::{sign_pack, sign_revocations};
+use super::signer::{sign_pack, sign_revocations, sign_signature_only};
 use super::store::tests::pack_entries;
 use super::store::PackStore;
 use super::validate::{validate_entries, ValidatedBundle};
@@ -193,6 +193,7 @@ fn revoked_hash_blocks_install_and_disables_installed_pack() {
     let list = RevocationList {
         format: 1,
         revoked: vec![Revocation {
+            kind: RevocationKind::Block,
             pack_hash: bundle.top.pack_hash.clone(),
             id: "com.example.a".into(),
             version: "1.0.0".into(),
@@ -318,4 +319,137 @@ fn embedded_keys_are_both_set_and_valid() {
         Keyring::new(&[(name, key)]).unwrap();
     }
     Keyring::embedded();
+}
+
+#[test]
+fn signature_only_signs_the_reviewed_files_list_and_nothing_else() {
+    let keys = Keys::new();
+    let entries = simple("com.example.a");
+    let reviewed = validate(entries.clone());
+    let sig = sign_signature_only(
+        entries.clone(),
+        &reviewed.top.pack_hash,
+        &keys.main.sk,
+        Some(&keys.main.pk),
+        &app(),
+    )
+    .unwrap();
+
+    // Added to the zip as files.json.minisig (the creator's step), the pack
+    // verifies, and the signature carries the same trusted comment as a
+    // fully signed zip.
+    let mut shipped = entries.clone();
+    shipped.push(Entry {
+        path: "files.json".into(),
+        bytes: reviewed.top.files.canonical_bytes(),
+    });
+    shipped.push(Entry {
+        path: "files.json.minisig".into(),
+        bytes: sig.clone().into_bytes(),
+    });
+    assert_eq!(
+        verify_pack(&validate(shipped).top, &keys.keyring(), &none()),
+        Verification::Verified { key: "main".into() }
+    );
+    let full = sign(entries, &keys.main);
+    let comment = |s: &str| s.lines().nth(2).unwrap().to_string();
+    assert_eq!(
+        comment(&sig),
+        comment(std::str::from_utf8(file(&full, "files.json.minisig")).unwrap())
+    );
+}
+
+#[test]
+fn signature_only_refuses_a_different_pack_hash() {
+    let keys = Keys::new();
+    let err = sign_signature_only(
+        simple("com.example.a"),
+        "sha256:not-the-reviewed-zip",
+        &keys.main.sk,
+        None,
+        &app(),
+    )
+    .unwrap_err();
+    assert_eq!(err.code, "SIGN_FAILED");
+}
+
+#[test]
+fn catalog_signature_verifies_a_zip_that_ships_none() {
+    let keys = Keys::new();
+    let entries = simple("com.example.a");
+    let sig = sign_signature_only(
+        entries.clone(),
+        &validate(entries.clone()).top.pack_hash,
+        &keys.main.sk,
+        None,
+        &app(),
+    )
+    .unwrap();
+
+    let mut bundle = validate(entries);
+    assert_eq!(
+        verify_pack(&bundle.top, &keys.keyring(), &none()),
+        Verification::Community
+    );
+    assert!(bundle.attach_signature("com.example.a", sig.into_bytes()));
+    assert_eq!(
+        verify_pack(&bundle.top, &keys.keyring(), &none()),
+        Verification::Verified { key: "main".into() }
+    );
+    assert!(!bundle.attach_signature("com.example.other", vec![]));
+}
+
+#[test]
+fn catalog_signature_for_another_version_is_invalid() {
+    let keys = Keys::new();
+    let old = simple("com.example.a");
+    let sig = sign_signature_only(
+        old.clone(),
+        &validate(old).top.pack_hash,
+        &keys.main.sk,
+        None,
+        &app(),
+    )
+    .unwrap();
+
+    // A different build of the pack must not pick up this signature.
+    let mut other = validate(pack_entries("com.example.a", "1.0.0", &[], "// changed\n"));
+    other.attach_signature("com.example.a", sig.into_bytes());
+    assert!(matches!(
+        verify_pack(&other.top, &keys.keyring(), &none()),
+        Verification::Invalid { .. }
+    ));
+}
+
+#[test]
+fn unverify_keeps_the_pack_installable_as_community() {
+    let keys = Keys::new();
+    let bundle = validate(sign(simple("com.example.a"), &keys.main));
+    let list = RevocationList {
+        format: 1,
+        revoked: vec![Revocation {
+            kind: RevocationKind::Unverify,
+            pack_hash: bundle.top.pack_hash.clone(),
+            id: "com.example.a".into(),
+            version: "1.0.0".into(),
+            reason: "Source no longer available.".into(),
+        }],
+    };
+    assert_eq!(
+        verify_pack(&bundle.top, &keys.keyring(), &list),
+        Verification::Unverified {
+            reason: "Source no longer available.".into()
+        }
+    );
+    let checks = check_bundle(&bundle, &keys.keyring(), &list).unwrap();
+    assert!(!checks.is_verified("com.example.a"));
+}
+
+#[test]
+fn revocation_without_a_kind_still_blocks() {
+    let list: RevocationList = serde_json::from_str(
+        r#"{"format":1,"revoked":[{"packHash":"h","id":"a","version":"1","reason":"r"}]}"#,
+    )
+    .unwrap();
+    assert_eq!(list.revoked[0].kind, RevocationKind::Block);
 }

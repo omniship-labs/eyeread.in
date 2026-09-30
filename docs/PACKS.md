@@ -62,6 +62,19 @@ the verifier is `src-tauri/src/packs/signature.rs`.
   checks the result with `--public-key` before writing `signed.zip`. Every
   version is signed separately.
 
+- **Catalog entries** (the `eyeread.in-packs` repo) store only the signature,
+  not the creator's zip. Download the reviewed zip, then:
+
+  ```bash
+  cargo run --features pack-signing --bin sign-pack -- \
+    --secret-key <key> --public-key <key.pub> --signature-only \
+    --pack-hash <approved hash> <reviewed pack.zip> files.json.minisig
+  ```
+
+  It refuses to sign if the zip's pack hash isn't the approved one, and writes
+  only `files.json.minisig`. Commit that next to the entry; the creator can add
+  it to their zip too, and the pack hash doesn't change.
+
 - **Revoking** a pack: add its pack hash (printed by `sign-pack`, or shown in
   the review) with a reason to `src-tauri/src/packs/revoked.json`, then sign
   the list:
@@ -74,6 +87,11 @@ the verifier is `src-tauri/src/packs/signature.rs`.
   The list ships with the next app update: matching packs are blocked at
   install, and disabled at launch with the reason shown. A unit test fails if
   the shipped list is neither empty nor correctly signed.
+
+  Entries are `"kind": "block"` (the default) or `"kind": "unverify"`. An
+  unverify is for a pack that isn't unsafe but can no longer be vouched for,
+  such as one whose source is gone: installed copies lose the badge and show
+  as Community with the reason, and keep running.
 
 ### Signing keys
 

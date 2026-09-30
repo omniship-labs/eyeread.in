@@ -78,9 +78,24 @@ impl Keyring {
     }
 }
 
+/// What a revocation does to a pack.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum RevocationKind {
+    /// The pack can't be installed, and an installed copy is disabled.
+    #[default]
+    Block,
+    /// The pack loses its ✓ Verified badge and shows as Community, with the
+    /// reason. It still installs and runs (for example, its source is gone).
+    Unverify,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Revocation {
+    /// What happens to the pack. Older lists have no `kind`: they block.
+    #[serde(default)]
+    pub kind: RevocationKind,
     pub pack_hash: String,
     pub id: String,
     pub version: String,
@@ -142,15 +157,19 @@ pub enum Verification {
     Community,
     /// A signature is present but doesn't match: treated as tampering.
     Invalid { reason: String },
-    /// On the revocation list.
+    /// On the revocation list as a block.
     Revoked { reason: String },
+    /// On the revocation list as an unverify: installable, but Community.
+    Unverified { reason: String },
 }
 
 /// Check one pack against `keys` and `revoked`.
 pub fn verify_pack(pack: &ValidatedPack, keys: &Keyring, revoked: &RevocationList) -> Verification {
     if let Some(r) = revoked.find(&pack.pack_hash) {
-        return Verification::Revoked {
-            reason: r.reason.clone(),
+        let reason = r.reason.clone();
+        return match r.kind {
+            RevocationKind::Block => Verification::Revoked { reason },
+            RevocationKind::Unverify => Verification::Unverified { reason },
         };
     }
     let Some(sig_bytes) = &pack.signature else {
@@ -175,6 +194,27 @@ pub fn verify_pack(pack: &ValidatedPack, keys: &Keyring, revoked: &RevocationLis
     match keys.verify(files_json, &sig) {
         Some(key) => Verification::Verified { key: key.into() },
         None => invalid("the signature doesn't match eyeread.in's keys"),
+    }
+}
+
+impl ValidatedBundle {
+    /// Use a signature that came from outside the zip (the catalog's
+    /// `files.json.minisig`) for pack `id`, when the zip doesn't carry its own.
+    /// It's checked like a shipped one: the files list it covers is the one
+    /// computed from the pack's files. Returns false if `id` isn't in the bundle.
+    pub fn attach_signature(&mut self, id: &str, signature: Vec<u8>) -> bool {
+        let pack = if self.top.manifest.id == id {
+            Some(&mut self.top)
+        } else {
+            self.included.iter_mut().find(|p| p.manifest.id == id)
+        };
+        let Some(pack) = pack else { return false };
+        if pack.signature.is_none() {
+            pack.shipped_files_json
+                .get_or_insert_with(|| pack.files.canonical_bytes());
+            pack.signature = Some(signature);
+        }
+        true
     }
 }
 
