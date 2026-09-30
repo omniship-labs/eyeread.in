@@ -1,8 +1,5 @@
 # Pack content policy
 
-> **Draft, pending sign-off.** This policy isn't final yet and may change
-> before the first pack is Verified.
-
 This is what we won't verify. A pack that breaks it doesn't get the
 ✓ **Verified by eyeread.in** badge, and a Verified pack found to break it later
 is revoked.
@@ -80,10 +77,56 @@ Any license is fine. Because the code is readable, a determined user can see
 how a license check works; charging tends to work best for support, updates,
 or a service your pack connects to.
 
+### 8. More permissions than it needs
+
+Ask only for the permissions and network sites the pack actually uses, for
+what its description says. No permissions "just in case", and no sites the
+code never calls.
+
+### 9. Remote switches
+
+A pack can't change what it does based on data from a server. It may fetch the
+content its description promises (a Notion page, say), but not settings, flags
+or instructions that turn features on or off, or change where data goes, after
+review. No kill switches and no hidden feature flags.
+
+### 10. Mishandling credentials
+
+Many packs need an API key or token for the service they connect to. A pack
+may send it only to that service, and must not log it, show it elsewhere, or
+send it anywhere else. Pack settings aren't secret storage, so say in the
+description what the key can access.
+
+A pack must never ask for your eyeread.in or OmniShip account details, or for
+passwords to services it doesn't connect to.
+
+### 11. A pack id that isn't yours
+
+A pack's `id` never changes and is shown as who made it, so it must be yours to
+use: reverse-DNS of a domain you control (`com.example.notion-sync` for
+`example.com`), or `io.github.<your-username>.<pack>` if you don't have one.
+No ids that suggest a company or product you aren't.
+
 ### Also
 
 We won't verify anything that's illegal, harmful to users (malware, scams,
 harassment), or breaks the [Terms of Use](TERMS.md).
+
+---
+
+## Staying Verified
+
+A Verified version must stay available from where it was reviewed. We check
+every Verified version daily, and withdraw it if:
+
+- its zip can't be downloaded for 3 days in a row (from its URL or any mirror);
+- its zip changes, even slightly; or
+- its tag or commit disappears from your repo, or the tag is moved.
+
+Withdrawing isn't a penalty. The version leaves the catalog and installed
+copies show as Community, with the reason, but they aren't blocked. To stay
+Verified, don't delete or re-tag your releases; to fix a problem, submit a new
+version.
 
 ---
 
