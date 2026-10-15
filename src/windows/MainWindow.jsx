@@ -78,6 +78,7 @@ import {
 } from '../lib/tauri';
 import { useShareProtection } from '../hooks/useShareProtection';
 import { usePermissionsGate } from '../hooks/usePermissionsGate';
+import { usePackInput } from '../hooks/usePackInput';
 import { usePacksHost } from '../hooks/usePacksHost';
 import { usePackInstaller } from '../hooks/usePackInstaller';
 import { useUiScale, useReducedMotion, useDyslexicFont } from '../hooks/useA11y';
@@ -316,6 +317,7 @@ export function MainWindow() {
 
   // Packs / Connected apps: pairing prompt + calls routed to this window.
   const { pairingModal, importModal } = usePacksHost({ setScripts, startReading });
+  usePackInput();
   // Packs: drop a .zip on the window, or "Install pack…" in Settings.
   const { installModal } = usePackInstaller();
 

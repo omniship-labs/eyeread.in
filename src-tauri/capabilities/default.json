@@ -71,6 +71,8 @@
     "allow-packs-net-clear-log",
     "allow-packs-rpc-result",
     "allow-packs-prompter-state",
+    "allow-packs-input-event",
+    "allow-packs-input-wanted",
     "allow-packs-grants",
     "allow-packs-set-grant",
     "allow-packs-settings-get",

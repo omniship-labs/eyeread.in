@@ -168,6 +168,21 @@ describe('protocol messages', () => {
       error: { code: 'E_NO_SESSION', message: "The prompter isn't open." },
     },
     { v: 1, type: 'event', name: 'settings.changed', data: { autoOpen: false } },
+    {
+      v: 1,
+      type: 'call',
+      id: 9,
+      permission: 'prompter:control',
+      method: 'input.subscribe',
+      params: { source: 'keyboard' },
+    },
+    {
+      v: 1,
+      type: 'event',
+      name: 'input.key',
+      data: { type: 'down', code: 'ArrowRight', modifiers: {}, repeat: false },
+    },
+    { v: 1, type: 'event', name: 'input.mouse.wheel', data: { deltaX: 0, deltaY: -120 } },
     { v: 1, type: 'log', level: 'info', args: ['hello'] },
     { v: 1, type: 'error', message: 'boom', fatal: true },
   ];
@@ -195,6 +210,7 @@ describe('protocol messages', () => {
     { v: 1, type: 'result', id: 1, ok: false, value: 1 },
     { v: 1, type: 'result', id: 1, ok: false, error: { code: 'E_WHATEVER', message: '' } },
     { v: 1, type: 'log', level: 'trace', args: [] },
+    { v: 1, type: 'event', name: 'input.clipboard', data: {} },
     { v: 1, type: 'ready', handlers: ['prompter:control'], extra: true },
   ];
 

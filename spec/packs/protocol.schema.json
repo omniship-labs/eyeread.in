@@ -101,6 +101,26 @@
             },
             "network": {
               "type": "boolean"
+            },
+            "input": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["keyboard", "mouse", "wheel", "position"],
+              "description": "Present for an input sandbox: which sources exist, and whether mouse.onWheel and mouse.onMove do.",
+              "properties": {
+                "keyboard": {
+                  "type": "boolean"
+                },
+                "mouse": {
+                  "type": "boolean"
+                },
+                "position": {
+                  "type": "boolean"
+                },
+                "wheel": {
+                  "type": "boolean"
+                }
+              }
             }
           }
         },
@@ -182,6 +202,8 @@
             "prompter.getState",
             "prompter.subscribe",
             "prompter.unsubscribe",
+            "input.subscribe",
+            "input.unsubscribe",
             "files.import",
             "net.fetch",
             "settings.get"
@@ -269,7 +291,14 @@
           "const": "event"
         },
         "name": {
-          "enum": ["prompter.state", "settings.changed"]
+          "enum": [
+            "prompter.state",
+            "settings.changed",
+            "input.key",
+            "input.mouse.button",
+            "input.mouse.wheel",
+            "input.mouse.move"
+          ]
         },
         "data": {
           "type": "object"

@@ -375,6 +375,16 @@
       "prompterEvents": "पढ़ते समय मौजूदा स्क्रिप्ट का शीर्षक और उसमें आपकी स्थिति।",
       "filesImport": "ऐप के अपने पिकर से एक फ़ाइल चुनने को कहता है और केवल वही फ़ाइल पाता है।"
     },
+    "input": {
+      "keys": "कुंजियाँ {{keys}}",
+      "anyKey": "कोई भी कुंजी",
+      "buttons": "माउस बटन {{buttons}}",
+      "anyButton": "कोई भी माउस बटन",
+      "wheel": "माउस व्हील",
+      "position": "पॉइंटर की स्थिति",
+      "reads": "eyeread.in के फ़ोकस में होने पर {{what}} पढ़ता है, टेक्स्ट फ़ील्ड में आप जो टाइप करते हैं वह कभी नहीं।",
+      "withInternet": "यह पैक {{what}} देख सकता है और {{sites}} तक पहुँच सकता है।"
+    },
     "sourceLabel": "{{name}} से",
     "attribution": {
       "play": "{{name}} ने चलाना शुरू किया",
@@ -452,7 +462,10 @@
       "logPermission": "अनुमति",
       "logRequest": "अनुरोध",
       "logResult": "परिणाम",
-      "logBytes": "बाइट"
+      "logBytes": "बाइट",
+      "input": "इनपुट",
+      "inputLabel": "इनपुट: {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "डेवलपर मोड",

@@ -375,6 +375,16 @@
       "prompterEvents": "वाचताना सध्याच्या स्क्रिप्टचे शीर्षक आणि त्यातील तुमचे स्थान.",
       "filesImport": "अ‍ॅपच्या स्वतःच्या पिकरने एक फाइल निवडायला सांगते आणि फक्त तीच फाइल मिळवते."
     },
+    "input": {
+      "keys": "की {{keys}}",
+      "anyKey": "कोणतीही की",
+      "buttons": "माउस बटणे {{buttons}}",
+      "anyButton": "कोणतेही माउस बटण",
+      "wheel": "माउस व्हील",
+      "position": "पॉइंटरची जागा",
+      "reads": "eyeread.in फोकसमध्ये असताना {{what}} वाचतो, मजकूर फील्डमध्ये तुम्ही टाइप करता ते कधीही नाही.",
+      "withInternet": "हा पॅक {{what}} पाहू शकतो आणि {{sites}} पर्यंत पोहोचू शकतो."
+    },
     "sourceLabel": "{{name}} कडून",
     "attribution": {
       "play": "{{name}} ने प्ले सुरू केले",
@@ -452,7 +462,10 @@
       "logPermission": "परवानगी",
       "logRequest": "विनंती",
       "logResult": "निकाल",
-      "logBytes": "बाइट्स"
+      "logBytes": "बाइट्स",
+      "input": "इनपुट",
+      "inputLabel": "इनपुट: {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "डेव्हलपर मोड",

@@ -173,7 +173,7 @@ Scopes have the same names, and mean the same thing, as pack permissions.
 | ------------------ | ----------------------------------------------------------------------- |
 | `scripts:write`    | Add scripts to the user's library                                       |
 | `prompter:load`    | Open text in the prompter and start a reading session                   |
-| `prompter:control` | Play, pause, restart, seek, or close the prompter                       |
+| `prompter:control` | Play, pause, restart, seek, advance, or close the prompter              |
 | `prompter:events`  | Read the prompter's state (title and position of the script being read) |
 
 Ask for the fewest scopes you need; the user sees every one. No scope can
@@ -279,7 +279,9 @@ Response: `{ "ok": true, "scriptId": "…" }`
 ```
 
 `action` is one of `play`, `pause`, `toggle`, `restart`, `seek` (needs
-`wordIndex`, clamped to the script), or `close`.
+`wordIndex`, clamped to the script), `advance` (needs `words`, a whole number
+of words forward or, if negative, back, at most 10 000, clamped to the script),
+or `close`.
 
 `409 no_active_session` if the prompter isn't open.
 

@@ -61,6 +61,42 @@ describe('PackInstallModal', () => {
     expect(screen.getByText('License: AGPL-3.0-only')).toBeTruthy();
   });
 
+  it('lists the exact keys next to the sites when a pack has both', () => {
+    setup({
+      review: review({
+        permissions: [
+          {
+            permission: 'scripts:write',
+            packs: ['com.example.notion'],
+            network: ['https://api.notion.com'],
+            input: null,
+          },
+          {
+            permission: 'prompter:control',
+            packs: ['com.example.notion'],
+            network: [],
+            input: {
+              keyboard: true,
+              anyKey: false,
+              keys: ['ArrowLeft', 'ArrowRight'],
+              mouse: true,
+              anyButton: false,
+              buttons: [3, 4],
+              wheel: false,
+              position: false,
+              global: false,
+            },
+          },
+        ],
+      }),
+    });
+    const text = screen.getByTestId('pk-install-input').textContent;
+    expect(text).toContain('the keys ArrowLeft, ArrowRight, mouse buttons 3, 4');
+    expect(text).toContain(
+      'This pack can see the keys ArrowLeft, ArrowRight, mouse buttons 3, 4 and reach https://api.notion.com.'
+    );
+  });
+
   it('keeps Install disabled for an unsigned pack until the risks are acknowledged', () => {
     const { install, onInstall } = setup({ review: review() });
     expect(screen.getByText('Not verified')).toBeTruthy();
