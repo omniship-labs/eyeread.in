@@ -76,13 +76,36 @@ beforeEach(() => {
       network: ['https://api.notion.com'],
       allowed: false,
       internet: false,
+      input: null,
+      inputAllowed: false,
     },
-    { permission: 'prompter:control', network: [], allowed: true, internet: false },
+    {
+      permission: 'prompter:control',
+      network: [],
+      allowed: true,
+      internet: false,
+      input: null,
+      inputAllowed: false,
+    },
   ]);
   api.setPackGrant.mockImplementation((id, permission, allowed, internet) =>
     Promise.resolve([
-      { permission: 'scripts:write', network: ['https://api.notion.com'], allowed, internet },
-      { permission: 'prompter:control', network: [], allowed: true, internet: false },
+      {
+        permission: 'scripts:write',
+        network: ['https://api.notion.com'],
+        allowed,
+        internet,
+        input: null,
+        inputAllowed: false,
+      },
+      {
+        permission: 'prompter:control',
+        network: [],
+        allowed: true,
+        internet: false,
+        input: null,
+        inputAllowed: false,
+      },
     ])
   );
   api.getPackSettings.mockResolvedValue({
@@ -145,6 +168,7 @@ describe('PackScreen', () => {
       'com.example.notion',
       'scripts:write',
       true,
+      false,
       false
     );
     await waitFor(() => expect(internet.disabled).toBe(false));
@@ -153,12 +177,60 @@ describe('PackScreen', () => {
       'com.example.notion',
       'scripts:write',
       true,
-      true
+      true,
+      false
     );
 
     // An offline permission has no internet switch at all.
     expect(
       within(row('prompter:control')).queryByRole('switch', { name: /Internet for/ })
+    ).toBeNull();
+  });
+
+  it('draws an Input switch that needs Allow, and says which keys and sites', async () => {
+    const control = {
+      permission: 'prompter:control',
+      network: [],
+      allowed: true,
+      internet: false,
+      input: { keyboard: { keys: ['ArrowLeft', 'ArrowRight'] } },
+      inputAllowed: false,
+    };
+    api.getPackGrants.mockResolvedValue([
+      {
+        permission: 'scripts:write',
+        network: ['https://api.notion.com'],
+        allowed: true,
+        internet: true,
+        input: null,
+        inputAllowed: false,
+      },
+      control,
+    ]);
+    render(<PackScreen pack={installed()} onBack={() => {}} />);
+    await waitFor(() => expect(row('prompter:control')).toBeTruthy());
+    const controls = within(row('prompter:control'));
+    const input = controls.getByRole('switch', { name: 'Input for: Control playback' });
+    expect(input.disabled).toBe(false);
+    // The user is told exactly which keys, and which sites the pack can reach.
+    expect(controls.getByTestId('pk-input-reads').textContent).toContain(
+      'the keys ArrowLeft, ArrowRight'
+    );
+    expect(controls.getByTestId('pk-input-reads').textContent).toContain(
+      'This pack can see the keys ArrowLeft, ArrowRight and reach https://api.notion.com.'
+    );
+
+    fireEvent.click(input);
+    expect(api.setPackGrant).toHaveBeenLastCalledWith(
+      'com.example.notion',
+      'prompter:control',
+      true,
+      false,
+      true
+    );
+    // Permissions that can't carry input have no Input switch.
+    expect(
+      within(row('scripts:write')).queryByRole('switch', { name: /Input for/ })
     ).toBeNull();
   });
 

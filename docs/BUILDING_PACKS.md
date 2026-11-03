@@ -68,13 +68,51 @@ The `id` never changes between versions. Unknown fields are rejected, so the
 manifest means exactly what the user is shown. Every field is in
 [FORMAT.md](../spec/packs/FORMAT.md#packjson).
 
+## Keyboard and mouse
+
+`prompter:control` can also receive the user's keys and mouse, through an
+`input` option. It is off until the user turns it on for the pack.
+
+```json
+"permissions": {
+  "prompter:control": { "input": { "keyboard": { "keys": ["ArrowRight", "ArrowLeft"] } } }
+}
+```
+
+```js
+eyeread.on('prompter:control', ({ prompter, keys }) => {
+  if (!keys) return; // not declared, or the user hasn't allowed input
+  keys.onKey((e) => {
+    if (e.type !== 'down' || e.repeat) return;
+    if (e.code === 'ArrowRight') prompter.advance(1);
+    if (e.code === 'ArrowLeft') prompter.advance(-1);
+  });
+});
+```
+
+Things to know:
+
+- Events are the physical key (`code`), never the character, and only while
+  eyeread.in is focused. Keys pressed in a text field are never delivered.
+- If the pack can also reach the internet, its input has to be **narrow**: at
+  most 8 named keys, at most 3 named mouse buttons, no wheel, no pointer
+  position, focused scope. Otherwise install fails with
+  `PACK_INPUT_PACK_NETWORK`, naming the limit. The same test applies to every
+  pack in a bundle.
+- Input may only drive the prompter. Don't encode it into anything else; see
+  the content policy.
+- Users see the exact keys, and the sites if there are any, before they install
+  and when they turn input on.
+
+Full details are in [`spec/packs/FORMAT.md`](../spec/packs/FORMAT.md#input-keyboard-and-mouse).
+
 ## Permissions
 
 | Permission         | Lets the pack                                                                     |
 | ------------------ | --------------------------------------------------------------------------------- |
 | `scripts:write`    | Add scripts to the library                                                        |
 | `prompter:load`    | Open text in the prompter and start a reading session                             |
-| `prompter:control` | Play, pause, restart, seek or close the prompter                                  |
+| `prompter:control` | Play, pause, restart, seek, advance or close the prompter                         |
 | `prompter:events`  | Read the prompter's state; the script is only described during an active session  |
 | `files:import`     | Ask the user to pick a file with the app's own picker, and receive only that file |
 

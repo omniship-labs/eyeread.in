@@ -65,6 +65,8 @@ declare global {
       restart(): Promise<void>;
       /** Clamped to the script. */
       seek(wordIndex: number): Promise<void>;
+      /** Move by a whole number of words from the current position; negative goes back. At most 10 000. Clamped to the script. */
+      advance(words: number): Promise<void>;
       close(): Promise<void>;
     }
 
@@ -103,6 +105,51 @@ declare global {
       import(options?: ImportOptions): Promise<ImportedFile | null>;
     }
 
+    interface Modifiers {
+      readonly ctrl: boolean;
+      readonly shift: boolean;
+      readonly alt: boolean;
+      readonly meta: boolean;
+    }
+
+    interface KeyEvent {
+      readonly type: 'down' | 'up';
+      /** The physical key, a `KeyboardEvent.code` such as `'KeyA'`. No typed character. */
+      readonly code: string;
+      readonly modifiers: Modifiers;
+      readonly repeat: boolean;
+    }
+
+    interface KeysApi {
+      onKey(callback: (event: KeyEvent) => void): Unsubscribe;
+    }
+
+    interface MouseButtonEvent {
+      readonly type: 'down' | 'up';
+      /** 0 left, 1 middle, 2 right, 3 back, 4 forward. */
+      readonly button: number;
+      readonly modifiers: Modifiers;
+    }
+
+    interface MouseWheelEvent {
+      readonly deltaX: number;
+      readonly deltaY: number;
+      readonly modifiers: Modifiers;
+    }
+
+    interface MouseMoveEvent {
+      readonly x: number;
+      readonly y: number;
+    }
+
+    interface MouseApi {
+      onButton(callback: (event: MouseButtonEvent) => void): Unsubscribe;
+      /** Present only when pack.json sets `wheel: true` and the user allowed input. */
+      onWheel?(callback: (event: MouseWheelEvent) => void): Unsubscribe;
+      /** Present only when pack.json sets `position: true` and the user allowed input. */
+      onMove?(callback: (event: MouseMoveEvent) => void): Unsubscribe;
+    }
+
     type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
     interface NetRequestInit {
@@ -130,14 +177,20 @@ declare global {
 
     interface BaseContext {
       settings: SettingsApi;
-      /** Present only when the permission declares `network` in pack.json. */
+      /** Present only when the permission declares `network` in pack.json. Never in a pack that has input. */
       net?: NetApi;
     }
 
     interface ContextMap {
       'scripts:write': BaseContext & { scripts: ScriptsApi };
       'prompter:load': BaseContext & { prompter: PrompterLoadApi };
-      'prompter:control': BaseContext & { prompter: PrompterControlApi };
+      'prompter:control': BaseContext & {
+        prompter: PrompterControlApi;
+        /** Present only when pack.json declares `input.keyboard` and the user allowed input. */
+        keys?: KeysApi;
+        /** Present only when pack.json declares `input.mouse` and the user allowed input. */
+        mouse?: MouseApi;
+      };
       'prompter:events': BaseContext & { prompter: PrompterEventsApi };
       'files:import': BaseContext & { files: FilesApi };
     }
