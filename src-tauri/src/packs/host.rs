@@ -148,7 +148,7 @@ pub fn csp(base: &str) -> String {
 
 fn random_token() -> String {
     let mut buf = [0u8; 16];
-    getrandom::getrandom(&mut buf).expect("OS random source unavailable");
+    getrandom::fill(&mut buf).expect("OS random source unavailable");
     buf.iter().map(|b| format!("{b:02x}")).collect()
 }
 

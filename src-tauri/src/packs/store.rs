@@ -92,7 +92,7 @@ fn now_ms() -> u64 {
 
 fn random_name() -> String {
     let mut buf = [0u8; 8];
-    getrandom::getrandom(&mut buf).expect("OS random source unavailable");
+    getrandom::fill(&mut buf).expect("OS random source unavailable");
     buf.iter().map(|b| format!("{b:02x}")).collect()
 }
 
