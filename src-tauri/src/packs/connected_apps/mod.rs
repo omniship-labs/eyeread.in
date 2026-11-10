@@ -130,7 +130,7 @@ fn now_ms() -> u64 {
 
 fn random_hex(bytes: usize) -> String {
     let mut buf = vec![0u8; bytes];
-    getrandom::getrandom(&mut buf).expect("OS random source unavailable");
+    getrandom::fill(&mut buf).expect("OS random source unavailable");
     buf.iter().map(|b| format!("{b:02x}")).collect()
 }
 
