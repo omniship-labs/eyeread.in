@@ -74,6 +74,17 @@
   let accepting = true;
   const settingsListeners = new Set();
   const stateListeners = new Set();
+  // Input listeners, by event. A source (keyboard, mouse) is subscribed while
+  // any of its listeners exist.
+  const keyListeners = new Set();
+  const mouseButtonListeners = new Set();
+  const mouseWheelListeners = new Set();
+  const mouseMoveListeners = new Set();
+  const inputSets = {
+    keyboard: [keyListeners],
+    mouse: [mouseButtonListeners, mouseWheelListeners, mouseMoveListeners],
+  };
+  const listenerCount = (source) => inputSets[source].reduce((n, set) => n + set.size, 0);
 
   const settingsApi = Object.freeze({
     get: () => call(null, 'settings.get', {}),
@@ -122,6 +133,21 @@
 
   let init = null;
 
+  /** Add an input listener; the first one subscribes the source, the last unsubscribes. */
+  function onInput(source, set, callback) {
+    if (typeof callback !== 'function')
+      throw new EyereadError('E_INVALID_ARGUMENT', 'callback must be a function');
+    set.add(callback);
+    if (listenerCount(source) === 1)
+      call('prompter:control', 'input.subscribe', { source }).catch((e) =>
+        reportError(e, false)
+      );
+    return () => {
+      if (!set.delete(callback) || listenerCount(source) > 0) return;
+      call('prompter:control', 'input.unsubscribe', { source }).catch(() => {});
+    };
+  }
+
   /** A handler's context: its own permission's API, settings, and net if declared. */
   function contextFor(permission) {
     const c = (method, params) => call(permission, method, params);
@@ -144,7 +170,24 @@
           restart: () => control('restart'),
           close: () => control('close'),
           seek: (wordIndex) => control('seek', { wordIndex }),
+          advance: (words) => control('advance', { words }),
         });
+        // Keyboard and mouse, only in a sandbox the user allowed input for.
+        if (init.sandbox.input?.keyboard) {
+          ctx.keys = Object.freeze({
+            onKey: (callback) => onInput('keyboard', keyListeners, callback),
+          });
+        }
+        if (init.sandbox.input?.mouse) {
+          const mouse = {
+            onButton: (callback) => onInput('mouse', mouseButtonListeners, callback),
+          };
+          if (init.sandbox.input.wheel)
+            mouse.onWheel = (callback) => onInput('mouse', mouseWheelListeners, callback);
+          if (init.sandbox.input.position)
+            mouse.onMove = (callback) => onInput('mouse', mouseMoveListeners, callback);
+          ctx.mouse = Object.freeze(mouse);
+        }
         break;
       case 'prompter:events':
         ctx.prompter = Object.freeze({
@@ -218,12 +261,15 @@
   // ---- events (and heartbeat) ----------------------------------------------------
   function dispatch(message) {
     if (message.type !== 'event') return;
-    const listeners =
-      message.name === 'settings.changed'
-        ? settingsListeners
-        : message.name === 'prompter.state'
-          ? stateListeners
-          : null;
+    const byName = {
+      'settings.changed': settingsListeners,
+      'prompter.state': stateListeners,
+      'input.key': keyListeners,
+      'input.mouse.button': mouseButtonListeners,
+      'input.mouse.wheel': mouseWheelListeners,
+      'input.mouse.move': mouseMoveListeners,
+    };
+    const listeners = Object.hasOwn(byName, message.name) ? byName[message.name] : null;
     for (const callback of listeners ?? []) {
       try {
         callback(message.data);

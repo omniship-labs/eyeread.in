@@ -375,6 +375,16 @@
       "prompterEvents": "El título del guion actual y tu posición en él mientras lees.",
       "filesImport": "Te pide elegir un archivo con el selector de la app y solo recibe ese archivo."
     },
+    "input": {
+      "keys": "las teclas {{keys}}",
+      "anyKey": "cualquier tecla",
+      "buttons": "botones del ratón {{buttons}}",
+      "anyButton": "cualquier botón del ratón",
+      "wheel": "la rueda del ratón",
+      "position": "la posición del puntero",
+      "reads": "Lee {{what}} mientras eyeread.in tiene el foco, nunca lo que escribes en los campos de texto.",
+      "withInternet": "Este pack puede ver {{what}} y acceder a {{sites}}."
+    },
     "sourceLabel": "De {{name}}",
     "attribution": {
       "play": "Reproducción iniciada por {{name}}",
@@ -452,7 +462,10 @@
       "logPermission": "Permiso",
       "logRequest": "Petición",
       "logResult": "Resultado",
-      "logBytes": "Bytes"
+      "logBytes": "Bytes",
+      "input": "Entrada",
+      "inputLabel": "Entrada para: {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "Modo desarrollador",

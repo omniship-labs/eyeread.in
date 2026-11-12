@@ -107,6 +107,30 @@ use: reverse-DNS of a domain you control (`com.example.notion-sync` for
 `example.com`), or `io.github.<your-username>.<pack>` if you don't have one.
 No ids that suggest a company or product you aren't.
 
+### 12. Using input for anything but driving the prompter
+
+A pack that reads the keyboard or mouse (the `input` option of
+`prompter:control`) may use what it reads only to drive the prompter: play,
+pause, move through the script. It must never encode input into anything else.
+That includes script text and titles, seek or advance amounts that don't follow
+from the script, settings, and logs. Moving to the next word is navigation; a
+move whose size is a keystroke is a leak.
+
+- **Ask for the least.** List the `keys` or `buttons` the pack uses, and say in
+  the description which they are. Wheel, pointer position and global scope each
+  need a clear reason in the description.
+- **Input and internet in one pack.** A pack that can reach the internet may
+  read only narrow input: at most 8 named keys, at most 3 named mouse buttons,
+  no wheel, no pointer position, focused only. The installer enforces those
+  limits. Narrow input isn't zero, because the pack can learn when one of its
+  listed keys was pressed. So the keys must be ones the pack needs for its
+  description, and the description must say what the pack sends to its sites.
+- **No relays.** Don't split a pack into two that work together to carry input
+  out: one writes state (a seek position, a title) that the other reads and
+  sends. Packs built to do that are refused, whichever way they're packaged.
+- **No recording.** No logging, storing or buffering of input, and nothing that
+  tries to read what the user types into other apps.
+
 ### Also
 
 We won't verify anything that's illegal, harmful to users (malware, scams,

@@ -79,6 +79,36 @@
       "schema": false,
       "error": "PACK_MANIFEST_SCHEMA"
     },
+    "invalid-input-bundle-network": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_PACK_NETWORK"
+    },
+    "invalid-input-empty": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-input-key-code": {
+      "valid": false,
+      "schema": false,
+      "error": "PACK_MANIFEST_SCHEMA"
+    },
+    "invalid-input-option": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_PERMISSION_OPTION"
+    },
+    "invalid-input-wide-network": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_PACK_NETWORK"
+    },
+    "invalid-input-wide-same-permission": {
+      "valid": false,
+      "schema": true,
+      "error": "PACK_INPUT_PACK_NETWORK"
+    },
     "invalid-main-missing": {
       "valid": false,
       "schema": true,
@@ -202,6 +232,16 @@
       "error": null
     },
     "valid-files-json": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-input": {
+      "valid": true,
+      "schema": true,
+      "error": null
+    },
+    "valid-input-narrow-network": {
       "valid": true,
       "schema": true,
       "error": null

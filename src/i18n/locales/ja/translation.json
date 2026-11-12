@@ -375,6 +375,16 @@
       "prompterEvents": "読んでいる間の現在の原稿のタイトルと読み進めた位置。",
       "filesImport": "アプリのファイル選択でファイルを 1 つ選ぶよう求め、そのファイルだけを受け取ります。"
     },
+    "input": {
+      "keys": "キー {{keys}}",
+      "anyKey": "すべてのキー",
+      "buttons": "マウスボタン {{buttons}}",
+      "anyButton": "すべてのマウスボタン",
+      "wheel": "マウスホイール",
+      "position": "ポインターの位置",
+      "reads": "eyeread.in がフォーカスされている間、{{what}} を読み取ります。テキスト欄への入力内容は読み取りません。",
+      "withInternet": "このパックは {{what}} を見ることができ、{{sites}} に接続できます。"
+    },
     "sourceLabel": "{{name}} から",
     "attribution": {
       "play": "{{name}} が再生を開始しました",
@@ -452,7 +462,10 @@
       "logPermission": "権限",
       "logRequest": "リクエスト",
       "logResult": "結果",
-      "logBytes": "バイト"
+      "logBytes": "バイト",
+      "input": "入力",
+      "inputLabel": "入力: {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "開発者モード",
