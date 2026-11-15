@@ -28,6 +28,8 @@ const APP_COMMANDS: &[&str] = &[
     "packs_net_clear_log",
     "packs_rpc_result",
     "packs_prompter_state",
+    "packs_input_event",
+    "packs_input_wanted",
     "packs_grants",
     "packs_set_grant",
     "packs_settings_get",

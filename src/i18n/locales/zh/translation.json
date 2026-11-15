@@ -375,6 +375,16 @@
       "prompterEvents": "阅读时当前稿件的标题以及你读到的位置。",
       "filesImport": "请你用应用自带的选择器挑一个文件，并且只拿到这个文件。"
     },
+    "input": {
+      "keys": "按键 {{keys}}",
+      "anyKey": "任意按键",
+      "buttons": "鼠标按键 {{buttons}}",
+      "anyButton": "任意鼠标按键",
+      "wheel": "鼠标滚轮",
+      "position": "指针位置",
+      "reads": "在 eyeread.in 处于焦点时读取{{what}}，绝不读取你在文本框中输入的内容。",
+      "withInternet": "此包可以看到{{what}}，并可访问 {{sites}}。"
+    },
     "sourceLabel": "来自 {{name}}",
     "attribution": {
       "play": "{{name}} 开始了播放",
@@ -452,7 +462,10 @@
       "logPermission": "权限",
       "logRequest": "请求",
       "logResult": "结果",
-      "logBytes": "字节"
+      "logBytes": "字节",
+      "input": "输入",
+      "inputLabel": "输入：{{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "开发者模式",

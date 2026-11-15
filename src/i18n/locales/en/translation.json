@@ -375,6 +375,16 @@
       "prompterEvents": "The current script's title and your position in it, as you read.",
       "filesImport": "Asks you to pick a file with the app’s own picker, and receives only that file."
     },
+    "input": {
+      "keys": "the keys {{keys}}",
+      "anyKey": "any key",
+      "buttons": "mouse buttons {{buttons}}",
+      "anyButton": "any mouse button",
+      "wheel": "the mouse wheel",
+      "position": "the pointer position",
+      "reads": "Reads {{what}} while eyeread.in is focused, never what you type into text fields.",
+      "withInternet": "This pack can see {{what}} and reach {{sites}}."
+    },
     "sourceLabel": "From {{name}}",
     "attribution": {
       "play": "Playing, started by {{name}}",
@@ -452,7 +462,10 @@
       "logPermission": "Permission",
       "logRequest": "Request",
       "logResult": "Result",
-      "logBytes": "Bytes"
+      "logBytes": "Bytes",
+      "input": "Input",
+      "inputLabel": "Input for: {{permission}}",
+      "noInput": "—"
     },
     "dev": {
       "title": "Developer mode",
